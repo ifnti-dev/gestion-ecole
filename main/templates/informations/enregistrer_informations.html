@@ -21,13 +21,18 @@
       <form class="container-fluid p-3" action="#" method="POST">
         {% csrf_token %}
 
-        <div class="form-row mb-12">        
-          <div class="col-md-12">
+        <div class="form-row mb-3">        
+          <div class="col-md-6">
             {{ form.enseignant.label_tag }}
             {{ form.enseignant }}
             <span class="text-danger">{{ form.enseignant.errors }}</span>
           </div>
 
+          <div class="col-md-6">
+            {{ form.numeroSecurite.label_tag }}
+            {{ form.numeroSecurite }}
+            <span class="text-danger">{{ form.numeroSecurite.errors }}</span>
+          </div>
         </div>
 
          <div class="form-row mb-3">        
@@ -58,18 +63,6 @@
           </div>
         </div>
 
-         <div class="form-row mb-3">        
-          <div class="col-md-6">
-            {{ form.duree.label_tag }}
-            {{ form.duree }}
-            <span class="text-danger">{{ form.duree.errors }}</span>
-          </div>
-          <div class="col-md-6">
-            {{ form.numeroSecurite.label_tag }}
-            {{ form.numeroSecurite }}
-            <span class="text-danger">{{ form.numeroSecurite.errors }}</span>
-          </div>
-        </div>
         <br>
 
         <button class="btn btn-primary btn-block" type="submit"><i class="fas fa-database"></i> Enrégistrer &nbsp;&nbsp;&nbsp;<span></span></button>

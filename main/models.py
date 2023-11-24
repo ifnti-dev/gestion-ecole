@@ -1113,7 +1113,12 @@ class Information(models.Model):
     niveau = models.CharField(max_length=100, choices=TYPE_CHOISE, verbose_name="Niveau")
     dateDebut = models.DateField(verbose_name="Date de début")
     dateFin = models.DateField(verbose_name="Date de fin")
-    duree = models.CharField(max_length=100, verbose_name="Durée")
+    duree = models.CharField(max_length=100, verbose_name="Durée", default='0')
+
+    def save(self, *args, **kwargs):
+        duree = self.dateFin - self.dateDebut
+        self.duree = duree.days if duree.days > 0 else 0
+        super(Information, self).save(*args, **kwargs)
 
     def __str__(self):
         return str(self.enseignant.nom) + " " + str(self.numeroSecurite) + " " + str(self.discipline.libelle) 

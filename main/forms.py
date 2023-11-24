@@ -338,14 +338,14 @@ class EnseignantForm(forms.ModelForm):
 class InformationForm(forms.ModelForm):
     class Meta:
         model = Information
-        fields = ('enseignant', 'numeroSecurite', 'discipline', 'niveau', 'dateDebut', 'dateFin', 'duree')
+        fields = ('enseignant', 'numeroSecurite', 'discipline', 'niveau', 'dateDebut', 'dateFin')
         widgets = {
            # 'directeur': forms.Select(attrs={'class': 'form-control'}), 
             'enseignant': forms.Select(attrs={'class': 'form-control'}), 
             'discipline': forms.Select(attrs={'class': 'form-control'}), 
             'numeroSecurite': forms.TextInput(attrs={'class': 'form-control'}),
             'niveau': forms.Select(choices=Information.TYPE_CHOISE, attrs={'class': 'form-control'}),
-            'duree': forms.TextInput(attrs={'class': 'form-control'}),
+          #  'duree': forms.TextInput(attrs={'class': 'form-control'}),
             'dateDebut': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'dateFin': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
         }
