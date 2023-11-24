@@ -1,0 +1,59 @@
+{% extends '../index.html' %}
+
+{% block content %}
+
+<style>
+    #etudiant{
+        font-family: Arial, Helvetica, sans-serif;
+        border-collapse: collapse;
+        width: 100%;
+    }
+    #etudiant td,#etudiant th{
+        border: 1px solid #ddd;
+        padding: 8px;
+    }
+    #etudiant tr:nth-child(even){
+        background-color: #e8c1f7;
+    }
+    #etudiant th{
+        padding-top: 12px;
+        padding-bottom: 12px;
+        text-align: left;
+        background-color: #d6eaf8;
+    }
+</style>
+
+<div class="block block-rounded m-5">
+    <div class="block-header p-4">
+        <h3 class="block-title">Détail de l'UE {{ue.libelle}}</h3>
+        <a class="btn btn-sm btn-success" href="{% url 'main:liste_des_ues' %}" style="padding: 8px; float: right; background-color: blue; color: white;"><i class="fas fa-chevron-left fa-lg"></i>
+            Retour</a>
+            </div>
+    <div class="block-content block-content-full">
+                <table id="etudiant">
+            <thead>
+                <tr>
+                    <th class="text-center" style="width: 14%;">Code UE</th>
+                    <th class="text-center" style="width: 20%;">Libelle</th>
+                    <th class="text-center" style="width: 15%;">Crédits</th>
+                    <th class="text-center" style="width: 20%;">Enseignant</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="text-center font-size-sm">{{ue.codeUE}}</td>
+                    <td class="text-center font-size-sm">{{ue.libelle}}</td>
+                    <td class="text-center font-size-sm">{{ue.nbreCredits}}</td>
+                    <td class="text-center font-size-sm">
+                        {% if ue.enseignant %}
+                            {{ue.enseignant}}
+                        {% else %}
+                            pas de prof
+                        {% endif %}                        
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

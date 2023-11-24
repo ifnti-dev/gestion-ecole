@@ -1,0 +1,40 @@
+{% extends '../consulter_historique.html' %}
+
+{% block content %}
+<div class="block block-rounded m-5">
+    <div class="block-header p-4">
+        <h3 class="block-title" style="text-align: center; font-weight: bold;">Liste des étudiants</h3>
+    </div>
+    <div class="block-content block-content-full">
+        <table class="table table-bordered table-striped table-vcenter js-dataTable-full-pagination">
+            <thead>
+                <tr>
+                    <th class="text-center" style="width: 80px;">Matricule</th>
+                    <th class="text-center" style="width: 30%;">Nom & Prénoms</th>
+                    <th class="text-center" style="width: 80px;">Sexe</th>
+                    <th class="text-center" style="width: 15%;">Contact</th>
+                    <th scope="col" class="bg-warning" style="width: 15%;">Afficher</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for etudiant in etudiants %}
+                <tr>
+                    <td class="text-center font-size-sm">{{etudiant.id}}</td>
+                    <td class="text-center font-size-sm">{{etudiant.nom}} {{etudiant.prenom}}</td>
+                    <td class="text-center font-size-sm">{{etudiant.sexe}}</td>
+                    <td class="text-center font-size-sm">{{etudiant.contact}}</td>
+                    <td style="text-align: center;">                                       
+                        <button type="button" class="bs-modal read-book btn btn-sm btn-primary">
+                            <a style="color: blanchedalmond;" href="{% url 'historique:detail_etudiant' selected_annee_id=selected_annee_id id=etudiant.id %}">
+                                <span class="fa fa-eye"></span>                
+                            </a>
+                        </button>
+                         
+                    </td> 
+                </tr>
+                {% endfor%}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

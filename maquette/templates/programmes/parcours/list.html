@@ -1,0 +1,73 @@
+{% extends 'index.html' %}
+{% block content_title %} Parcours du domaine {{ domaine }} {% endblock content_title %}
+{% block content_title_description %} {% endblock content_title_description %}
+{% block content %}
+<div class="block block-rounded">
+        <div class="block-header">
+            <div class="block-title"></div>
+            <a href="{% url 'maquette:add_parcours' domaine.id %}">
+                <button class="btn btn-outline-primary mt-4" id="add">
+                    <i class="fas fa-plus"></i> Ajouter un parcours
+                </button>
+            </a>
+        </div>
+        <div class="block-content block-content-full">
+            <table class="table table-bordered table-striped table-vcenter js-dataTable-full-pagination">
+                <thead>
+                    <tr>
+                        <th class="text-center" style="width: 80px;">Id</th>
+                        <th class="d-none d-sm-table-cell text-center" >Nom</th>
+                        <th class="d-none d-sm-table-cell text-center" >Description</th>
+                        <th style="width: 15%;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for parcours in parcours_list %}
+                    <tr>
+                        <td class="text-center font-size-sm">{{ parcours.id }}</td>
+                        <td class="text-center font-w600 font-size-sm">{{ parcours.nom }}</td>
+                        <td class="text-center font-w600 font-size-sm">{{ parcours.description }}</td>
+                        <td class="text-center">                                       
+                            <a href="{% url 'maquette:semestres_by_parcours' parcours.id %}">
+                                <button type="button" class="update-book btn btn-sm btn-success">
+                                    <span><i class="far fa-eye fa-lg"></i></span>
+                                </button>  
+                            </a>                                      
+                            <a href="{% url 'maquette:edit_parcours' parcours.id %}">
+                                <button type="button" class="update-book btn btn-sm btn-warning">
+                                    <span><i class="far fa-edit fa-lg"></i></span>
+                                </button>  
+                            </a>
+                            <a style="color: blanchedalmond;" href="{% url 'maquette:delete_parcours' parcours.id %}">
+                                <button type="button" class="delete-evaluation btn btn-sm btn-danger">
+                                        <span><i class="fa fa-fw fa-times mr-1"></i></span>
+                                </button>   
+                            </a>                                   
+                        </td> 
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>            
+    </div>
+</div>
+{% endblock content %}
+
+{% block scripts %}
+    <script type="text/javascript">
+        function initForm(id, value, description){
+            $("#id")[0].value = id;
+            $("#id_nom")[0].value = value;
+            $('#id_description')[0].value = description;
+            $('#add')[0].children[1].innerText = "Editer";
+        }
+
+        $(".delete").on('click', function(){
+            response = confirm("Voulez vous vraiment supprimer cet programme ?")
+            if (! response){
+                event.stopPropagation();
+                event.preventDefault();
+            }
+        });
+    </script>
+{% endblock scripts %}

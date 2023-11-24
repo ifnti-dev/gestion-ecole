@@ -1,0 +1,48 @@
+{% extends 'index.html' %}
+{% block content_title %}
+
+Création d'un compte
+
+  <h1>
+     <a href="{% url 'paiement:compte_bancaire' id_annee_selectionnee %}" class="btn btn-outline-warning">
+        <i class="fas fa-chevron-left fa-lg"></i> Retour
+      </a>
+  </h1>
+{% endblock %}
+{% block content_title_description %}
+
+
+{% endblock %}
+{% block content %}
+  <div class="d-flex justify-content-center">
+    <div class="block-content card m-4 col-md-10 col-lg-8 col-xl-6">
+      <div class="d-flex justify-content-between">
+        <h3>         
+        </h3>
+    </div>
+      <form class="container-fluid p-3" action="#" method="POST">
+        {% csrf_token %}
+
+        <br>
+
+        <div class="form-row mb-3">        
+          <div class="col-md-6">
+            {{ form.numero.label_tag }}
+            {{ form.numero }}
+            <span class="text-danger">{{ form.numero.errors }}</span>
+          </div>
+
+          <div class="col-md-6">
+            {{ form.frais_tenue_de_compte.label_tag }}
+            {{ form.frais_tenue_de_compte }}
+            <span class="text-danger">{{ form.frais_tenue_de_compte.errors }}</span>
+          </div>
+        </div>
+
+        <br>
+
+        <button class="btn btn-primary btn-block" type="submit"><i class="fas fa-database"></i> Enrégistrer &nbsp;&nbsp;&nbsp;<span></span></button>
+      </form> 
+    </div>
+  </div>
+{% endblock %}

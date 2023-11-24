@@ -1,0 +1,21 @@
+{% extends '../index.html' %}
+{% load static %}
+{% block content %}
+    <!-- ... (code existant) -->
+    <div class="card-body">
+        <form method="POST" action="{% url 'historique:consulter_historique' %}">
+            {% csrf_token %}
+            <label for="annee_univ">Année universitaire :</label>
+            <select id="annee_univ" name="annee_univ">
+                <option value="">Sélectionner</option>
+                {% for annee_univ in annees_univ %}
+                <option value="{{ annee_univ.id }}">{{ annee_univ.anneeUniv }}</option>
+                {% endfor %}
+            </select>
+            <input type="hidden" name="next" value="{{ current_page }}">
+            <button type="submit">Rechercher</button>
+        </form>
+    </div>
+
+   
+{% endblock %}

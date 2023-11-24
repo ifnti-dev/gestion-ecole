@@ -1,0 +1,90 @@
+{% extends 'index.html' %}
+{% block content_title %}
+
+Enregistrement d'une fiche de paie
+
+  <h1>
+     <a href="{% url 'paiement:liste_fiches_de_paie' id_annee_selectionnee  %}" class="btn btn-outline-warning">
+        <i class="fas fa-chevron-left fa-lg"></i> Retour
+      </a>
+  </h1>
+{% endblock %}
+{% block content_title_description %}
+
+
+{% endblock %}
+{% block content %}
+  <div class="d-flex justify-content-center">
+    <div class="block-content card m-4 col-md-10 col-lg-8 col-xl-6">
+      <div class="d-flex justify-content-between">
+        <h3>         
+        </h3>
+    </div>
+      <form class="container-fluid p-3" action="#" method="POST">
+        {% csrf_token %}
+  
+        <div class="form-row mb-3">
+          <div class="col-md-6">
+            {{ form.dateDebut.label_tag }}
+            {{ form.dateDebut }}
+            <span class="text-danger">{{ form.dateDebut.errors }}</span>
+          </div>
+          <div class="col-md-6">
+            {{ form.dateFin.label_tag }}
+            {{ form.dateFin }}
+            <span class="text-danger">{{ form.dateFin.errors }}</span>
+          </div>
+        </div>
+
+        <div class="form-row mb-3">        
+          <div class="col-md-6">
+            {{ form.enseignant.label_tag }}
+            {{ form.enseignant }}
+            <span class="text-danger">{{ form.enseignant.errors }}</span>
+          </div>
+          <div class="col-md-6">
+            {{ form.matiere.label_tag }}
+            {{ form.matiere }}
+            <span class="text-danger">{{ form.matiere.errors }}</span>
+        </div> 
+        </div>
+
+        <div class="form-row mb-3"> 
+           <div class="col-md-6">
+            {{ form.nombreHeureL1.label_tag }}
+            {{ form.nombreHeureL1 }}
+            <span class="text-danger">{{ form.nombreHeureL1.errors }}</span>
+          </div>
+          <div class="col-md-6">
+            {{ form.nombreHeureL2.label_tag }}
+            {{ form.nombreHeureL2 }}
+            <span class="text-danger">{{ form.nombreHeureL2.errors }}</span>
+          </div>
+        </div>
+
+        <div class="form-row mb-3"> 
+           <div class="col-md-6">
+            {{ form.nombreHeureL3.label_tag }}
+            {{ form.nombreHeureL3 }}
+            <span class="text-danger">{{ form.nombreHeureL3.errors }}</span>
+          </div>
+          <div class="col-md-6">
+            {{ form.prixUnitaire.label_tag }}
+            {{ form.prixUnitaire }}
+            <span class="text-danger">{{ form.prixUnitaire.errors }}</span>
+          </div>
+        </div>
+
+        <div class="form-row mb-3">
+          <div class="col-md-6">
+            {{ form.acomptes.label_tag }}
+            {{ form.acomptes }}
+            <span class="text-danger">{{ form.acomptes.errors }}</span>
+          </div>    
+        </div>
+
+        <button class="btn btn-primary btn-block" type="submit"><i class="fas fa-database"></i> Enrégistrer &nbsp;&nbsp;&nbsp;<span></span></button>
+      </form> 
+    </div>
+  </div>
+{% endblock %} 

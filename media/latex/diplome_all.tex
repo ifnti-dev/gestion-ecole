@@ -1,0 +1,102 @@
+\documentclass[a4paper, landscape, 10pt]{article}
+\usepackage[french]{babel}
+\usepackage[OT1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[none]{hyphenat}
+\usepackage[bottom=0cm, top=3.5cm, left=2cm, right=2cm]{geometry}
+\usepackage{fancyhdr}
+\usepackage{eso-pic, graphicx}
+
+\graphicspath{ {\VAR{image_path}} }
+\newcommand\BackgroundPic{
+\put(-4,0){
+\parbox[b][\paperheight]{\paperwidth}{
+\includegraphics[width=\paperwidth,height=\paperheight]{fond_diplome_haut}
+}}}
+
+
+
+\date{}
+\pagestyle{fancyplain}
+\cfoot{\vspace{-2.5cm} \small Agrément N\textdegree2019/064/MESR/SG/DES\\300 BP 40, Sokodé TOGO \hspace{0.5cm} www.ifnti.com \hspace{0.5cm} +228 90 91 81 41  \hspace{0.5cm} contact@ifnti.org \hspace{0.5cm}}
+\renewcommand{\headrulewidth}{0pt}
+
+
+
+\begin{document}
+
+\BLOCK{for etudiant in etudiants}
+
+\AddToShipoutPicture*{\BackgroundPic}
+
+\vspace{-4.5cm}
+%\hspace{4cm}
+
+\begin{center}
+\large
+MINISTÈRE DE L'ENSEIGNEMENT SUPÉRIEUR\\
+ET DE LA RECHERCHE\\
+\vspace{0.5cm}
+INSTITUT DE FORMATION AUX NORMES ET\\
+TECHNOLOGIES DE L'INFORMATIQUE\\
+\vspace{0.5cm}
+\LARGE
+\textbf{DIPLÔME\\
+DE LICENCE PROFESSIONNELLE}\\
+\end{center}
+\vspace{0.5cm}
+\noindent
+Vu la loi n\textdegree2017-005 du 19 juin 2017 portant orientation de l’enseignement supérieur et de la recherche ;\\
+Vu l’ordonnance n\textdegree16 du 06 mai 1975 portant réforme de l’enseignement au Togo ;\\
+Vu le décret n\textdegree2008-066/PR du 21 juillet 2008 instituant le système LMD dans l’enseignement supérieur au Togo ;\\
+Vu le décret n\textdegree2012-008/PR du 07 mars 2012 portant organisation des départements ministériels ;\\
+Vu l'arrêté ministériel n\textdegree2019/064/MESR/SG/DES du 03 juin 2019 portant renouvellement d'agrément de l'Institut de Formation aux Normes et Technologies de l’Informatique de Sokodé ;\\
+Vu les pièces justificatives produites par \textbf{\BLOCK{if etudiant.sexe == 'F'}Madame\BLOCK{endif} \BLOCK{if etudiant.sexe == 'M'}Monsieur\BLOCK{endif} \BLOCK{if etudiant.sexe == 'F'}née\BLOCK{endif}\BLOCK{if etudiant.sexe =='M'}né\BLOCK{endif} le \VAR{etudiant.datenaissance}} en vue de son inscription au parcours Licence ;\\
+Vu le procès-verbal en date du 20-10-2022 \hspace{0.15cm}du conseil académique attestant que l'intéressé\BLOCK{if etudiant.sexe == 'F'}e\BLOCK{endif} a satisfait au contrôle des compétences prévues par le programme de formation ;\\
+
+\noindent
+Le diplôme de Licence professionnelle en Sciences informatiques,\\
+est délivré à \textbf{\BLOCK{if etudiant.sexe == 'F'}Madame\BLOCK{endif} \BLOCK{if etudiant.sexe == 'M'}Monsieur\BLOCK{endif} \VAR{etudiant.nom} \VAR{etudiant.prenom}} au titre de l'année académique 2022-2023\\
+et lui confère le \textbf{GRADE DE LICENCE PROFESSIONNELLE} en \textbf{SCIENCES INFORMATIQUES},\\
+Spécialité : \textbf{INFORMATIQUE DES ORGANISATIONS}\\
+
+Fait à Sokodé, le 20-12-2023 \\
+
+\vspace{0.5cm}
+
+
+\noindent
+\begin{minipage}{0.49\textwidth}
+	\begin{center}
+		\BLOCK{if etudiant.sexe == 'F'}la titulaire\BLOCK{endif}\BLOCK{if etudiant.sexe == 'M'}le titulaire\BLOCK{endif}\\
+		\vspace{2cm}
+		\VAR{etudiant.nom} \VAR{etudiant.prenom}
+	\end{center}
+\end{minipage}\hfill
+\begin{minipage}{0.49\textwidth}
+	\begin{center}
+		Le responsable d'établissement\\
+		\vspace{2cm}
+		Mohamed Sabirou TEOURI
+	\end{center}
+\end{minipage}
+
+\vspace{1.5cm}
+\noindent
+N\textdegree \VAR{etudiant.id}
+
+
+\newpage
+
+
+\vspace{-10cm}
+\begin{center}
+	Pour vérifier l’authenticité de ce document, veuillez contacter l’IFNTI,
+	ou le service homologation des diplômes du Ministère de l’Enseignement Supérieur et de la Recherche.
+\end{center}
+
+\newpage
+
+\BLOCK{endfor}
+
+\end{document}

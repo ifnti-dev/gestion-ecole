@@ -1,0 +1,38 @@
+{% extends '../index.html' %}
+
+{% block content %}
+
+<div class="block block-rounded m-5">
+    <div class="block-header p-4">
+        <h3 class="block-title">Bulletins de paye</h3>  
+    </div>
+
+    <div class="block-content block-content-full">
+        <table class="table table-bordered table-striped table-vcenter js-dataTable-full-pagination">
+            <thead>
+                <tr>
+                    <th class="text-center" style="width: 15%;">Personnel</th>
+                    <th class="text-center" style="width: 15%;">Qualification</th>
+                    <th class="text-center" style="width: 15%;">Période</th>
+                    <th class="text-center" style="width: 15%;">Salaire de base</th>
+                    <th class="text-center" style="width: 15%;">Net à payer</th>
+                    <th class="text-center" style="width: 15%;">Retenu cnss salarié</th>
+                    <th class="text-center" style="width: 15%;">Retenu cnss employeur</th>
+                </tr>
+            </thead> 
+            <tbody>
+                <tr>
+                    <td class="text-center font-size-sm">{{ bulletin.personnel.nom }} {{ bulletin.personnel.prenom }}</td>
+                    <td class="text-center font-size-sm">{{ bulletin.qualification_professionnel }}</td>
+                    <td class="text-center font-size-sm">Du {{ bulletin.date_debut}} au {{ bulletin.date_fin}}</td>
+                    <td class="text-center font-size-sm">{{ bulletin.personnel.salaireBrut }} FCFA</td>                
+                    <td class="text-center font-size-sm">{{ bulletin.salaire_net_a_payer }} FCFA</td>    
+                    <td class="text-center font-size-sm">{{ retenues_cnss_personnel }} FCFA</td>                            
+                    <td class="text-center font-size-sm">{{ retenues_cnss_employeur }} FCFA</td>                            
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,28 @@
+version: "3"
+
+services:
+  ifnti_nginx:
+    container_name: web
+    build: ./nginx/
+    restart: always
+    ports:
+      - "81:80"
+    depends_on:
+      - ifnti_app
+    links:
+      - ifnti_app
+    volumes:
+      - data:/app
+    # labels:
+    #   - traefik.http.routers.ifnti_app.rule=Path(`/`)
+
+  ifnti_app:
+    container_name: ifnti_app
+    build: ./ifnti_app/
+    restart: always
+    volumes:
+      - data:/app/ifnti/projet_ifnti/static/
+    extra_hosts:
+      - "host_localhost:192.168.60.62"
+volumes:
+  data:

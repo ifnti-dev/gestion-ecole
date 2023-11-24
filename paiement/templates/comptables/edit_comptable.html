@@ -1,0 +1,18 @@
+{% extends '../index.html' %}
+
+{% block content %}
+<div class="block block-rounded m-5">
+    <div class="block-header">
+        <h3 class="block-title">Editer un comptable</h3>
+    </div>
+    <div class="block-content block-content-full">
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Modifier</button>
+        </form>
+    </div>
+
+
+</div>
+{% endblock %}

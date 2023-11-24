@@ -1,0 +1,113 @@
+{% load static %}
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+
+        <title>PASSWORD UPDATE</title>
+        <link rel="stylesheet" href="{% static  'assets/css/oneui.css' %}">
+        <link rel="shortcut icon" href="{% static 'assets/media/favicons/favicon.png' %}">
+        <link rel="icon" type="image/png" sizes="192x192" href="{% static 'assets/media/favicons/favicon-192x192.png' %}">
+        <link rel="apple-touch-icon" sizes="180x180" href="{% static 'assets/media/favicons/apple-touch-icon-180x180.png' %}">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+        <link rel="stylesheet" id="css-main" href="{% static 'assets/css/oneui.min.css' %}">
+
+
+    </head>
+    <body>
+        <script type="text/javascript">
+            window.onload = function() {
+                var notify = JSON.parse('{{ notify | escapejs }}');
+                var formData = JSON.parse('{{ formData | escapejs }}');
+                console.log(notify);
+                if (notify === "succes") {
+                    console.log('gg');
+                    $.ajax('https://api.emailjs.com/api/v1.0/email/send', {
+                        type: 'POST',
+                        data: JSON.stringify(formData),
+                        contentType: 'application/json'
+                    }).done(function() {
+                        alert('Your mail is sent!');
+                    }).fail(function(error) {
+                        alert('Oops... ' + JSON.stringify(error));
+                    });
+                }
+            }
+        </script>
+        <main id="main-container"  style="background-image: url('{% static '/assets/media/ifnti_background.jpeg' %}');">
+            <!-- Page Content -->
+            <div class="hero-static d-flex align-items-center">
+                <div class="w-100">
+                    <div class="">
+                        <div class="content content-full">
+                            <div class="row justify-content-center">
+                                <div class="col-md-8 col-lg-6 col-xl-4 py-4 px-4 bg-white">
+                                    <div class="text-center">
+                                        <p class="mb-2">
+                                            <i class="fa fa-2x fa-circle-notch text-primary"></i>
+                                        </p>
+                                        <h1 class="h4 mb-1">
+                                            Recuperation de Mot de Passe
+                                        </h1>
+                                        <h2 class="h6 font-w400 text-muted mb-3">
+                                            Veuillez entrer votre username
+                                        </h2>
+                                    </div>
+                                    <form  action="{% url 'main:reminder' %}" method="POST">
+                                        {% csrf_token %}
+                                        <div class="form-group py-3">
+                                            <input type="text" class="form-control form-control-lg form-control-alt" id="username" name="username" placeholder="Username">
+                                        </div>
+                                        {% if notification %}
+                                            {% if notification.type == "erreur" %}
+                                                <div class="alert alert-danger alert-dismissable" role="alert">
+                                            {% elif notification.type == "succes" %}
+                                                <div class="alert alert-success alert-dismissable" role="alert">
+                                            {% else %}
+                                                <div class="alert alert-primary alert-dismissable" role="alert">
+                                            {% endif %}
+                                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                                <p class="mb-0">{{notification.message}}</p>
+                                            </div>
+                                        {% endif %}
+                                        <div class="form-group row justify-content-center">
+                                            <div class="col-md-6 col-xl-5">
+                                                <button type="submit" class="btn btn-block btn-primary">
+                                                    <i class="fa fa-fw fa-envelope mr-1"></i> Envoyer Mail
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </form>
+
+                                    <div class="text-center">
+                                        <a class="font-size-sm font-w500" href="{% url 'main:connexion' %}">Connexion ?</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- END Reminder Section -->
+
+                    <!-- Footer -->
+                    <div class="font-size-sm text-center text-muted py-3">
+                        <strong>OneUI 4.7</strong> &copy; <span data-toggle="year-copy"></span>
+                    </div>
+                    <!-- END Footer -->
+                </div>
+            </div>
+            <!-- END Page Content -->
+        </main>
+</div></body>
+
+
+
+<script src="{% static 'assets/js/oneui.core.min.js' %}"></script>
+<script src="{% static 'assets/js/oneui.app.min.js' %}"></script>
+
+
+
+{% block scripts %}{% endblock scripts %}
+
+</html>

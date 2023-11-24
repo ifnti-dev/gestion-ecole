@@ -1,0 +1,122 @@
+{% extends '../index.html' %}
+{% load static %} 
+{% block title %}Chat room for "{{ course.title }}"{% endblock %}
+{% block content %}
+
+{{ course.id|json_script:"course-id" }}
+{{ request.user.username|json_script:"request-user" }}
+<style>
+#chat-room {
+    height: 100%;
+}
+
+#chat {
+    height: calc(100% - 50px);  /* 50px pour la hauteur de chat-input */
+    overflow-y: auto;  /* Ajoutez une barre de défilement vertical si nécessaire */
+}
+
+#chat-input {
+    height: 50px;
+}
+
+
+
+
+#main {
+  height: 400px; /* Hauteur fixe souhaitée pour le conteneur principal */
+  overflow: hidden;
+  display: flex;
+  align-items: center; /* Centrer le contenu verticalement */
+}
+
+.tab-content {
+  height: 100%;
+  overflow-y: auto;
+}
+
+/* ... Vos autres styles ... */
+
+.message {
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+}
+
+.message.left {
+  background-color: #e0e0e0;
+}
+
+.message.right {
+  background-color: #4caf50;
+  color: white;
+  text-align: right;
+}
+
+</style>
+
+<main id="main">
+  <div class="content">
+      <div class="block block-rounded">
+          <ul class="nav nav-tabs nav-tabs-block" data-toggle="tabs" role="tablist">
+              <li class="nav-item">
+                  <a class="nav-link active" href="#btabs-static-home">{{ group_name }}</a>
+              </li>
+              <li class="nav-item">
+                  <a class="nav-link" href="#btabs-static-profile">Info</a>
+              </li>
+              <li class="nav-item ml-auto">
+                  <a class="nav-link" href="#btabs-static-settings">
+                      <i class="si si-settings"></i>
+                  </a>
+              </li>
+          </ul>
+          <div class="block-content tab-content">
+              <div class="tab-pane active" id="btabs-static-home" role="tabpanel">
+                <div id="chat-room">
+                  <div class="chat-header">
+                      <h2></h2>
+                  </div>
+                  <div id="chat">
+                    {% for message in group_messages %}
+                        {% if message.user != request.user or not loop.first %}
+                            <div class="message {% if message.user == request.user %}right{% else %}left{% endif %}">
+                                {% if not message.user == request.user %}
+                                    <div class="username">
+                                      <strong>{{ message.user.username }}</strong> : <em>{{ message.user.first_name }}&nbsp;{{ message.user.last_name }}</em>
+                                    </div>
+                                {% endif %}
+                                <div class="message-content">
+                                    <div class="large-text">{{ message.content }}</div>
+                                    <div class="small-text">
+                                        {{ message.timestamp|date:"F j, Y, g:i a" }}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                
+                  <div id="chat-input">
+                      <input id="chat-message-input" type="text">
+                      <input id="chat-message-submit" type="submit" value="Send">
+                  </div>
+              </div>
+
+              </div>
+              <div class="tab-pane" id="btabs-static-profile" role="tabpanel">
+                  <h4 class="font-w400">Info Content</h4>
+                  <p>...</p>
+              </div>
+              <div class="tab-pane" id="btabs-static-settings" role="tabpanel">
+                  <h4 class="font-w400">Settings Content</h4>
+                  <p>...</p>
+              </div>
+          </div>
+      </div>
+      
+  </div>
+</main>
+
+<script type="text/javascript" src="{% static 'room.js' %}"></script>
+
+{% endblock %}

@@ -1,0 +1,52 @@
+{% extends '../consulter_historique.html' %}
+
+{% block content %}
+<div class="block block-rounded">
+    <div class="block-header" style="text-align: center;">
+        <h3 class="block-title">Détails d'un enseignant</h3>
+    </div>
+    <div class="block-content block-content-full">
+        <table class="table table-bordered table-striped table-vcenter">
+            <thead>
+                <tr>
+                    <th class="text-center" style="width: 30%;">Nom & Prénom</th>
+                    <th class="text-center" style="width: 80px;">Sexe</th>
+                    <th class="text-center" style="width: 15%;">Date Naissance</th>
+                    <th class="text-center" style="width: 15%;">Lieu Naissance</th>
+                    <th class="text-center" style="width: 15%;">Contact</th>
+                    <th class="text-center" style="width: 15%;">Email</th>
+                    <th class="text-center" style="width: 15%;">Adresse</th>
+                    <th class="text-center" style="width: 15%;">Préfecture</th>
+                    <th class="text-center" style="width: 15%;">Nationalité</th>
+                    <th class="text-center" style="width: 15%;">Type</th>
+                    <th class="text-center" style="width: 15%;">Specialité</th>
+                    <th class="text-center" style="width: 15%;">Salaire Brut</th>
+                    <th class="text-center" style="width: 15%;">Nbre Jrs Congés Restant</th>
+                    <th class="text-center" style="width: 15%;">Nbre Jrs Consommé</th>
+                    
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="text-center font-size-sm">{{enseignant.nom}} {{enseignant.prenom}}</td>
+                    <td class="text-center font-size-sm">{{enseignant.sexe}}</td>
+                    <td class="text-center font-size-sm">{{enseignant.datenaissance}}</td>
+                    <td class="text-center font-size-sm">{{enseignant.lieunaissance}}</td>
+                    <td class="text-center font-size-sm">{{enseignant.contact}}</td>
+                    <td class="text-center font-size-sm">{{enseignant.email}}</td>
+                    <td class="text-center font-size-sm">{{enseignant.adresse}}</td>
+                    <td class="text-center font-size-sm">{{enseignant.prefecture}}</td>
+                    <td class="text-center font-size-sm">{{enseignant.nationalite}}</td>
+                    <td class="text-center font-size-sm">{{enseignant.type}}</td>
+                    <td class="text-center font-size-sm">{{enseignant.specialite}}</td>
+                    <td class="text-center font-size-sm">{{enseignant.salaireBrut}}</td>
+                    <td class="text-center font-size-sm">{{enseignant.nbreJrsCongesRestant}}</td>
+                    <td class="text-center font-size-sm">{{enseignant.nbreJrsConsomme}}</td>
+
+            </tbody>
+        </table>
+    </div>
+
+
+</div>
+{% endblock %}

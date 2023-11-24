@@ -1,0 +1,615 @@
+{% load static %}
+<nav id="sidebar" aria-label="Main Navigation">
+    <!-- Side Header -->
+    <div class="content-header primary-bg">
+        <!-- Logo -->
+        <a class="font-w600 text-white" href="{% url 'main:index' %}">
+            <span class="smini-visible bg-white">
+                <img src="/media/assets/logo-purge.png" alt="" width="24px">     
+            </span>
+            <span class="smini-hide font-size-h5 tracking-wider"> IFNTI </span>
+        </a>
+    </div>
+
+    <div class="js-sidebar-scroll primary-bg-glace">
+        <!-- Side Navigation -->
+        <div class="content-side">
+            <ul class="nav-main">
+                <li class="nav-main-item">
+                    <a class="nav-main-link active" href="/">
+                        <i class="nav-main-link-icon si si-speedometer"></i>
+                        <span class="nav-main-link-name">Dashboard</span>
+                    </a>
+                </li>
+                
+                {% if is_comptable %}
+                <li class="nav-main-heading text-white">Etudiants</li>
+
+                <li class="nav-main-item">
+                    <a
+                        class="nav-main-link"
+                        href="{% url 'main:etudiants' %}"
+                    >
+                        <i class="nav-main-link-icon si si-energy"></i>
+                        <span class="nav-main-link-name text-capitalize"
+                            >Étudiants</span
+                        >
+                    </a>
+                </li>
+
+                <li class="nav-main-item">
+                    <a
+                        class="nav-main-link"
+                        href="{% url 'main:liste_des_tuteurs' %}"
+                    >
+                        <i class="nav-main-link-icon si si-energy"></i>
+                        <span class="nav-main-link-name text-capitalize"
+                            >Tuteurs</span
+                        >
+                    </a>
+                </li>
+               
+                <li class="nav-main-item">
+                    <a
+                        class="nav-main-link"
+                        href="{% url 'main:enseignants' %}"
+                    >
+                        <i class="nav-main-link-icon si si-energy"></i>
+                        <span class="nav-main-link-name text-capitalize"
+                            >Enseignants</span
+                        >
+                    </a>
+                </li>
+
+                <li class="nav-main-item">
+                    <a
+                        class="nav-main-link"
+                        href="{% url 'paiement:comptable_list' id_annee_selectionnee %}"
+                    >
+                        <i class="nav-main-link-icon si si-energy"></i>
+                        <span class="nav-main-link-name text-capitalize"
+                            >Comptables</span
+                        >
+                    </a>
+                </li>
+                
+                <li class="nav-main-heading text-white">paiements</li>
+
+                <li class="nav-main-item">
+                    <a
+                        class="nav-main-link"
+                        href="{% url 'paiement:liste_frais' id_annee_selectionnee %}"
+                    >
+                        <i class="nav-main-link-icon si si-energy"></i>
+                        <span class="nav-main-link-name text-capitalize"
+                            >Enregistrer frais</span
+                        >
+                    </a>
+                </li>
+
+                <li class="nav-main-item">
+                    <a
+                        class="nav-main-link"
+                        href="{% url 'paiement:liste_paiements' id_annee_selectionnee %}"
+                    >
+                        <i class="nav-main-link-icon si si-energy"></i>
+                        <span class="nav-main-link-name text-capitalize"
+                            >Frais scolaires</span
+                        >
+                    </a>
+                </li>
+                <li class="nav-main-item">
+                    <a
+                        class="nav-main-link"
+                        href="{% url 'paiement:bulletins_de_paye' id_annee_selectionnee %}"
+                    >
+                        <i class="nav-main-link-icon si si-energy"></i>
+                        <span class="nav-main-link-name text-capitalize"
+                            >Bulletin de paie</span
+                        >
+                    </a>
+                </li>
+
+                <li class="nav-main-item">
+                    <a
+                        class="nav-main-link"
+                        href="{% url 'paiement:liste_fiches_de_paie' id_annee_selectionnee %}"
+                    >
+                        <i class="nav-main-link-icon si si-energy"></i>
+                        <span class="nav-main-link-name text-capitalize"
+                            >Fiche de paie</span
+                        >
+                    </a>
+                </li>
+
+                <li class="nav-main-item">
+                    <a
+                        class="nav-main-link"
+                        href="{% url 'paiement:liste_fiches_de_prise_en_charge' id_annee_selectionnee %}"
+                    >
+                        <i class="nav-main-link-icon si si-energy"></i>
+                        <span class="nav-main-link-name text-capitalize"
+                            >Fiche de prise en charge</span
+                        >
+                    </a>
+                </li>
+
+                 <li class="nav-main-item">
+                    <a
+                        class="nav-main-link"
+                        href="{% url 'paiement:liste_paiements_fournisseurs' id_annee_selectionnee %}"
+                    >
+                        <i class="nav-main-link-icon si si-energy"></i>
+                        <span class="nav-main-link-name text-capitalize"
+                            >Fournisseurs</span
+                        >
+                    </a>
+                </li>
+
+                <li class="nav-main-heading text-white">Compte bancaire</li>
+
+                <li class="nav-main-item">
+                    <a
+                        class="nav-main-link"
+                        href="{% url 'paiement:compte_bancaire' id_annee_selectionnee %}"
+                    >
+                        <i class="nav-main-link-icon si si-energy"></i>
+                        <span class="nav-main-link-name text-capitalize"
+                            >Solde bancaire</span
+                        >
+                    </a>
+                </li>
+
+                <li class="nav-main-heading text-white">Congés</li> 
+
+                <li class="nav-main-item">
+                    <a
+                        class="nav-main-link"
+                        href="{% url 'conges:liste_mes_conges' id_annee_selectionnee %}"
+                    >
+                        <i class="nav-main-link-icon si si-energy"></i>
+                        <span class="nav-main-link-name text-capitalize"
+                            >Afficher</span
+                        >
+                    </a>
+                </li>
+
+
+                {% endif %} 
+
+
+
+
+                {% if is_secretaire %}
+                <li class="nav-main-heading text-white">Etudiants</li>
+
+                <li class="nav-main-item text-white">
+                    <a
+                        class="nav-main-link"
+                        href="{% url 'main:etudiants' %}"
+                    >
+                        <i class="nav-main-link-icon si si-energy"></i>
+                        <span class="nav-main-link-name text-capitalize"
+                            >Étudiants</span
+                        >
+                    </a>
+                </li>
+
+                <li class="nav-main-item">
+                    <a
+                        class="nav-main-link"
+                        href="{% url 'main:liste_des_tuteurs' %}"
+                    >
+                        <i class="nav-main-link-icon si si-energy"></i>
+                        <span class="nav-main-link-name text-capitalize"
+                            >Tuteurs</span
+                        >
+                    </a>
+                </li>
+                <li class="nav-main-item">
+                    <a
+                        class="nav-main-link"
+                        href="{% url 'main:liste_des_etudiants_suspendu' %}"
+                    >
+                        <i class="nav-main-link-icon si si-energy"></i>
+                        <span class="nav-main-link-name text-capitalize"
+                            >Etudiants suspendus</span
+                        >
+                    </a>
+                </li>
+                {% endif %} 
+
+                {% if is_directeur_des_etudes %}
+
+                <li class="nav-main-heading text-white">Etudiants</li>
+
+                <li class="nav-main-item">
+                    <a
+                        class="nav-main-link"
+                        href="{% url 'main:etudiants' %}"
+                    >
+                        <i class="nav-main-link-icon si si-energy"></i>
+                        <span class="nav-main-link-name text-capitalize"
+                            >Liste des Étudiants</span
+                        >
+                    </a>
+                </li>
+
+                <li class="nav-main-item">
+                    <a
+                        class="nav-main-link"
+                        href="{% url 'main:liste_etudiants_par_semestre' id_annee_selectionnee %}"
+                    >
+                        <i class="nav-main-link-icon si si-energy"></i>
+                        <span class="nav-main-link-name text-capitalize"
+                            >Passage étudiants</span
+                        >
+                    </a>
+                </li>
+
+               
+
+                <li class="nav-main-item">
+                    <a
+                        class="nav-main-link"
+                        href="{% url 'main:liste_des_tuteurs' %}"
+                    >
+                        <i class="nav-main-link-icon si si-energy"></i>
+                        <span class="nav-main-link-name text-capitalize"
+                            >Tuteurs</span
+                        >
+                    </a>
+                </li>
+                <li class="nav-main-item">
+                    <a
+                        class="nav-main-link"
+                        href="{% url 'main:liste_des_etudiants_suspendu' %}"
+                    >
+                        <i class="nav-main-link-icon si si-energy"></i>
+                        <span class="nav-main-link-name text-capitalize"
+                            >Etudiants suspendus</span
+                        >
+                    </a>
+                </li>
+                {% endif %} 
+                {% if is_etudiant or is_enseignant %}
+                <li class="nav-main-heading text-white">Classe</li>
+                <li class="nav-main-item">
+                    <a
+                        class="nav-main-link"
+                        href="{% url 'main:etudiants' %}"
+                    >
+                        <i class="nav-main-link-icon si si-energy"></i>
+                        <span class="nav-main-link-name text-capitalize"
+                            >Étudiants</span
+                        >
+                    </a>
+                </li>
+                <li class="nav-main-item">
+                    <a
+                        class="nav-main-link"
+                        href="{% url 'main:enseignants' %}"
+                    >
+                        <i class="nav-main-link-icon si si-energy"></i>
+                        <span class="nav-main-link-name text-capitalize"
+                            >Enseignants</span
+                        >
+                    </a>
+                </li> 
+                
+                <li class="nav-main-item">
+                    <a
+                        class="nav-main-link"
+                        href="{% url 'main:ues' %}">
+                        <i class="nav-main-link-icon si si-energy"></i>
+                        <span class="nav-main-link-name text-capitalize"
+                            >Ues</span
+                        >
+                    </a>
+                </li>
+                
+                <li class="nav-main-item">
+                    <a
+                        class="nav-main-link"
+                        href="{% url 'main:matieres_etudiant' %}"
+                    >
+                        <i class="nav-main-link-icon si si-energy"></i>
+                        <span class="nav-main-link-name text-capitalize"
+                            >Matières</span
+                        >
+                    </a>
+                </li>
+                {% endif %}
+                <li class="nav-main-heading text-white">Cahier de text</li>
+                <li class="nav-main-item">
+                    <a
+                        class="nav-main-link"
+                        href="{% url 'cahier_de_texte:cahier_de_text' %}"
+                    >
+                        <i class="nav-main-link-icon si si-energy"></i>
+                        <span class="nav-main-link-name text-capitalize"
+                            >Afficher</span
+                        >
+                    </a>
+                </li>
+                {% if is_etudiant %}
+                <li class="nav-main-item">
+                    <a
+                        class="nav-main-link"
+                        href="{% url 'cahier_de_texte:enregistrer_seance' %}"
+                    >
+                        <i class="nav-main-link-icon si si-energy"></i>
+                        <span class="nav-main-link-name text-capitalize"
+                            >Enregistrer une séance</span
+                        >
+                    </a>
+                </li>
+                <li class="nav-main-item">
+                    <a
+                        class="nav-main-link"
+                        href="{% url 'cahier_de_texte:liste_seance_etudiant' %}"
+                    >
+                        <i class="nav-main-link-icon si si-energy"></i>
+                        <span class="nav-main-link-name text-capitalize"
+                            >Séances enregistrées</span
+                        >
+                    </a>
+                </li>
+                {% elif is_enseignant %}
+                <li class="nav-main-item">
+                    <a
+                        class="nav-main-link"
+                        href="{% url 'cahier_de_texte:liste_seance' %}"
+                    >
+                        <i class="nav-main-link-icon si si-energy"></i>
+                        <span class="nav-main-link-name text-capitalize"
+                            >Séances</span
+                        >
+                    </a>
+                </li>
+
+                <li class="nav-main-heading text-white">Congés</li> 
+                <li class="nav-main-item">
+                    <a
+                        class="nav-main-link"
+                        href="{% url 'conges:liste_mes_conges' id_annee_selectionnee %}"
+                    >
+                        <i class="nav-main-link-icon si si-energy"></i>
+                        <span class="nav-main-link-name text-capitalize"
+                            >Afficher</span
+                        >
+                    </a>
+                </li>
+                {% endif %}
+                <li class="nav-main-heading text-white">Programmes</li>
+                <li class="nav-main-item">
+                    <a
+                        class="nav-main-link"
+                        href="{% url 'maquette:' id_annee_selectionnee %}"
+                    >
+                        <i class="nav-main-link-icon si si-energy"></i>
+                        <span class="nav-main-link-name text-capitalize"
+                            >Afficher maquette</span
+                        >
+                    </a>
+                </li>
+                {% if is_directeur_des_etudes %}
+                <li class="nav-main-item">
+                    <a
+                        class="nav-main-link"
+                        href="{% url 'maquette:programmes' id_annee_selectionnee %}"
+                    >
+                        <i class="nav-main-link-icon si si-energy"></i>
+                        <span class="nav-main-link-name text-capitalize"
+                            >Gestion maquette</span
+                        >
+                    </a>
+                </li>
+                <li class="nav-main-item">
+                    <a
+                        class="nav-main-link"
+                        href="{% url 'main:affectation_matieres_professeur'  %}"
+                    >
+                        <i class="nav-main-link-icon si si-energy"></i>
+                        <span class="nav-main-link-name text-capitalize"
+                            >Affectation Matieres</span
+                        >
+                    </a>
+                </li>
+                <li class="nav-main-item">
+                    <a
+                        class="nav-main-link"
+                        href="{% url 'main:affectation_ues_professeur'  %}"
+                    >
+                        <i class="nav-main-link-icon si si-energy"></i>
+                        <span class="nav-main-link-name text-capitalize"
+                            >Affectation Ues</span
+                        >
+                    </a>
+                </li>
+                {% endif %}
+                {% if is_directeur_des_etudes or is_secretaire %}
+                <li class="nav-main-heading text-white">Semestres</li>
+                <li class="nav-main-item">
+                    <a
+                        class="nav-main-link"
+                        href="{% url 'main:ues' %}"
+                    >
+                        <i class="nav-main-link-icon si si-energy"></i>
+                        <span class="nav-main-link-name text-capitalize"
+                            >Ues</span
+                        >
+                    </a>
+                </li>
+                <li class="nav-main-item">
+                    <a class="nav-main-link" href="{% url 'main:semestres' %}">
+                        <i class="nav-main-link-icon si si-energy"></i>
+                        <span class="nav-main-link-name text-capitalize"
+                            >semestres</span
+                        >
+                    </a>
+                </li>
+                <li class="nav-main-item">
+                    <a
+                        class="nav-main-link"
+                        href="{% url 'main:matieres_etudiant' %}"
+                    >
+                        <i class="nav-main-link-icon si si-energy"></i>
+                        <span class="nav-main-link-name text-capitalize"
+                            >Matières</span
+                        >
+                    </a>
+                </li>
+                {% endif %}
+                {% if is_directeur_des_etudes %}
+                <li class="nav-main-heading text-white">Employes</li>
+
+                <li class="nav-main-item">
+                    <a
+                        class="nav-main-link"
+                        href="{% url 'main:liste_informations_enseignants' id_annee_selectionnee %}"
+                    >
+                        <i class="nav-main-link-icon si si-energy"></i>
+                        <span class="nav-main-link-name text-capitalize"
+                            >Certificat de travail</span
+                        >
+                    </a>
+                </li>
+
+                <li class="nav-main-item">
+                    <a
+                        class="nav-main-link"
+                        href="{% url 'main:enseignants' %}"
+                    >
+                        <i class="nav-main-link-icon si si-energy"></i>
+                        <span class="nav-main-link-name text-capitalize"
+                            >Enseignants</span
+                        >
+                    </a>
+                    <a
+                        class="nav-main-link"
+                        href="{% url 'main:enseignant_suspendu' %}"
+                    >
+                        <i class="nav-main-link-icon si si-energy"></i>
+                        <span class="nav-main-link-name text-capitalize"
+                            >Enseignants suspendus</span
+                        >
+                    </a>
+                   
+                    <a
+                        class="nav-main-link"
+                        href="{% url 'paiement:comptable_list' id_annee_selectionnee %}"
+                    >
+                        <i class="nav-main-link-icon si si-energy"></i>
+                        <span class="nav-main-link-name text-capitalize"
+                            >Comptables</span
+                        >
+                    </a>
+
+                    <a
+                        class="nav-main-link"
+                        href="{% url 'paiement:comptables_suspendu' %}"
+                    >
+                        <i class="nav-main-link-icon si si-energy"></i>
+                        <span class="nav-main-link-name text-capitalize"
+                            >Comptables suspendus</span
+                        >
+                    </a>
+                   
+                </li>
+
+                <li class="nav-main-heading text-white">Paiements</li>
+
+                <li class="nav-main-item">
+                    <a
+                        class="nav-main-link"
+                        href="{% url 'paiement:liste_paiements' id_annee_selectionnee %}"
+                    >
+                        <i class="nav-main-link-icon si si-energy"></i>
+                        <span class="nav-main-link-name text-capitalize"
+                            >Frais scolaires</span
+                        >
+                    </a>
+                </li>
+
+                <li class="nav-main-item">
+                    <a
+                        class="nav-main-link"
+                        href="{% url 'paiement:bulletins_de_paye' id_annee_selectionnee %}"
+                    >
+                        <i class="nav-main-link-icon si si-energy"></i>
+                        <span class="nav-main-link-name text-capitalize"
+                            >Bulletin de paie</span
+                        >
+                    </a>
+                </li>
+
+                <li class="nav-main-item">
+                    <a
+                        class="nav-main-link"
+                        href="{% url 'paiement:liste_fiches_de_paie' id_annee_selectionnee %}"
+                    >
+                        <i class="nav-main-link-icon si si-energy"></i>
+                        <span class="nav-main-link-name text-capitalize"
+                            >Fiche de paie</span
+                        >
+                    </a>
+                </li>
+
+                <li class="nav-main-item">
+                    <a
+                        class="nav-main-link"
+                        href="{% url 'paiement:liste_fiches_de_prise_en_charge' id_annee_selectionnee %}"
+                    >
+                        <i class="nav-main-link-icon si si-energy"></i>
+                        <span class="nav-main-link-name text-capitalize"
+                            >Fiche de prise en charge</span
+                        >
+                    </a>
+                </li>
+
+                 <li class="nav-main-item">
+                    <a
+                        class="nav-main-link"
+                        href="{% url 'paiement:liste_paiements_fournisseurs' id_annee_selectionnee %}"
+                    >
+                        <i class="nav-main-link-icon si si-energy"></i>
+                        <span class="nav-main-link-name text-capitalize"
+                            >Fournisseurs</span
+                        >
+                    </a>
+                </li>
+
+                <li class="nav-main-heading text-white">Compte bancaire</li> 
+
+                <li class="nav-main-item">
+                    <a
+                        class="nav-main-link"
+                        href="{% url 'paiement:compte_bancaire' id_annee_selectionnee %}"
+                    >
+                        <i class="nav-main-link-icon si si-energy"></i>
+                        <span class="nav-main-link-name text-capitalize"
+                            >Solde bancaire</span
+                        >
+                    </a>
+                </li>
+
+                <li class="nav-main-heading text-white">Congés</li> 
+
+                <li class="nav-main-item">
+                    <a
+                        class="nav-main-link"
+                        href="{% url 'conges:demandes_en_attentes' id_annee_selectionnee %}"
+                    >
+                        <i class="nav-main-link-icon si si-energy"></i>
+                        <span class="nav-main-link-name text-capitalize"
+                            >Afficher</span
+                        >
+                    </a>
+                </li>
+
+                {% endif %} 
+            </ul>
+        </div>
+    </div>
+</nav>

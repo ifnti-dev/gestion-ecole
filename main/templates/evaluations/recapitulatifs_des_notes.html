@@ -1,0 +1,54 @@
+{% extends '../index.html' %}
+{% block content_title %} Récapitulatif {% endblock content_title %}
+{% block backURl %}  
+<a href="{% url 'main:matieres_etudiant' %}">
+    <button class="btn btn-warning">
+        <i class="si si-arrow-left"></i>
+        Retour
+    </button>
+</a>
+{% endblock backURl %}
+{% block content %}
+<div class="block block-rounded m-5">
+    <div class="block-header p-4">
+        <h3 class="block-title">Récapitulatif des notes de  : <span class="">{{ matiere.libelle }}</span> </h3>
+        <a href="{% url 'main:recap_notes' matiere.id semestre.id %}">
+            <button class="btn btn-primary">
+                <i class="fa fa-file-export"></i>
+            </button>
+        </a>
+    </div>
+    <div class="block-content block-content-full">
+        <table class="table table-bordered table-striped table-vcenter js-dataTable-full-pagination">
+            <thead>
+                <tr>
+                    <th class="text-center">Etudiant</th>
+                    {% for evaluation in evaluations  %}
+                        <th scope="col" class="" style="width: 15%;"> {{ evaluation.libelle }} </th>
+                    {% endfor %}
+                    <th scope="col" class="" style="width: 15%;"> Moyenne </th> 
+                    <th scope="col" class="" style="width: 15%;"> Validé </th> 
+                </tr>
+            </thead>
+            <tbody>
+                {% for etudiant in etudiants %}
+                <tr>
+                    <td class="text-center font-size-sm">{{etudiant.full_name}} </td>
+                    {% for note in etudiant.notes  %}
+                    <td class="text-center font-size-sm"> {{ note.valeur }} </td>
+                    {% endfor %}
+                    <td class="text-center font-size-sm"> {{ etudiant.moyenne }} </td>
+                    <td class="text-center font-size-sm"> 
+                        {% if etudiant.a_valider %}
+                            <span class="text-success">Oui</span>
+                        {% else %}
+                            <span class="text-danger">Non</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor%}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

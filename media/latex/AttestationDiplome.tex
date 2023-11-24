@@ -1,0 +1,42 @@
+\documentclass[a4paper, 12pt]{article}
+
+\usepackage[OT1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=2.8cm,right=.5cm]{geometry}
+\usepackage{graphicx}
+\usepackage{pdflscape}
+
+\usepackage{eso-pic, graphicx}
+\newcommand\BackgroundPic{
+\put(-248,0){\rotatebox{90}{
+\parbox[b][\paperheight]{\paperwidth}{
+\includegraphics[width=\paperheight,height=\paperwidth]{CharteGraphiquePresentationPageDeGarde}
+}}}}
+
+\title{\vspace{1.5cm}\hspace{6cm}\textbf{Attestation de diplôme de\\\hspace{6cm}Licence informatique des organisations}}
+\author{}
+\date{}
+
+\begin{document}
+
+\input{"donnees.tex"}
+
+\AddToShipoutPicture*{\BackgroundPic}
+\begin{landscape}
+\maketitle\vspace{.5cm}
+Le responsable d'établissement soussigné atteste que\\\\
+\textbf{\NomEtudiant}, matricule \NumeroEtudiant, né le \dateEtLieuNaissance , de nationalité togolaise,\\
+
+a rempli l'ensemble des conditions requises pour l'obtention du diplôme de licence de type LMD délivré par l'IFNTI.\\\\
+\textbf{Option :} Informatique des organisations\hfill \textbf{Mention :} \mention \hfill\textbf{Session :} \session \hfill\null\\
+
+Cette attestation lui est délivrée pour servir et valoir ce que de droit.\hfill Fait à Sokodé, \dateConseilScientifique \\
+\null\hfill Le responsable d'établissement\vfill
+\null\hfill Mohamed Sabirou TÉOURI\\\footnotesize\vspace{-.5cm}\\\\\\\\\\
+\footnotesize\textbf{Avis important :} La présente attestation ne peut être délivrée qu'en un seul exemplaire. Le candidat a la possibilité d'en établir la copie ou photocopie et la faire certifier conforme par le Maire ou le Commissaire de Police de sa résidence.\tiny
+\begin{center}
+Institut de formation aux normes et technologies de l'informatique -- 300 BP 40, Sokodé TOGO -- Tél. : +228 90 91 81 41\\Agrément N\degre2019/064/MESR/SG/DES
+\end{center}
+\thispagestyle{empty}
+\end{landscape}
+\end{document}

@@ -1,0 +1,51 @@
+{% extends '../index.html' %}
+
+{% block content %}
+
+<div class="block block-rounded m-5">
+    <div class="block-header p-4">
+        <h3 class="block-title">Liste des Paiements</h3>
+        {% if is_comptable %}
+        <a href="{% url 'paiement:enregistrer_paiement_fournisseur'%}" class="btn btn-outline-primary">
+                <i class="fas fa-plus"></i> Ajouter
+        </a>
+        {% endif %}
+    </div>
+
+    <div class="block-content block-content-full">
+        <table class="table table-bordered table-striped table-vcenter js-dataTable-full-pagination">
+            <thead>
+                <tr>
+                    <th class="text-center" style="width: 25%;">Type de fournisseur</th>
+                    <th class="text-center" style="width: 25%;">Montant versé</th>
+                    <th class="text-center" style="width: 25%;">Date de versement</th>
+                    <th class="text-center" style="width: 25%;">Mois de paiement</th>
+                    {% if is_comptable %}
+                    <th class="text-center" style="width: 15%;">Modifier</th>
+                    {% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for paiements_fournisseur in paiements_fournisseurs %}
+                <tr>
+                    <td class="text-center font-size-sm">{{ paiements_fournisseur.type }}</td>
+                    <td class="text-center font-size-sm">{{ paiements_fournisseur.montant}} FCFA</td>
+                    <td class="text-center font-size-sm">{{ paiements_fournisseur.dateversement }}</td>
+                    <td class="text-center font-size-sm">{{ paiements_fournisseur.le_mois }}</td>
+                    {% if is_comptable %}
+                    <td style="text-align: center;">
+                        <button type="button" class="update-book btn btn-sm btn-warning">
+                            <a style="color: blanchedalmond;" href="{% url 'paiement:modifier_paiement_fournisseur' paiements_fournisseur.id %}">
+                                <span><i class="far fa-edit"></i></span>
+                            </a>
+                        </button>
+                    </td>
+                    {% endif %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

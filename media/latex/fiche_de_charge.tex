@@ -1,0 +1,90 @@
+\documentclass[a4paper, 12pt]{article}
+\usepackage[french]{babel}
+\usepackage[OT1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[none]{hyphenat}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{graphicx}
+\usepackage{eso-pic}
+\usepackage[left=2cm,right=2cm,top=2cm,bottom=2cm]{geometry}
+\usepackage{tikz}
+\usepackage{lipsum}
+\usepackage{amssymb}
+\usepackage{latexsym}
+\usepackage{fancyhdr}
+\pagestyle{fancyplain}
+\cfoot{\vspace{.5cm}Institut de formation aux normes et technologies de l'informatique\\300 BP 40, Sokodé TOGO -- Tél. : +228 90 91 81 41\\Agrément N\textdegree2019/064/MESR/SG/DES }
+
+\usepackage{eso-pic, graphicx}
+
+\graphicspath{ {\VAR{image_path}} }
+
+\newcommand\BackgroundPic{
+\put(0,0){
+\parbox[b][\paperheight]{\paperwidth}{
+\includegraphics[width=\paperwidth,height=\paperheight]{CharteGraphiqueDocumentPageDeGardeLogo}
+}}}
+
+
+\title{\vspace{2cm}\textbf{FICHE DE PRISE EN CHARGE DU VOLONTAIRE}}
+\author{}
+\date{}
+\begin{document}
+\maketitle
+\AddToShipoutPicture*{\BackgroundPic}
+\vspace{-1cm}
+
+\begin{center}
+\begin{tabular}{@{}ll}
+\textbf{NOM : }\hspace{4cm}\textbf{\VAR{fiche_de_charge.personnel.nom}}\\
+\vspace{1mm}
+\textbf{PRÉNOMS : }\hspace{2.8cm}\textbf{\VAR{fiche_de_charge.personnel.prenom}}\\
+\vspace{1mm}
+\textbf{Période de : }\hspace{2.5cm}\textbf{\VAR{fiche_de_charge.dateDebut} à \VAR{fiche_de_charge.dateFin}}\\
+\end{tabular}
+\end{center}
+\vspace{5Mm}
+
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\hline 
+\textbf{Désignations} & \textbf{   Montant} & \textbf{   IFNTI} \\ 
+\hline 
+Nourriture & \VAR{fiche_de_charge.frais_nourriture} & \VAR{fiche_de_charge.frais_nourriture} \\ 
+\hline 
+Frais de vie & \VAR{fiche_de_charge.frais_de_vie} & \VAR{fiche_de_charge.frais_de_vie} \\ 
+\hline 
+\textbf{TOTAL À PAYER} & \VAR{fiche_de_charge.montant} & \VAR{fiche_de_charge.montant} \\ 
+\hline 
+VALEUR EN LETTRE &\multicolumn{2}{|c|}{\VAR{fiche_de_charge.montantEnLettre} francs CFA}\\ 
+\hline 
+\end{tabular} 
+\end{center}
+\vspace{1cm}
+
+\textbf{MODE DE PAIEMENT : \hspace{4.5cm} \textbf{Numéro : \VAR{fiche_de_charge.numero}} 
+\begin{itemize}
+  \item \textbf{Chèque : $\square$}
+  \item \textbf{Espèces : $\square$}
+\end{itemize}} 
+
+\begin{flushright}
+Sokodé le \today
+\end{flushright}\vspace{2mm}
+
+\begin{center}
+\textbf{SIGNATURES}
+\end{center}
+
+
+\begin{minipage}[t]{0.5\textwidth}
+  \raggedright Directeur
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.5\textwidth}
+  \raggedleft Volontaire
+\end{minipage}
+
+
+\end{document}

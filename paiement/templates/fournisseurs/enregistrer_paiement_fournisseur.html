@@ -1,0 +1,63 @@
+{% extends 'index.html' %}
+{% block content_title %}
+
+Enregistrement du paiement d'un fournisseur
+
+  <h1>
+     <a href="{% url 'paiement:liste_paiements_fournisseurs' id_annee_selectionnee  %}" class="btn btn-outline-warning">
+        <i class="fas fa-chevron-left fa-lg"></i> Retour
+      </a>
+  </h1>
+{% endblock %}
+{% block content_title_description %}
+
+
+{% endblock %}
+{% block content %}
+  <div class="d-flex justify-content-center">
+    <div class="block-content card m-4 col-md-10 col-lg-8 col-xl-6">
+      <div class="d-flex justify-content-between">
+        <h3>         
+        </h3>
+    </div>
+      <form class="container-fluid p-3" action="#" method="POST">
+        {% csrf_token %}
+
+      {% if form.non_field_errors %}
+        <div class="alert alert-danger">
+          {{ form.non_field_errors }}
+        </div>
+      {% endif %}
+  
+
+        <div class="form-row mb-3">
+          <div class="col-md-6">
+            {{ form.type.label_tag }}
+            {{ form.type }}
+            <span class="text-danger">{{ form.type.errors }}</span>
+          </div>
+           <div class="col-md-6">
+            {{ form.montant.label_tag }}
+            {{ form.montant }}
+            <span class="text-danger">{{ form.montant.errors }}</span>
+          </div>
+        </div>
+
+        <div class="form-row mb-3">  
+          <div class="col-md-6">
+            {{ form.dateversement.label_tag }}
+            {{ form.dateversement }}
+            <span class="text-danger">{{ form.dateversement.errors }}</span>
+          </div>      
+          <div class="col-md-6">
+            {{ form.le_mois.label_tag }}
+            {{ form.le_mois }}
+            <span class="text-danger">{{ form.le_mois.errors }}</span>
+          </div>
+        </div>
+
+        <button class="btn btn-primary btn-block" type="submit"><i class="fas fa-database"></i> Enrégistrer &nbsp;&nbsp;&nbsp;<span></span></button>
+      </form> 
+    </div>
+  </div>
+{% endblock %} 

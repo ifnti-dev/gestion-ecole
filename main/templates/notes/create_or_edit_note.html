@@ -1,0 +1,138 @@
+{% extends 'index.html' %}
+{% block content_title %}
+Enregistrement d'une evaluation
+  <h1>
+   <a href="{% url 'main:evaluations' matiere.id %}" class="btn btn-outline-warning">
+        <i class="fas fa-chevron-left fa-lg"></i> Retour
+      </a>
+  </h1>
+{% endblock %}
+{% block content_title_description %}
+
+{% endblock %}
+{% block content %}
+    <style>
+        .note_set-etudiant_full_name, .note_set-etudiant_full_name:hover , .note_set-etudiant_full_name:focus {
+            background: #999999;
+            color: white;
+            cursor: pointer;
+        }
+    </style>
+  <div class="d-flex justify-content-center">
+    <div class="block-content card m-4 col-md-10 col-lg-8 col-xl-6">
+      <div class="d-flex justify-content-between">
+        <h3>         
+        </h3>
+    </div>
+        <form action="" method="POST">
+            {% csrf_token %}
+            <div class="p-3">
+                <div class="">
+                    {{ note_form_set.management_form }}
+                    <div class="">
+                        <h1>Enregistrer une evaluation</h1>
+                        <div class="form-row mb-3">
+                            <div class="col-md-6">
+                                {{ evaluation_form.date.label_tag }}
+                                <div class="d-flex">
+                                    {{ evaluation_form.date }}
+                                </div>
+                                <span class="errors">{{ evaluation_form.date.errors }}</span>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="col-md-6">
+                                {{ evaluation_form.libelle.label_tag }}
+                                {{ evaluation_form.libelle }}
+                                <span class="errors">{{ evaluation_form.libelle.errors }}</span>
+                            </div>
+                            <div class="col-md-6">
+                                {{ evaluation_form.ponderation.label_tag }}
+                                {{ evaluation_form.ponderation }}
+                                <span class="errors">{{ evaluation_form.ponderation.errors }}</span>
+                            </div>
+                            {% comment %} <div class="col-md-2">
+                                {{ evaluation_form.rattrapage.label_tag }}
+                                {{ evaluation_form.rattrapage }}
+                                {{ evaluation_form.rattrapage.errors }}
+                            </div> {% endcomment %}
+                        </div>
+                        <input type="text" id="id_matiere" name="matiere" value="{{ matiere.id }}" hidden/>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    {{ note_form_set.management_form }}
+                    <div class="">
+                        <h1>Assigner les notes </h1>
+                        <div class="">
+                            {% if 0 %}
+                                <span>Aucun étuidant ne suit cette matière</span>
+                            {% else %}
+                            {{ notes_formset.management_form }}
+                            <table class="w-100" border="0">
+                                <thead>
+                                    <tr>
+                                        <th>Étudiant</th>
+                                        <th>Note</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for note_form in notes_formset %}
+                                        <tr>
+                                            <td>
+                                                {{ note_form.etudiant }}
+                                                {{ note_form.etudiant_full_name }}
+                                                <span class="errors">{{ note_form.etudiant.errors }}</span>
+                                            </td>
+                                            <td>
+                                                {{ note_form.id }}
+                                                {{ note_form.valeurNote }}
+                                                <span class="errors">{{ note_form.valeurNote.errors }}</span>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                            {% endif %}
+                        </div>
+                        <div class="mt-4">
+                            <input type='submit' class="btn btn-primary" value="Enregistrer">
+                            <a href="{% url 'main:evaluations' matiere.id %}">
+                                <button type='button' class="btn btn-secondary">Annuler</button>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+  </div>
+{% endblock %}
+
+{% block scripts %}
+    <script type="text/javascript">
+        //alert("Okay");
+        // Récupérer les valeurs possible restante pour cette matiere
+        let rattrapage = '{{ rattrapage }}';
+        let ponderation_possible = {{ ponderation_possible }} ;
+        console.log(ponderation_possible);
+        // A la saisi de la pondération vérifier que l'évalation est valide
+        let input_etudiant_full_name = $(".note_set-etudiant_full_name");
+        input_etudiant_full_name.on("keydown", function(){
+            event.preventDefault();
+        })
+        let ponderation = $("#id_ponderation");
+        ponderation.on("keyup", function(){
+            let value = parseInt(ponderation.val());
+            if (rattrapage === 'False'){
+                if (isNaN(value) || value > ponderation_possible){
+                    ponderation.addClass('border-danger');
+                    ponderation.addClass('text-danger');
+                } else {
+                    ponderation.removeClass('border-danger');
+                    ponderation.removeClass('text-danger');
+                }
+            }
+        });       
+    </script>
+{% endblock scripts %}

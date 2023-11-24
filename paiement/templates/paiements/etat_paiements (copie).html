@@ -1,0 +1,61 @@
+{% extends 'index.html' %}
+{% block content_title %}
+
+État des paiements de {{ etudiant.nom }}  {{ etudiant.prenom }}  <br>
+
+  <h1>
+     <a href="{% url 'main:etudiants' %}" class="btn btn-outline-warning">
+        <i class="fas fa-chevron-left fa-lg"></i> Retour
+      </a>
+  </h1>
+{% endblock %}
+{% block content_title_description %}
+
+
+{% endblock %}
+{% block content %}
+<div class="block block-rounded m-5">
+    <div class="block-content block-content-full">
+      {% if frais_definis %}
+      <h4 style="text-align: center;">Montant total à payer : {{montant_du }} FCFA</h4>
+        <table class="table table-bordered table-striped table-vcenter js-dataTable-full-pagination">
+            <thead>
+                <tr>
+                    <th class="text-center" style="width: 50%;">Date de paiement</th>
+                    <th class="text-center" style="width: 60px;">Montant versé</th>
+                </tr>
+            </thead>
+            <tbody>
+                 {% for paiement in paiements %}
+                <tr>
+                    <td class="text-center font-size-sm">{{paiement.dateversement}}</td>
+                    <td class="text-center font-size-sm">{{paiement.montant}}</td>             
+                </tr>
+                {% empty %}
+                  <li>L'étudiant n'a effectuer aucun versement pour cette année universitaire.</li>
+                {% endfor %}
+              </tbody>
+
+            <tfoot>
+      <tr>
+        <th class="text-center" style="width: 50%;"><strong>Somme totale versée :</strong></td>
+        <th class="text-center" style="width: 50%;"><strong>{{ total_versements }} FCFA</strong></td>
+      </tr>
+  
+      <tr>
+        <th class="text-center" style="width: 50%;"><strong>Somme restante :</strong></td>
+        <th class="text-center" style="width: 50%;"><strong>{{ somme_restante }} FCFA</strong></td>
+      </tr>
+
+    </tfoot>
+  </table>
+  
+  {% else %}
+    <div class="alert alert-warning" role="alert">
+      Les frais ne sont pas définis pour l'année universitaire sélectionnée.
+    </div>
+  {% endif %}
+        
+    </div>
+</div>
+{% endblock %}

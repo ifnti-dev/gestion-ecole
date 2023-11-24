@@ -1,0 +1,38 @@
+{% extends 'index.html' %}
+{% block content_title %} Ajouter un programme {% endblock content_title %}
+{% block content_title_description %}  {% endblock content_title_description %}
+{% block content %} 
+<div class="block block-rounded">
+    <div class="block-header">
+       
+    </div>
+    <div class="block-content block-content-full">
+        <form action="" method="POST">
+            {% csrf_token %}
+            <div class="col-md-12">
+                {{ form.parcours.label_tag }}
+                {{ form.parcours }}
+                {{ form.parcours.error }}
+            </div>
+            <div class="col-md-12">
+                {{ form.semestre.label_tag }}
+                {{ form.semestre }}
+                {{ form.semestre.error }}
+            </div>
+            <div class="col-md-12">
+                {{ form.ues.label_tag }}
+                {{ form.ues }}
+                {{ form.ues.error }}
+            </div>
+            <div class="col-md-12">
+                <button type="submit" name="save" class="btn btn-outline-primary mt-4" id="add">
+                    <i class="fas fa-plus"></i> Enregistrer
+                </button>
+                <button type="submit" name="save_and_contitnue" class="btn btn-outline-primary mt-4" id="add">
+                    <i class="fas fa-plus"></i> Enregistrer et continuer
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock content %}

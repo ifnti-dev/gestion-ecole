@@ -1,0 +1,69 @@
+{% extends '../index.html' %}
+
+{% load static %}
+
+{% block content %}
+    <div id="content-wrapper">
+        <div class="container-fluid">        
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h3><i class="fas fa-table"></i> Enregistrement d'une UE
+                        <a class="btn btn-sm btn-success" href="{% url 'main:liste_des_ues' %}" style="padding: 8px; float: right; background-color: blue; color: white;"><i class="fas fa-chevron-left fa-lg"></i>
+                            Retour
+                        </a>
+                    </h3>
+                </div>
+                <div class="card-body">
+                  <form class="form-horizontal" action="#" method="POST">
+                    {% csrf_token %}               
+                
+                    <div class="form-group row">
+                        <label for="{{ form.libelle.id_for_label }}" class="col-md-2 col-form-label">Libellé de l'UE:</label>
+                        <div class="col-md-10">
+                            {{ form.libelle }}
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label for="{{ form.type.id_for_label }}" class="col-md-2 col-form-label">Type de l'UE:</label>
+                        <div class="col-md-10">
+                            {{ form.type }}
+                        </div>
+                    </div>
+
+                     <div class="form-group row">
+                        <label for="{{ form.type.id_for_label }}" class="col-md-2 col-form-label">Niveau d'Étude:</label>
+                        <div class="col-md-10">
+                            {{ form.niveau }}
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label for="{{ form.nbreCredits.id_for_label }}" class="col-md-2 col-form-label">Nombre de crédit:</label>
+                        <div class="col-md-10">
+                            {{ form.nbreCredits }}
+                        </div>
+                    </div> 
+
+                    <div class="form-group row">
+                        <label for="{{ form.heures.id_for_label }}" class="col-md-2 col-form-label">Nombre d'heure:</label>
+                        <div class="col-md-10">
+                            {{ form.heures }}
+                        </div>
+                    </div>
+                               
+                    <div class="form-group row">
+                        <label for="{{ form.enseignant.id_for_label }}" class="col-md-2 col-form-label">Enseignant responsable:</label>
+                        <div class="col-md-10">
+                            {{ form.enseignant }}
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary btn-block" type="submit"><i class="fas fa-database"></i> Enregistrer &nbsp;&nbsp;&nbsp;<span></span></button>
+                </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

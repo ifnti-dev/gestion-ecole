@@ -1,0 +1,18 @@
+django
+psycopg2-binary
+Pillow==9.5.0
+latex
+jinja2
+Faker
+watchdog
+num2words #permet de convertir en lettre le montant à payer
+django-import-export
+django-browser-reload
+django_extensions # Pour excécuter des scripts
+gunicorn
+django-solo
+requests
+python-decouple
+channels[daphne]
+Werkzeug
+python-dotenv

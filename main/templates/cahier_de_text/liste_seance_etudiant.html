@@ -1,0 +1,138 @@
+{% extends '../index.html' %}
+{% block content_title %} Mes Enregistrements{% endblock content_title %}
+{% load static %}
+
+{% block content %}
+ <main id="main-container">
+                
+                <div class="content">
+        <!-- Seances en attente de validation -->
+        <div class="block block-rounded">
+            <div class="block-header">
+                <h3 class="block-title">En attente de validation</h3>
+            </div>
+            <div class="block-content">
+                 <div class="table-responsive">
+                    <table class="table table-bordered table-striped table-vcenter">
+                        <thead>
+                            <tr>
+                                <th>Intitulé</th>
+                                <th style="width: 20%;">Matiere</th>
+                                <th style="width: 20%;">Enseignant</th>
+                                <th style="width: 20%;">Début</th>                            
+                                <th style="width: 20%;">Fin</th>
+                                <th class="text-center" style="width: 100px;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for seance in seances_en_attente %}
+                                <tr>
+                                    <td class="font-w600 font-size-sm">
+                                        <a href="/cahier_de_texte/info_seance/{{seance.id}}/">{{ seance.intitule }}</a>
+                                    </td>
+                                    {% if seance.commentaire %}
+                                        <td class="text-warning">
+                                            {{ seance.matiere.libelle }} 
+                                        </td>
+                                        <td class="text-warning">
+                                            {{ seance.matiere.enseignant.nom }} {{ seance.matiere.enseignant.prenom }} 
+                                        </td>
+                                        <td class="text-warning">
+                                            {{ seance.date_et_heure_debut }}
+                                        </td>
+                                        <td class="text-warning">
+                                            {{ seance.date_et_heure_fin }}
+                                        </td>
+                                    {% else %}
+                                        <td>
+                                            {{ seance.matiere.libelle }} 
+                                        </td>
+                                        <td>
+                                            {{ seance.matiere.enseignant.nom }} {{ seance.matiere.enseignant.prenom }} 
+                                        </td>
+                                        <td>
+                                            {{ seance.date_et_heure_debut }}
+                                        </td>
+                                        <td>
+                                            {{ seance.date_et_heure_fin }}
+                                        </td>
+                                    {% endif %}
+                                    <td class="text-center">
+                                        <a href="/cahier_de_texte/modifier_seance/{{seance.id}}/" class="btn btn-sm btn-alt-primary" data-toggle="tooltip" title="Modifier">
+                                            <i class="fa fa-fw fa-pencil-alt"></i>
+                                        </a>
+                                        
+                                        <a href="/cahier_de_texte/supprimer_seance/{{seance.id}}/" class="btn btn-sm btn-alt-primary" data-toggle="tooltip" title="Supprimer">
+                                            <i class="far fa-calendar-times"></i>
+                                        </a>
+
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <!-- END Seances en attente de validation -->
+
+        <div class="block block-rounded">
+            <div class="block-header">
+                <h3 class="block-title">Validées</h3>
+                
+            </div>
+            <div class="block-content">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped table-vcenter">
+                        <thead>
+                            <tr>
+                                <th>Intitulé</th>
+                                <th style="width: 20%;">Matiere</th>
+                                <th style="width: 20%;">Enseignant</th>
+                                <th style="width: 20%;">Début</th>                            
+                                <th style="width: 20%;">Fin</th>
+                            	<th class="text-center" style="width: 100px;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for seance in seances_validees %}
+                            <tr>
+                                <td class="font-w600 font-size-sm">
+                                    <a href="/cahier_de_texte/info_seance/{{seance.id}}/">{{ seance.intitule }}</a>
+                                </td>
+                                <td>
+                                    {{ seance.matiere.libelle }} 
+                                </td>
+                                <td>
+                                    {{ seance.matiere.enseignant.nom }} {{ seance.matiere.enseignant.prenom }} 
+                                </td>
+                                <td>
+                                    {{ seance.date_et_heure_debut }}
+                                </td>
+                                <td>
+                                    {{ seance.date_et_heure_fin }}
+                                </td>
+                                <td class="text-center">
+                                    <a href="/cahier_de_texte/modifier_seance/{{seance.id}}/" class="btn btn-sm btn-alt-primary" data-toggle="tooltip" title="Modifier">
+                                                <i class="fa fa-fw fa-pencil-alt"></i>
+                                            </a>
+
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+                </div>
+                <!-- END Page Content -->
+            </main>
+          
+  {% endblock %}
+
+
+

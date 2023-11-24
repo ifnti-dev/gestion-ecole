@@ -1,0 +1,16 @@
+{% extends '../index.html' %}
+    
+{% block content %}
+
+    <script>
+        // Récupérez le message d'erreur passé en contexte
+        var errorMessage = "{{ message }}";
+
+        // Affichez le message d'erreur dans une fenêtre d'alerte
+        alert(errorMessage);
+
+        // Redirigez l'utilisateur vers la page précédente
+      //  window.history.back();
+    </script>
+
+{% endblock %}

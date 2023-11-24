@@ -1,0 +1,84 @@
+{% extends '../index.html' %}
+{% block content %}
+
+<style>
+    #etudiant{
+        font-family: Arial, Helvetica, sans-serif;
+        border-collapse: collapse;
+        width: 100%;
+    }
+    #etudiant td,#etudiant th{
+        border: 1px solid #ddd;
+        padding: 8px;
+    }
+    #etudiant tr:nth-child(even){
+        background-color: #e8c1f7;
+    }
+    #etudiant th{
+        padding-top: 12px;
+        padding-bottom: 12px;
+        text-align: left;
+        background-color: #d6eaf8;
+    }
+</style>
+<div class="block block-rounded m-5">
+    <div class="block-header p-4">
+        <h3 class="block-title">Détails de l'enseignant {{enseignant.nom}} {{enseignant.prenom}}</h3>
+        <a class="btn btn-sm btn-success"  href="{% url 'main:enseignants' id_annee_selectionnee %}" style="padding: 8px; float: right; background-color: blue; color: white;"><i class="fas fa-chevron-left fa-lg"></i>
+            Retour</a>
+    </div>
+    <div class="block-content block-content-full">
+        <table id="etudiant">
+            <thead class="thead-dark">
+                <tr>
+                    <th class="text-center" style="width: 80px;">Sexe</th>
+                    <th class="text-center" style="width: 15%;">Email</th>
+                    <th class="text-center" style="width: 15%;">Contact</th>
+                    <th class="text-center" style="width: 15%;">Adresse</th>
+                    <th class="text-center" style="width: 15%;">Date de Naissance</th>
+                    <th class="text-center" style="width: 15%;">Lieu de Naissance</th>
+                    <th class="text-center" style="width: 15%;">État</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="text-center font-size-sm">{{enseignant.sexe}}</td>
+                    <td class="text-center font-size-sm">{{enseignant.email}}</td>
+                    <td class="text-center font-size-sm">{{enseignant.contact}}</td>
+                    <td class="text-center font-size-sm">{{enseignant.adresse}}</td>
+                    <td class="text-center font-size-sm">{{enseignant.datenaissance}}</td>
+                    <td class="text-center font-size-sm">{{enseignant.lieunaissance}}</td>              
+                    <td class="text-center font-size-sm">{{enseignant.is_active}}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <br>
+        <br>
+
+        <table id="etudiant">
+            <thead class="thead-dark">
+                <tr>
+                    <th class="text-center" style="width: 20%;">Nationalité</th>
+                    <th class="text-center" style="width: 15%;">Type</th>
+                    <th class="text-center" style="width: 80px;">Spécialité</th>
+                    <th class="text-center" style="width: 80px;">Salaire brut</th>
+                    <th class="text-center" style="width: 80px;">Nbre jours de congés restant</th>
+                    <th class="text-center" style="width: 15%;">Nombre de jours consommé</th>  
+                </tr>
+            </thead>
+            
+            <tbody>
+                <tr>
+                    <td class="text-center font-size-sm">{{enseignant.nationalite}}</td>
+                    <td class="text-center font-size-sm">{{enseignant.type}}</td>
+                    <td class="text-center font-size-sm">{{enseignant.specialite}}</td>
+                    <td class="text-center font-size-sm">{{enseignant.salaireBrut}}</td>
+                    <td class="text-center font-size-sm">{{enseignant.nbreJrsCongesRestant}}</td>
+                    <td class="text-center font-size-sm">{{enseignant.nbreJrsConsomme}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

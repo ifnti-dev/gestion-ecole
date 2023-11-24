@@ -1,0 +1,135 @@
+{% extends 'index.html' %}
+{% load static %}
+
+{% block content %}
+
+
+<div class="bg-image" style="background-image: url('{% static 'assets/media/ifnti_background.jpeg' %}');">
+    <div class="bg-black-75">
+        <div class="content content-full text-center">
+            <div class="my-3">
+                <img class="img-avatar img-avatar-thumb" src="assets/media/avatars/avatar13.jpg" alt="">
+            </div>
+            <h1 class="h2 text-white mb-0">Modification du Profil</h1>
+            <h2 class="h4 font-w400 text-white-75">{{utilisateur.first_name}} {{utilisateur.last_name}}</h2>
+            <a class="btn btn-light" href="#">
+                <i class="fa fa-fw fa-arrow-left text-danger"></i> Retour à l'acceuil
+            </a>
+        </div>
+    </div>
+</div>
+{% if notification %}
+    {% if notification.type == "erreur" %}
+        <div class="alert alert-danger alert-dismissable" role="alert">
+    {% elif notification.type == "succes" %}
+        <div class="alert alert-success alert-dismissable" role="alert">
+    {% else %}
+        <div class="alert alert-primary alert-dismissable" role="alert">
+    {% endif %}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        <p class="mb-0">{{notification.message}}</p>
+    </div>
+{% endif %}
+        <!-- END Hero -->
+
+<!-- Page Content -->
+<div class="content content-boxed">
+    <!-- User Profile -->
+    <div class="block block-rounded">
+        <div class="block-header">
+            <h3 class="block-title">Profil Utilisateur</h3>
+        </div>
+        <div class="block-content">
+            <form action="/main/edit_profil" method="POST" enctype="multipart/form-data" >
+                {% csrf_token %}
+                <div class="row push">
+                    <div class="col-lg-4">
+                    </div>
+                    <div class="col-lg-8 col-xl-5">
+                        <div class="form-group">
+                            <label for="one-profile-edit-username">Nom d'utilisateur</label>
+                            <input type="text" class="form-control" id="username" name="username" placeholder="Enter your username.." value="{{utilisateur.username}}">
+                        </div>
+                        <div class="form-group">
+                            <label for="one-profile-edit-name">Nom</label>
+                            <input type="text" class="form-control" id="nom" name="nom" placeholder="Enter your name.." value="{{utilisateur.last_name}}">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="one-profile-edit-name">Prenom</label>
+                            <input type="text" class="form-control" id="prenom" name="prenom" placeholder="Enter your name.." value="{{utilisateur.first_name}}">
+                        </div>
+                        <div class="form-group">
+                            <label for="one-profile-edit-email">Email Address</label>
+                            <input type="email" disabled class="form-control" id="email" name="email" placeholder="Enter your email.." value="{{utilisateur.email}}">
+                        </div>
+                        <div class="form-group">
+                            <label>Your Avatar</label>
+                            {% if user.photo_passport %}
+                            <div class="push">
+                                <img class="img-avatar" src="assets/media/avatars/avatar13.jpg" alt="">
+                            </div>
+                            {% endif%}
+                            <div class="custom-file">
+                               <input type="file" class="custom-file-input" data-toggle="custom-file-input" id="one-profile-edit-avatar" name="one-profile-edit-avatar">
+                                <label class="custom-file-label" for="one-profile-edit-avatar">Choose a new avatar</label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-alt-primary">
+                                Update
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- END User Profile -->
+
+    <!-- Change Password -->
+    <div class="block block-rounded">
+        <div class="block-header">
+            <h3 class="block-title">Modification du MDP</h3>
+        </div>
+        <div class="block-content">
+            <form action="/main/changer_mdp" method="POST" >
+                {% csrf_token %}
+                <div class="row push">
+                    <div class="col-lg-4">
+                        <p class="font-size-sm text-muted">
+                        </p>
+                    </div>
+                    <div class="col-lg-8 col-xl-5">
+                        <div class="form-group">
+                            <label for="old_password">Mot de passe actuel</label>
+                            <input type="password" class="form-control" id="old_password" name="old_password">
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-12">
+                                <label for="one-profile-edit-password-new">Nouveau mot de passe</label>
+                                <input type="password" class="form-control" id="password" name="password">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-12">
+                                <label for="password-confirm">Confirmation mot de passe</label>
+                                <input type="password" class="form-control" id="password-confirm" name="password-confirm">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-alt-primary">
+                                Modifier
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+{% endblock content %}

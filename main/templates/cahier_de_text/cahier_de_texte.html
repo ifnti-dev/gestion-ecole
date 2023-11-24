@@ -1,0 +1,194 @@
+{% extends '../index.html' %}
+{% block content_title %} Cahier de texte {{niveau}}{% endblock content_title %}
+{% load static %}
+
+{% block content %}
+<script src="{% static 'assets/js/calendar.global.js'%}"></script>
+<script src="{% static 'assets/js/sample_french.js'%}"></script>
+
+<script>
+
+document.addEventListener('DOMContentLoaded', function() {
+  var calendarEl = document.getElementById('calendar');
+  var event_data = JSON.parse('{{ event_data|safe }}');
+
+  var calendar = new FullCalendar.Calendar(calendarEl, {
+    headerToolbar: {
+      left: 'prev,next today',
+      center: 'title',
+      right: 'dayGridMonth,timeGridWeek,timeGridDay'
+    },
+    locale: 'es',
+    initialDate: new Date(), // Le calendrier commencera à la date actuelle
+    navLinks: true, // Permet de cliquer sur les noms des jours/semaines pour naviguer entre les vues
+    selectable: true, // Permet de sélectionner les événements
+    eventClick: function(arg) {
+      window.location.href = arg.event.url; // Redirige vers l'URL de l'événement
+    },
+    editable: false, // Désactive la modification des événements par glisser-déposer
+    dayMaxEvents: true, // Affiche le lien "plus" lorsqu'il y a trop d'événements dans une journée
+    slotDuration: '00:15:00',
+    scrollTime: '06:00:00', // Défilement initial à partir de 6h
+    slotMinTime: '06:00:00', // Commence la grille à partir de 6h
+    slotMaxTime: '20:00:00',
+    events: event_data,
+  });
+  calendar.setOption('locale', 'fr');
+
+  calendar.render();
+});
+
+
+</script>
+
+
+<style>
+
+.fc-event {
+    background-color: green;
+    border-color: green;
+    color: black;
+  }
+
+  #calendar {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: auto;
+  }
+
+</style>
+ <main id="main-container">
+
+
+               
+                    <div class="content content-full">
+                        <div class="d-flex flex-column flex-sm-row justify-content-sm-between align-items-sm-center">
+                                {% if not user.groups.all.0.name == "etudiant" %}
+                                    <div class="dropdown">
+                                        <button type="button" class="btn btn-light dropdown-toggle" id="dropdown-default-primary" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            Classe
+                                        </button>
+                                        <div class="dropdown-menu font-size-sm" aria-labelledby="dropdown-default-primary">
+                                            <form id="dropdown-form" action="{% url 'cahier_de_texte:cahier_de_text' %}" method="post">
+                                                 {% csrf_token %}
+                                                <input type="hidden" name="niveau" id="niveau-input" value="">
+                                                <a class="dropdown-item" href="#" onclick="selectNiveau('L1')">Cahier de texte L1</a>
+                                                <a class="dropdown-item" href="#" onclick="selectNiveau('L2')">Cahier de texte L2</a>
+                                                <a class="dropdown-item" href="#" onclick="selectNiveau('L3')">Cahier de texte L3</a>
+                                            </form>
+                                        </div>
+                                    </div>
+
+                                    <script>
+                                        function selectNiveau(niveau) {
+                                            document.getElementById('niveau-input').value = niveau;
+                                            document.getElementById('dropdown-form').submit();
+                                        }
+                                    </script>
+                                {% endif %}
+                                {% if user.groups.all.0.name == "directeur_des_etudes" %}
+                                <div>
+                                    <button type="button" class="btn btn-light push" data-toggle="modal" data-target="#modal-block-vcenter">Imprimer</button>
+                                </div>
+                                {% endif %}  
+                       </div>
+                    </div>
+                    <div class="content">
+                        <div id='calendar'>
+
+                        </div>
+                    </div>
+                    <div class="modal" id="modal-block-vcenter" tabindex="-1" role="dialog" aria-labelledby="modal-block-vcenter" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered" role="document">
+                            <div class="modal-content">
+                                <form method="post" action="{% url 'cahier_de_texte:imprimer' %}">
+                                    {% csrf_token %}
+                                    <div class="block block-rounded block-themed block-transparent mb-0">
+                                        <div class="block-header bg-primary-dark">
+                                            <h3 class="block-title">Options d'Impression</h3>
+                                            <div class="block-options">
+                                                <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
+                                                    <i class="fa fa-fw fa-times"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="block-content font-size-sm">
+                                            <div class="form-group col-md-12">
+                                                <label for="semestres">Semestres</label>
+                                                <select class="js-select2 form-control" id="semestres" required name="semestres" style="width: 100%;" data-placeholder="Choisissez les.." multiple>
+                                                    <option></option>
+                                                    {% for Semestre in semestres %}
+                                                        <option value="{{ Semestre.id }}">{{ Semestre.libelle }} {{ Semestre.annee_universitaire }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                            <!-- Options d'Impression -->
+                                            <div class="column">
+                                                <div class="row">
+                                                    <div class="form-group col-md-6">
+                                                        <label>Options d'Impression :</label>
+                                                        <div class="custom-control custom-checkbox">
+                                                            <input type="checkbox" class="custom-control-input" id="imprimer_commentaires" name="imprimer_commentaires">
+                                                            <label class="custom-control-label" for="imprimer_commentaires">Commentaires des Enseignants</label>
+                                                        </div>
+                                                        <div class="custom-control custom-checkbox">
+                                                            <input type="checkbox" class="custom-control-input" id="imprimer_non_validees" name="imprimer_non_validees">
+                                                            <label class="custom-control-label" for="imprimer_non_validees">Séances Non Validées</label>
+                                                        </div>
+                                                        <div class="custom-control custom-checkbox">
+                                                            <input type="checkbox" class="custom-control-input" id="eleves_absents" name="eleves_absents">
+                                                            <label class="custom-control-label" for="eleves_absents">Élèves Absents</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group col-md-6">
+                                                        <label>Sous-catégorisation des Séances:</label>
+                                                        <div class="custom-control custom-radio">
+                                                            <input type="radio" class="custom-control-input" id="chronologie_horaire" name="sous_categorisation" value="chronologieHoraire" checked>
+                                                            <label class="custom-control-label" for="chronologie_horaire">Chronologie Horaire</label>
+                                                        </div>
+                                                        <div class="custom-control custom-radio">
+                                                            <input type="radio" class="custom-control-input" id="categoris_matieres" name="sous_categorisation" value="parMatieres">
+                                                            <label class="custom-control-label" for="categoris_matieres">Par Matières</label>
+                                                        </div>
+                                                      
+                                                    </div>
+                                                    
+                                                </div>
+                                                <div>
+                                                    <label>Détails par Semestre : </label>
+                                                    <div class="custom-control custom-checkbox">
+                                                        <input type="checkbox" class="custom-control-input" id="details_ue" name="details_ue">
+                                                        <label class="custom-control-label" for="details_ue">Listes des UEs</label>
+                                                    </div>
+                                                    <div class="custom-control custom-checkbox">
+                                                        <input type="checkbox" class="custom-control-input" id="details_etudiants" name="details_etudiants">
+                                                        <label class="custom-control-label" for="details_etudiants">Listes des Étudiants</label>
+                                                    </div>
+                                                    <div class="custom-control custom-checkbox">
+                                                        <input type="checkbox" class="custom-control-input" id="details_matieres" name="details_matieres">
+                                                        <label class="custom-control-label" for="details_matieres">Listes des Matières</label>
+                                                    </div>
+                                                    <div class="custom-control custom-checkbox">
+                                                        <input type="checkbox" class="custom-control-input" id="details_heures_matieres" name="details_heures_matieres">
+                                                        <label class="custom-control-label" for="details_heures_matieres">Heures Consommées par Matières</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>                                       
+                                    </div>
+                            
+                                    <div class="block-content block-content-full text-right border-top mt-3">
+                                        <button type="button" class="btn btn-alt-secondary mr-1" data-dismiss="modal">Fermer</button>
+                                        <button type="submit" class="btn btn-alt-success">Valider</button>
+                                    </div>
+                                </form>
+                            </div>
+                            
+                        </div>
+                    </div>
+                  
+    
+    
+              </main>
+
+{% endblock %}

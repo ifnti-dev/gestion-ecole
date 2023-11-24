@@ -1,0 +1,48 @@
+{% extends '../consulter_historique.html' %}
+
+{% block content %}
+<div class="block block-rounded">
+    <div class="block-header" style="text-align: center;">
+        <h3 class="block-title">Détails d'un comptable</h3>
+    </div>
+    <div class="block-content block-content-full">
+        <table class="table table-bordered table-striped table-vcenter">
+            <thead>
+                <tr>
+                    <th class="text-center" style="width: 30%;">Nom & Prénom</th>
+                    <th class="text-center" style="width: 80px;">Sexe</th>
+                    <th class="text-center" style="width: 15%;">Date Naissance</th>
+                    <th class="text-center" style="width: 15%;">Lieu Naissance</th>
+                    <th class="text-center" style="width: 15%;">Contact</th>
+                    <th class="text-center" style="width: 15%;">Email</th>
+                    <th class="text-center" style="width: 15%;">Adresse</th>
+                    <th class="text-center" style="width: 15%;">Préfecture</th>
+                    <th class="text-center" style="width: 15%;">Nationalité</th>
+                    <th class="text-center" style="width: 15%;">Salaire Brut</th>
+                    <th class="text-center" style="width: 15%;">Nbre Jrs Congés Restant</th>
+                    <th class="text-center" style="width: 15%;">Nbre Jrs Consommé</th>
+                    
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="text-center font-size-sm">{{comptable.nom}} {{comptable.prenom}}</td>
+                    <td class="text-center font-size-sm">{{comptable.sexe}}</td>
+                    <td class="text-center font-size-sm">{{comptable.datenaissance}}</td>
+                    <td class="text-center font-size-sm">{{comptable.lieunaissance}}</td>
+                    <td class="text-center font-size-sm">{{comptable.contact}}</td>
+                    <td class="text-center font-size-sm">{{comptable.email}}</td>
+                    <td class="text-center font-size-sm">{{comptable.adresse}}</td>
+                    <td class="text-center font-size-sm">{{comptable.prefecture}}</td>
+                    <td class="text-center font-size-sm">{{comptable.nationalite}}</td>
+                    <td class="text-center font-size-sm">{{comptable.salaireBrut}}</td>
+                    <td class="text-center font-size-sm">{{comptable.nbreJrsCongesRestant}}</td>
+                    <td class="text-center font-size-sm">{{comptable.nbreJrsConsomme}}</td>
+
+            </tbody>
+        </table>
+    </div>
+
+
+</div>
+{% endblock %}

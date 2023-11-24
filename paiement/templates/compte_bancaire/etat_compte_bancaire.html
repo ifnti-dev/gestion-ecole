@@ -1,0 +1,78 @@
+{% extends 'index.html' %}
+{% block content_title %}
+
+
+  <h1>
+     <a href="{% url 'paiement:compte_bancaire' id_annee_selectionnee %}" class="btn btn-outline-warning">
+        <i class="fas fa-chevron-left fa-lg"></i> Retour
+      </a>
+  </h1>
+{% endblock %}
+{% block content_title_description %}
+
+
+{% endblock %}
+{% block content %}
+<div class="block block-rounded m-5">
+    <div class="block-content block-content-full">
+      <h4 style="text-align: center;">Historique des transactions </h4>
+        <table class="table table-bordered table-striped table-vcenter js-dataTable-full-pagination">
+            <thead>
+                <tr>
+                    <th class="text-center" style="width: 60px;">Date de paiement</th>
+                    <th class="text-center" style="width: 60px;">Montant versé</th>
+                    <th class="text-center" style="width: 60px;">Bénéficiaire	</th>
+                    <th class="text-center" style="width: 60px;">Type</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for paiement in total_paiements %}
+                <tr>
+                    <td class="text-center font-size-sm">{{paiement.dateversement}}</td>
+                    <td class="text-center font-size-sm">{{paiement.montant}}</td>             
+                    <td class="text-center font-size-sm">{{ paiement.etudiant.nom }} {{ paiement.etudiant.prenom }}</td>             
+                    <td class="text-center font-size-sm">{{paiement.type}}</td>             
+                </tr>
+                {% endfor%}
+
+                {% for salaire in total_salaires %}
+                <tr>
+                    <td class="text-center font-size-sm">{{salaire.date_fin}}</td>
+                    <td class="text-center font-size-sm">{{salaire.salaire_net_a_payer}}</td>             
+                    <td class="text-center font-size-sm">{{salaire.personnel.nom }} {{ salaire.personnel.prenom }}</td>             
+                    <td class="text-center font-size-sm">Salaire</td>             
+                </tr>
+                {% endfor%}
+
+                {% for salaire in total_fiches_de_paies %}
+                <tr>
+                    <td class="text-center font-size-sm">{{salaire.dateFin}}</td>
+                    <td class="text-center font-size-sm">{{salaire.difference}}</td>             
+                    <td class="text-center font-size-sm">{{salaire.enseignant.nom }} {{ salaire.enseignant.prenom }}</td>             
+                    <td class="text-center font-size-sm">Salaire</td>             
+                </tr>
+                {% endfor%}
+
+                {% for salaire in total_fiche_charges %}
+                <tr>
+                    <td class="text-center font-size-sm">{{salaire.dateFin}}</td>
+                    <td class="text-center font-size-sm">{{salaire.montant}}</td>             
+                    <td class="text-center font-size-sm">{{salaire.personnel.nom }} {{ salaire.personnel.prenom }}</td>             
+                    <td class="text-center font-size-sm">Salaire</td>              
+                </tr>
+                {% endfor%}
+
+                {% for fournisseur in total_fournisseurs %}
+                <tr>
+                    <td class="text-center font-size-sm">{{fournisseur.dateversement}}</td>
+                    <td class="text-center font-size-sm">{{fournisseur.montant}}</td>             
+                    <td class="text-center font-size-sm">{{fournisseur.type }}</td>             
+                    <td class="text-center font-size-sm">Fournisseur</td>             
+                </tr>
+                {% endfor%}
+            </tbody>
+        </table>
+        
+    </div>
+</div>
+{% endblock %}

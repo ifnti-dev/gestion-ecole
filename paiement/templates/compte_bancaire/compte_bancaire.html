@@ -1,0 +1,131 @@
+
+{% extends 'index.html' %}
+{% block content_title %}
+ Compte bancaire de l'IFNTI 
+
+{% if is_comptable %}
+  <h1>
+     <a href="{% url 'paiement:create_compte' %}" class="btn btn-outline-primary">
+        <i class="fas fa-plus"></i> Ajouter
+      </a>
+  </h1>
+{% endif %}
+
+{% endblock %}
+{% block content_title_description %}
+
+
+{% endblock %}
+{% block content %}
+<div class="block block-rounded m-5">
+    <div class="block-content block-content-full">
+    
+      <table class="table table-bordered table-dark">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Montant Total des frais de scolarité </th>
+      <th scope="col">{{ total_paiements }} FCFA</th>
+    </tr>
+  </thead>
+  <tbody>
+    
+     <tr>
+      <th scope="col">#</th>
+      <th scope="col">Montant Total des salaires des employés </th>
+      <th scope="col">{{ total_salaires }} FCFA</th>
+    </tr>
+
+     <tr>
+      <th scope="col">#</th>
+      <th scope="col">Montant Total des paiements des fournisseurs </th>
+      <th scope="col">{{ total_paiements_fournisseurs }} FCFA</th>
+    </tr>
+    <h1 style="text-align: center;">
+      
+          {% if compte_bancaire_obj %}
+              <a href="{% url 'paiement:etat_compte_bancaire' id_annee_selectionnee compte_bancaire_obj.id %}" class="btn btn-outline-success">
+                  Historique des transactions
+              </a>
+          {% endif %}
+
+      </h1>
+
+  </tbody>
+</table>
+  <br>
+  <h3 style="text-align: center;">Informations Détailleés</h3>
+
+  <table class="table">
+  <thead>
+    <tr>
+      <th scope="col"></th>
+      <th scope="col">#</th>
+      <th scope="col">Montant total </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">1</th>
+      <td>Montant Total des Salaires Bruts</td>
+      <td>{{ total_salaire_brut }}</td>
+    </tr>
+    <tr>
+      <th scope="row">2</th>
+      <td>Montant Total des Contributions CNSS</td>
+      <td> {{ total_cnss }}</td>
+    </tr>
+    <tr>
+      <th scope="row">3</th>
+      <td>Montant Total de l'IRPP </td>
+      <td>{{ total_irpp }}</td>
+    </tr>
+    <tr>
+      <th scope="row">4</th>
+      <td>Montant Total des Salaires Nets </td>
+      <td>{{ total_salaire_net }}</td>
+    </tr>
+    <tr>
+      <th scope="row">5</th>
+      <td>Montant Total des Salaires des vaccataires</td>
+      <td>{{ total_fiche_de_paies }}</td>
+    </tr>
+    <tr>
+      <th scope="row">6</th>
+      <td>Montant Total des Salaires des vonlontaires</td>
+      <td> {{ total_charges }}</td>
+    </tr>
+
+  </tbody>
+</table>
+
+ <br>
+  <h3 style="text-align: center;">Compte Bancaire</h3>
+
+  <table class="table table-bordered table-dark">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Numéro de compte</th>
+      <th scope="col">{{ compte_bancaire_obj.numero  }}</th>
+    </tr>
+  </thead>
+  <tbody>
+    
+     <tr>
+      <th scope="col">#</th>
+      <th scope="col">Solde bancaire </th>
+      <th scope="col">{{ compte_bancaire_obj.solde_bancaire }} FCFA</th>
+    </tr>
+
+  </tbody>
+</table>
+
+
+
+  </div>
+</div>
+{% endblock %}
+
+
+

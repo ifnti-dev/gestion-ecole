@@ -1,0 +1,51 @@
+{% extends '../consulter_historique.html' %}
+
+{% block content %}
+
+<div class="block block-rounded m-5">
+    <div class="block-header p-4">
+        <h3 class="block-title" style="text-align: center;">Liste des matières</h3>
+    </div>
+    <div class="block-content block-content-full">
+        <table class="table table-bordered table-striped table-vcenter js-dataTable-full-pagination">
+            <thead>
+                <tr>
+                    <th class="text-center" style="width: 14%;">Code matière</th>
+                    <th class="text-center" style="width: 20%;">Libéllé</th>
+                    <th class="text-center" style="width: 40px;">Coefficient</th>
+                    <th class="text-center" style="width: 50px;">Valeur minimale</th>
+                    <th class="text-center" style="width: 20%;">Enseignant</th>
+                    <th scope="col" class="bg-warning" style="width: 15%;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for matiere in matieres %}
+                <tr>
+                    <td class="text-center font-size-sm">{{matiere.codematiere}}</td>
+                    <td class="text-center font-size-sm">
+                        <a href="{% url 'historique:evaluations' id_matiere=matiere.pk selected_annee_id=selected_annee_id %}">
+                            {{ matiere.libelle }}
+                        </a>                    </td>                  
+                    <td class="text-center font-size-sm">{{matiere.coefficient}}</td>                  
+                    <td class="text-center font-size-sm">{{matiere.minValue}}</td>                  
+                    <td class="text-center font-size-sm">
+                        {% if matiere.enseignant %}
+                            {{matiere.enseignant}}
+                        {% else %}
+                            pas de prof
+                        {% endif %}                            
+                        </td> 
+                    <td style="text-align: center;">                                       
+                        <button type="button" class="bs-modal read-book btn btn-sm btn-primary">
+                            <a style="color: blanchedalmond;" href="{% url 'historique:detail_matiere' selected_annee_id=selected_annee_id id=matiere.id %}">
+                                <span class="fa fa-eye"></span>                
+                            </a>                         
+                        </button>                                 
+                    </td> 
+                </tr>
+                {% endfor%}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

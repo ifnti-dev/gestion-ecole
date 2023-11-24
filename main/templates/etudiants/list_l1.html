@@ -1,0 +1,240 @@
+{% extends 'index.html' %}
+
+<style>
+
+    .dropdown-submenu2 {
+        position: relative;
+    }
+
+    .dropdown-submenu2>.dropdown-menu2 {
+        top: 0;
+        left: 100%;
+        margin-top: -6px;
+        margin-left: -1px;
+        -webkit-border-radius: 0 6px 6px 6px;
+        -moz-border-radius: 0 6px 6px;
+        border-radius: 0 6px 6px 6px;
+    }
+
+    .dropdown-submenu2:hover>.dropdown-menu2 {
+        display: block;
+    }
+
+    .dropdown-submenu2>a:after {
+        display: block;
+        content: " ";
+        float: right;
+        width: 0;
+        height: 0;
+        border-color: transparent;
+        border-style: solid;
+        border-width: 5px 0 5px 5px;
+        border-left-color: #ccc;
+        margin-top: 5px;
+        margin-right: -10px;
+    }
+
+    .dropdown-submenu2:hover>a:after {
+        border-left-color: #fff;
+    }
+
+    .dropdown-submenu2.pull-left {
+        float: none;
+    }
+
+    .dropdown-submenu2.pull-left>.dropdown-menu2 {
+        left: -100%;
+        margin-left: 10px;
+        -webkit-border-radius: 6px 0 6px 6px;
+        -moz-border-radius: 6px 0 6px 6px;
+        border-radius: 6px 0 6px 6px;
+    }
+</style>
+
+{% block content %}
+
+<div class="block block-rounded m-5">
+    <div class="block-header p-4">
+        <h3 class="block-title">Etudiants de {{niveau}}</h3>
+
+        <button type="button" class="btn btn-secondary dropdown-toggle float-right" id="dropdown-default-secondary" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Action groupées
+        </button>
+        <div class="dropdown-menu font-size-sm" aria-labelledby="dropdown-default-secondary">
+
+            {% comment %} Génération des notes {% endcomment %}
+            <li class="nav-main-item">
+                <a class="nav-main-link nav-main-link-submenu" data-toggle="submenu" aria-haspopup="true" aria-expanded="false" href="#">
+                    <i class="fa fa-file mr-1" aria-hidden="true"></i>
+                    <span class="nav-main-link-name">Relevés de notes du semestre</span>
+                </a>
+                <ul class="nav-main-submenu">
+                    <li class="nav-main-item">
+                        <a class="nav-main-link" href="{% url 'main:releve_notes' s1.id %}">
+                            <span class="nav-main-link-name">{{s1.libelle}}</span>
+                        </a>
+                    </li>
+                    <li class="nav-main-item">
+                        <a class="nav-main-link" href="{% url 'main:releve_notes' s2.id %}">
+                            <span class="nav-main-link-name">{{s2.libelle}}</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            {% comment %} Fin génération des notes {% endcomment %}
+
+            {% comment %} Génération de la carte étudiant {% endcomment %}
+            <li class="nav-main-item">
+                <a class="nav-main-link nav-main-link-name" data-toggle="" aria-haspopup="true" aria-expanded="false" href="{% url 'main:carte_etudiant' niveau %}">
+                    <i class="fa fa-id-card mr-1" aria-hidden="true"></i>
+                    <span class="nav-main-link-name">Cartes étudiants</span>
+                </a>                   
+            </li>
+            {% comment %} Fin génération carte étudiant {% endcomment %}
+
+            {% comment %} Génération du diplome étudiant {% endcomment %}
+            <li class="nav-main-item">
+                <a class="nav-main-link nav-main-link-name" data-toggle="" aria-haspopup="true" aria-expanded="false" href="{% url 'main:diplome_etudiant' %}">
+                    <i class="fa fa-certificate mr-1" aria-hidden="true"></i>
+                    <span class="nav-main-link-name">Diplomes étudiants</span>
+                </a>                   
+            </li>
+            {% comment %} Fin génération du diplome étudiant {% endcomment %}
+
+        </div>
+
+    </div>
+    <div class="block-content block-content-full">
+
+        <table class="table table-bordered table-striped table-vcenter js-dataTable-full-pagination">
+            <thead>
+                <tr>
+                    <th class="text-center" style="width: 80px;">Matricule</th>
+                    <th>Nom et Prénom</th>
+                    <th class="d-none d-sm-table-cell" style="width: 10%;">Sexe</th>
+                    <th style="width: 10%;">Niveau</th>
+                    <th class="d-none d-sm-table-cell" style="width: 15%;">Contact</th>
+                    <th style="width: 15%;">Actif</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                {% for etudiant in etudiants %}
+                <tr>
+                    <td class="text-center font-size-sm">{{etudiant.id}}</td>
+                    <td class="font-w600 font-size-sm">{{etudiant.nom}} {{etudiant.prenom}}</td>
+                    <td class="d-none d-sm-table-cell font-size-sm">
+                        {{etudiant.sexe}}
+                    </td>
+                    <td class="d-none d-sm-table-cell">
+                        <span class="badge badge-info">{{niveau}}</span>
+                    </td>
+                    <td>
+                        {{etudiant.contact}}
+                    </td>
+                    {% if etudiant.is_active %}
+                    <td class="text-success">
+                        Oui
+                    </td>
+                    {% endif %}
+                    {% if etudiant.is_active == False %}
+                    <td class="text-danger">
+                        Non
+                    </td>
+                    {% endif %}
+                    <td>
+                        {% comment %} Boutton permettant de regrouper les actions concernant chaque élève {% endcomment %}
+                        <button type="button" class="btn btn-secondary dropdown-toggle" id="dropdown-default-secondary" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fa fa-bars" aria-hidden="true"></i>
+                        </button>
+                        <div class="dropdown-menu font-size-sm" aria-labelledby="dropdown-default-secondary">
+
+                            {% comment %} Génération des notes {% endcomment %}
+                            <li class="nav-main-item">
+                                <a class="nav-main-link nav-main-link-submenu" data-toggle="submenu" aria-haspopup="true" aria-expanded="false" href="#">
+                                    <i class="fa fa-file mr-1" aria-hidden="true"></i>
+                                    <span class="nav-main-link-name">Relevé de notes</span>
+                                </a>
+                                <ul class="nav-main-submenu">
+                                    
+                                    <li class="nav-main-item">
+                                        <a class="nav-main-link nav-main-link-submenu" data-toggle="submenu" aria-haspopup="true" aria-expanded="false" href="#">
+                                            <span class="nav-main-link-name">Relevé synthétique</span>
+                                        </a>
+                                        <ul class="nav-main-submenu">
+                                            <li class="nav-main-item">
+                                                <a class="nav-main-link" href= "{% url 'main:releve_notes' etudiant.id s1.id %}">
+                                                    <span class="nav-main-link-name">{{s1.libelle}}</span>
+                                                </a>
+                                            </li>
+                                            <li class="nav-main-item">
+                                                <a class="nav-main-link" href="#">
+                                                    <span class="nav-main-link-name">{{s2.libelle}}</span>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </li>
+
+                                    <li class="nav-main-item">
+                                        <a class="nav-main-link nav-main-link-submenu" data-toggle="submenu" aria-haspopup="true" aria-expanded="false" href="#">
+                                            <span class="nav-main-link-name">Relevé détaillé</span>
+                                        </a>
+                                        <ul class="nav-main-submenu">
+                                            <li class="nav-main-item">
+                                                <a class="nav-main-link" href="#">
+                                                    <span class="nav-main-link-name">{{s1.libelle}}</span>
+                                                </a>
+                                            </li>
+                                            <li class="nav-main-item">
+                                                <a class="nav-main-link" href="#">
+                                                    <span class="nav-main-link-name">{{s2.libelle}}</span>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </li>
+
+                                </ul>
+                            </li>
+                            {% comment %} Fin génération des notes {% endcomment %}
+
+
+                            {% comment %} Génération de la carte étudiant {% endcomment %}
+                            <li class="nav-main-item">
+                                <a class="nav-main-link nav-main-link-name" data-toggle="" aria-haspopup="true" aria-expanded="false" href="{% url 'main:carte_etudiant' etudiant.id niveau %}">
+                                    <i class="fa fa-id-card mr-1" aria-hidden="true"></i>
+                                    <span class="nav-main-link-name">Carte étudiant</span>
+                                </a>                   
+                            </li>
+                            {% comment %} Fin génération carte étudiant {% endcomment %}
+
+                            {% comment %} Génération du diplome étudiant {% endcomment %}
+                            <li class="nav-main-item">
+                                <a class="nav-main-link nav-main-link-name" data-toggle="" aria-haspopup="true" aria-expanded="false" href="{% url 'main:diplome_etudiant' etudiant.id %}">
+                                    <i class="fa fa-certificate mr-1" aria-hidden="true"></i>
+                                    <span class="nav-main-link-name">Diplome étudiant</span>
+                                </a>                   
+                            </li>
+                            {% comment %} Fin génération du diplome étudiant {% endcomment %}
+
+                            {% comment %} Génération du diplome étudiant {% endcomment %}
+                            <li class="nav-main-item">
+                                <a class="nav-main-link nav-main-link-name" data-toggle="" aria-haspopup="true" aria-expanded="false" href="{% url 'main:certificat_scolaire' etudiant.id niveau %}">
+                                    <i class="fa fa-certificate mr-1" aria-hidden="true"></i>
+                                    <span class="nav-main-link-name">Attestation</span>
+                                </a>                   
+                            </li>
+                            {% comment %} Fin génération du diplome étudiant {% endcomment %}
+
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+{% endblock %}

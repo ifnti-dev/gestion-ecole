@@ -1,0 +1,143 @@
+{% extends '../index.html' %}
+{% block content_title %} Enregistrement d'une seance {% endblock content_title %}
+{% load static %}
+
+
+{% block content %}
+<script src="{% static 'assets/js/ckeditor.js'%}"></script>
+
+
+  <main id="main-container">
+       
+                <div class="content">
+                    <div style="position: fixed; top: 2rem; right: 2rem; z-index: 9999999;">
+
+                        <div id="notification" class="toast fade hide" data-delay="16000" role="alert" aria-live="assertive" aria-atomic="true">
+                            <div class="toast-header">
+                                <i class="si si-wrench text-danger mr-2"></i>
+                                <strong class="mr-auto">Contrôle</strong>
+                                <small class="text-muted">à l'instant</small>
+                                <button type="button" class="ml-2 close" data-dismiss="toast" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="toast-body">
+                                Corrigez votre intervalle d'heure, </br>
+                                Une seance fait minimum 30 min .
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Alternative Style -->
+                    <div class="block block-rounded">
+                        <div class="block-header">
+                            <h3 class="block-title"></h3>
+                        </div>
+                        <div class="block-content block-content-full">
+                            <form action="{% url 'cahier_de_texte:enregistrer_seance' %}" onsubmit="return validateForm();" method="post">
+                            	{% csrf_token %}
+                                        <input type="hidden" id="ecrit_par" name="ecrit_par" value="{{ request.etudiant.id }}">
+                                        <div class="form-row" >
+                                            <div class="form-group col-md-6" >
+                                                <label for="example-text-input-alt">Intitulé</label>
+                                                <input type="text" class="form-control form-control-alt" id="intitulé" name="intitulé" required="true"  placeholder="Entrez un intitulé">
+                                            </div>
+                                            <div class="form-group col-md-6">
+                                                <label for="example-select">Selectionnez la matiere</label>
+                                                <select required="true" class="form-control" id="matiere" name="matiere">
+                                                    {% for matiere in matieres %}
+                                                    <option value="{{ matiere.pk }}">{{ matiere.libelle }}</option>
+                                                  {% endfor %}
+                                                </select>
+                                            </div>
+                                        
+                                        </div>
+                                        
+                                        <div class="form-row">
+                                            <div class="form-group col-md-6">
+                                                <label for="eleves-absents">Élèves absents</label>
+                                                <select  class="js-select2 form-control" id="eleves-absent" name="eleves-absent" style="width: 100%;" data-placeholder="Choisissez les.." multiple>
+                                                    <option></option><!-- Required for data-placeholder attribute to work with Select2 plugin -->
+                                                    {% for etudiant in etudiants %}
+                                                    <option value="{{ etudiant.id }}">{{ etudiant.nom }} {{ etudiant.prenom }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                                   
+                                            </div>
+                                            <div class="form-group col-md-6">
+                                                <label for="example-flatpickr-datetime-24">Date de la seance</label>
+                                                <input type="text" class="js-flatpickr form-control bg-white" id="dateseance" name="dateseance" required="true" placeholder="Choisissez la date" value="{{ currentDate }}">
+                                            </div>
+                                        </div>
+                                        <div class="form-row">
+                                                <div class="form-group col-md-6">
+                                                    <label for="example-flatpickr-datetime-24">Heure debut de la seance</label>
+                                                    <input type="text"  class="js-flatpickr form-control bg-white" id="heuredebut" name="heuredebut" required="true" data-enable-time="true" data-no-calendar="true" placeholder="Commencer" data-date-format="H:i" data-time_24hr="true" value="{{ currentTime }}">
+                                                </div>
+                                          
+                                                <div class="form-group col-md-6">
+                                                    <label for="example-flatpickr-datetime-24">Heure fin de la seance</label>
+                                                    <input type="text" class="js-flatpickr form-control bg-white" id="heurefin" required="true" name="heurefin" data-enable-time="true" data-no-calendar="true" placeholder="Finir" data-date-format="H:i" data-time_24hr="true" value="{{ currentTime }}">
+                                                </div>
+                                        </div>
+                                        <input type="hidden" id="description" name="description" value="Resumé">
+   
+                                        <div class="form-group">
+                                            <div id="js-ckeditor5-classic" name="js-ckeditor5-classic">Resumé</div>
+                                          </div>
+                                        
+                                         
+                                        <button type="submit" id="submit" class="btn btn-outline-primary">Enregistrer</button>
+                          
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </main>
+            <script>
+                      
+                
+                    ClassicEditor
+                        .create(document.querySelector('#js-ckeditor5-classic'), {
+                        })
+                        .then(editor => {
+                            editor.model.document.on('change:data', () => {
+                                const content = editor.getData();
+                                document.querySelector('#description').value = content;
+                                console.log(content)
+                            });
+                        })
+                        .catch(error => {
+                            console.error(error);
+                        });
+
+                    
+                    function validateForm() {
+                        const heureDebutInput = document.getElementById("heuredebut");
+                        const heureFinInput = document.getElementById("heurefin");
+                        const dateInput = document.getElementById("dateseance");
+                        const date = dateInput.value
+                        const startTime = heureDebutInput.value;
+                        const endTime = heureFinInput.value;
+                        if (!startTime || !endTime) {
+                            return true;
+                        }
+
+                        const startDate = new Date(`01/01/2000 ${startTime}`);
+                        const endDate = new Date(`01/01/2000 ${endTime}`);
+                        const minDuration = 30 * 60 * 1000;
+                        
+                        
+                        if (endDate - startDate < minDuration) {
+                            jQuery('#notification').toast('show');
+                            return false; 
+                            
+                        }
+                        
+                        return true;
+
+                    }
+
+            </script>
+   {% endblock %}

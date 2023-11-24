@@ -1,0 +1,80 @@
+{% extends './index.html' %}
+{% block content_title %} Boite à Suggestion {% endblock content_title %}
+{% load static %}
+
+{% block content %}
+<script src="{% static 'assets/js/ckeditor.js'%}"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+<script type="text/javascript">
+    (function() {
+        
+        emailjs.init('-VtuXoQneyabX9Fr4');// on doit mettre ici le public key, obtenu sur emailjs , du compte ifnti.
+    })();
+</script>
+<script type="text/javascript">
+    window.onload = function() {
+        document.getElementById('contact-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            // generate a five digit number for the contact_number variable
+            this.contact_number.value = Math.random() * 100000 | 0;
+            // these IDs from the previous steps
+            emailjs.sendForm('service_fsp0sli', 'template_7c35wdn', this)
+                .then(function() {
+                    console.log('SUCCESS!');
+                }, function(error) {
+                    console.log('FAILED...', error);
+                });
+        });
+    }
+</script>
+
+<div class="bg-white">
+    <div class="content">
+        <div class="row items-push justify-content-center">
+            <div class="col-md-10 col-xl-5">
+                <form id="contact-form">
+                    
+                    <div class="form-group">
+                        <label for="frontend-contact-subject">Objet</label>
+                        <select class="custom-select" id="sujet" name="sujet" size="1">
+                            <option value="Plainte / Reclamation">Plainte / Reclamation</option>
+                            <option value="Suggestion">Suggestion</option>
+                            <option value="Felicitation / Encouragement">Felicitation / Encouragement</option>
+                        </select>
+                    </div>
+                    <input type="hidden" id="contact_number" name="contact_number">
+                    <input type="hidden" id="to_name" name="to_name" value="IFNTI">
+                    <input type="hidden" id="message" name="message" value="Message">
+                    <div class="form-group">
+                        <div id="js-ckeditor5-classic" name="js-ckeditor5-classic">Message</div>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-alt-primary">
+                            <i class="fa fa-paper-plane mr-1"></i> Transmettre
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    ClassicEditor
+        .create(document.querySelector('#js-ckeditor5-classic'), {})
+        .then(editor => {
+            editor.model.document.on('change:data', () => {
+                const content = editor.getData();
+                document.querySelector('#message').value = content;
+            });
+        })
+        .catch(error => {
+            console.error(error);
+        });
+
+    function convertHtmlToPlainText(html) {
+        const doc = new DOMParser().parseFromString(html, 'text/html');
+        return doc.body.textContent || "";
+    }
+</script>
+{% endblock %}
+

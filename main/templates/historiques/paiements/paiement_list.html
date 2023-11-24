@@ -1,0 +1,52 @@
+{% extends '../consulter_historique.html' %}
+
+{% block content %}
+
+<div class="block block-rounded m-5">
+    <div class="block-header p-4">
+        <h3 class="block-title" style="text-align:center;">Liste des Paiements</h3>
+    </div>
+
+    <div class="block-content block-content-full">
+        <table class="table table-bordered table-striped table-vcenter js-dataTable-full-pagination">
+            <thead>
+                <tr>
+                    <th class="text-center" style="width: 80px;">ID</th>
+                    <th class="text-center" style="width: 30%;">Type</th>
+                    <th class="text-center" style="width: 80px;">Montant versé</th>
+                    <th class="text-center" style="width: 15%;">Frais de concours</th>
+                    <th class="text-center" style="width: 15%;">Frais d'inscription</th>
+                    <th class="text-center" style="width: 15%;">Date de versement</th>
+                    <th class="text-center" style="width: 15%;">Nombre de tranche</th>
+                    <th class="text-center" style="width: 15%;">Débit</th>
+                    <th class="text-center" style="width: 15%;">Crédit</th>
+                    <th class="text-center" style="width: 55%;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for paiement in paiements %}
+                <tr>
+                    <td class="text-center font-size-sm">{{ paiement.id }}</td>
+                    <td class="text-center font-size-sm">{{ paiement.type }}</td>
+                    <td class="text-center font-size-sm">{{ paiement.montant }}</td>
+                    <td class="text-center font-size-sm">{{ paiement.fraisconcours }}</td>
+                    <td class="text-center font-size-sm">{{ paiement.fraisinscription }}</td>
+                    <td class="text-center font-size-sm">{{ paiement.dateversement }}</td>
+                    <td class="text-center font-size-sm">{{ paiement.nombreTranche }}</td>
+                    <td class="text-center font-size-sm">{{ paiement.debit }}</td>
+                    <td class="text-center font-size-sm">{{ paiement.credit }}</td>
+                    <td style="text-align: center;">
+                        <button type="button" class="bs-modal read-book btn btn-sm btn-primary">
+                            <a style="color: blanchedalmond;" href="{% url 'historique:paiement_detail' selected_annee_id=selected_annee_id id=paiement.id %}">
+                                <span class="fa fa-eye"></span>
+                            </a>
+                        </button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

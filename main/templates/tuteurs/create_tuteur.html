@@ -1,0 +1,75 @@
+{% extends '../index.html' %}
+
+{% load static %}
+
+{% block content %}
+    <div id="content-wrapper">
+        <div class="container-fluid">           
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h3><i class="fas fa-table"></i> Enrégistrement d'un tuteur</h3>
+                    <a class="btn btn-sm btn-success"  href="{% url 'main:liste_des_tuteurs' %}" style="padding: 8px; float: right; background-color: blue; color: white;"><i class="fas fa-chevron-left fa-lg"></i>
+                        Retour</a>
+                </div>
+                <div class="card-body">
+                  <form class="form-horizontal" action="#" method="POST">
+                    {% csrf_token %}
+
+                
+                    <div class="form-group row">
+                        <label for="{{ form.nom.id_for_label }}" class="col-md-2 col-form-label">Nom:</label>
+                        <div class="col-md-10">
+                            {{ form.nom }}
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label for="{{ form.prenom.id_for_label }}" class="col-md-2 col-form-label">Prénom:</label>
+                        <div class="col-md-10">
+                            {{ form.prenom }}
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label for="{{ form.sexe.id_for_label }}" class="col-md-2 col-form-label">Sexe:</label>
+                        <div class="col-md-10">
+                            {{ form.sexe }}
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label for="{{ form.type.id_for_label }}" class="col-md-2 col-form-label">Type:</label>
+                        <div class="col-md-10">
+                            {{ form.type }}
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label for="{{ form.contact.id_for_label }}" class="col-md-2 col-form-label">Contact:</label>
+                        <div class="col-md-10">
+                            {{ form.contact }}
+                        </div>
+                    </div> 
+
+                    <div class="form-group row">
+                        <label for="{{ form.profession.id_for_label }}" class="col-md-2 col-form-label">Profession:</label>
+                        <div class="col-md-10">
+                            {{ form.profession }}
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label for="{{ form.adresse.id_for_label }}" class="col-md-2 col-form-label">Adresse:</label>
+                        <div class="col-md-10">
+                            {{ form.adresse }}
+                        </div>
+                    </div>
+
+                                     
+                    <button class="btn btn-primary btn-block" type="submit"><i class="fas fa-database"></i> Enrégistrer &nbsp;&nbsp;&nbsp;<span></span></button>
+                </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

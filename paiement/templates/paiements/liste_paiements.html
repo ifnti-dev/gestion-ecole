@@ -1,0 +1,59 @@
+{% extends '../index.html' %}
+
+{% block content %}
+
+<div class="block block-rounded m-5">
+    <div class="block-header p-4">
+        <h3 class="block-title">Liste des Paiements</h3>
+        <a href="{% url 'paiement:bilan_paiements_annuel' id_annee_selectionnee %}" class="btn btn-outline-dark">
+                <span class="fa fa-eye"></span> Bilan
+        </a>  
+
+         {% if is_comptable %}
+        <a href="{% url 'paiement:enregistrer_paiement'%}" class="btn btn-outline-primary">
+                <i class="fas fa-plus"></i> Ajouter
+        </a>
+        {% endif %}
+    </div>
+
+    <div class="block-content block-content-full">
+        <table class="table table-bordered table-striped table-vcenter js-dataTable-full-pagination">
+            <thead>
+                <tr>
+                    <th class="text-center" style="width: 25%;">Type de paiement</th>
+                    <th class="text-center" style="width: 25%;">Étudiant</th>
+                    <th class="text-center" style="width: 25%;">Montant versé</th>
+                    <th class="text-center" style="width: 25%;">Date de versement</th>
+                    <th class="text-center" style="width: 25%;">Numéro bordereau</th>
+                    <th class="text-center" style="width: 25%;">Comptable</th>
+                    {% if is_comptable %}
+                        <th class="text-center" style="width: 15%;">Modifier</th>
+                    {% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for paiement in paiements %}
+                <tr>
+                    <td class="text-center font-size-sm">{{ paiement.type }}</td>
+                    <td class="text-center font-size-sm">{{ paiement.etudiant.nom }} {{ paiement.etudiant.prenom }}</td>
+                    <td class="text-center font-size-sm">{{ paiement.montant }}</td>
+                    <td class="text-center font-size-sm">{{ paiement.dateversement }}</td>
+                    <td class="text-center font-size-sm">{{ paiement.numerobordereau }}</td>
+                    <td class="text-center font-size-sm">{{ paiement.comptable }}</td>
+                    {% if is_comptable %}
+                    <td style="text-align: center;">
+                        <button type="button" class="update-book btn btn-sm btn-warning">
+                            <a style="color: blanchedalmond;" href="{% url 'paiement:modifier_paiement' paiement.id %}">
+                                <span><i class="far fa-edit"></i></span>
+                            </a>
+                        </button>
+                    </td>
+                    {% endif %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

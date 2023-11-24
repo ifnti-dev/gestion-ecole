@@ -1,0 +1,72 @@
+\begin{document}  
+ 
+\begin{landscape}
+%faire une boucle qui compte et additionne pour chaque ue , le nombre de matiere , recuperer la valeur total de matiere et y ajouter 2
+%la valeur ainsi recuperer , on fait une boucle pour creer le begin tabular et  la valeur correspond au nombre de |c|
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
+//ensuite pour le cline on par de 3 jusqua cette valeur recuperer
+\cline{3-23}
+//ensuite ici on met la premierer ligne (\multicolumn{2}{c|}{} &) et  on fait une boucle pour recuperer les ue , pour chaque ue , on recupere une valeur correspondante au nombre de matiere que comprend l'ue et on la met ensuite dabs le multicolumn , et dans les crochet , de fin , on ajoute le libelle de l'ue
+\multicolumn{2}{c|}{} & 
+\multicolumn{4}{p{2cm}|}{\centering Base de données} & 
+\multicolumn{4}{p{2cm}|}{\centering Présentation orale}  & 
+\multicolumn{2}{p{2cm}|}{\centering Données semis structurées} & 
+\multicolumn{3}{p{2cm}|}{\centering Réseau} &  
+\multicolumn{4}{p{2cm}|}{\centering Électronique} & 
+\multicolumn{2}{p{2cm}|}{\centering Projet} & 
+\multicolumn{2}{p{2cm}|}{\centering Stage} \\ 
+
+// on vient ensuite ici apres le hline , on met (Prénom & Nom & ) et on boucle ensuite pour recuperer dans l'odre des ue , les libellle de chacune des matieres des ue et on les met dans les crochet avec la proprieter centring
+\hline 
+Prénom & Nom & 
+\rotatebox{90}{\parbox[c]{2.5cm}{\centering UML }}  & 
+\rotatebox{90}{\parbox[c]{2.5cm}{\centering BPMN }} &  
+\rotatebox{90}{\parbox[c]{2.5cm}{\centering Base de données }} &  
+\rotatebox{90}{\parbox[c]{2.5cm}{\centering UE }} &  
+\rotatebox{90}{\parbox[c]{2.5cm}{\centering  Présentation }} &
+\rotatebox{90}{\parbox[c]{2.5cm}{\centering Intro au droits }}  &  
+\rotatebox{90}{\parbox[c]{2.5cm}{\centering Anglais }} & 
+\rotatebox{90}{\parbox[c]{2.5cm}{\centering UE }}  & \rotatebox{90}{\parbox[c]{2.5cm}{\centering TDSS }} & \rotatebox{90}{\parbox[c]{2.5cm}{\centering UE }} & \rotatebox{90}{\parbox[c]{2.5cm}{\centering Knowbridge }} & \rotatebox{90}{\parbox[c]{2.5cm}{\centering DHCP }} & \rotatebox{90}{\parbox[c]{2.5cm}{\centering UE }} & \rotatebox{90}{\parbox[c]{2.5cm}{\centering Fonctions mathématiques }} & \rotatebox{90}{\parbox[c]{2.5cm}{\centering Analogique }} & \rotatebox{90}{\parbox[c]{2.5cm}{\centering architecture des ordinateurs }} & \rotatebox{90}{\parbox[c]{2.5cm}{\centering UE }} & \rotatebox{90}{\parbox[c]{2.5cm}{\centering Projet }} & \rotatebox{90}{\parbox[c]{2.5cm}{\centering UE }} & \rotatebox{90}{\parbox[c]{2.5cm}{\centering Stage }} & \rotatebox{90}{\parbox[c]{2.5cm}{\centering UE }} \\ 
+// ensuite ici on ferme en mettant un intervale de la valeur recuperer , qui par de cet valeur a cette valeur dans l'element cline
+\cline{23-23}
+
+//ici on fait une boucle pour compter le nombre d'eleve et pour chaque eleve , on genere une ligne de l'element hline qui prend le prenom , le nom , et la moyenne pour chaque matiere dans l'ordre 
+\hline 
+Test & Test & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 \\ 
+\hline 
+Test & Test & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 \\ 
+\hline 
+Test & Test & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 \\ 
+\hline 
+Test & Test & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 \\ 
+\hline 
+Test & Test & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 \\ 
+\hline 
+Test & Test & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 \\ 
+\hline 
+Test & Test & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 \\ 
+\hline 
+Test & Test & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 & 10 \\ 
+\hline 
+\end{tabular} 
+\end{landscape}
+
+// un dictionnaire qui qui a le nombre de matiere par ue et le libelle de cette ue
+// un tableau des libelle de chacune des matiere
+// une donnee longueur tableau qui est le nombre de matiere total pour les ue + 2 
+// j'ai besoin d'un dictionnaire qui pour chaque etudiant , regroupe son prenom , son nom et chacune des moyennes de chacune de ses matieres
+
+
+
+\begin{tabular}{|c|>{\centering\arraybackslash}p{3cm}|>{\centering\arraybackslash}p{3cm}|}
+  \cline{2-3}
+  \multicolumn{1}{c|}{} & \rotatebox{90}{\parbox[c]{2.5cm}{\centering Colonne des Données semis structurées}} & \rotatebox{90}{\parbox[c]{2.5cm}{\centering Colonne2 et Colonne3}} \\
+  
+  \hline
+  Document de synthèse du semestre 1 & Document de synthèse du semestre 2 & Document de synthèse du semestre 3 \\
+  \cline{2-3}
+  \hline
+  Document de synthèse du semestre 4 & Document de synthèse du semestre 5 & Document de synthèse du semestre 6 \\
+  \cline{2-3}
+  \hline
+\end{tabular}

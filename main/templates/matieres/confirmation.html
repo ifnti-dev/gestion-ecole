@@ -1,0 +1,31 @@
+{% extends '../index.html' %}
+{% block content_title %} Affectation Matières : Page de confirmation {% endblock content_title %}
+{% load static %}
+
+{% block content %}
+                <div class="content">
+                    <!-- lal -->
+                    <div class="block block-rounded mt-4">
+                        <div class="block-header">
+                          <h3 class="block-title"></h3>
+                        </div>
+                        <div class="block-content">
+                          <p>L'affectation suivante a été enregistrée avec succès :</p>
+                          <ul>
+                            
+                            <li class="mb-2">
+                              Matière : {{ matiere.libelle }} 
+                            </li>
+                            <li class="mb-2">
+                                Coefficient : {{ matiere.coefficient }}
+                            </li>
+                            <li class="mb-2">
+                                Professeur : {{ matiere.enseignant.nom }}  {{matiere.enseignant.prenom}}
+                            </li>
+                          </ul>
+                        </div>
+                      </div>
+                </div>
+ 
+
+{% endblock %}

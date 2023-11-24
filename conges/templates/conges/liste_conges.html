@@ -1,0 +1,82 @@
+{% extends '../index.html' %}
+
+{% block content %}
+
+<div class="block block-rounded m-5">
+    <div class="block-header p-4">
+        <h3 class="block-title">Mes demandes de congés</h3>
+        <a href="{% url 'conges:demander_conges'%}" class="btn btn-outline-primary">
+                <i class="fas fa-plus"></i> Ajouter
+        </a>  
+    </div>
+
+    <div class="block-content block-content-full">
+        <table class="table table-bordered table-striped table-vcenter js-dataTable-full-pagination">
+            <thead>
+                <tr>
+                    <th class="text-center" style="width: 35%;">Période</th>
+                    <th class="text-center" style="width: 15%;">Durée</th>
+                    <th class="text-center" style="width: 15%;">État</th>
+                    <!--th class="text-center" style="width: 15%;">Modifier</th-->
+                </tr>
+            </thead>
+            <tbody>
+                {% for conge in conges %}
+                <tr>
+                    <td class="text-center font-size-sm">Du {{ conge.date_et_heure_debut }} au  {{ conge.date_et_heure_fin }}</td>
+                    <td class="text-center font-size-sm">{{conge.nombre_de_jours_de_conge }} Jours</td>
+                    <td class="text-center font-size-sm">
+                        {% if conge.valider == "Actif" %}
+                            <button type="button" class="update-book btn btn-sm btn-primary">
+                                <a style="color: blanchedalmond;" href="#">
+                                <span><i class="far fa-check-circle "></i></span> 
+                                </a>
+                            </button>
+                        {% elif conge.valider == "Inactif" %}
+                            <button type="button" class="update-book btn btn-sm btn-danger">
+                                <a style="color: blanchedalmond;" href="#" data-toggle="modal" data-target="#motifRefusModal{{ conge.id }}">
+                                    <span><i class="far fa-calendar-times"></i></span>
+                                </a>
+                            </button>
+
+                            <div class="modal fade" id="motifRefusModal{{ conge.id }}" tabindex="-1" role="dialog" aria-labelledby="motifRefusModalLabel{{ conge.id }}" aria-hidden="true">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="motifRefusModalLabel{{ conge.id }}">Motif de refus</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            {{ conge.motif_refus }}
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% else %}
+                            <button type="button" class="update-book btn btn-sm btn-dark">
+                                <a style="color: blanchedalmond;" href="#">
+                                <span><i class="fa fa-question-circle" aria-hidden="true"></i></span> 
+                                </a>
+                            </button>  
+                        {% endif %}
+                    </td>
+                   <!--td style="text-align: center;">
+                        <button type="button" class="update-book btn btn-sm btn-warning">
+                            <a style="color: blanchedalmond;" href="{% url 'conges:modifier_demande_conge' conge.id %}">
+                                <span><i class="far fa-edit"></i></span> 
+                            </a>
+                        </button>
+                    </td-->
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

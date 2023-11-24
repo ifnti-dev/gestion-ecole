@@ -1,0 +1,52 @@
+{% extends '../index.html' %}
+
+{% block content %}
+<div class="block block-rounded m-5">
+    <div class="block-header p-4">
+        <h3 class="block-title">Liste des semestres clôturés</h3>
+    </div>
+    <div class="block-content block-content-full">
+        <table class="table table-bordered table-striped table-vcenter js-dataTable-full-pagination">
+            <thead>
+                <tr>
+                    <th class="text-center" style="width: 80px;">ID</th>
+                    <th class="text-center" style="width: 20%;">Libelle</th>
+                    <th class="text-center" style="width: 40px;">Smestre courant</th>
+                    <th scope="col" class="bg-warning" style="width: 90px;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for semestre in semestres %}
+                <tr>
+                    <td class="text-center font-size-sm">{{semestre.id}}</td>
+                    <td class="text-center font-size-sm">{{semestre.libelle}}</td>
+                    <td class="text-center font-size-sm">{{semestre.semestreCourant}}</td>
+                    <td style="text-align: center;">                             
+                        <button type="button" class="bs-modal read-book btn btn-sm btn-danger" onclick="confirmCloture('{{ semestre.id }}')">
+                            <span>Réactiver</span>                
+                        </button> 
+                        
+                        <button type="button" class="update-book btn btn-sm btn-primary">
+                            <a style="color: blanchedalmond;" href="{% url 'main:historique_semestre' semestre.id %}">
+                                <span>Historique</span> 
+                        </button>  
+                    </td>
+                </tr>
+                {% endfor%}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+<script>
+    function confirmCloture(semestreId) {
+        if (confirm("Voulez-vous vraiment réactiver ce semestre ?")) {
+            // Rediriger vers l'URL de clôture du semestre avec l'ID du semestre en tant qu'argument
+            window.location.href = "{% url 'main:reactiver_semestre' semestre_id='SEMESTRE_ID' %}".replace('SEMESTRE_ID', semestreId);
+
+        }
+    }
+</script>
+
+{% endblock %}

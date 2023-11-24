@@ -1,0 +1,82 @@
+{% extends '../index.html' %}
+{% block content %}
+
+<style>
+    #etudiant{
+        font-family: Arial, Helvetica, sans-serif;
+        border-collapse: collapse;
+        width: 100%;
+    }
+    #etudiant td,#etudiant th{
+        border: 1px solid #ddd;
+        padding: 8px;
+    }
+    #etudiant tr:nth-child(even){
+        background-color: #e8c1f7;
+    }
+    #etudiant th{
+        padding-top: 12px;
+        padding-bottom: 12px;
+        text-align: left;
+        background-color: #d6eaf8;
+    }
+</style>
+<div class="block block-rounded m-5">
+    <div class="block-header p-4">
+        <h3 class="block-title">Détails du comptable {{enseignant.nom}} {{enseignant.prenom}}</h3>
+        <a class="btn btn-sm btn-success"  href="{% url 'paiement:comptable_list' %}" style="padding: 8px; float: right; background-color: blue; color: white;"><i class="fas fa-chevron-left fa-lg"></i>
+            Retour</a>
+    </div>
+    <div class="block-content block-content-full">
+        <table id="etudiant">
+            <thead class="thead-dark">
+                <tr>
+                    <th class="text-center" style="width: 80px;">Sexe</th>
+                    <th class="text-center" style="width: 15%;">Email</th>
+                    <th class="text-center" style="width: 15%;">Contact</th>
+                    <th class="text-center" style="width: 15%;">Adresse</th>
+                    <th class="text-center" style="width: 15%;">Date de Naissance</th>
+                    <th class="text-center" style="width: 15%;">Lieu de Naissance</th>
+                    <th class="text-center" style="width: 15%;">État</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="text-center font-size-sm">{{comptable.sexe}}</td>
+                    <td class="text-center font-size-sm">{{comptable.email}}</td>
+                    <td class="text-center font-size-sm">{{comptable.contact}}</td>
+                    <td class="text-center font-size-sm">{{comptable.adresse}}</td>
+                    <td class="text-center font-size-sm">{{comptable.datenaissance}}</td>
+                    <td class="text-center font-size-sm">{{comptable.lieunaissance}}</td>              
+                    <td class="text-center font-size-sm">{{comptable.is_active}}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <br>
+        <br>
+
+        <table id="etudiant">
+            <thead class="thead-dark">
+                <tr>
+                    <th class="text-center" style="width: 20%;">Nationalité</th>
+                    <th class="text-center" style="width: 20%;">Préfecture</th>
+                    <th class="text-center" style="width: 80px;">Salaire brut</th>
+                    <th class="text-center" style="width: 80px;">Nbre jours de congés restant</th>
+                    <th class="text-center" style="width: 15%;">Nombre de jours consommé</th>  
+                </tr>
+            </thead>
+            
+            <tbody>
+                <tr>
+                    <td class="text-center font-size-sm">{{comptable.nationalite}}</td>
+                    <td class="text-center font-size-sm">{{comptable.prefecture}}</td>
+                    <td class="text-center font-size-sm">{{comptable.salaireBrut}}</td>
+                    <td class="text-center font-size-sm">{{comptable.nbreJrsCongesRestant}}</td>
+                    <td class="text-center font-size-sm">{{comptable.nbreJrsConsomme}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

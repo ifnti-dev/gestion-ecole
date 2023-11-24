@@ -1,0 +1,142 @@
+\documentclass[a4paper, 13pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{multirow}
+\usepackage{geometry}
+\geometry{
+margin=1cm,
+bottom=0.25cm,
+top=3.4cm,
+paperwidth=34.18cm,
+paperheight=21cm
+}
+\usepackage{hyperref}
+\usepackage{fix-cm}
+\usepackage{enumitem}
+\usepackage{qrcode}
+\graphicspath{ {\VAR{image_path}} }
+\pagestyle{empty}
+\author{Manaar}
+\title{carte_etudiant}
+\usepackage{eso-pic}
+
+\makeatletter
+\newcommand\HUGE{\@setfontsize\Huge {30}{36}}
+\newcommand\Larged{\@setfontsize\Larged {20.4}{18}}
+\makeatother
+
+\newcommand\BackgroundPicCorps{
+\put(0,0){
+\parbox[b][\paperheight]{\paperwidth}{
+\includegraphics[width=\paperwidth,height=\paperheight]{carte_graphique6.png}
+}}}
+
+\newcommand\BackgroundPicVerso{
+\put(0,0){
+\parbox[b][\paperheight]{\paperwidth}{
+\includegraphics[width=\paperwidth,height=\paperheight]{carte_graphique_verso2.png}
+}}}
+
+\begin{document}
+\AddToShipoutPicture{\BackgroundPicCorps}
+\noindent
+
+\vspace*{2.5cm}
+
+\HUGE
+%\vfill
+
+%\begin{table}
+%\resizebox{0.75\textwidth}{!}{
+\begin{tabular}{lll}
+
+\multirow{8}{7cm}{\includegraphics[width=7cm]{etudianttemp.png}}
+   		& N\degre étudiant : & RM857402 \\ 
+  		& Nom : & MARKER \\ 
+ 		& Prénom :  & Roger\\ 
+ 		& Né le : & 21/12/1996\\ 
+ 		& A: & Djoto, Togo \\ 
+ 		& Sexe : & Masculin \\ 
+ 		& Adresse : & 3 rue des moulin, Aneho\\ 
+ 		& Tél : & +228 91425783\\ 
+
+\end{tabular} %}
+%\end{table}
+
+\vspace{-1cm}
+\huge
+\begin{minipage}{0.35\textwidth}
+\vspace{2cm}
+\begin{center}
+Licence LMD\\
+\vspace{0.5cm}
+Informatique des organisations\\
+\end{center}
+\end{minipage}
+\hfill
+\begin{minipage}{0.3\textwidth}
+\begin{center}
+\vspace{1cm}
+Sokodé, le \today\\
+\vspace{-.15cm}
+Le Directeur\\
+\vspace{-0.9cm}
+%\includegraphics[height=3cm]{/home/jean-christophe/git_IFNTI/CharteGraphique/signature_sab.png}
+
+\includegraphics[height=3cm]{signature_temp.png}
+
+\vspace{-0.3cm}
+Sabirou TEOURI\\
+\end{center}
+\end{minipage}
+
+\newpage
+
+\AddToShipoutPictureBG*{\BackgroundPicVerso}
+
+\newgeometry{left=1.5cm, bottom=1cm, top=3.4cm,}
+
+\HUGE
+
+\noindent
+\begin{minipage}{0.6\textwidth}
+\vspace{2cm}
+IFNTI Sokodé\\
+300 BP 40\\
+Tél: 90 91 31 41\\
+Site web: https://www.ifnti.com\\
+\end{minipage}
+\hfill
+\begin{minipage}{0.2\textwidth}
+\vspace{-2cm}
+%\qrcode[height=3in]{}\\
+\end{minipage}
+
+%\vfill
+
+\noindent
+Année Academique {\color{blue} 2021-2022} \hspace{1cm} Niveau {\color{blue} L1}\\
+
+\vspace{-0.25cm}
+%\vfill
+
+
+\noindent
+\begin{tabular}{ccc}
+Personne à prévenir : & MARKER Hector & (+228 9999999)
+\end{tabular}
+
+\vspace{1cm}
+
+
+
+\noindent
+Observations importantes\\
+- Cette carte est stritement personnelle \\
+- Toute fraude constatée donnera lieu à des poursuites
+%- La validité de cette carte couvre tout le parcours académique
+
+
+%\vspace{2cm}
+
+\end{document}

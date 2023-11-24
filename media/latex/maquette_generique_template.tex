@@ -1,0 +1,42 @@
+\documentclass[12pt,a4paper,landscape]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{multirow}
+\usepackage{longtable}
+\usepackage[left=0.3cm,right=0.3cm,top=2cm,bottom=2cm]{geometry}
+\begin{document}
+\begin{center}
+% Définition du titre
+\begin{LARGE}
+IFNTI : Maquette \VAR{titre}
+\end{LARGE}
+\end{center}
+\begin{center}
+% Définition du tableau
+\begin{longtable}{|c|c|c|c|c|c|c|c|}
+\hline
+Semestre & Intitulé UE & Type UE & Matières & Crédit UE & Volume Horaire (H) & Enseignant principal & Enseignant secondaire  \\ 
+\hline
+\BLOCK{for ue in ues}
+\multicolumn{1}{|c|}{\multirow{\VAR{ue.matieres|length}}{*}{\VAR{ue.semestre}}}
+     & \multicolumn{1}{c|}{\multirow{\VAR{ue.matieres|length}}{*}{\VAR{ue.intitule}}} & \multicolumn{1}{c|}{\multirow{\VAR{ue.matieres|length}}{*}{\VAR{ue.type_ue}}} & \VAR{ue.matieres[0]} & \multicolumn{1}{c|}{\multirow{\VAR{ue.matieres|length}}{*}{\VAR{ue.credit}}} & \VAR{ue.volumes_horaires[0]} & \VAR{ue.enseignants[0]} & \VAR{ue.enseignants_principaux} \\ \cline{4-3} \cline{6-3} \cline{7-3} \cline{8-3}
+	 \BLOCK{for i in range(1, ue.matieres|length)}
+	 \multicolumn{1}{|c|}{}
+	 & & & \VAR{ue.matieres[i]} & & \VAR{ue.volumes_horaires[i]} & \VAR{ue.enseignants[i]} & \VAR{ue.enseignants_principaux}\\ 
+	 \BLOCK{if not loop.last}
+	 	\cline{4-3} \cline{6-3} \cline{7-3} \cline{8-3}
+	 \BLOCK{endif}
+	 \BLOCK{endfor}
+\hline
+\BLOCK{endfor}
+Total &  &  &  & \VAR{tatale_credit} & \VAR{totale_volume_horaire} &  &  \\ 
+\hline 
+\end{longtable}
+
+\end{center}
+
+
+\end{document}

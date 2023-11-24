@@ -1,0 +1,43 @@
+{% extends '../index.html' %}
+
+{% block content %}
+
+<div class="block block-rounded m-5">
+    <div class="block-header p-4">
+        <h3 class="block-title">Demandes de congés rejettées</h3>
+        <a href="{% url 'conges:demandes_en_attentes' id_annee_selectionnee %}" class="btn btn-outline-warning">
+            <i class="fas fa-chevron-left fa-lg"></i>Retour
+        </a>  
+  </div>
+
+
+    <div class="block-content block-content-full">
+        <table class="table table-bordered table-striped table-vcenter js-dataTable-full-pagination">
+            <thead>
+                <tr>
+                    <th class="text-center" style="width: 25%;">Personnel</th>
+                    <th class="text-center" style="width: 35%;">Période</th>
+                    <th class="text-center" style="width: 25%;">Durée</th>
+                    <th class="text-center" style="width: 20%;">Modifier</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for conge in demandes_rejettees %}
+                <tr>
+                    <td class="text-center font-size-sm">{{ conge.personnel.nom }} {{ conge.personnel.prenom }}</td>
+                    <td class="text-center font-size-sm">Du {{ conge.date_et_heure_debut }} au  {{ conge.date_et_heure_fin }}</td>
+                    <td class="text-center font-size-sm">{{conge.nombre_de_jours_de_conge }} jours</td>
+                   <td style="text-align: center;">
+                      <button type="submit" class="update-book btn btn-sm btn-danger">
+                        <span><i class="far fa-calendar-times"></i></span>
+                      </button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <br>
+        </table>       
+    </div>
+</div>
+
+{% endblock %}

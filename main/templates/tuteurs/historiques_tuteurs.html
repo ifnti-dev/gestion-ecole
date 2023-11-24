@@ -1,0 +1,44 @@
+{% extends '../index.html' %}
+
+{% block content %}
+<div class="block block-rounded m-5">
+    <div class="block-header p-4">
+        <h3 class="block-title" style="text-align:center">Liste des tuteurs des étudiants</h3>
+       </div>
+    <div class="block-content block-content-full">
+        <table class="table table-bordered table-striped table-vcenter js-dataTable-full-pagination">
+            <thead>
+                <tr>
+                    <th class="text-center" style="width: 80px;">ID</th>
+                    <th class="text-center" style="width: 30%;">Nom & Prénoms</th>
+                    <th class="text-center" style="width: 80px;">TYPE</th>
+                    <th class="text-center" style="width: 15%;">Contact</th>
+                    <th scope="col" class="bg-warning" style="width: 15%;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for tuteur in tuteurs %}
+                <tr>
+                    <td class="text-center font-size-sm">{{tuteur.id}}</td>
+                    <td class="text-center font-size-sm">{{tuteur.nom}} {{tuteur.prenom}}</td>
+                    <td class="text-center font-size-sm">{{tuteur.type}}</td>
+                    <td class="text-center font-size-sm">{{tuteur.contact}}</td>
+                    <td style="text-align: center;">                                       
+                        <button type="button" class="bs-modal read-book btn btn-sm btn-primary">
+                            <a style="color: blanchedalmond;" href="{% url 'main:detail_tuteur' tuteur.id %}">
+                                <span class="fa fa-eye"></span>                
+                            </a>
+                        </button>
+               
+                        <button type="button" class="update-book btn btn-sm btn-warning">
+                            <a style="color: blanchedalmond;" href="{% url 'main:update_tuteur' tuteur.id %}">
+                                <span><i class="far fa-edit fa-lg"></i></span>
+                        </button>                                         
+                    </td> 
+                </tr>
+                {% endfor%}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

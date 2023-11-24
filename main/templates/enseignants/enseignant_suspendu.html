@@ -1,0 +1,56 @@
+{% extends '../index.html' %}
+
+{% block content %}
+<div class="block block-rounded m-5">
+    <div class="block-header p-4">
+        <h3 class="block-title">Liste des enseignants</h3>
+    </div>
+    <div class="block-content block-content-full">
+        <!-- DataTables init on table by adding .js-dataTable-full-pagination class, functionality is initialized in js/pages/be_tables_datatables.min.js which was auto compiled from _es6/pages/be_tables_datatables.js -->
+        <table class="table table-bordered table-striped table-vcenter js-dataTable-full-pagination">
+            <thead>
+                <tr>
+                    <th class="text-center" style="width: 80px;">ID</th>
+                    <th class="text-center" style="width: 30%;">Nom & Prénoms</th>
+                    <th class="text-center" style="width: 80px;">Sexe</th>
+                    <th class="text-center" style="width: 15%;">Date Naissance</th>
+                    <th class="text-center" style="width: 15%;">Contact</th>
+                    <th class="text-center" style="width: 15%;">Email</th>
+                    <th class="text-center" style="width: 15%;">Type</th>
+                    <th class="text-center" style="width: 15%;">Specialité</th>
+                    <th style="width: 15%;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for enseignant in enseignants %}
+                <tr>
+                    <td class="text-center font-size-sm">{{enseignant.id}}</td>
+                    <td class="text-center font-size-sm">{{enseignant.nom}} {{enseignant.prenom}}</td>
+                    <td class="text-center font-size-sm">{{enseignant.sexe}}</td>
+                    <td class="text-center font-size-sm">{{enseignant.datenaissance}}</td>
+                    <td class="text-center font-size-sm">{{enseignant.contact}}</td>
+                    <td class="text-center font-size-sm">{{enseignant.email}}</td>
+                    <td class="text-center font-size-sm">{{enseignant.type}}</td>
+                    <td class="text-center font-size-sm">{{enseignant.specialite}}</td>
+                    <td style="text-align: center;">                                       
+                        <button type="button" class="bs-modal read-book btn btn-sm btn-primary">
+                            <a style="color: blanchedalmond;" href="{% url 'main:enseignant_detail' enseignant.id %}">
+                                <span class="fa fa-eye"></span>                
+                            </a>
+                        </button>
+                        
+                        <button type="button" class="update-book btn btn-sm btn-warning">
+                            <a  style="color: blanchedalmond;" href="{% url 'main:edit_enseignant' enseignant.id %}">
+                                <span><i class="far fa-edit"></i></span>
+                            </a>
+                        </button>                                     
+                    </td> 
+                </tr>
+                {% endfor%}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+            
+{% endblock %}

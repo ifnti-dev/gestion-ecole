@@ -1,0 +1,59 @@
+{% extends '../index.html' %}
+
+{% block content %}
+
+<div class="block block-rounded m-5">
+    <div class="block-header p-4">
+        <h3 class="block-title">Liste des Fiches de Paie</h3>
+        {% if is_comptable %}
+        <a href="{% url 'paiement:enregistrer_fiche_de_paie' %}" class="btn btn-outline-primary">
+                <i class="fas fa-plus"></i> Ajouter
+        </a>
+        {% endif %}
+    </div>
+
+    <div class="block-content block-content-full">
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped table-vcenter js-dataTable-full-pagination">
+                <thead>
+                    <tr>
+                        <th class="text-center" style="width: 30%;">Période</th>
+                        <th class="text-center" style="width: 30%;">Enseignant</th>
+                        <th class="text-center" style="width: 30%;">Matière</th>
+                        <th class="text-center" style="width: 30%;">Nombre d'heure</th>
+                        <th class="text-center" style="width: 30%;">Montant à payer</th>
+                        <th class="text-center" style="width: 55%;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for fiche in fiches %}
+                    <tr>
+                        <td class="text-center font-size-sm">Du {{ fiche.dateDebut }} au {{ fiche.dateFin }}</td>
+                        <td class="text-center font-size-sm">{{ fiche.enseignant.nom }} {{ fiche.enseignant.prenom }}</td>
+                        <td class="text-center font-size-sm">{{ fiche.matiere }}</td>
+                        <td class="text-center font-size-sm">{{ fiche.nombreHeure }} H</td>
+                        <td class="text-center font-size-sm">{{ fiche.difference }} FCFA</td>
+                        <td style="text-align: center;">
+                            {% if is_comptable %}
+                            <button type="button" class="update-book btn btn-sm btn-warning">
+                                <a style="color: blanchedalmond;" href="{% url 'paiement:modifier_fiche_de_paie' fiche.id %}">
+                                    <span><i class="far fa-edit"></i></span>
+                                </a>
+                            </button>
+                            {% endif %}
+
+                            <button type="button" class="update-book btn btn-sm btn-success">
+                                <a  style="color: blanchedalmond;" href="{% url 'paiement:fiche_paie' fiche.id %}">
+                                    <span><i class="fas fa-file-pdf"></i></span>
+                                </a>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

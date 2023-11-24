@@ -1,0 +1,77 @@
+\documentclass[a4paper,10pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[OT1]{fontenc}
+\usepackage[bottom=2.5cm, top=3.5cm, left=2.8cm, right=2.5cm]{geometry}
+\usepackage[table]{xcolor}
+\usepackage{multirow}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage{eso-pic}
+
+\usepackage{array}
+
+\graphicspath{ {\VAR{image_path}} }
+
+\newcolumntype{P}[1]{>{\centering\arraybackslash}p{#1}} %Permet d'avoir des colonnes de taille fixe et centrées.
+
+\pagestyle{fancyplain}
+\cfoot{\vspace{-.5cm}Institut de formation aux normes et technologies de l'informatique\\300 BP 40, Sokodé TOGO -- Tél. : +228 90 91 81 41\\Agrément N\textdegree2019/064/MESR/SG/DES}
+\renewcommand{\headrulewidth}{0pt}
+
+\title{\vspace{-1cm} \hspace{2.5cm}Relevé de notes du Semestre 5}
+\author{\vspace{-1cm} \hspace{2.5cm}Année académique 2016-2017}
+\date{}
+
+
+\newcommand\BackgroundPic{
+\put(0,0){
+\parbox[b][\paperheight]{\paperwidth}{
+\includegraphics[width=\paperwidth,height=\paperheight]{CharteGraphiqueDocumentPageDeGardeLogo.png}
+}}}
+
+\begin{document}
+\AddToShipoutPicture{\BackgroundPic}
+\maketitle\vspace{1cm}
+
+\noindent
+\textbf{Nom de l'étudiant :} FOFANA Rachad\\\\
+\textbf{Numéro d'étudiant :} FR201402 \hfill\textbf{Sexe :} M\\\\
+\textbf{Date de naissance :} 06/07/1995\hfill\textbf{Lieu de naissance :} Sokodé
+
+\vspace{1cm}
+\begin{center}
+\begin{tabular}{|>{\raggedright}p{9cm}|P{1.1cm}|P{1.6cm}|P{2.4cm}|}
+	\hline
+	\textbf{Unité d'enseignement} & \textbf{Note} & \textbf{Crédits} & \textbf{Année d'obtention}\\
+	\hline
+Réseaux & 18,3 & 4 & 2017-2018\\
+\hline
+Programmation Web & 13 & 5 & 2016-2017\\
+\hline
+Programmation Java & 14,2 & 5 & 2017-2018\\
+\hline
+Mathématiques & 10 &   3 & 2017-2018\\
+\hline
+Base de données 5 & 12 &   5 & 2016-2017\\
+\hline
+Insertion et responsabilité sociale & 17 & 3 & 2016-2017\\
+\hline
+Projet CHR-Sokodé & 12 & 5 & 2016-2017\\
+\hline
+\multicolumn{2}{|l|}{\textbf{Total crédits obtenus}} & \textbf{30} & \multicolumn{1}{c}{}\\\cline{1-3}
+\end{tabular}
+\end{center}
+\vspace{1cm}
+\null\hfill Fait à Sokodé, le \today\\
+\null\hfill Le Responsable d'établissement\\
+
+%\hspace{7cm} \includegraphics[width=10cm]{/home/manaar/manaar/notes/releve_note/releve_2014/signature_sab.png}
+
+\vspace{2cm}
+
+\null\hfill Sabirou TÉOURI
+
+\vfill
+
+\end{document}

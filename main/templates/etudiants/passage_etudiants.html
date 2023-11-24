@@ -1,0 +1,52 @@
+{% extends '../index.html' %}
+
+{% block content %}
+<div class="block block-rounded m-5">
+    <div class="block-header p-4">
+        <h3 class="block-title">Liste des étudiants</h3>
+        <a href="{% url 'main:create_etudiant' %}" class="btn btn-outline-primary">
+            <i class="fas fa-plus"></i> Ajout Étudiant
+        </a>
+    </div>
+    <div class="block-content block-content-full">
+        <form action="{% url 'main:passage_etudiants' %}" method="post">
+            {% csrf_token %}
+        <table class="table table-bordered table-striped table-vcenter js-dataTable-full-pagination">
+            <thead>
+                <tr>
+                    <th class="text-center" style="width: 80px;">Matricule</th>
+                    <th class="text-center" style="width: 30%;">Nom & Prénoms</th>
+                    <th class="text-center" style="width: 80px;">Sexe</th>
+                    <th class="text-center" style="width: 15%;">Admis</th>
+                    <th scope="col" class="bg-warning" style="width: 15%;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for etudiant in etudiants %}
+                <tr>
+                    <td class="text-center font-size-sm">{{etudiant.id}}</td>
+                    <td class="text-center font-size-sm">{{etudiant.nom}} {{etudiant.prenom}}</td>
+                    <td class="text-center font-size-sm">{{etudiant.sexe}}</td>
+                    <td class="text-center font-size-sm"><input type="checkbox" name="passer_semestre_suivant" value="{{ etudiant.id }}"></td> 
+                    <td style="text-align: center;">                                       
+                        <button type="button" class="bs-modal read-book btn btn-sm btn-primary">
+                            <a style="color: blanchedalmond;" href="{% url 'main:detail_etudiant' etudiant.id %}">
+                                <span class="fa fa-eye"></span>                
+                            </a>
+                        </button>
+               
+                        <button type="button" class="update-book btn btn-sm btn-warning">
+                            <a style="color: blanchedalmond;" href="{% url 'main:update_etudiant' etudiant.id %}">
+                                <span><i class="far fa-edit fa-lg"></i></span>
+                        </button>       
+                         
+                    </td> 
+                </tr>
+                {% endfor%}
+            </tbody>
+        </table>
+        <button type="submit" class="btn btn-outline-primary">Enregistrer</button>
+    </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,109 @@
+{% extends '../index.html' %}
+
+{% block content %}
+
+<div class="block block-rounded m-5">
+    <div class="block-header p-4">
+        <a href="{% url 'conges:demandes_validees' id_annee_selectionnee %}" class="btn btn-outline-warning">
+            Demandes validées
+        </a>
+        <a href="{% url 'conges:demandes_rejettees' id_annee_selectionnee %}" class="btn btn-outline-warning">
+            Demandes rejettées
+        </a>
+    </div>
+    <div class="block-content block-content-full">
+        <h3 class="block-title" style="text-align: center;">Demandes de congés en attente</h3>
+        <table class="table table-bordered table-striped table-vcenter js-dataTable-full-pagination">
+            <thead>
+                <tr>
+                    <th class="text-center" style="width: 25%;">Personnel</th>
+                    <th class="text-center" style="width: 35%;">Période</th>
+                    <th class="text-center" style="width: 25%;">Durée</th>
+                    <th class="text-center" style="width: 20%;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for conge in demandes_en_attentes %}
+                <tr>
+                    <td class="text-center font-size-sm">{{ conge.personnel.nom }} {{ conge.personnel.prenom }}</td>
+                    <td class="text-center font-size-sm">Du {{ conge.date_et_heure_debut }} au  {{ conge.date_et_heure_fin }}</td>
+                    <td class="text-center font-size-sm">{{conge.nombre_de_jours_de_conge }} jours</td>
+                    <td style="text-align: center;">                      
+                        <button type="button" class="update-book btn btn-sm btn-primary">
+                            <a style="color: blanchedalmond;" href="{% url 'conges:valider_conges' conge.id %}">
+                                <span><i class="far fa-check-circle "></i></span> 
+                            </a>
+                        </button>
+                        <button type="submit" class="update-book btn btn-sm btn-danger" href="{% url 'conges:refuser_conge' conge.id %}" >
+                            <span><i class="far fa-calendar-times"></i></span>
+                        </button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <br>
+        </table>       
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Sélectionnez tous les boutons de validation
+        var validateButtons = document.querySelectorAll('.update-book.btn-primary');
+
+        // Ajoutez un gestionnaire d'événements à chaque bouton
+        validateButtons.forEach(function (button) {
+            button.addEventListener('click', function (event) {
+                // Empêche le comportement par défaut du bouton (le lien ne sera pas suivi immédiatement)
+                event.preventDefault();
+
+                // Affiche la boîte de dialogue de confirmation Bootstrap
+                if (window.confirm("Êtes-vous sûr de vouloir valider cette demande de congé?")) {
+                    // Si l'utilisateur clique sur OK, suivez le lien du bouton
+                    window.location.href = button.querySelector('a').getAttribute('href');
+                }
+            });
+        });
+    });
+</script>
+
+
+<!-- Script JavaScript pour la confirmation pop-up avec saisie du motif de refus -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Sélectionnez tous les boutons de refus
+        var refuseButtons = document.querySelectorAll('.update-book.btn-danger');
+
+        // Ajoutez un gestionnaire d'événements à chaque bouton
+        refuseButtons.forEach(function (button) {
+            button.addEventListener('click', function (event) {
+                // Empêche le comportement par défaut du bouton (le lien ne sera pas suivi immédiatement)
+                event.preventDefault();
+
+                // Affiche une boîte de dialogue personnalisée pour la saisie du motif de refus
+                var motifRefus = prompt("Veuillez saisir le motif de refus :");
+
+                // Si l'utilisateur saisit un motif et clique sur OK, envoyez une requête POST
+                if (motifRefus !== null) {
+                    var form = document.createElement('form');
+                    form.method = 'post';
+                    form.action = button.getAttribute('href');
+                    var csrfInput = document.createElement('input');
+                    csrfInput.type = 'hidden';
+                    csrfInput.name = 'csrfmiddlewaretoken';
+                    csrfInput.value = '{{ csrf_token }}';
+                    form.appendChild(csrfInput);
+                    var motifRefusInput = document.createElement('input');
+                    motifRefusInput.type = 'hidden';
+                    motifRefusInput.name = 'motif_refus';
+                    motifRefusInput.value = motifRefus;
+                    form.appendChild(motifRefusInput);
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+            });
+        });
+    });
+</script>
+
+{% endblock %}

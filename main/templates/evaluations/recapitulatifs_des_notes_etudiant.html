@@ -1,0 +1,51 @@
+{% extends '../index.html' %}
+{% block content_title %} Récapitulatif {% endblock content_title %}
+{% block backURl %}  
+<a href="{% url 'main:matieres_etudiant' %}">
+    <button class="btn btn-warning">
+        <i class="si si-arrow-left"></i>
+        Retour
+    </button>
+</a>
+{% endblock backURl %}
+{% block content %}
+<div class="block block-rounded m-5">
+    <div class="block-header p-4">
+        <h3 class="block-title">Récapitulatif des notes de l'étudiant  : <span class="">{{ etudiant.full_name }}</span> </h3>
+    </div>
+    <div class="block-content block-content-full">
+        <table class="table table-bordered table-striped table-vcenter js-dataTable-full-pagination">
+            <thead>
+                <tr>
+                    <th class="text-center">Matiere</th>
+                    <th scope="col" class="" style="width: 15%;"> Moyenne </th> 
+                    <th scope="col" class="" style="width: 15%;"> Validé </th> 
+                </tr>
+            </thead>
+            <tbody>
+                {% for matiere in matieres %}
+                <tr>
+                    <td class="text-center font-size-sm">{{matiere.matiere}} </td>
+                    <td class="text-center font-size-sm"> {{ matiere.moyenne }} </td>
+                    <td class="text-center font-size-sm"> 
+                        {% if matiere.a_valider %}
+                            <span class="text-success">Oui</span>
+                        {% else %}
+                            <span class="text-danger">Non</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor%}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+{% comment %} {% block scripts %}
+    <script type="text/javascript">
+        form_tag = $('#form-semestre');
+        $('#semestre').on('change', function() {
+            form_tag.submit();
+        });
+    </script>
+{% endblock scripts %} {% endcomment %}

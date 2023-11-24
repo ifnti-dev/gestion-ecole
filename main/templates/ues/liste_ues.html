@@ -1,0 +1,60 @@
+{% extends '../index.html' %}
+{% block content_title %} Liste des Ues par Professeur{% endblock content_title %}
+{% load static %}
+
+{% block content %}
+<script src="{% static 'assets/js/jquery-3.7.1.min.js'%}"></script>
+      <div class="content">
+                    <div class="block block-rounded mt-4">
+                        <div class="block-header">
+                          <h3 class="block-title"></h3>
+                          <a href="/main/affecter_ues_prof" class="btn btn-sm btn-primary ml-3">AFFECTER DES UES A UN PROFESSEUR</a>
+  
+                        </div>
+                        <div class="block-content">
+                            <table class="table table-borderless table-vcenter">
+                              <thead>
+                                <tr>
+                                  <th class="text-center" style="width: 50px;">#</th>
+                                  <th>Ue</th>
+                                  <th class="text-center" style="width: 100px;">Professeur</th>
+                                  <th class="text-center" style="width: 100px;">Action</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {% for ue in ues %}
+                                <tr>
+                                  <th class="text-center" scope="row">{{ loop.index }}</th>
+                                  <td class="font-w600 font-size-sm">
+                                    <a href="/main/detail_matiere/{{matiere.id }}">
+                                      {{ue.libelle}}
+                                    </a>
+                                  </td>
+                                  {% if ue.enseignant %}
+                                    <td class="text-center">{{ ue.enseignant.nom }}  {{ ue.enseignant.prenom }}</td>
+                                    {% else %}
+                                        <td class="text-center">Pas de professeur</td>
+                                    {% endif %}
+                                    <td class="text-center">
+                                    <div class="btn-group">
+                                      <button type="button" class="btn btn-alt-danger">Action</button>
+                                      <button type="button" class="btn btn-alt-danger dropdown-toggle dropdown-toggle-split" id="dropdown-split-alt-danger" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <span class="sr-only">Toggle Dropdown</span>
+                                      </button>
+                                      <div class="dropdown-menu font-size-sm" aria-labelledby="dropdown-split-alt-danger">
+                                        <a class="dropdown-item" href="/main/retirer_professeur_ue/{{ue.id }}">Retirer le professeur</a>
+                                      </div>
+                                    </div>
+                                  </td>
+                                </tr>
+                                {% endfor %}
+                              </tbody>
+                            </table>
+                          </div>
+                          
+                                                   
+         </div>
+     
+
+{% endblock %}
+                      

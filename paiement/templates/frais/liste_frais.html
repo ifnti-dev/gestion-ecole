@@ -1,0 +1,43 @@
+{% extends '../index.html' %}
+
+{% block content %}
+
+<div class="block block-rounded m-5">
+    <div class="block-header p-4">
+        <h3 class="block-title">Frais scolaires</h3>
+        <a href="{% url 'paiement:enregistrer_frais'%}" class="btn btn-outline-primary">
+                <i class="fas fa-plus"></i> Ajouter
+        </a>  
+    </div>
+
+    <div class="block-content block-content-full">
+        <table class="table table-bordered table-striped table-vcenter js-dataTable-full-pagination">
+            <thead>
+                <tr>
+                    <th class="text-center" style="width: 25%;">Année Universitaire</th>
+                    <th class="text-center" style="width: 25%;">Frais d'inscription</th>
+                    <th class="text-center" style="width: 25%;">Frais de scolairité</th>
+                    <th class="text-center" style="width: 15%;">Modifier</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for frai in frais %}
+                <tr>
+                    <td class="text-center font-size-sm">{{ frai.annee_universitaire }}</td>
+                    <td class="text-center font-size-sm">{{ frai.montant_inscription }}</td>
+                    <td class="text-center font-size-sm">{{ frai.montant_scolarite }}</td>
+                    <td style="text-align: center;">
+                        <button type="button" class="update-book btn btn-sm btn-warning">
+                            <a style="color: blanchedalmond;" href="{% url 'paiement:modifier_frais' frai.id %}">
+                                <span><i class="far fa-edit"></i></span>
+                            </a>
+                        </button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

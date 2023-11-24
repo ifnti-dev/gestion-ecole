@@ -1,0 +1,64 @@
+{% extends 'index.html' %}
+{% block content_title %}
+
+Enregistrement d'une fiche de prise en charge
+  <h1>
+     <a href="{% url 'paiement:liste_fiches_de_prise_en_charge' id_annee_selectionnee  %}" class="btn btn-outline-warning">
+        <i class="fas fa-chevron-left fa-lg"></i> Retour
+      </a>
+  </h1>
+{% endblock %}
+{% block content_title_description %}
+
+
+{% endblock %}
+{% block content %}
+  <div class="d-flex justify-content-center">
+    <div class="block-content card m-4 col-md-10 col-lg-8 col-xl-6">
+      <div class="d-flex justify-content-between">
+        <h3>         
+        </h3>
+    </div>
+      <form class="container-fluid p-3" action="#" method="POST">
+        {% csrf_token %}
+  
+        <div class="form-row mb-3">
+          <div class="col-md-6">
+            {{ form.dateDebut.label_tag }}
+            {{ form.dateDebut }}
+            <span class="text-danger">{{ form.dateDebut.errors }}</span>
+          </div>
+          <div class="col-md-6">
+            {{ form.dateFin.label_tag }}
+            {{ form.dateFin }}
+            <span class="text-danger">{{ form.dateFin.errors }}</span>
+          </div>
+        </div>
+
+        <div class="form-row mb-3">        
+          <div class="col-md-6">
+            {{ form.personnel.label_tag }}
+            {{ form.personnel }}
+            <span class="text-danger">{{ form.personnel.errors }}</span>
+          </div>
+         
+        </div>
+
+        <div class="form-row mb-3">
+          <div class="col-md-6">
+            {{ form.frais_de_vie.label_tag }}
+            {{ form.frais_de_vie }}
+            <span class="text-danger">{{ form.frais_de_vie.errors }}</span>
+          </div> 
+          <div class="col-md-6">
+            {{ form.frais_nourriture.label_tag }}
+            {{ form.frais_nourriture }}
+            <span class="text-danger">{{ form.frais_nourriture.errors }}</span>
+          </div>      
+        </div>
+
+        <button class="btn btn-primary btn-block" type="submit"><i class="fas fa-database"></i> Enrégistrer &nbsp;&nbsp;&nbsp;<span></span></button>
+      </form> 
+    </div>
+  </div>
+{% endblock %} 

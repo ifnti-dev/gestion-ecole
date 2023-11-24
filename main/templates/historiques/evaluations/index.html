@@ -1,0 +1,56 @@
+{% extends '../consulter_historique.html' %}
+{% block content_title %} Evaluations {% endblock content_title %}
+{% block content_title_description %} Liste des evaluations de {{ matiere.libelle }} {% endblock content_title_description %}
+{% block content %}
+
+<div class="block block-rounded m-5">
+    <div class="block-header p-4">
+        <h3 class="block-title" style="text-align: center;">Matiere : {{ matiere.libelle }}</h3>
+    </div>
+        <div class="block-content block-content-full">
+            <table class="table table-bordered table-striped table-vcenter js-dataTable-full-pagination">
+                <thead>
+                    <tr>
+                        <th class="text-center" style="width: 80px;">Id</th>
+                        <th class="d-none d-sm-table-cell text-center" >Date</th>
+                        <th class="d-none d-sm-table-cell text-center" >Nom</th>
+                        <th class="d-none d-sm-table-cell text-center" style="width: 30%;">Pondération (%)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for evaluation in evaluations %}
+                    <tr>
+                        <td class="text-center font-size-sm">{{ evaluation.id }}</td>
+                        <td class="text-center font-w600 font-size-sm">{{ evaluation.date }}</td>
+                        <td class="d-none d-sm-table-cell text-center">
+                            {{ evaluation.libelle }}
+                        </td>
+                        <td class="text-center d-none d-sm-table-cell font-size-sm">
+                            {{ evaluation.ponderation }}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+            
+    </div>
+    <div class="block-content block-content-full">
+        <table class="table table-bordered table-striped table-vcenter js-dataTable-full-pagination">
+            <!-- Table content -->
+        </table>
+    </div>
+</div>
+{% endblock content %}
+
+{% block scripts %}
+    <script type="text/javascript">
+        $(".delete-evaluation").on('click', function(){
+            response = confirm("Voulez vous vraiment supprimer cette évaluation ?")
+            if (! response){
+                event.stopPropagation();
+                event.preventDefault();
+            }
+        });
+    </script>
+{% endblock scripts %}

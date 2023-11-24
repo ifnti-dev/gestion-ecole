@@ -1,0 +1,119 @@
+{% extends '../index.html' %}
+{% block content_title %} Modification d'une séance {% endblock content_title %}
+{% load static %}
+
+{% block content %}
+<script src="{% static 'assets/js/ckeditor.js'%}"></script>
+<main id="main-container">
+    <div class="content">
+        <!-- Your modification form goes here -->
+        <div class="block block-rounded">
+            <div class="block-header">
+                <h3 class="block-title"></h3>
+            </div>
+            <div class="block-content block-content-full">
+                <form action="{% url 'cahier_de_texte:modifier_seance' seance.id %}" onsubmit="return validateForm();" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" id="ecrit_par" name="ecrit_par" value="{{ request.etudiant.id }}">
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="intitulé">Intitulé</label>
+                            <input type="text" class="form-control form-control-alt" id="intitule" name="intitule" required="true" value="{{ seance.intitule }}" placeholder="Entrez un intitulé">
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="matiere">Sélectionnez la matière</label>
+                            <select required="true" class="form-control" id="matiere" name="matiere">
+                                {% for matiere in matieres %}
+                                <option value="{{ matiere.pk }}" {% if matiere.pk == seance.matiere.pk %}selected{% endif %}>{{ matiere.libelle }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+					 
+					<div class="form-row">
+						<div class="form-group col-md-6">
+							<label for="eleves-absents">Élèves absents</label>
+							<select  class="js-select2 form-control" id="eleves-absent" name="eleves-absent" style="width: 100%;" data-placeholder="Choisissez les.." multiple>
+											<option></option>
+										 {% for etudiant in etudiants %}
+											<option value="{{ etudiant.id }}">{{ etudiant.nom }} {{ etudiant.prenom }}</option>
+										 {% endfor %}
+							</select>
+							   
+						</div>
+						<div class="form-group col-md-6">
+							<label for="example-flatpickr-datetime-24">Date de la seance</label>
+							<input type="text" class="js-flatpickr form-control bg-white" id="dateseance" name="dateseance" required placeholder="Choisissez la date" value="{{ seance.date_et_heure_debut|date:"Y-m-d" }}">
+						</div>
+					</div>
+					<div class="form-row">
+							<div class="form-group col-md-6">
+								<label for="example-flatpickr-datetime-24">Heure debut de la seance</label>
+								<input type="text"  class="js-flatpickr form-control bg-white" id="heuredebut" name="heuredebut" required data-enable-time="true" data-no-calendar="true" placeholder="Commencer" data-date-format="H:i" data-time_24hr="true" value="{{ seance.date_et_heure_debut|time:"H:i" }}">
+							</div>
+					  
+							<div class="form-group col-md-6">
+								<label for="example-flatpickr-datetime-24">Heure fin de la seance</label>
+								<input type="text" class="js-flatpickr form-control bg-white" id="heurefin" required name="heurefin" data-enable-time="true" data-no-calendar="true" placeholder="Finir" data-date-format="H:i" data-time_24hr="true" value="{{ seance.date_et_heure_fin|time:"H:i" }}">
+							</div>
+					</div>
+					<input type="hidden" id="description" name="description" value="{{seance.description}}">
+					<div class="form-group">
+						<div id="js-ckeditor5-classic" name="js-ckeditor5-classic">{{seance.description | safe}}</div>
+					  </div>
+                    <div class="form-row">
+                        <!-- Add form fields for modification here -->
+                    </div>
+                    <button type="submit" id="submit" class="btn btn-outline-primary">Enregistrer les modifications</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</main>
+<script>
+                
+    ClassicEditor
+        .create(document.querySelector('#js-ckeditor5-classic'), {
+        })
+        .then(editor => {
+            editor.model.document.on('change:data', () => {
+                const content = editor.getData();
+                document.querySelector('#description').value = content;
+                console.log(content)
+            });
+        })
+        .catch(error => {
+            console.error(error);
+        });
+
+    
+    function validateForm() {
+        const heureDebutInput = document.getElementById("heuredebut");
+        const heureFinInput = document.getElementById("heurefin");
+        const dateInput = document.getElementById("dateseance");
+        const date = dateInput.value
+        const startTime = heureDebutInput.value;
+        const endTime = heureFinInput.value;
+        if (!startTime || !endTime) {
+            return true;
+        }
+
+        const startDate = new Date(`01/01/2000 ${startTime}`);
+        const endDate = new Date(`01/01/2000 ${endTime}`);
+        const minDuration = 30 * 60 * 1000;
+        
+        console.log(date)
+        console.log(startTime)
+        
+        if (endDate - startDate < minDuration) {
+            jQuery('#notification').toast('show');
+            return false; 
+            
+        }
+        
+        return true;
+
+    }
+
+</script>
+{% endblock %}

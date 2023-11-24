@@ -1,0 +1,141 @@
+{% extends '../index.html' %}
+
+{% load static %}
+
+{% block content %}
+<main id="main-container">
+    <div class="content">
+        <div class="block block-rounded">
+            <div class="block-header">
+                <h3 class="block-title">Controle Classe</h3>
+            </div>
+            <div class="block-content block-content-full">
+                <div class="row">
+                    <div class="col-lg-4">
+                        <h4>License 1</h4>
+                        <ul>
+                            {% for etudiant in license1_students %}
+                                <li>{{ etudiant.nom }} {{ etudiant.prenom }} 
+                                    {% if etudiant.secretaire %}
+                                        - Secrétaire
+                                    {% endif %}
+                                    {% if etudiant.delegue %}
+                                        - Délégué
+                                    {% endif %}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <div class="col-lg-4">
+                        <h4>Changer de délégué (License 1)</h4>
+                        <form method="post" action="{% url 'cahier_de_texte:changer_delegue' %}">
+                            {% csrf_token %}
+                            <select name="delegue">
+                                {% for etudiant in license1_students %}
+                                    <option value="{{ etudiant.id }}">{{ etudiant.nom }} {{ etudiant.prenom }}</option>
+                                {% endfor %}
+                            </select>
+                            <button type="submit">Enregistrer</button>
+                        </form>
+                    </div>
+                    <div class="col-lg-4">
+                        <h4>Changer de secrétaire (License 1)</h4>
+                        <form method="post" action="{% url 'cahier_de_texte:changer_secretaire' %}">
+                            {% csrf_token %}
+                            <select name="secretaire">
+                                {% for etudiant in license1_students %}
+                                    <option value="{{ etudiant.id }}">{{ etudiant.nom }} {{ etudiant.prenom }}</option>
+                                {% endfor %}
+                            </select>
+                            <button type="submit">Enregistrer</button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-4">
+                        <h4>License 2</h4>
+                        <ul>
+                            {% for etudiant in license2_students %}
+                                <li>{{ etudiant.nom }} {{ etudiant.prenom }} 
+                                    {% if etudiant.secretaire %}
+                                        - Secrétaire
+                                    {% endif %}
+                                    {% if etudiant.delegue %}
+                                        - Délégué
+                                    {% endif %}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <div class="col-lg-4">
+                        <h4>Changer de délégué (License 2)</h4>
+                        <form method="post" action="{% url 'cahier_de_texte:changer_delegue' %}">
+                            {% csrf_token %}
+                            <select name="delegue">
+                                {% for etudiant in license2_students %}
+                                    <option value="{{ etudiant.id }}">{{ etudiant.nom }} {{ etudiant.prenom }}</option>
+                                {% endfor %}
+                            </select>
+                            <button type="submit">Enregistrer</button>
+                        </form>
+                    </div>
+                    <div class="col-lg-4">
+                        <h4>Changer de secrétaire (License 2)</h4>
+                        <form method="post" action="{% url 'cahier_de_texte:changer_secretaire' %}">
+                            {% csrf_token %}
+                            <select name="secretaire">
+                                {% for etudiant in license2_students %}
+                                    <option value="{{ etudiant.id }}">{{ etudiant.nom }} {{ etudiant.prenom }}</option>
+                                {% endfor %}
+                            </select>
+                            <button type="submit">Enregistrer</button>
+                        </form>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-4">
+                        <h4>License 3</h4>
+                        <ul>
+                            {% for etudiant in license3_students %}
+                                <li>{{ etudiant.nom }} {{ etudiant.prenom }} 
+                                    {% if etudiant.secretaire %}
+                                        - Secrétaire
+                                    {% endif %}
+                                    {% if etudiant.delegue %}
+                                        - Délégué
+                                    {% endif %}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <div class="col-lg-4">
+                        <h4>Changer de délégué (License 3)</h4>
+                        <form method="post" action="{% url 'cahier_de_texte:changer_delegue' %}">
+                            {% csrf_token %}
+                            <select name="delegue">
+                                {% for etudiant in license3_students %}
+                                    <option value="{{ etudiant.id }}">{{ etudiant.nom }} {{ etudiant.prenom }}</option>
+                                {% endfor %}
+                            </select>
+                            <button type="submit">Enregistrer</button>
+                        </form>
+                    </div>
+                    <div class="col-lg-4">
+                        <h4>Changer de secrétaire (License 3)</h4>
+                        <form method="post" action="{% url 'cahier_de_texte:changer_secretaire' %}">
+                            {% csrf_token %}
+                            <select name="secretaire">
+                                {% for etudiant in license3_students %}
+                                    <option value="{{ etudiant.id }}">{{ etudiant.nom }} {{ etudiant.prenom }}</option>
+                                {% endfor %}
+                            </select>
+                            <button type="submit">Enregistrer</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}

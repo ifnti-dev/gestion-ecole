@@ -1,0 +1,77 @@
+{% extends '../index.html' %}
+{% block content_title %} Détails de la séance {% endblock content_title %}
+{% load static %}
+
+{% block content %}
+  <main id="main-container">
+       
+                <div class="content">
+<div class="block block-rounded">
+
+    <div class="block-content block-content-full">
+        <div class="row">
+            <div class="col-lg-6">
+                <p><strong>Intitulé:</strong> {{ seance.intitule }}</p>
+                <p><strong>Date et Heure de début:</strong> {{ date_debut }}</p>
+                <p><strong>Date et Heure de fin:</strong> {{ date_fin }}</p>
+                <p><strong>Matière:</strong> {{ seance.matiere }}</p>
+                <p><strong>Ecrit Par:</strong> {{ seance.auteur.nom }} {{ seance.auteur.prenom }}</p>
+            </div>
+            <div class="col-lg-6">
+                <p><strong>Élèves absents:</strong></p>
+                <ul>
+                    {% for etudiant in seance.eleves_presents.all %}
+                        <li>{{ etudiant.nom }} {{ etudiant.prenom }}</li>
+                    {% empty %}
+                        <li>Aucun élève absent</li>
+                    {% endfor %}
+                </ul>
+                <p><strong>Validé par l'Enseignant ?:</strong> {%if seance.valider %} OUI {% else %} NON {% endif %}</p>
+                <p><strong>Enseignant:</strong>  {{ seance.matiere.enseignant.prenom }} {{ seance.matiere.enseignant.nom }}</p>
+            </div>
+        </div>
+    <hr/>
+    <hr/>
+    <hr/>
+    <hr/>
+    <div class="row">
+        <div class="col-lg-6" id="displayContent">
+            <p><strong>Résumé Enregistrer</strong> :</p>
+            {{ seance.description|safe }}
+        </div>
+        {% if seance.commentaire %}
+        <div class="col-lg-6" >
+            <p><strong>Commentaires Enseignant</strong> :</p>
+            {{ seance.commentaire|safe }}
+        </div>
+        {% endif %}
+        
+    </div>
+        
+       
+    </div>
+</div>
+{% if not seance.valider and user.is_authenticated and user.groups.all.0.name == 'enseignant' %}
+<form method="post" action="{% url 'cahier_de_texte:commenter' %}">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-lg-12">
+            <label for="commentaire">Laisser un commentaire :</label>
+            <textarea class="form-control" id="commentaire" name="commentaire" rows="3"></textarea>
+        </div>
+        <input type="hidden" id="seance_id" name="seance_id" value=" {{seance.id}} ">
+    </div>
+    <div class="row mt-2">
+        <div class="col-lg-12">
+            <button type="submit" class="btn btn-primary">Envoyer le commentaire</button>
+        </div>
+    </div>
+</form>
+{% endif %}
+
+<hr/>
+ </div>
+ 
+            </main>
+            
+{% endblock %}

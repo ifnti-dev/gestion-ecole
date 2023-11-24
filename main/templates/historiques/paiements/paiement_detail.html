@@ -1,0 +1,25 @@
+{% extends '../consulter_historique.html' %}
+
+{% block content %}
+
+<div class="block block-rounded m-5">
+    <div class="block-header p-4">
+        <h3 class="block-title" style="text-align:center;">Détails du Paiement</h3>
+    </div>
+
+    <div class="block-content block-content-full">
+        <p>ID: {{ paiement.id }}</p>
+        <p>Type: {{ paiement.type }}</p>
+        <p>Montant versé: {{ paiement.montant }}</p>
+        <p>Frais de concours: {{ paiement.fraisconcours }}</p>
+        <p>Frais de concours: {{ paiement.fraisinscription }}</p>
+        <p>Date de versement: {{ paiement.dateversement }}</p>
+        <p>Nombre de tranche: {{ paiement.nombreTranche }}</p>
+        <p>Débit: {{ paiement.debit }}</p>
+        <p>Crédit: {{ paiement.credit }}</p>
+        <p>Etudiant: {{ paiement.etudiant.nom }} {{ paiement.etudiant.prenom }}</p>
+        <p>Comptable: {{ paiement.comptable }}</p>
+    </div>
+</div>
+
+{% endblock %}

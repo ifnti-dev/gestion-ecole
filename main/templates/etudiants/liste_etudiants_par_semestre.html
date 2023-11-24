@@ -1,0 +1,114 @@
+{% extends '../index.html' %}
+{% block content %}
+<div class="block block-rounded m-5">
+    <div class="block-header p-4">
+        <h3 class="block-title">Liste des étudiants de {{ niveau }} </h3>
+        <form action="" method="get" id="form-semestre" class="w-full mr-3">
+            <select name="semestre" id="semestre" class="form-control">
+                <option value="">Semestres</option>
+                {% for semestre in semestres %}
+                    <option value="{{ semestre.id }}" {% if selected_semestre.id == semestre.id %}selected{% endif %}>{{ semestre }}</option>
+                {% endfor %}
+            </select>  
+       </form>  
+        <a href="{% url 'main:create_etudiant' %}" class="btn btn-outline-primary">
+            <i class="fas fa-plus"></i> Ajout Étudiant
+        </a>
+    </div>
+    <div class="block-content block-content-full">
+        <form action="{% url 'main:passage_etudiants' %}" method="post" onsubmit="return confirmPassageEtudiants();">
+            {% csrf_token %}
+        <table class="table table-bordered table-striped table-vcenter js-dataTable-full-pagination">
+            <thead>
+                <tr>
+                    <th class="text-center" style="width: 30%;">Nom & Prénoms</th>
+                    <th class="text-center" style="width: 80px;">Email</th>
+                    <th class="text-center" style="width: 15%;">Crédits obtenus</th>
+                    <th class="text-center" style="width: 15%;">semestre</th>
+                    <th class="text-center" style="width: 15%;">Admis</th>
+                    <th scope="col" class="" style="width: 15%;">Actions</th>
+                </tr>
+            </thead>
+            
+            <tbody>
+                {% for etudiant in etudiants %}
+                <tr>
+                    <td class="text-center font-size-sm">
+                        {% if etudiant.credits_obtenus > 0 and etudiant.credits_obtenus < 30 %}
+                            <span style="color: yellow;">{{ etudiant.nom }} {{ etudiant.prenom }}</span>
+                        {% elif etudiant.credits_obtenus == 0 %}
+                            <span style="color: red;">{{ etudiant.nom }} {{ etudiant.prenom }}</span>
+                        {% else %}
+                            {{ etudiant.nom }} {{ etudiant.prenom }}
+                        {% endif %}
+                    </td>
+                    <td class="text-center font-size-sm">{{ etudiant.email }}</td>
+                    <td class="text-center font-size-sm">{{ etudiant.credits_obtenus }}</td>
+                    <td  class="text-center font-size-sm" >
+                        {% if etudiant.semestre_actuel %}
+                            <span class="badge badge-info">{{ etudiant.semestre_actuel.libelle }}</span>
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </td>
+
+                    <td class="text-center font-size-sm">
+                        <input type="checkbox" name="passer_semestre_suivant" value="{{ etudiant.id }}" data-etudiant-id="{{ etudiant.id }}" data-etudiant-nom="{{ etudiant.nom }}" data-etudiant-prenom="{{ etudiant.prenom }}">
+                    </td>
+                    <td style="text-align: center;">
+                        <button type="button" class="read-book btn btn-sm btn-primary">
+                            <a style="color: blanchedalmond;" href="{% url 'main:detail_etudiant' etudiant.id %}">
+                                <span class="fa fa-eye"></span>
+                            </a>
+                        </button>
+                        <button type="button" class="update-book btn btn-sm btn-warning">
+                            <a style="color: blanchedalmond;" href="{% url 'main:update_etudiant' etudiant.id %}">
+                                <span><i class="far fa-edit fa-lg"></i></span>
+                            </a>
+                        </button>
+                        <input type="text" name="decision_conseil_{{ etudiant.id }}" style="display: none;">
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+
+        </table>
+        <button type="submit" class="btn btn-outline-primary">            
+            Enregistrer
+        </button>
+    </form>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+    <script type="text/javascript">
+        form_tag = $('#form-semestre');
+        $('#semestre').on('change', function() {
+            form_tag.submit();
+        });
+    </script>
+    <script>
+        function confirmPassageEtudiants() {
+            var checkboxes = document.getElementsByName("passer_semestre_suivant");        
+            // Parcourez les cases à cocher pour afficher la boîte de dialogue pour chaque étudiant sélectionné
+            for (var i = 0; i < checkboxes.length; i++) {
+                if (checkboxes[i].checked) {
+                    var etudiantId = checkboxes[i].value;
+                    var etudiantNom = checkboxes[i].getAttribute("data-etudiant-nom");
+                    var etudiantPrenom = checkboxes[i].getAttribute("data-etudiant-prenom");
+                    
+                    var decisionConseil = prompt("Veuillez saisir la décision du conseil pour l'étudiant " + etudiantNom + " " + etudiantPrenom + ":");
+                    
+                    if (decisionConseil !== null) {
+                        decisionConseilInput.value = decisionConseil;
+                    } else {
+                        // L'utilisateur a annulé la saisie, décochez la case à cocher
+                        checkboxes[i].checked = false;
+                    }
+                }
+            }       
+            return true;
+        }
+    </script>
+{% endblock scripts %}
+

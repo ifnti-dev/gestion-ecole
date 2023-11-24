@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Liste des Étudiants</title>
+</head>
+<body>
+    <h1> Liste des Étudiants </h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID de l'Étudiant</th>
+                <th>Nom de l'Étudiant</th>
+                <th>Arriérés {{ id_annee_selectionnee|add:"-1" }} </th>
+                <th>Frais d'inscription</th>
+                <th>Frais de Scolarité</th>
+                <th>Total Scolarité</th>
+                <th>Montant Total Versé</th>
+                <th>Sommes restantes</th>
+            </tr>
+        </thead>
+       <tbody>
+            {% for item in etudiants_avec_montant_total %}
+                <tr>
+                    <td>{{ item.etudiant.id }}</td>
+                    <td>{{ item.etudiant.nom }}</td>
+                    <td>{{ item.arrierees }}</td>
+                    <td>{{ frais_etudiant.montant_inscription }}</td>
+                    <td>{{ frais_etudiant.montant_scolarite }}</td>
+                    <td>{{ total_frais_courante }}</td>
+                    <td>{{ item.montant_total }}</td>
+                    <td>{{ item.somme_restante }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

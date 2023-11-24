@@ -1,0 +1,474 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <link rel="stylesheet" href="{% static  'assets/css/oneui.css' %}">
+
+    <link rel="shortcut icon" href="{% static 'assets/media/favicons/favicon.png' %}">
+    <link rel="icon" type="image/png" sizes="192x192" href="{% static 'assets/media/favicons/favicon-192x192.png' %}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'assets/media/favicons/apple-touch-icon-180x180.png' %}">
+    <!-- END Icons -->
+
+    <!-- Stylesheets -->
+    <!-- Page JS Plugins CSS -->
+    <link rel="stylesheet" href="{% static 'assets/js/plugins/datatables/dataTables.bootstrap4.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/js/plugins/datatables/buttons-bs4/buttons.bootstrap4.min.css' %}">
+
+    <!-- Fonts and OneUI framework -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+    <link rel="stylesheet" id="css-main" href="{% static 'assets/css/oneui.min.css' %}">
+
+    <title>GESTION IFNTI</title>
+</head>
+<body>
+    <div id="page-container" class="sidebar-o sidebar-dark enable-page-overlay side-scroll page-header-fixed main-content-narrow">
+
+            <nav id="sidebar" aria-label="Main Navigation">
+                <!-- Side Header -->
+                <div class="content-header bg-white-5">
+                    <!-- Logo -->
+                    <a class="font-w600 text-dual" href="{% url 'main:index' %}">
+                        <span class="smini-visible">
+                            <i class="fa fa-circle-notch text-primary"></i>
+                        </span>
+                        <span class="smini-hide font-size-h5 tracking-wider">
+                            One<span class="font-w400">UI</span>
+                        </span>
+                    </a>
+                    <!-- END Logo -->
+
+                    <!-- Extra -->
+                    <div>
+                        <!-- Options -->
+                        <div class="dropdown d-inline-block ml-2">
+                            <a class="btn btn-sm btn-dual" id="sidebar-themes-dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" href="#">
+                                <i class="si si-drop"></i>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-right font-size-sm smini-hide border-0" aria-labelledby="sidebar-themes-dropdown">
+                                <!-- Color Themes -->
+                                <!-- Layout API, functionality initialized in Template._uiHandleTheme() -->
+                                <a class="dropdown-item d-flex align-items-center justify-content-between font-w500" data-toggle="theme" data-theme="default" href="#">
+                                    <span>Default</span>
+                                    <i class="fa fa-circle text-default"></i>
+                                </a>
+                                <a class="dropdown-item d-flex align-items-center justify-content-between font-w500" data-toggle="theme" data-theme="{% static 'assets/css/themes/amethyst.min.css'}" href="#">
+                                    <span>Amethyst</span>
+                                    <i class="fa fa-circle text-amethyst"></i>
+                                </a>
+                                <a class="dropdown-item d-flex align-items-center justify-content-between font-w500" data-toggle="theme" data-theme="{% static 'assets/css/themes/city.min.css'}"href="#">
+                                    <span>City</span>
+                                    <i class="fa fa-circle text-city"></i>
+                                </a>
+                                <a class="dropdown-item d-flex align-items-center justify-content-between font-w500" data-toggle="theme" data-theme="{% static 'assets/css/themes/flat.min.css'}" href="#">
+                                    <span>Flat</span>
+                                    <i class="fa fa-circle text-flat"></i>
+                                </a>
+                                <a class="dropdown-item d-flex align-items-center justify-content-between font-w500" data-toggle="theme" data-theme="{% static 'assets/css/themes/modern.min.css'}" href="#">
+                                    <span>Modern</span>
+                                    <i class="fa fa-circle text-modern"></i>
+                                </a>
+                                <a class="dropdown-item d-flex align-items-center justify-content-between font-w500" data-toggle="theme" data-theme="{% static 'assets/css/themes/smooth.min.css'}" href="#">
+                                    <span>Smooth</span>
+                                    <i class="fa fa-circle text-smooth"></i>
+                                </a>
+                                <!-- END Color Themes -->
+
+                                <div class="dropdown-divider"></div>
+
+                                <!-- Sidebar Styles -->
+                                <!-- Layout API, functionality initialized in Template._uiApiLayout() -->
+                                <a class="dropdown-item font-w500" data-toggle="layout" data-action="sidebar_style_light" href="#">
+                                    <span>Sidebar Light</span>
+                                </a>
+                                <a class="dropdown-item font-w500" data-toggle="layout" data-action="sidebar_style_dark" href="#">
+                                    <span>Sidebar Dark</span>
+                                </a>
+                                <!-- Sidebar Styles -->
+
+                                <div class="dropdown-divider"></div>
+
+                                <!-- Header Styles -->
+                                <!-- Layout API, functionality initialized in Template._uiApiLayout() -->
+                                <a class="dropdown-item font-w500" data-toggle="layout" data-action="header_style_light" href="#">
+                                    <span>Header Light</span>
+                                </a>
+                                <a class="dropdown-item font-w500" data-toggle="layout" data-action="header_style_dark" href="#">
+                                    <span>Header Dark</span>
+                                </a>
+                                <!-- Header Styles -->
+                            </div>
+                        </div>
+                        <!-- END Options -->
+
+                        <!-- Close Sidebar, Visible only on mobile screens -->
+                        <!-- Layout API, functionality initialized in Template._uiApiLayout() -->
+                        <a class="d-lg-none btn btn-sm btn-dual ml-1" data-toggle="layout" data-action="sidebar_close" href="javascript:void(0)">
+                            <i class="fa fa-fw fa-times"></i>
+                        </a>
+                        <!-- END Close Sidebar -->
+                    </div>
+                    <!-- END Extra -->
+                </div>
+                <!-- END Side Header -->
+
+                <!-- Sidebar Scrolling -->
+                <div class="js-sidebar-scroll">
+                    <!-- Side Navigation -->
+                    <div class="content-side">
+                        <ul class="nav-main">
+
+
+                            <li class="nav-main-item">
+                                <a class="nav-main-link nav-main-link-submenu" data-toggle="submenu" aria-haspopup="true" aria-expanded="false" href="#">
+                                    <i class="nav-main-link-icon "></i>
+                                    <span class="nav-main-link-name" style="font-weight: bold;">GESTION ETUDIANTS</span>
+                                </a>
+                                <ul class="nav-main-submenu">
+
+                                        <li class="nav-main-item">
+                                            <a class="nav-main-link" href="{% url 'historique:etudiants_ln' niveau=1 selected_annee_id=selected_annee_id  %}">
+                                                <span class="nav-main-link-name">Étudiants L1</span>
+                                            </a>
+                                        </li>
+
+
+                                    <li class="nav-main-item">
+                                        <a class="nav-main-link" href="{% url 'historique:etudiants_ln'  niveau=2 selected_annee_id=selected_annee_id  %}">
+                                            <span class="nav-main-link-name">Étudiants L2</span>
+                                        </a>
+                                    </li>
+
+
+                                    <li class="nav-main-item">
+                                        <a class="nav-main-link" href="{% url 'historique:etudiants_ln'  niveau=3 selected_annee_id=selected_annee_id  %}">
+                                            <span class="nav-main-link-name">Étudiants L3</span>
+                                        </a>
+                                    </li>
+
+
+                                        <li class="nav-main-item">
+                                            <a class="nav-main-link" href="{% url 'historique:liste_des_etudiants_suspendu' selected_annee_id %}">
+                                                <span class="nav-main-link-name">Étudiants suspendus</span>
+                                            </a>
+                                        </li>
+
+                                    
+                                        <li class="nav-main-item">
+                                            <a class="nav-main-link" href="{% url 'historique:liste_des_etudiants' selected_annee_id %}">
+                                                <span class="nav-main-link-name">Étudiants IFNTI</span>
+                                            </a>
+                                        </li>
+                                         
+
+                                        <li class="nav-main-item">
+                                            <a class="nav-main-link" href="{% url 'historique:liste_des_tuteurs' selected_annee_id %}">
+                                                <span class="nav-main-link-name">Tuteurs des étudiants</span>
+                                            </a>
+                                        </li>
+
+                                   
+                                </ul>
+                            </li>
+
+
+                            <li class="nav-main-item">
+                                <a class="nav-main-link nav-main-link-submenu" data-toggle="submenu" aria-haspopup="true" aria-expanded="false" href="#">
+                                    <i class="nav-main-link-icon "></i>
+                                    <span class="nav-main-link-name" style="font-weight: bold;"> PROGRAMMES</span>
+                                </a>
+                                <ul class="nav-main-submenu">     
+        
+                                    <li class="nav-main-item">
+                                        <a class="nav-main-link nav-main-link-name" data-toggle="" aria-haspopup="true" aria-expanded="false" href="{% url 'historique:liste_des_programmes' selected_annee_id %}">
+                                            <i class="nav-main-link-icon "></i>
+                                            <span class="nav-main-link-name">Liste des programmes</span>
+                                        </a>                   
+                                    </li>
+
+                                    <li class="nav-main-item">
+                                        <a class="nav-main-link nav-main-link-name" data-toggle="" aria-haspopup="true" aria-expanded="false" href="{% url 'historique:liste_des_ues' selected_annee_id %}">
+                                            <i class="nav-main-link-icon "></i>
+                                            <span class="nav-main-link-name">Liste des UEs</span>
+                                        </a>                   
+                                    </li>
+                                    
+        
+                                    <li class="nav-main-item">
+                                        <a class="nav-main-link nav-main-link-submenu" data-toggle="submenu" aria-haspopup="true" aria-expanded="false" href="#">
+                                            <i class="nav-main-link-icon "></i>
+                                            <span class="nav-main-link-name">UEs par semestre</span>
+                                        </a>
+                                        <ul class="nav-main-submenu">
+
+                                            <li class="nav-main-item">
+                                                <a class="nav-main-link" href="{% url 'historique:ues_semestre1' selected_annee_id=selected_annee_id %}">
+                                                    <span class="nav-main-link-name">Semestre 1</span>
+                                                </a>
+                                            </li>
+
+                                            <li class="nav-main-item">
+                                                <a class="nav-main-link" href="{% url 'historique:ues_semestre2' selected_annee_id=selected_annee_id %}">
+                                                    <span class="nav-main-link-name">Semestre 2</span>
+                                                </a>
+                                            </li>
+                                            <li class="nav-main-item">
+                                                <a class="nav-main-link" href="{% url 'historique:ues_semestre3' selected_annee_id=selected_annee_id %}">
+                                                    <span class="nav-main-link-name">Semestre 3</span>
+                                                </a>
+                                            </li>
+                                            <li class="nav-main-item">
+                                                <a class="nav-main-link" href="{% url 'historique:ues_semestre4' selected_annee_id=selected_annee_id %}"> 
+                                                    <span class="nav-main-link-name">Semestre 4</span>
+                                                </a>
+                                            </li>
+                                            <li class="nav-main-item">
+                                                <a class="nav-main-link" href="{% url 'historique:ues_semestre5' selected_annee_id=selected_annee_id %}">
+                                                    <span class="nav-main-link-name">Semestre 5</span>
+                                                </a>
+                                            </li>
+                                            <li class="nav-main-item">
+                                                <a class="nav-main-link" href="{% url 'historique:ues_semestre6' selected_annee_id=selected_annee_id %}">
+                                                    <span class="nav-main-link-name">Semestre 6</span>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </li>
+        
+                                    <li class="nav-main-item">
+                                        <a class="nav-main-link nav-main-link-name" data-toggle="" aria-haspopup="true" aria-expanded="false" href="{% url 'historique:liste_des_matieres' selected_annee_id %}">
+                                            <i class="nav-main-link-icon "></i>
+                                            <span class="nav-main-link-name">Liste des matières</span>
+                                        </a>                   
+                                    </li>
+
+
+                                    <li class="nav-main-item">
+                                        <a class="nav-main-link nav-main-link-submenu" data-toggle="submenu" aria-haspopup="true" aria-expanded="false" href="#">
+                                            <i class="nav-main-link-icon "></i>
+                                            <span class="nav-main-link-name">Matières par semestre</span>
+                                        </a>
+                                        <ul class="nav-main-submenu">
+
+                                            <li class="nav-main-item">
+                                                <a class="nav-main-link" href="{% url 'historique:matiere_semestre1' selected_annee_id=selected_annee_id %}">
+                                                    <span class="nav-main-link-name">Semestre 1</span>
+                                                </a>
+                                            </li>
+
+                                            <li class="nav-main-item">
+                                                <a class="nav-main-link" href="{% url 'historique:matiere_semestre2' selected_annee_id=selected_annee_id %}">
+                                                    <span class="nav-main-link-name">Semestre 2</span>
+                                                </a>
+                                            </li>
+
+                                            <li class="nav-main-item">
+                                                <a class="nav-main-link" href="{% url 'historique:matiere_semestre3' selected_annee_id=selected_annee_id %}">
+                                                    <span class="nav-main-link-name">Semestre 3</span>
+                                                </a>
+                                            </li>
+
+                                            <li class="nav-main-item">
+                                                <a class="nav-main-link" href="{% url 'historique:matiere_semestre4' selected_annee_id=selected_annee_id %}">
+                                                    <span class="nav-main-link-name">Semestre 4</span>
+                                                </a>
+                                            </li>
+
+                                            <li class="nav-main-item">
+                                                <a class="nav-main-link" href="{% url 'historique:matiere_semestre5' selected_annee_id=selected_annee_id %}">
+                                                    <span class="nav-main-link-name">Semestre 5</span>
+                                                </a>
+                                            </li>
+
+                                            <li class="nav-main-item">
+                                                <a class="nav-main-link" href="{% url 'historique:matiere_semestre6' selected_annee_id=selected_annee_id %}">
+                                                    <span class="nav-main-link-name">Semestre 6</span>
+                                                </a>
+                                            </li>
+                                            
+                                        </ul>
+                                    </li>                                                
+                                </ul>
+                            </li>
+
+
+
+                            <li class="nav-main-item">
+                                <a class="nav-main-link nav-main-link-submenu" data-toggle="submenu" aria-haspopup="true" aria-expanded="false" href="#">
+                                    <i class="nav-main-link-icon "></i>
+                                    <span class="nav-main-link-name" style="font-weight: bold;">GESTION MAQUETTE</span>
+                                </a>
+                                <ul class="nav-main-submenu">
+                                    
+                                        <li class="nav-main-item">
+                                            <a class="nav-main-link" href="#">
+                                                <span class="nav-main-link-name">Générer maquette</span>
+                                            </a>
+                                        </li>
+
+                                   
+                                </ul>
+                            </li>
+
+
+                            <li class="nav-main-item">
+                                <a class="nav-main-link nav-main-link-submenu" data-toggle="submenu" aria-haspopup="true" aria-expanded="false" href="#">
+                                    <i class="nav-main-link-icon "></i>
+                                    <span class="nav-main-link-name" style="font-weight: bold;">CAHIER DE TEXTE</span>
+                                </a>
+                                <ul class="nav-main-submenu">
+                                    
+                                        <li class="nav-main-item">
+                                            <a class="nav-main-link" href="{% url 'main:liste_seance' %}">
+                                                <span class="nav-main-link-name">Cahier de texte</span>
+                                            </a>
+                                        </li>
+                                    
+                                
+                                </ul>
+                            </li>
+
+
+                            <li class="nav-main-item">
+                                <a class="nav-main-link nav-main-link-submenu" data-toggle="submenu" aria-haspopup="true" aria-expanded="false" href="#">
+                                    <i class="nav-main-link-icon "></i>
+                                    <span class="nav-main-link-name" style="font-weight: bold;">GESTION PAIEMENT</span>
+                                </a>
+                                <ul class="nav-main-submenu">
+                                    
+                                    <li class="nav-main-item">
+                                        <a class="nav-main-link nav-main-link-name" data-toggle="" aria-haspopup="true" aria-expanded="false" href="{% url 'historique:paiement_list' selected_annee_id %}">
+                                            <i class="nav-main-link-icon "></i>
+                                            <span class="nav-main-link-name">Liste des Paiements</span>
+                                        </a>                   
+                                    </li>
+                                    
+                                    <li class="nav-main-item">
+                                        <a class="nav-main-link nav-main-link-name" data-toggle="" aria-haspopup="true" aria-expanded="false" href="{% url 'historique:fiche_de_paie_list' selected_annee_id %}">
+                                            <i class="nav-main-link-icon "></i>
+                                            <span class="nav-main-link-name">Fiche de Paie</span>
+                                        </a>                   
+                                    </li> 
+
+                                   
+                                </ul>
+                            </li>
+
+                            <li class="nav-main-item">
+                                <a class="nav-main-link nav-main-link-submenu" data-toggle="submenu" aria-haspopup="true" aria-expanded="false" href="#">
+                                    <i class="nav-main-link-icon "></i>
+                                    <span class="nav-main-link-name" style="font-weight: bold;">GESTION EMPLOYÉ</span>
+                                </a>
+                                <ul class="nav-main-submenu">
+                                    
+                                    <li class="nav-main-item">
+                                        <a class="nav-main-link nav-main-link-name" data-toggle="" aria-haspopup="true" aria-expanded="false" href="{% url 'historique:enseignant_list' selected_annee_id %}">
+                                            <i class="nav-main-link-icon "></i>
+                                            <span class="nav-main-link-name">Liste des enseignants</span>
+                                        </a>                   
+                                    </li>
+
+                                    <li class="nav-main-item">
+                                        <a class="nav-main-link nav-main-link-name" data-toggle="" aria-haspopup="true" aria-expanded="false" href="{% url 'main:enseignant_suspendu' %}">
+                                            <i class="nav-main-link-icon "></i>
+                                            <span class="nav-main-link-name">Enseignants suspendus</span>
+                                        </a>                   
+                                    </li>
+
+                                    <li class="nav-main-item">
+                                        <a class="nav-main-link nav-main-link-name" data-toggle="" aria-haspopup="true" aria-expanded="false" href="{% url 'main:information_list' %}">
+                                            <i class="nav-main-link-icon "></i>
+                                            <span class="nav-main-link-name">Attestation de service</span>
+                                        </a>                   
+                                    </li>
+
+                                    <li class="nav-main-item">
+                                        <a class="nav-main-link nav-main-link-name" data-toggle="" aria-haspopup="true" aria-expanded="false" href="{% url 'historique:comptable_list' selected_annee_id %}">
+                                            <i class="nav-main-link-icon "></i>
+                                            <span class="nav-main-link-name">Liste des Comptables</span>
+                                        </a>                   
+                                    </li>    
+
+
+                                    <li class="nav-main-item">
+                                        <a class="nav-main-link nav-main-link-name" data-toggle="" aria-haspopup="true" aria-expanded="false" href="{% url 'main:liste_matieres_professeur' %}">
+                                            <i class="nav-main-link-icon "></i>
+                                            <span class="nav-main-link-name">Affectation des matières aux profs</span>
+                                        </a>                   
+                                    </li>
+
+                                   
+                                </ul>
+                            </li>
+
+
+                                                       
+
+                            <li class="nav-main-item">
+                                <a class="nav-main-link nav-main-link-submenu" data-toggle="submenu" aria-haspopup="true" aria-expanded="false" href="#">
+                                    <i class="nav-main-link-icon "></i>
+                                    <span class="nav-main-link-name" style="font-weight: bold;">GESTION CONGÉS</span>
+                                </a>
+                                <ul class="nav-main-submenu">
+                                    
+                                    {% if etudiants %}
+                                        <li class="nav-main-item">
+                                            <a class="nav-main-link" href="{% url 'historique:liste_des_etudiants' selected_annee_id %}">
+                                                <span class="nav-main-link-name">Étudiants IFNTI</span>
+                                            </a>
+                                        </li>
+                                    {% endif %}                                     
+                                </ul>
+                            </li>
+
+
+                                   
+
+                        </ul>
+                    </div>
+                    <!-- END Side Navigation -->
+                </div>
+                <!-- END Sidebar Scrolling -->
+            </nav>
+
+        {% include 'components/header.html' %}
+
+        <main id="main-container">
+             <!-- Bannier -->
+             
+            <!-- FIN Bannier -->
+
+            
+
+            
+            {% block content %}
+
+            {% endblock content %}
+        </main>
+
+
+        {% include 'components/footer.html'  %}
+    </div>
+
+</body>
+
+
+
+<script src="{% static 'assets/js/oneui.core.min.js' %}"></script>
+<script src="{% static 'assets/js/oneui.app.min.js' %}"></script>
+<script src="{% static 'assets/js/plugins/datatables/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'assets/js/plugins/datatables/dataTables.bootstrap4.min.js' %}"></script>
+<script src="{% static 'assets/js/plugins/datatables/buttons/dataTables.buttons.min.js' %}"></script>
+<script src="{% static 'assets/js/plugins/datatables/buttons/buttons.print.min.js' %}"></script>
+<script src="{% static 'assets/js/plugins/datatables/buttons/buttons.html5.min.js' %}"></script>
+<script src="{% static 'assets/js/plugins/datatables/buttons/buttons.flash.min.js' %}"></script>
+<script src="{% static 'assets/js/plugins/datatables/buttons/buttons.colVis.min.js' %}"></script>
+<script src="{% static 'assets/js/pages/be_tables_datatables.min.js' %}"></script>
+
+{% block scripts %}{% endblock scripts %}
+
+</html>
