@@ -50,8 +50,7 @@ INSTALLED_APPS = [
     'django_extensions',
     'solo',
     'conges',
-    'chat',
-]
+ ]
 
 
 MIDDLEWARE = [
