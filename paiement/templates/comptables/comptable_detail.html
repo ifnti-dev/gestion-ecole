@@ -24,7 +24,7 @@
 <div class="block block-rounded m-5">
     <div class="block-header p-4">
         <h3 class="block-title">Détails du comptable {{enseignant.nom}} {{enseignant.prenom}}</h3>
-        <a class="btn btn-sm btn-success"  href="{% url 'paiement:comptable_list' %}" style="padding: 8px; float: right; background-color: blue; color: white;"><i class="fas fa-chevron-left fa-lg"></i>
+        <a class="btn btn-sm btn-success"  href="{% url 'paiement:comptable_list' id_annee_selectionnee %}" style="padding: 8px; float: right; background-color: blue; color: white;"><i class="fas fa-chevron-left fa-lg"></i>
             Retour</a>
     </div>
     <div class="block-content block-content-full">
