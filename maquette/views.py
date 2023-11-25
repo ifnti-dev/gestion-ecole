@@ -84,7 +84,7 @@ def generate_maquette(request, id_annee_selectionnee):
     else:
         data['maquette_semestres'] = generateDictFromProgrammeData(None, parcours, annee_accademique)
         generate_maquette_pdf(data['maquette_semestres'])
-        data['pdf_file'] = "/media/pdf/maquette/maquette.pdf"
+        data['pdf_file'] = "/media/pdf/maquette.pdf"
         data['form'] = GenerateMaquetteForm(initial={'semestre': Semestre.objects.all()})
         
     return render(request, "maquette/generate_maquette.html", data)
@@ -133,7 +133,7 @@ def generateDictFromProgrammeData(semestre, parcours, annee_accademique):
 def generate_maquette_pdf(context):
     latex_input = 'maquette_generique_template'
     latex_ouput = 'maquette_generique'
-    pdf_file = 'maquette/maquette'
+    pdf_file = 'maquette'
 
     generate_pdf(context, latex_input, latex_ouput, pdf_file)
 
