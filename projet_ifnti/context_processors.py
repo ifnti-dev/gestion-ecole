@@ -17,8 +17,9 @@ def bootstrap(request):
     else:
         niveau = ''
         
-    id_annee_selectionnee = current_annee_accademique.id if current_annee_accademique else 0
-    request.session["id_annee_selectionnee"] = id_annee_selectionnee
+    if not request.session["id_annee_selectionnee"]:
+        id_annee_selectionnee = current_annee_accademique.id if current_annee_accademique else 0
+        request.session["id_annee_selectionnee"] = id_annee_selectionnee
         
     id_auth_model = get_id_authenticate_user_model(request)
     return {
@@ -31,7 +32,7 @@ def bootstrap(request):
         'is_secretaire': role_name == 'secretaire',
         'is_comptable': role_name == 'comptable',
         'id_authenticate_user_model': id_auth_model,
-        'id_annee_selectionnee': id_annee_selectionnee,
+        'id_annee_selectionnee': int(request.session.get("id_annee_selectionnee")),
         'page_is_not_profil' : True,
         'profile_path': get_authenticate_profile_path(request, id_auth_model),
         'niveau': niveau

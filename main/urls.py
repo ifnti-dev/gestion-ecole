@@ -4,8 +4,6 @@ from . import views
 app_name = 'main'
 
 urlpatterns = [
-    path('', views.index, name='index'),
-
     path('affecter_matieres_prof', views.affectation_matieres_professeur,
          name='affectation_matieres_professeur'),
     path('liste_matieres_professeur', views.liste_matieres_professeur,
