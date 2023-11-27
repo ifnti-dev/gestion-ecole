@@ -5,7 +5,7 @@
         <h3 class="block-title">{{ niveau }} </h3>
         <form action="" method="post" id="form-semestre" class="d-flex mr-3">
             {% csrf_token %}
-            {% if is_directeur_des_etudes %}
+            <!-- {% if is_directeur_des_etudes %}
             <select name="etat" id="etat" class="form-control mr-3">
                 <option value="">Etat</option>
                 <option value="__all__" {% if selected_etat.id == '__all__' %}selected{% endif %}>Tous</option>
@@ -13,15 +13,16 @@
                     <option value="{{ etat.id }}" {% if selected_etat.id == etat.id %}selected{% endif %}>{{ etat.value }}</option>
                 {% endfor %}
             </select>  
-            {% endif %}
+            {% endif %} -->
             <select name="semestre" id="semestre" class="form-control">
                 <option value="">Semestres</option>
                 {% for semestre in semestres %}
-                    <option value="{{ semestre.id }}" {% if selected_semestre.id == semestre.id %}selected{% endif %}>{{ semestre.libelle  }} {{semestre.annee_universitaire}}</option>
+                <option value="{{ semestre.id }}" {% if selected_semestre.id == semestre.id %}selected{% endif %}>
+                    {{ semestre.libelle }} {{semestre.annee_universitaire}}</option>
                 {% endfor %}
-            </select>  
-       </form>  
-       
+            </select>
+        </form>
+
         {% if is_secretaire or is_directeur_des_etudes or is_admin %}
         <a href="{% url 'main:create_etudiant' %}" class="btn btn-outline-primary">
             <i class="fas fa-plus"></i> Ajout Étudiant
@@ -30,43 +31,48 @@
     </div>
     <div class="block-header">
         {%  if is_secretaire or is_directeur_des_etudes %}
-        <button type="button" class="btn btn-secondary dropdown-toggle float-right" id="dropdown-default-secondary" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <button type="button" class="btn btn-secondary dropdown-toggle float-right" id="dropdown-default-secondary"
+            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             Action groupées
         </button>
         <div class="dropdown-menu font-size-sm" aria-labelledby="dropdown-default-secondary">
             {% comment %} Génération des notes {% endcomment %}
             {% if  is_directeur_des_etudes %}
             <li class="nav-main-item">
-                <a class="nav-main-link nav-main-link-submenu" data-toggle="submenu" aria-haspopup="true" aria-expanded="false" href="#">
+                <a class="nav-main-link nav-main-link-submenu" data-toggle="submenu" aria-haspopup="true"
+                    aria-expanded="false" href="#">
                     <i class="fa fa-file mr-1" aria-hidden="true"></i>
-                    <span class="nav-main-link-name">Relevés de notes du semestre</span>
+                    <span class="nav-main-link-name documents-link" style="color: #1c72d6;">Relevés de notes du semestre</span>
                 </a>
-                <ul class="nav-main-submenu">  
+                <ul class="nav-main-submenu">
                     <li class="nav-main-item">
-                        <a class="nav-main-link nav-main-link-submenu" data-toggle="submenu" aria-haspopup="true" aria-expanded="false" href="#">
-                            <span class="nav-main-link-name">Relevé synthétique</span>
+                        <a class="nav-main-link nav-main-link-submenu" data-toggle="submenu" aria-haspopup="true"
+                            aria-expanded="false" href="#">
+                            <span class="nav-main-link-name documents-link" style="color: #1c72d6;">Relevé synthétique</span>
                         </a>
                         <ul class="nav-main-submenu">
-                            
+
                             <li class="nav-main-item">
                                 <a class="nav-main-link" href="{% url 'main:releve_notes'  selected_semestre.id %}">
-                                    <span class="nav-main-link-name">{{selected_semestre.libelle}}</span>
+                                    <span class="nav-main-link-name documents-link" style="color: #1c72d6;">{{selected_semestre.libelle}}</span>
                                 </a>
                             </li>
                         </ul>
                     </li>
                     <li class="nav-main-item">
-                        <a class="nav-main-link nav-main-link-submenu" data-toggle="submenu" aria-haspopup="true" aria-expanded="false" href="#">
-                            <span class="nav-main-link-name">Relevé détaillé</span>
+                        <a class="nav-main-link nav-main-link-submenu" data-toggle="submenu" aria-haspopup="true"
+                            aria-expanded="false" href="#">
+                            <span class="nav-main-link-name" style="color: #1c72d6;">Relevé détaillé</span>
                         </a>
                         <ul class="nav-main-submenu">
-                           
+
                             <li class="nav-main-item">
-                                <a class="nav-main-link" href="{% url 'main:releve_notes_detail' selected_semestre.id %}">
-                                    <span class="nav-main-link-name">{{selected_semestre.libelle}}</span>
+                                <a class="nav-main-link"
+                                    href="{% url 'main:releve_notes_detail' selected_semestre.id %}">
+                                    <span class="nav-main-link-name documents-link" style="color: #1c72d6;">{{selected_semestre.libelle}}</span>
                                 </a>
                             </li>
-                           
+
                         </ul>
                     </li>
                 </ul>
@@ -77,10 +83,11 @@
             {% comment %} Génération de la carte étudiant {% endcomment %}
             {%  if is_secretaire or is_directeur_des_etudes %}
             <li class="nav-main-item">
-                <a class="nav-main-link nav-main-link-name" data-toggle="" aria-haspopup="true" aria-expanded="false" href="{% url 'main:carte_etudiant' selected_semestre.id %}">
+                <a class="nav-main-link nav-main-link-name" data-toggle="" aria-haspopup="true" aria-expanded="false"
+                    href="{% url 'main:carte_etudiant' selected_semestre.id %}">
                     <i class="fa fa-id-card mr-1" aria-hidden="true"></i>
-                    <span class="nav-main-link-name">Cartes étudiants {{niveau}}</span>
-                </a>                   
+                    <span class="nav-main-link-name documents-link" style="color: #1c72d6;">Cartes étudiants {{niveau}}</span>
+                </a>
             </li>
             {% endif %}
             {% comment %} Fin génération carte étudiant {% endcomment %}
@@ -88,10 +95,11 @@
             {% comment %} Génération du diplome étudiant {% endcomment %}
             {%  if user.groups.all.0.name == "directeur_des_etudes" and niveau == 'L3'%}
             <li class="nav-main-item">
-                <a class="nav-main-link nav-main-link-name" data-toggle="" aria-haspopup="true" aria-expanded="false" href="{% url 'main:diplome_etudiant' %}">
+                <a class="nav-main-link nav-main-link-name" data-toggle="" aria-haspopup="true" aria-expanded="false"
+                    href="{% url 'main:diplome_etudiant' %}">
                     <i class="fa fa-certificate mr-1" aria-hidden="true"></i>
-                    <span class="nav-main-link-name">Diplomes étudiants</span>
-                </a>                   
+                    <span class="nav-main-link-name documents-link" style="color: #1c72d6;">Diplomes étudiants</span>
+                </a>
             </li>
             {% endif %}
             {% comment %} Fin génération du diplome étudiant {% endcomment %}
@@ -102,72 +110,80 @@
     <div class="block-content block-content-full">
         <form action="{% url 'main:passage_etudiants' %}" method="post" onsubmit="return confirmPassageEtudiants();">
             {% csrf_token %}
-        <table class="table table-bordered table-striped table-vcenter js-dataTable-full-pagination">
-            <thead>
-                <tr>
-                    <th class="text-center" style="width: 30%;">Nom & Prénoms</th>
-                    <th class="text-center">Niveau</th>
-                    <th class="text-center" style="width: 80px;">Email</th>
-                    <th class="text-center" style="width: 15%;">Contact</th>
-                    {% if is_directeur_des_etudes or is_comptable  %}
+            <table class="table table-bordered table-striped table-vcenter js-dataTable-full-pagination">
+                <thead>
+                    <tr>
+                        <th class="text-center" style="width: 30%;">Nom & Prénoms</th>
+                        <th class="text-center">Niveau</th>
+                        <th class="text-center" style="width: 80px;">Email</th>
+                        <th class="text-center" style="width: 15%;">Contact</th>
+                        {% if is_directeur_des_etudes or is_comptable  %}
                         <th scope="col" class="text-center" style="width: 15%">État paiement</th>
-                    {% endif %}
-                    {% if is_directeur_des_etudes or is_etudiant or is_secretaire %}
-                    <th scope="col" class="" style="width: 15%;">Actions</th>
-                    {% endif %} 
-                </tr>
-            </thead>
-            <tbody>
-                {% for etudiant in etudiants %}
-                <tr {% if etudiant in etudiants_insuffisants %}class="bg-danger text-white"{% endif %}>
-                    <td class="text-center font-size-sm">{{etudiant.etudiant.nom}} {{etudiant.etudiant.prenom}}</td>
-                    <td class="text-center d-sm-table-cell">
-                        {% if etudiant.niveau == 'L1' %}
-                            <span class="badge badge-info">{{etudiant.niveau}}</span>
-                        {% elif etudiant.niveau == 'L2' %}
-                            <span class="badge badge-primary">{{etudiant.niveau}}</span>
-                        {% elif etudiant.niveau == 'L3' %}
-                            <span class="badge badge-success">{{etudiant.niveau}}</span>
-                        {% else %}
-                            <span class="badge badge-secondary">ancien</span>
                         {% endif %}
-                    </td>
-                    <td class="text-center font-size-sm">{{etudiant.etudiant.email}}</td>
-                    <td class="text-center font-size-sm">{{etudiant.etudiant.contact}}</td>
-                    {% if is_directeur_des_etudes or is_comptable  %}
-                    <td style="text-align: center;">                                       
-                        <button type="button" class="bs-modal read-book btn btn-sm btn-primary">
-                            <a style="color: blanchedalmond;" href="{% url 'paiement:etat_paiements' etudiant.etudiant.id id_annee_selectionnee %}">
-                                <span class="fa fa-eye"></span> Afficher               
-                            </a>
-                        </button>
-                         
-                    </td> 
-                    {% endif %}
+                        {% if is_directeur_des_etudes or is_etudiant or is_secretaire %}
+                        <th scope="col" class="" style="width: 15%;">Actions</th>
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for etudiant in etudiants %}
+                    <tr {% if etudiant in etudiants_insuffisants %}class="bg-danger text-white" {% endif %}>
+                        <td class="text-center font-size-sm">{{etudiant.etudiant.nom}} {{etudiant.etudiant.prenom}}</td>
+                        <td class="text-center d-sm-table-cell">
+                            {% if etudiant.niveau == 'L1' %}
+                            <span class="badge badge-info">{{etudiant.niveau}}</span>
+                            {% elif etudiant.niveau == 'L2' %}
+                            <span class="badge badge-primary">{{etudiant.niveau}}</span>
+                            {% elif etudiant.niveau == 'L3' %}
+                            <span class="badge badge-success">{{etudiant.niveau}}</span>
+                            {% else %}
+                            <span class="badge badge-secondary">ancien</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center font-size-sm">{{etudiant.etudiant.email}}</td>
+                        <td class="text-center font-size-sm">{{etudiant.etudiant.contact}}</td>
+                        {% if is_directeur_des_etudes or is_comptable  %}
+                        <td style="text-align: center;">
+                            <button type="button" class="bs-modal read-book btn btn-sm btn-primary">
+                                <a style="color: blanchedalmond;"
+                                    href="{% url 'paiement:etat_paiements' etudiant.etudiant.id id_annee_selectionnee %}">
+                                    <span class="fa fa-eye"></span> Afficher
+                                </a>
+                            </button>
 
-                    {% if is_directeur_des_etudes or is_secretaire or is_etudiant and user.etudiant == etudiant.etudiant %}
-                    <td style="text-align: center;">
+                        </td>
+                        {% endif %}
 
-                            
-                            <input type="text" name="decision_conseil_{{ etudiant.etudiant.id }}" style="display: none;">
-                            <button type="button" class="btn btn-secondary dropdown-toggle" id="dropdown-default-secondary" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        {% if is_directeur_des_etudes or is_secretaire or is_etudiant and user.etudiant == etudiant.etudiant %}
+                        <td style="text-align: center;">
+
+
+                            <input type="text" name="decision_conseil_{{ etudiant.etudiant.id }}"
+                                style="display: none;">
+                            <button type="button" class="btn btn-secondary dropdown-toggle"
+                                id="dropdown-default-secondary" data-toggle="dropdown" aria-haspopup="true"
+                                aria-expanded="false">
                                 <i class="fa fa-bars" aria-hidden="true"></i>
                             </button>
                             <div class="dropdown-menu font-size-sm" aria-labelledby="dropdown-default-secondary">
                                 <li class="nav-main-item">
-                                    <a class="nav-main-link nav-main-link-name" data-toggle="" aria-haspopup="true" aria-expanded="false" href="{% url 'main:detail_etudiant' etudiant.etudiant.id %}">
+                                    <a class="nav-main-link nav-main-link-name" data-toggle="" aria-haspopup="true"
+                                        aria-expanded="false"
+                                        href="{% url 'main:detail_etudiant' etudiant.etudiant.id %}">
                                         <i class="fa fa-eye mr-1" aria-hidden="true"></i>
                                         <span class="nav-main-link-name">voir</span>
                                     </a>
                                 </li>
 
-                                
+
                                 {% if is_etudiant and user.etudiant == etudiant.etudiant or is_directeur_des_etudes %}
 
                                 {% if is_directeur_des_etudes %}
 
                                 <li class="nav-main-item">
-                                    <a class="nav-main-link nav-main-link-name" data-toggle="" aria-haspopup="true" aria-expanded="false" href="{% url 'main:update_etudiant' etudiant.etudiant.id %}">
+                                    <a class="nav-main-link nav-main-link-name" data-toggle="" aria-haspopup="true"
+                                        aria-expanded="false"
+                                        href="{% url 'main:update_etudiant' etudiant.etudiant.id %}">
                                         <i class="fa fa-edit mr-1" aria-hidden="true"></i>
                                         <span class="nav-main-link-name">editer</span>
                                     </a>
@@ -177,48 +193,59 @@
 
 
                                 <li class="nav-main-item">
-                                    <a class="nav-main-link nav-main-link-submenu" data-toggle="submenu" aria-haspopup="true" aria-expanded="false" href="#">
+                                    <a class="nav-main-link nav-main-link-submenu" data-toggle="submenu"
+                                        aria-haspopup="true" aria-expanded="false" href="#">
                                         <i class="fa fa-file mr-1" aria-hidden="true"></i>
                                         <span class="nav-main-link-name">Relevé de notes</span>
                                     </a>
                                     <ul class="nav-main-submenu">
 
                                         <li class="nav-main-item">
-                                            <a class="nav-main-link nav-main-link-submenu" data-toggle="submenu" aria-haspopup="true" aria-expanded="false" href="#">
-                                                <span class="nav-main-link-name">Relevé synthétique</span>
+                                            <a class="nav-main-link nav-main-link-submenu" data-toggle="submenu"
+                                                aria-haspopup="true" aria-expanded="false" href="#">
+                                                <span class="nav-main-link-name documents-link" style="color: #1c72d6;">Relevé synthétique</span>
                                             </a>
                                             <ul class="nav-main-submenu">
                                                 <li class="nav-main-item">
-                                                    
+
                                                     {% if is_etudiant %}
-                                                        <a class="nav-main-link" href="{% url 'main:releve_notes' etudiant.etudiant.id selected_semestre.id %}">e
-                                                            <span class="nav-main-link-name">{{selected_semestre.libelle}}</span>
-                                                        </a>
+                                                    <a class="nav-main-link"
+                                                        href="{% url 'main:releve_notes' etudiant.etudiant.id selected_semestre.id %}">e
+                                                        <span
+                                                            class="nav-main-link-name documents-link" style="color: #1c72d6;">{{selected_semestre.libelle}}</span>
+                                                    </a>
                                                     {% else %}
-                                                        <a class="nav-main-link" href="{% url 'main:releve_notes' etudiant.etudiant.id selected_semestre.id %}">
-                                                            <span class="nav-main-link-name">{{selected_semestre.libelle}}</span>
-                                                        </a>
+                                                    <a class="nav-main-link"
+                                                        href="{% url 'main:releve_notes' etudiant.etudiant.id selected_semestre.id %}">
+                                                        <span
+                                                            class="nav-main-link-name documents-link" style="color: #1c72d6;">{{selected_semestre.libelle}}</span>
+                                                    </a>
                                                     {% endif %}
-                                                        
+
                                                 </li>
                                             </ul>
                                         </li>
 
 
                                         <li class="nav-main-item">
-                                            <a class="nav-main-link nav-main-link-submenu" data-toggle="submenu" aria-haspopup="true" aria-expanded="false" href="#">
-                                                <span class="nav-main-link-name">Relevé détaillé</span>
+                                            <a class="nav-main-link nav-main-link-submenu" data-toggle="submenu"
+                                                aria-haspopup="true" aria-expanded="false" href="#">
+                                                <span class="nav-main-link-name" style="color: #1c72d6;">Relevé détaillé</span>
                                             </a>
                                             <ul class="nav-main-submenu">
                                                 <li class="nav-main-item">
                                                     {% if is_etudiant %}
-                                                        <a class="nav-main-link" href="{% url 'main:releve_notes_detail' etudiant.etudiant.id selected_semestre.id %}">
-                                                            <span class="nav-main-link-name">{{selected_semestre.libelle}}</span>
-                                                        </a>
+                                                    <a class="nav-main-link"
+                                                        href="{% url 'main:releve_notes_detail' etudiant.etudiant.id selected_semestre.id %}">
+                                                        <span
+                                                            class="nav-main-link-name documents-link" style="color: #1c72d6;">{{selected_semestre.libelle}}</span>
+                                                    </a>
                                                     {% else %}
-                                                        <a class="nav-main-link" href="{% url 'main:releve_notes_detail' etudiant.etudiant.id selected_semestre.id %}">
-                                                            <span class="nav-main-link-name">{{selected_semestre.libelle}}</span>
-                                                        </a>
+                                                    <a class="nav-main-link"
+                                                        href="{% url 'main:releve_notes_detail' etudiant.etudiant.id selected_semestre.id %}">
+                                                        <span
+                                                            class="nav-main-link-name documents-link" style="color: #1c72d6;">{{selected_semestre.libelle}}</span>
+                                                    </a>
                                                     {% endif %}
                                                 </li>
                                             </ul>
@@ -232,49 +259,55 @@
                                 {%  if is_secretaire  %}
                                 {% comment %} Génération de la carte étudiant {% endcomment %}
                                 <li class="nav-main-item">
-                                    <a class="nav-main-link nav-main-link-name" data-toggle="" aria-haspopup="true" aria-expanded="false" href="{% url 'main:carte_etudiant' etudiant.etudiant.id etudiant.niveau %}">
+                                    <a class="nav-main-link nav-main-link-name" data-toggle="" aria-haspopup="true"
+                                        aria-expanded="false"
+                                        href="{% url 'main:carte_etudiant' etudiant.etudiant.id etudiant.niveau %}">
                                         <i class="fa fa-id-card mr-1" aria-hidden="true"></i>
-                                        <span class="nav-main-link-name">Carte étudiant</span>
-                                    </a>                   
+                                        <span class="nav-main-link-name documents-link" style="color: #1c72d6;">Carte étudiant</span>
+                                    </a>
                                 </li>
                                 {% comment %} Fin génération carte étudiant {% endcomment %}
                                 {% endif %}
 
 
-                                
+
                                 {% if is_directeur %}
-                                    <li class="nav-main-item">
-                                        <a class="nav-main-link nav-main-link-name" data-toggle="" aria-haspopup="true" aria-expanded="false" href="{% url 'main:diplome_etudiant' etudiant.etudiant.id %}">
-                                            <i class="fa fa-certificate mr-1" aria-hidden="true"></i>
-                                            <span class="nav-main-link-name">Diplome étudiant</span>
-                                        </a>                   
-                                    </li>
+                                <li class="nav-main-item">
+                                    <a class="nav-main-link nav-main-link-name" data-toggle="" aria-haspopup="true"
+                                        aria-expanded="false"
+                                        href="{% url 'main:diplome_etudiant' etudiant.etudiant.id %}">
+                                        <i class="fa fa-certificate mr-1" aria-hidden="true"></i>
+                                        <span class="nav-main-link-name documents-link" style="color: #1c72d6;">Diplome étudiant</span>
+                                    </a>
+                                </li>
                                 {% endif %}
-                                    
+
 
                                 {%  if is_secretaire or is_directeur_des_etudes %}
                                 {% comment %} Génération du diplome étudiant {% endcomment %}
                                 <li class="nav-main-item">
-                                    <a class="nav-main-link nav-main-link-name" data-toggle="" aria-haspopup="true" aria-expanded="false" href="{% url 'main:certificat_scolaire' etudiant.etudiant.id etudiant.niveau %}">
+                                    <a class="nav-main-link nav-main-link-name" data-toggle="" aria-haspopup="true"
+                                        aria-expanded="false"
+                                        href="{% url 'main:certificat_scolaire' etudiant.etudiant.id etudiant.niveau %}">
                                         <i class="fa fa-certificate mr-1" aria-hidden="true"></i>
-                                        <span class="nav-main-link-name">Attestation</span>
-                                    </a>                   
-                                </li> 
+                                        <span class="nav-main-link-name documents-link">Attestation</span>
+                                    </a>
+                                </li>
                                 {% comment %} Fin génération du diplome étudiant {% endcomment %}
                                 {% endif %}
 
-                           
-                                
+
+
                             </div>
-                            
-                    </td> 
-                    {% endif %}
+
+                        </td>
+                        {% endif %}
                     </tr>
                     {% endfor%}
                 </tbody>
             </table>
             {% if is_directeur_des_etudes %}
-            <button type="submit" class="btn btn-outline-primary">            
+            <button type="submit" class="btn btn-outline-primary">
                 Enregistrer
             </button>
             {% endif %}
@@ -283,37 +316,37 @@
 </div>
 {% endblock  %}
 {% block scripts %}
-    <script type="text/javascript">
-        form_tag = $('#form-semestre');
-        $('#semestre').on('change', function() {
-            form_tag.submit();
-        });
+<script type="text/javascript">
+    form_tag = $('#form-semestre');
+    $('#semestre').on('change', function () {
+        form_tag.submit();
+    });
 
-        $('#etat').on('change', function() {
-            form_tag.submit();
-        });
-    </script>
-    <script>
-        function confirmPassageEtudiants() {
-            var checkboxes = document.getElementsByName("passer_semestre_suivant");        
-            // Parcourez les cases à cocher pour afficher la boîte de dialogue pour chaque étudiant sélectionné
-            for (var i = 0; i < checkboxes.length; i++) {
-                if (checkboxes[i].checked) {
-                    var etudiantId = checkboxes[i].value;
-                    var etudiantNom = checkboxes[i].getAttribute("data-etudiant-nom");
-                    var etudiantPrenom = checkboxes[i].getAttribute("data-etudiant-prenom");
-                    
-                    var decisionConseil = prompt("Veuillez saisir la décision du conseil pour l'étudiant " + etudiantNom + " " + etudiantPrenom + ":");
-                    
-                    if (decisionConseil !== null) {
-                        decisionConseilInput.value = decisionConseil;
-                    } else {
-                        // L'utilisateur a annulé la saisie, décochez la case à cocher
-                        checkboxes[i].checked = false;
-                    }
+    $('#etat').on('change', function () {
+        form_tag.submit();
+    });
+</script>
+<script>
+    function confirmPassageEtudiants() {
+        var checkboxes = document.getElementsByName("passer_semestre_suivant");
+        // Parcourez les cases à cocher pour afficher la boîte de dialogue pour chaque étudiant sélectionné
+        for (var i = 0; i < checkboxes.length; i++) {
+            if (checkboxes[i].checked) {
+                var etudiantId = checkboxes[i].value;
+                var etudiantNom = checkboxes[i].getAttribute("data-etudiant-nom");
+                var etudiantPrenom = checkboxes[i].getAttribute("data-etudiant-prenom");
+
+                var decisionConseil = prompt("Veuillez saisir la décision du conseil pour l'étudiant " + etudiantNom + " " + etudiantPrenom + ":");
+
+                if (decisionConseil !== null) {
+                    decisionConseilInput.value = decisionConseil;
+                } else {
+                    // L'utilisateur a annulé la saisie, décochez la case à cocher
+                    checkboxes[i].checked = false;
                 }
-            }       
-            return true;
+            }
         }
-    </script>
+        return true;
+    }
+</script>
 {% endblock scripts %}
