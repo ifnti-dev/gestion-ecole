@@ -1549,36 +1549,45 @@ def importer_les_enseignants(request):
         try:
             imported_data = dataset.load(enseignant.read(), format='xlsx')
             for data in imported_data:
+                lieunaissance = data[5] if data[5] else "Inconnu" 
+                nationalite = data[12] if data[12] else "Togolaise"
+                salaireBrut = data[16] if data[16] else '0'
+                nbreJrsCongesRestant = data[18] if data[18] else '0' 
+                nbreJrsConsomme = data[19] if data[19] else '0'
+                specialite = data[21] if data[21] else "Inconnu"
+
                 enseignant = Enseignant(
-                    id=data[0],
-                    nom=data[1],
-                    prenom=data[2],
-                    sexe=data[3],
-                    datenaissance=data[4],
-                    lieunaissance=data[5],
-                    contact=data[6],
-                    email=data[7],
-                    adresse=data[8],
-                    prefecture=data[9],
-                    is_active=data[10],
-                    carte_identity=data[11],
-                    nationalite=data[12],
-                    user=data[13],
-                    photo_passport=data[14],
-                    salaireBrut=data[16],
-                    dernierdiplome=data[17],
-                    nbreJrsCongesRestant=data[18],
-                    nbreJrsConsomme=data[19],
-                    type=data[20],
-                    specialite=data[21],                   
-                )
+                        personnel_ptr=data[0],
+                        nom=data[1],
+                        prenom=data[2],
+                        sexe=data[3],
+                        datenaissance=data[4],
+                        lieunaissance=lieunaissance,
+                        contact=data[6],
+                        email=data[7],
+                        adresse=data[8],
+                        prefecture=data[9],
+                        is_active=data[10],
+                        carte_identity=data[11],
+                        nationalite=nationalite,
+                        user=data[13],
+                        photo_passport=data[14],
+                        id=data[15],
+                        salaireBrut=salaireBrut,
+                        dernierdiplome=data[17],
+                        nbreJrsCongesRestant=nbreJrsCongesRestant,
+                        nbreJrsConsomme=nbreJrsConsomme,
+                        type=data[20],
+                        specialite=specialite,                   
+                    )
                 enseignant.save()
                 return render(request, 'etudiants/message_erreur.html', {'message': "Données importées avec succès."})
-
+        
         except Exception as e:
-            return render(request, 'etudiants/message_erreur.html', {'message': "Erreur lors de l'importation du fichier Excel."})
-
+            return render(request, 'etudiants/message_erreur.html', {'message': "Erreur lors de l importation du fichier Excel."})
     return render(request, 'enseignants/importer.html')
+
+
 
 
 @login_required(login_url=settings.LOGIN_URL)
