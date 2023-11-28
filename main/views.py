@@ -9,32 +9,31 @@ from django.shortcuts import get_object_or_404, redirect, render
 from main.helpers import *
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth import authenticate, login, logout, get_user_model
-from .resources import EtudiantResource
+from .resources import EtudiantResource, EnseignantResource
 from tablib import Dataset
 from .custom_permission_required import evaluation_permission, show_recapitulatif_note_permission
 
 
 @login_required(login_url=settings.LOGIN_URL)
-def dashboard(request):
-    id_annee_selectionnee = request.session.get('id_annee_selectionnee')
-    annee_selectionnee = get_object_or_404(
-        AnneeUniversitaire, pk=id_annee_selectionnee)
-    semestres = annee_selectionnee.get_semestres()
-    data = {
-        'nb_etudiants': len(Etudiant.objects.filter(semestres__in=semestres).distinct()),
-        'nb_enseignants': len(Enseignant.objects.filter(matiere__ue__programme__semestre__in=semestres).distinct()),
-        'nb_matieres': len(Matiere.objects.filter(ue__programme__semestre__in=semestres).distinct()),
-        'nb_ues': len(Ue.objects.filter(programme__semestre__in=semestres).distinct()),
-    }
-    return render(request, 'dashboard.html', context=data)
+def index(request):
+    annees_univ = AnneeUniversitaire.objects.all()
+    etudiants = Etudiant.objects.filter(is_active=True)
+    if request.method == 'POST':
+        annee_univ_id = request.POST.get('annee_univ')
 
-@login_required(login_url=settings.LOGIN_URL)
+    context = {
+        'annees_univ': annees_univ,
+        'etudiants': etudiants,
+    }
+    return render(request,  'dashboard.html', context)
+
+
 def change_annee_universitaire(request):
     if 'annee_universitaire' in request.GET:
-        selected_annee = request.GET.get('annee_universitaire')
-        request.session["id_annee_selectionnee"] = selected_annee if selected_annee != "" else request.session["id_annee_selectionnee"]
+        request.session["id_annee_selectionnee"] = request.GET.get(
+            'annee_universitaire')
+        # print(request.session["id_annee_selectionnee"])
     return redirect(request.GET.get('origin_path'))
-
 
 @login_required(login_url=settings.LOGIN_URL)
 @permission_required("main.view_etudiant")
@@ -1276,6 +1275,22 @@ def deleteEvaluation(request, id):
     evaluation.delete()
     return redirect('main:evaluations', id_matiere=matiere.id)
 
+
+@login_required(login_url=settings.LOGIN_URL)
+def dashboard(request):
+    id_annee_selectionnee = request.session.get('id_annee_selectionnee')
+    annee_selectionnee = get_object_or_404(
+        AnneeUniversitaire, pk=id_annee_selectionnee)
+    semestres = annee_selectionnee.get_semestres()
+    data = {
+        'nb_etudiants': len(Etudiant.objects.filter(semestres__in=semestres).distinct()),
+        'nb_enseignants': len(Enseignant.objects.filter(matiere__ue__programme__semestre__in=semestres).distinct()),
+        'nb_matieres': len(Matiere.objects.filter(ue__programme__semestre__in=semestres).distinct()),
+        'nb_ues': len(Ue.objects.filter(programme__semestre__in=semestres).distinct()),
+    }
+    return render(request, 'dashboard.html', context=data)
+
+
 @login_required(login_url=settings.LOGIN_URL)
 def affectation_matieres_professeur(request):
     if request.user.groups.all().first().name not in ['directeur_des_etudes']:
@@ -1520,14 +1535,59 @@ def create_enseignant(request, id=0):
             return render(request, "enseignants/create_enseignant.html", {'form': form})
 
 
+
+# Cette vue permet d'importer les données enseignants via un fichier excel de foemat xlsx
+def importer_les_enseignants(request):
+    if request.method == 'POST':
+        if 'myfile' not in request.FILES:
+            return render(request, 'etudiants/message_erreur.html', {'message': "Aucun fichier sélectionné."})
+
+        enseignants_resource = EnseignantResource()
+        dataset = Dataset()
+        enseignant = request.FILES['myfile']
+
+        try:
+            imported_data = dataset.load(enseignant.read(), format='xlsx')
+            for data in imported_data:
+                enseignant = Enseignant(
+                    id=data[0],
+                    nom=data[1],
+                    prenom=data[2],
+                    sexe=data[3],
+                    datenaissance=data[4],
+                    lieunaissance=data[5],
+                    contact=data[6],
+                    email=data[7],
+                    adresse=data[8],
+                    prefecture=data[9],
+                    is_active=data[10],
+                    carte_identity=data[11],
+                    nationalite=data[12],
+                    user=data[13],
+                    photo_passport=data[14],
+                    salaireBrut=data[16],
+                    dernierdiplome=data[17],
+                    nbreJrsCongesRestant=data[18],
+                    nbreJrsConsomme=data[19],
+                    type=data[20],
+                    specialite=data[21],                   
+                )
+                enseignant.save()
+                return render(request, 'etudiants/message_erreur.html', {'message': "Données importées avec succès."})
+
+        except Exception as e:
+            return render(request, 'etudiants/message_erreur.html', {'message': "Erreur lors de l'importation du fichier Excel."})
+
+    return render(request, 'enseignants/importer.html')
+
+
 @login_required(login_url=settings.LOGIN_URL)
 def enseignants(request):
     id_annee_selectionnee = request.session.get("id_annee_selectionnee")
     role = get_user_role(request)
     annee_universitaire = get_object_or_404(
         AnneeUniversitaire, pk=id_annee_selectionnee)
-    enseignants = Enseignant.objects.filter(
-        annee_universitaire=annee_universitaire, is_active=True)
+    enseignants = Enseignant.objects.filter(is_active=True)
     data = {}
     etats = [{'id': 1, 'value': 'Actif'}, {'id': 0, 'value': 'Suspendue'}]
     etats_selected = [True, False]
@@ -1614,13 +1674,9 @@ def certificat_travail(request, id):
 
 
 @login_required(login_url=settings.LOGIN_URL)
-def liste_informations_enseignants(request, id_annee_selectionnee):
-    annee_universitaire = AnneeUniversitaire.objects.get(
-        pk=id_annee_selectionnee)
-    informations_enseignants = Information.objects.filter(
-        enseignant__annee_universitaire=annee_universitaire)
+def liste_informations_enseignants(request):
+    informations_enseignants = Information.objects.all()
     context = {
-        'annee_universitaire': annee_universitaire,
         'informations_enseignants': informations_enseignants,
     }
     return render(request, 'informations/information_list.html', context)
@@ -1657,8 +1713,7 @@ def enregistrer_informations(request, id=0):
 
             form.save()
 
-            id_annee_selectionnee = AnneeUniversitaire.static_get_current_annee_universitaire().id
-            return redirect('main:liste_informations_enseignants', id_annee_selectionnee=id_annee_selectionnee)
+            return redirect('main:liste_informations_enseignants')
 
         else:
             return render(request, "informations/enregistrer_informations.html", {'form': form})
@@ -1735,7 +1790,6 @@ def importer_les_donnees(request):
     if request.method == 'POST':
         if 'myfile' not in request.FILES:
             return render(request, 'etudiants/message_erreur.html', {'message': "Aucun fichier sélectionné."})
-        # Assurez-vous d'importer votre ressource EtudiantResource
         etudiants_resource = EtudiantResource()
         dataset = Dataset()
         etudiant = request.FILES['myfile']

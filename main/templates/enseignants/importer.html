@@ -1,0 +1,28 @@
+{% extends 'index.html' %}
+{% block content_title %}
+Importation des données
+  <h1>
+  <button class="btn btn-warning">
+    <i class="fas fa-chevron-left fa-lg"></i>
+    <span>Retour</span>
+  </button>
+  </h1>
+{% endblock %}
+{% block content_title_description %}
+
+{% endblock %}
+{% block content %}
+  <div class="d-flex justify-content-center">
+    <div class="block-content card m-4 col-md-10 col-lg-8 col-xl-6">
+      <div class="d-flex justify-content-between">
+      </div>
+
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <input type="file" name="myfile">
+      <button class="btn btn-outline-primary" type="submit"><i class="fas fa-plus"></i> Importer</button>
+    </form>
+    <br>
+    </div>
+  </div>
+{% endblock %}

@@ -4,3 +4,8 @@ from .models import Enseignant, Evaluation, Domaine,Information, Parcours,Progra
 class EtudiantResource(resources.ModelResource):
     class Meta:
         model = Etudiant
+
+
+class EnseignantResource(resources.ModelResource):
+    class Meta:
+        model = Enseignant

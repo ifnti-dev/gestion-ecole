@@ -67,8 +67,7 @@ def create_comptable(request, id=0):
             form = ComptableForm(request.POST,instance= comptable)
         if form.is_valid():
             form.save()
-            id_annee_selectionnee = AnneeUniversitaire.static_get_current_annee_universitaire().id
-            return redirect('paiement:comptable_list', id_annee_selectionnee=id_annee_selectionnee)
+            return redirect('paiement:comptable_list')
         else:
             print(form.errors)
             return render(request, 'comptables/create_comptable.html', {'form': form})
@@ -81,23 +80,19 @@ def comptable_detail(request, id):
 
 
 @login_required(login_url=settings.LOGIN_URL)
-def comptable_list(request, id_annee_selectionnee):
-    annee_universitaire = get_object_or_404(AnneeUniversitaire, pk=id_annee_selectionnee)
+def comptable_list(request):
     current_annee = AnneeUniversitaire.static_get_current_annee_universitaire()
-    comptables = Comptable.objects.filter(annee_universitaire = annee_universitaire, is_active=True)
+    comptables = Comptable.objects.filter(is_active=True)
     context = {
         "comptables": comptables,
-        "annee_universitaire": annee_universitaire,
     }
     return render(request, 'comptables/comptable_list.html', context)
-
-
 
 
 @login_required(login_url=settings.LOGIN_URL)
 def comptables_suspendu(request):
     annee_universitaire_courante = AnneeUniversitaire.static_get_current_annee_universitaire()
-    comptables = Comptable.objects.filter(annee_universitaire = annee_universitaire_courante, is_active=False)
+    comptables = Comptable.objects.filter(is_active=False)
     context = {
         "comptables": comptables,
         "annee_universitaire_courante": annee_universitaire_courante,
