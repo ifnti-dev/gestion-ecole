@@ -16,6 +16,9 @@ Enregistrement d'un enseignant
       <div class="d-flex justify-content-between">
         <h3>         
         </h3>
+        <a href="{% url 'main:importer_les_enseignants' %}" class="btn btn-outline-primary">
+          <i class="fas fa-plus"></i> Importer
+        </a>
     </div>
       <form class="container-fluid p-3" action="#" method="POST">
         {% csrf_token %}
