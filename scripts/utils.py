@@ -1,6 +1,6 @@
 import openpyxl
-
-from main.models import Semestre, Ue, Evaluation, Parcours, AnneeUniversitaire, Programme, Matiere
+import pandas as pd
+from main.models import Etudiant, Note, Semestre, Ue, Evaluation, Parcours, AnneeUniversitaire, Programme, Matiere
 
 CODE_UE = {
     'p_u_e_i_a': 'Politiques universitaires et intégrité académique', 
@@ -11,7 +11,7 @@ CODE_UE = {
     'f_d_t_e_s_d_i': "Fondement des TI et systèmes d'exploitation I", 
     'p_a_e_b_d_d': 'Programmation, algorithmes et bases de données', 
     'c_e_i_e_e': 'Communication et Insertion en entreprise', 
-    'é': 'Électronique', 
+    'elec': 'Électronique', 
     'c_o_o_e_b_d_d': 'Conception orientée objet et base de données', 
     'c_e_d_d_s_w': 'Conception et développement des sites web', 
     'i_a_d_d': "Introduction au développement d'applications", 
@@ -47,22 +47,21 @@ def load_maquette(path):
     
     # Upload ues data
     workbook = openpyxl.load_workbook(filename=path)
-    maquette_sheet = workbook.active
     semestre = ""
     semestre_ue = {}
-    code_ue={}
-    for row in maquette_sheet.iter_rows(values_only=True):
-        if row[0]:
-            if "debut_s" in row[0].lower():
-                semestre = row[0].lower().split('_')[1]
-                semestre_ue[semestre] = []
-            elif row[0] != "libelle" and "fin_s" not in row[0].lower():
+    code_ue = {}
+    for sheet in workbook:
+        semestre = sheet.title.lower()
+        semestre_ue[semestre] = []
+        for row in sheet.iter_rows(values_only=True):
+            if row[0] and row[0] != "libelle":
                 libelle = row[0].strip()
                 libelle = libelle.replace("  ", " ")
                 code  = "_".join([mot[0].lower() for mot in libelle.split(' ')])
                 code_ue[code] = libelle
                 ue = Ue.objects.create(libelle=libelle, type=row[1], niveau=row[2].split('=')[1], nbreCredits=row[3].split('=')[1], heures=row[4].split('=')[1])
                 semestre_ue[semestre].append(ue)
+                
     # Create programme
     annee_universitaires = AnneeUniversitaire.objects.all()
     parcours = Parcours.objects.all().first()
@@ -80,95 +79,138 @@ def load_matieres(path):
     for ue_sheet in workbook:
         ue = Ue.objects.filter(libelle=CODE_UE[ue_sheet.title]).get()
         for row in ue_sheet.iter_rows(values_only=True):
-           if row[0] and row[0] != "libelle":
+           if row[0] and row[0] != "libelle" and 'nom:' not in trim_str(row[0]).lower():
                 libelle = row[0].strip()
                 libelle = libelle.replace("  ", " ")
-                matiere = Matiere.objects.create(
+                
+                Matiere.objects.create(
                             libelle=libelle,
-                            coefficient=row[1].split('=')[1],
-                            minValue=row[2].split('=')[1],
-                            heures=row[3].split('=')[1],
+                            coefficient=get_cell_int_value(row[1]),
+                            minValue=get_cell_int_value(row[2]),
+                            heures=get_cell_int_value(row[3]),
                             ue=ue
                             )
 
-def run():
-    file_path = "media/excel/data/maquette_general_2022_2023.xlsx"
-    load_maquette(file_path)
-    file_path = "media/excel/data/maquette_S1_2022_2023.xlsx"
-    load_matieres(file_path)
-    file_path = "media/excel/notesS4-2021-2022.xlsx"
-    return
-    # Créer ou récupérer le programme
-    # Ouvrerture du classeur Excel
-    workbook = openpyxl.load_workbook(file_path)
-    semestre = Semestre.objects.all().first()
+def load_notes_from_matiere(path):
+    Evaluation.objects.all().delete()
+    # Charger le fichier excel des différentes notes d'une matière
+    workbook = openpyxl.load_workbook(path)
+    
+    # Initialiser les variable de base
+    annee = None
+    semestre = None
+    matiere = None
+    
     for sheet in workbook:
-        print(f':::::::::::::::::::::::::::::{sheet.title}:::::::::::::::::::::::::::::::')
-        if sheet.title.lower() in ["entreprise"]:
-            # Créer les Ues
-            # Ajouter les ues au programme
-            max_row = sheet.max_row
-            columns = {
-                'evaluations' : [],
-                'nom' : -1,
-                'prénom' : -1,
-            }
-            ###---  itérer sur le tableau des notes ----###
-            for row in sheet.iter_rows(values_only=True, max_row=max_row//2):
-                #print(row)
-                if "UE" in row:
-                    # Créer ou récupérer les matière
-                    print(row)
-                    matieres_names = get_row_value(row, ['ue'])
-                    columns['evaluations'] = { matiere : [] for matiere in matieres_names }
-                    
-                elif "Nom" in row:
-                    # Créer ou récupérer les evaluations
-                    evaluations_names = get_row_key_value(row)
-                    evaluations_names = [('prénom', 0), ('nom', 1), ('contrat_note_1', 2), ('contrat_note_2', 3), ('Partiel', 4), ('Moyenne', 5), ('salaire_note_1', 6), ('Moyenne', 7), ('Rattrapage', 8)]
-                    for i in range(len(evaluations_names)):
-                        if 'note' in evaluations_names[i][0]:
-                            data = evaluations_names[i][0].split("_")
-                            name = "_".join(data[1:3])
-                            #evaluation = Evaluation.objects.get_or_create()
-                            columns['evaluations'][data[0]].append((name, evaluations_names[i][1]))
-                        elif 'nom' == evaluations_names[i][0]:
-                            columns['nom'] = evaluations_names[i][1]
-                        elif 'prénom' == evaluations_names[i][0]:
-                            columns['prénom'] = evaluations_names[i][1]
-                    # Créer les evaluations
-                    print(columns)
-                else:
-                    pass
-                    # index_nom = columns['nom']
-                    # index_prenom = columns['prénom']
-                    # print(row[index_nom], " ", row[index_prenom])
-                    # for matiere_name in columns['evaluations']:
-                    #     # Ajouter des notes aux évaluations
-                    #     # Créer ou récupérer l' étudiants
-                    #     for evaluation, index in columns['evaluations'][matiere_name]:
-                    #         note = row[index]
-                    #         print(evaluation, " ", note)
-                
-            print("::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::")
-            ###---  itérer sur le tableau des rattrapages ----###
+        columns = {
+            'prenom_cell' : 0,
+            'nom_cell' : 1,
+            'evaluations' : [],
+        }
+        nb_evaluation = columns['nom_cell']
+        for row in sheet.iter_rows(values_only=True):
+            if row[0]:
+                firts_row_elt_value = trim_str(row[0])
+                second_row_elt_value = row[1]
+                if "annee:" in firts_row_elt_value:
+                    annee = trim_str(second_row_elt_value)
+                    annee = AnneeUniversitaire.objects.get(annee=annee)
+                elif "semestre:" in firts_row_elt_value:
+                    if annee:
+                        semestre = trim_str(second_row_elt_value)
+                        print(semestre)
+                        semestre = annee.semestre_set.get(libelle=semestre.upper())
+                elif "matière:" in firts_row_elt_value:
+                    matiere = second_row_elt_value.strip()
+                    matiere = Matiere.objects.get(libelle=matiere, ue__programme__semestre=semestre)
+                elif 'évaluation' in firts_row_elt_value:
+                    # Créer les evaluations 
+                    if annee and semestre and matiere:
+                        print(row)
+                        evaluation = Evaluation.objects.create(libelle=trim_str(row[2]), matiere=matiere, semestre=semestre, ponderation=int(trim_str(row[3])), date="2023-11-12")
+                        nb_evaluation += 1
+                        columns['evaluations'].append({ 
+                                                        'evaluation' : evaluation,
+                                                        'cell' : nb_evaluation,
+                                                        })
+                    else:
+                        raise Exception("Le format de votre fichier est ivalide !")
+                elif firts_row_elt_value != "prénom":
+                        nom = str(row[columns['nom_cell']])
+                        prenom = str(row[columns['prenom_cell']])
+                        try:
+                            etudiant = Etudiant.objects.get(nom__icontains=nom, prenom__icontains=prenom)
+                            print(etudiant)
+                            for evaluataion_data in columns['evaluations']:
+                                Note.objects.create(valeurNote=int(trim_str(row[evaluataion_data['cell']])), etudiant=etudiant, evaluation=evaluataion_data['evaluation'])
+                        except Exception as e:
+                            raise Etudiant.DoesNotExist(f'username = {firts_row_elt_value}')
+            
 
-            for row in sheet.iter_rows(values_only=True, min_row=max_row//2, max_row=max_row):
-                #print(row)
-                if "UE" in row:
-                    # Créer ou récupérer les matière
-                    pass 
-                elif "Nom" in row:
-                    # Créer ou récupérer les evaluations
-                    pass
-                else:
-                    # Créer les notes
-                    pass
+def trim_str(string):
+    result = ""
+    string = str(string)
+    string = string.lower()
+    for i in range(len(string)):
+        if string[i] != " " and string[i] != "=":
+            result += string[i]
+    return result
 
 
-def get_row_value(row, exculd_list):
-    return [ cell.lower() for cell in row if cell and cell.lower() not in exculd_list]
+   
+def run():
+    pass
 
-def get_row_key_value(row):
-    return [ (row[i], i)  for i in range(len(get_row_value(row, []))) ]
 
+
+def backup_models_to_excel():
+    models = [Ue, Matiere, Evaluation] 
+    
+    for model in models:
+        instances = model.objects.all()
+        if instances:
+            # Convertissez les instances en dataframe pandas
+            data = model.objects.values()
+            df = pd.DataFrame.from_records(data)
+
+            # Sauvegardez le dataframe dans un fichier Excel
+            file_name = f"{model.__name__.lower()}_backup.xlsx"
+            df.to_excel(file_name, index=False)
+
+            print(f"Sauvegarde de {model.__name__} dans {file_name}")
+
+    print("Sauvegarde terminée.")
+
+def load_data_from_excel(file_path):
+    # Lisez le fichier Excel en un dataframe pandas
+    df = pd.read_excel(file_path)
+
+    model_name = file_path.split('_')[0]  # Obtenez le nom du modèle à partir du nom du fichier
+
+    # Obtenez le modèle correspondant à partir du nom du modèle
+    model = None
+    if model_name.lower() == 'ue':
+        model = Ue
+    elif model_name.lower() == 'matiere':
+        model = Matiere
+    elif model_name.lower() == 'evaluation':
+        model = Evaluation
+
+    if model:
+        # Remplacez les valeurs None par null dans le dataframe
+        df = df.where(pd.notna(df), None)
+
+        # Convertissez le dataframe en list de dictionnaires
+        data = df.to_dict(orient='records')
+
+        # Supprimez toutes les instances existantes du modèle
+        model.objects.all().delete()
+
+        # Créez de nouvelles instances à partir des données du dataframe
+        model.objects.bulk_create([model(**item) for item in data])
+
+        print(f"Données chargées depuis {file_path} vers {model.__name__}")
+    else:
+        print(f"Modèle non reconnu pour le fichier {file_path}")
+
+    print("Chargement terminé.")

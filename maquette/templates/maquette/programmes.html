@@ -9,7 +9,7 @@
             {% for parcours in list_parcours %}
                 <option value="{{ parcours.id }}" {% if parcours_selected == parcours.id %}selected{% endif %}>{{ parcours }}</option>
             {% endfor %}
-        </select>  
+        </select>
         <form action="{% url 'maquette:add_programme' id_annee_selectionnee %}" method="get">
             <button type="submit" class="btn btn-outline-primary ml-3" id="add-form-row">
                 <i class="fas fa-plus"></i>

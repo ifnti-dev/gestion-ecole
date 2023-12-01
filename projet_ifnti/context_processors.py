@@ -20,8 +20,11 @@ def bootstrap(request):
     if 'id_annee_selectionnee' not in request.session:
         id_annee_selectionnee = current_annee_accademique.id if current_annee_accademique else 0
         request.session["id_annee_selectionnee"] = id_annee_selectionnee
+    
+    print(request.session["id_annee_selectionnee"])
         
     id_auth_model = get_id_authenticate_user_model(request)
+    
     return {
         'annee_universitaire': current_annee_accademique if current_annee_accademique else "-",
         'annees_universitaire': AnneeUniversitaire.objects.all(),
@@ -35,7 +38,8 @@ def bootstrap(request):
         'id_annee_selectionnee': int(request.session.get("id_annee_selectionnee")),
         'page_is_not_profil' : True,
         'profile_path': get_authenticate_profile_path(request, id_auth_model),
-        'niveau': niveau
+        'niveau': niveau,
+        'MEDIA_URL' : '/media/',
     }
 
 

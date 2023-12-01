@@ -2,11 +2,13 @@ from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from main.pdfMaker import generate_pdf
 from main.models import AnneeUniversitaire, Programme, Semestre, Ue, Domaine, Parcours
-from .forms import GenerateMaquetteForm, ProgrammeFormSet, DomaineForm, ParcoursForm, ProgrammeForm
-
+from scripts.utils import load_maquette, load_matieres, load_notes_from_matiere
+from .forms import DataForm, GenerateMaquetteForm, ProgrammeFormSet, DomaineForm, ParcoursForm, ProgrammeForm
+import openpyxl
 
 def programmes(request, id_annee_selectionnee):
     annee_universitaire = get_object_or_404(AnneeUniversitaire, pk=id_annee_selectionnee)
+    print(annee_universitaire)
     list_parcours = Parcours.objects.all()
     parcours_selected = ""
     if 'parcours' in request.GET:
@@ -59,11 +61,33 @@ def edit_programme(request, id, id_annee_selectionnee):
     
     return render(request, 'maquette/create_or_edit.html', context=data)
 
-
 def delete_programme(request, id, id_annee_selectionnee):
     programme = get_object_or_404(Programme, pk=id)
     programme.delete()
     return redirect('maquette:programmes', id_annee_selectionnee=id_annee_selectionnee)
+
+
+def data(request):
+    id_annee_selectionnee = request.session.get('id_annee_selectionnee')
+    if request.method == "POST":
+        form = DataForm(request.POST, request.FILES)
+        if form.is_valid():
+            cleaned_data = form.clean()
+            print(cleaned_data)
+            enseignants_excel_file = cleaned_data.get('enseignants_excel_file')
+            maquette_excel_file = cleaned_data.get('maquette_excel_file')
+            matieres_excel_file = cleaned_data.get('matieres_excel_file')
+            notes_excel_file = cleaned_data.get('notes_excel_file')
+            #load_maquette(maquette_excel_file)
+            #load_matieres(matieres_excel_file)
+            load_notes_from_matiere(notes_excel_file)
+        return HttpResponse('')
+    data = {
+        'form' : DataForm()
+    }
+    
+    return render(request, 'data/index.html', context=data)
+
 
 def generate_maquette(request, id_annee_selectionnee):
     data = {}

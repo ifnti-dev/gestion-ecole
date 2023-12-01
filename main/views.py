@@ -17,6 +17,7 @@ from .custom_permission_required import evaluation_permission, show_recapitulati
 @login_required(login_url=settings.LOGIN_URL)
 def dashboard(request):
     id_annee_selectionnee = request.session.get('id_annee_selectionnee')
+    print(id_annee_selectionnee)
     annee_selectionnee = get_object_or_404(
         AnneeUniversitaire, pk=id_annee_selectionnee)
     semestres = annee_selectionnee.get_semestres()
