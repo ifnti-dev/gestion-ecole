@@ -27,7 +27,7 @@ class Utilisateur(models.Model):
     prenom = models.CharField(max_length=50, verbose_name="Prénom")
     sexe = models.CharField(max_length=1, choices=SEXE_CHOISE)
     datenaissance = models.DateField(blank=True, verbose_name="date de naissance", null=True, validators=[MaxValueValidator(limit_value=date(2006, 1, 1), message="L'année de naissance doit être inférieure à 2006")])
-    lieunaissance = models.CharField(blank=True, max_length=20, verbose_name="lieu de naissance")
+    lieunaissance = models.CharField(blank=True, max_length=20, verbose_name="lieu de naissance", null=True)
     contact = models.CharField(max_length=25, null=True)
     email = models.CharField(max_length=50, null=True)
     adresse = models.CharField(max_length=50, null=True)
@@ -378,13 +378,9 @@ class Personnel(Utilisateur):
     dernierdiplome = models.ImageField(null=True, blank=True, verbose_name="Dernier diplome")
     nbreJrsCongesRestant = models.IntegerField(verbose_name="Nbre jours de congé restant", default=0)
     nbreJrsConsomme = models.IntegerField(verbose_name="Nombre de jours consommé", default=0)
-    annee_universitaire = models.ForeignKey('AnneeUniversitaire', on_delete=models.CASCADE, verbose_name="Année Universitaire", null=True, blank=True)
 
     
     def save(self):
-        if not self.annee_universitaire:
-            self.annee_universitaire = AnneeUniversitaire.static_get_current_annee_universitaire()
-
         print(f'----{self.id}----')
         if self.id == "" or self.id == None:
             username = (self.prenom + self.nom).lower()
@@ -449,11 +445,8 @@ class DirecteurDesEtudes(Personnel):
 
 class Enseignant(Personnel):
     CHOIX_TYPE = (('Vacataire', 'Vacataire'), ('Permanent', 'Permanent'))
-    type = models.CharField(null=True, blank=True,
-                            max_length=9, choices=CHOIX_TYPE)
-    specialite = models.CharField(
-        max_length=300, verbose_name="Spécialité", blank=True)
-
+    type = models.CharField(null=True, blank=True,max_length=9, choices=CHOIX_TYPE)
+    specialite = models.CharField(max_length=300, verbose_name="Spécialité", blank=True, null=True)
 
     def save(self, force_insert=False, force_update=False, using=None):
         if not self.id:

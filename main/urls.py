@@ -113,8 +113,6 @@ urlpatterns = [
           {'semestre': 6}, name='matiere_semestre6'),
 
 
-
-
      #### UEs ####
      path('ues/', views.ues_etudiants, name='ues'),
      path('liste_des_ues/', views.ues, name='liste_des_ues'),
@@ -143,9 +141,10 @@ urlpatterns = [
      path('enseignant_detail/<str:id>/',views.enseignant_detail, name='enseignant_detail'),
      path('edit_enseignant/<str:id>/',views.create_enseignant, name='edit_enseignant'),
      path('certificat_travail/(?P<id>[0-9]+)\\Z/',views.certificat_travail, name='certificat_travail'),
+     path('importer_les_enseignants/', views.importer_les_enseignants,name='importer_les_enseignants'),
 
      ### Information ###
-     path('liste_informations_enseignants/<int:id_annee_selectionnee>/', views.liste_informations_enseignants, name='liste_informations_enseignants'),
+     path('liste_informations_enseignants/', views.liste_informations_enseignants, name='liste_informations_enseignants'),
      path('enregistrer_informations/', views.enregistrer_informations,name='enregistrer_informations'),
      path('edit_information/(?P<id>[0-9]+)\\Z/',views.enregistrer_informations, name='edit_information'),
 
