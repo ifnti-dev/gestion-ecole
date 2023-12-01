@@ -10,78 +10,75 @@
 </a>
 {% endblock backURl %}
 {% block content %}
-<div class="p-3">
-    <div class="block block-rounded">
-        <div class="block-header">
-            <h3 class="block-title">Matiere : {{ matiere.libelle }} </h3>
-                <a href="{% url 'main:add_evaluation' matiere.id 0 selected_semestre.id %}" class="mr-3 btn btn-outline-primary">
-                    <i class="fas fa-plus"></i> evaluation
-                </a>
-                <a href="{% url 'main:add_evaluation' matiere.id 1 selected_semestre.id %}" class="mr-3 btn btn-outline-primary">
-                    <i class="fas fa-plus"></i> rattrapage
-                </a>
-            </div>
-            <div class="mx-4 d-flex justify-content-between">
-                <form action="" method="get" class="form-row" id="form-semestre">
-                    <select name="semestre" id="semestre" class="form-control col-md-5">
-                        <option value="">Semestres</option>
-                        {% for semestre in semestres %}
-                            <option value="{{ semestre.id }}" {% if selected_semestre.id == semestre.id %}selected{% endif %}>{{ semestre }}</option>
-                        {% endfor %}
-                    </select>
-                    <select name="type" id="" class="form-control col-md-6 ml-2">
-                        <option value="">Types évaluation</option>
-                        <option value="">Tous type</option>
-                        <option value="0">évaluation</option>
-                        <option value="1">rattrapage</option>
-                    </select>
-                </form>
-            </div>
-            <div class="block-content block-content-full">
-                <table class="table table-bordered table-striped table-vcenter js-dataTable-full-pagination">
-                    <thead>
-                        <tr>
-                            <th class="text-center" style="width: 80px;">Id</th>
-                            <th class="d-none d-sm-table-cell text-center" >Date</th>
-                            <th class="d-none d-sm-table-cell text-center" >Semestre</th>
-                            <th class="d-none d-sm-table-cell text-center" >Nature</th>
-                            <th class="d-none d-sm-table-cell text-center" >Nom</th>
-                            <th class="d-none d-sm-table-cell text-center" style="width: 30%;">Pondération (%)</th>
-                            <th style="width: 15%;">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for evaluation in evaluations %}
-                        <tr>
-                            <td class="text-center font-size-sm">{{ evaluation.id }}</td>
-                            <td class="text-center font-w600 font-size-sm">{{ evaluation.date }}</td>
-                            <td class="text-center font-w600 font-size-sm">{{ evaluation.semestre }}</td>
-                            <td class="text-center font-w600 font-size-sm">{{ evaluation.afficher_rattrapage }}</td>
-                            <td class="d-none d-sm-table-cell text-center">
-                                {{ evaluation.libelle }}
-                            </td>
-                            <td class="text-center d-none d-sm-table-cell font-size-sm">
-                                {{ evaluation.ponderation }}
-                            </td>
-                            <td class="text-center">     
-                                <button type="button" class="btn btn-secondary dropdown-toggle" id="dropdown-default-secondary" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    <i class="fa fa-bars" aria-hidden="true"></i>
-                                </button>
-                                <div class="dropdown-menu font-size-sm" aria-labelledby="dropdown-default-secondary">
-                                    <li class="nav-main-item">
-                                        <a class="nav-main-link nav-main-link-name" data-toggle="" aria-haspopup="true" aria-expanded="false" href="{% url 'main:edit_evaluation' evaluation.id %}">
-                                            <i class="fa fa-edit mr-1" aria-hidden="true"></i>
-                                            <span class="nav-main-link-name">Edit</span>
-                                        </a>                   
-                                    </li>
-                                </div>                                  
-                            </td> 
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
+<div class="block block-rounded">
+    <div class="block-header">
+        <h3 class="block-title"> Matiere : {{ matiere.libelle }} </h3>
+        <a href="{% url 'main:add_evaluation' matiere.id 0 selected_semestre.id %}" class="mr-3 btn btn-outline-primary">
+            <i class="fas fa-plus"></i> evaluation
+        </a>
+        <a href="{% url 'main:add_evaluation' matiere.id 1 selected_semestre.id %}" class="mr-3 btn btn-outline-primary">
+            <i class="fas fa-plus"></i> rattrapage
+        </a>
+    </div>
+    <div class="mx-4 d-flex justify-content-between">
+        <form action="" method="get" class="form-row" id="form-semestre">
+            <select name="semestre" id="semestre" class="form-control col-md-5">
+                <option value="">Semestres</option>
+                {% for semestre in semestres %}
+                    <option value="{{ semestre.id }}" {% if selected_semestre.id == semestre.id %}selected{% endif %}>{{ semestre }}</option>
+                {% endfor %}
+            </select>
+            <select name="type" id="" class="form-control col-md-6 ml-2">
+                <option value="">Types évaluation</option>
+                <option value="">Tous type</option>
+                <option value="0">évaluation</option>
+                <option value="1">rattrapage</option>
+            </select>
+        </form>
+    </div>
+    <div class="block-content block-content-full">
+        <table class="table table-bordered table-striped table-vcenter js-dataTable-full-pagination">
+            <thead>
+                <tr>
+                    <th class="text-center" style="width: 80px;">Id</th>
+                    <th class="d-none d-sm-table-cell text-center" >Date</th>
+                    <th class="d-none d-sm-table-cell text-center" >Semestre</th>
+                    <th class="d-none d-sm-table-cell text-center" >Nature</th>
+                    <th class="d-none d-sm-table-cell text-center" >Nom</th>
+                    <th class="d-none d-sm-table-cell text-center" style="width: 30%;">Pondération (%)</th>
+                    <th style="width: 15%;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for evaluation in evaluations %}
+                <tr>
+                    <td class="text-center font-size-sm">{{ evaluation.id }}</td>
+                    <td class="text-center font-w600 font-size-sm">{{ evaluation.date }}</td>
+                    <td class="text-center font-w600 font-size-sm">{{ evaluation.semestre }}</td>
+                    <td class="text-center font-w600 font-size-sm">{{ evaluation.afficher_rattrapage }}</td>
+                    <td class="d-none d-sm-table-cell text-center">
+                        {{ evaluation.libelle }}
+                    </td>
+                    <td class="text-center d-none d-sm-table-cell font-size-sm">
+                        {{ evaluation.ponderation }}
+                    </td>
+                    <td class="text-center">     
+                        <button type="button" class="btn btn-secondary dropdown-toggle" id="dropdown-default-secondary" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fa fa-bars" aria-hidden="true"></i>
+                        </button>
+                        <div class="dropdown-menu font-size-sm" aria-labelledby="dropdown-default-secondary">
+                            <li class="nav-main-item">
+                                <a class="nav-main-link nav-main-link-name" data-toggle="" aria-haspopup="true" aria-expanded="false" href="{% url 'main:edit_evaluation' evaluation.id %}">
+                                    <i class="fa fa-edit mr-1" aria-hidden="true"></i>
+                                    <span class="nav-main-link-name">Edit</span>
+                                </a>                   
+                            </li>
+                        </div>                                  
+                    </td> 
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 </div>
 {% endblock content %}

@@ -1,3 +1,4 @@
+import re
 from django.shortcuts import get_object_or_404
 from main.models import Enseignant, Etudiant, Evaluation, Matiere, Note, Programme, Ue
 
@@ -37,6 +38,15 @@ def get_id_authenticate_user_model(request):
     return 0
 
 
+def trim_str(string):
+    result = ""
+    string = str(string)
+    string = string.lower()
+    for i in range(len(string)):
+        if string[i] != " " and string[i] != "=":
+            result += string[i]
+    return result
+
 # cette fonction retourne de manière formatée l'ensemble des matières d'un ensemble d'UEs
 """
     paramètre(s) : tableau de dictionnaire d'UEs
@@ -62,6 +72,12 @@ def get_all_ues_matieres(ues_list):
         # ajout du tableau de matière de l'UE au dictionnaire de l'UE
         ue['matieres'] = tab_matiere_temp
     return ues_list
+
+
+
+def range_folder_file(filenames):
+    print(filenames)
+
 
 
 # cette fonction retourne sous la forme d'un tableau de dictionnaire les evaluations d'une matière

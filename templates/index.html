@@ -31,8 +31,11 @@
     <title>GESTION IFNTI</title>
     <link rel="stylesheet" href="{% static 'assets/css/ifnti.css' %}">
 </head>
-<body>
-    <div id="page-container" class="sidebar-o bg-sidebar-light enable-page-overlay side-scroll page-header-fixed main-content-narrow">
+<body onload="pageLoaded()" class="loading-overlay">
+    <div id="preloader">
+        <div id="loader"></div>
+    </div>  
+    <div id="page-container" class="d-none sidebar-o bg-sidebar-light enable-page-overlay side-scroll page-header-fixed main-content-narrow">
         {% include 'components/sidebar.html' %}
 
         {% include 'components/header.html' %}
@@ -42,7 +45,7 @@
             {% if page_is_not_profil %}
                 <div class="bg-body-light">
                     <div class="content content-full">
-                        <div class="d-flex flex-column flex-sm-row justify-content-sm-between align-items-sm-center">
+                        <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center">
                             <h1 class="flex-sm-fill h3 my-2">
                                 {% block content_title %} {% endblock content_title %}<small class="d-block d-sm-inline-block mt-2 mt-sm-0 font-size-base font-w400 text-muted">{% block content_title_description %} {% endblock content_title_description %}</small>
                             </h1>
@@ -77,7 +80,6 @@
 
         {% include 'components/footer.html'  %}
     </div>
-
 </body>
 
 
@@ -117,5 +119,23 @@
         console.log(form_tag_annee);
         form_tag_annee.submit();
     });
+
+    function showLoadingOverlay() {
+        console.log('La page en cours de chargement.');
+        document.getElementById('preloader').style.display = 'block';
+        $('#page-container').addClass('d-none');
+    }
+    
+    function hideLoadingOverlay() {
+        document.getElementById('preloader').style.display = 'none';
+        $('#page-container').removeClass('d-none');
+    }
+    
+    function pageLoaded() {
+        console.log('La page est entièrement chargée.');
+        hideLoadingOverlay(); // Masquer l'élément de chargement une fois que la page est chargée
+    }
+    // Afficher l'élément de chargement au chargement initial de la page
+    showLoadingOverlay();
 </script>
 </html>

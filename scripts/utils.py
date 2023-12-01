@@ -1,6 +1,16 @@
+import os
+from numpy import NaN
 import openpyxl
+import pandas as pd
+from main.helpers import trim_str
+from main.models import Charge, Competence, Comptable, CompteBancaire, CompteEtudiant, Conge, DirecteurDesEtudes, Domaine, Enseignant, Etudiant, FicheDePaie, Fournisseur, Frais, Information, Note, Paiement, Personnel, Salaire, Seance, Semestre, Tuteur, Ue, Evaluation, Parcours, AnneeUniversitaire, Programme, Matiere
+from main.resources import get_model_by_name, get_resource_by_name
+from tablib import Dataset
+from import_export import resources, fields
+from import_export.widgets import ForeignKeyWidget
+from import_export.admin import ImportExportModelAdmin
+from import_export.results import RowResult
 
-from main.models import Semestre, Ue, Evaluation, Parcours, AnneeUniversitaire, Programme, Matiere
 
 CODE_UE = {
     'p_u_e_i_a': 'Politiques universitaires et intégrité académique', 
@@ -11,7 +21,7 @@ CODE_UE = {
     'f_d_t_e_s_d_i': "Fondement des TI et systèmes d'exploitation I", 
     'p_a_e_b_d_d': 'Programmation, algorithmes et bases de données', 
     'c_e_i_e_e': 'Communication et Insertion en entreprise', 
-    'é': 'Électronique', 
+    'elec': 'Électronique', 
     'c_o_o_e_b_d_d': 'Conception orientée objet et base de données', 
     'c_e_d_d_s_w': 'Conception et développement des sites web', 
     'i_a_d_d': "Introduction au développement d'applications", 
@@ -34,38 +44,75 @@ CODE_UE = {
     'c_d_c_/_c_c_2': 'Cours de concentration / Cours complémentaire 2', 
     'c_d_c_/_c_c_3': 'Cours de concentration / Cours complémentaire 3', 
     's_d_e_s_(_i': "Stage/Projets d'entreprise et soutenance (Stage III)"
-    }
 
-def clean_evaluation_data():
-    Evaluation.objects.all().delete()
-    print("Drop all evaluations data ")
+}
+
+MODEL = [
+    #AnneeUniversitaire,
+    Domaine,
+    Tuteur,
+    Enseignant,
+    Comptable,
+    DirecteurDesEtudes,
+    Evaluation,
+    Matiere,
+    Competence,
+    Personnel,
+    Etudiant,
+    Ue,
+    #Semestre,
+    Domaine,
+    Seance,
+    Parcours,
+    Programme,
+    Note,
+    Frais,
+    CompteEtudiant,
+    Paiement,
+    CompteBancaire,
+    Salaire,
+    Fournisseur,
+    Information,
+    FicheDePaie,
+    Charge,
+    Conge,
+]
+
+MODEL_DICT = {model.__name__.lower(): model for model in MODEL}
+
+def get_cell_int_value(value):
+    return int(trim_str(value))
 
 def load_maquette(path):
+    print('llllll:::::::::::::')
     # Clean ue and programme data
     Ue.objects.all().delete()
     Programme.objects.all().delete()
     
     # Upload ues data
     workbook = openpyxl.load_workbook(filename=path)
-    maquette_sheet = workbook.active
     semestre = ""
     semestre_ue = {}
-    code_ue={}
-    for row in maquette_sheet.iter_rows(values_only=True):
-        if row[0]:
-            if "debut_s" in row[0].lower():
-                semestre = row[0].lower().split('_')[1]
-                semestre_ue[semestre] = []
-            elif row[0] != "libelle" and "fin_s" not in row[0].lower():
+    code_ue = {}
+    for sheet in workbook:
+        semestre = sheet.title.lower()
+        semestre_ue[semestre] = []
+        for row in sheet.iter_rows(values_only=True):
+            if row[0] and row[0] != "libelle":
                 libelle = row[0].strip()
                 libelle = libelle.replace("  ", " ")
                 code  = "_".join([mot[0].lower() for mot in libelle.split(' ')])
                 code_ue[code] = libelle
                 ue = Ue.objects.create(libelle=libelle, type=row[1], niveau=row[2].split('=')[1], nbreCredits=row[3].split('=')[1], heures=row[4].split('=')[1])
                 semestre_ue[semestre].append(ue)
+                
     # Create programme
     annee_universitaires = AnneeUniversitaire.objects.all()
     parcours = Parcours.objects.all().first()
+    if not parcours:
+        init_data_base()
+        parcours = Parcours.objects.all().first()
+        
     for anne_universitaire in annee_universitaires:
         semestres = anne_universitaire.semestre_set.all()
         for semestre in semestres:
@@ -80,95 +127,243 @@ def load_matieres(path):
     for ue_sheet in workbook:
         ue = Ue.objects.filter(libelle=CODE_UE[ue_sheet.title]).get()
         for row in ue_sheet.iter_rows(values_only=True):
-           if row[0] and row[0] != "libelle":
+           if row[0] and row[0] != "libelle" and 'nom:' not in trim_str(row[0]).lower():
                 libelle = row[0].strip()
                 libelle = libelle.replace("  ", " ")
-                matiere = Matiere.objects.create(
+                
+                Matiere.objects.create(
                             libelle=libelle,
-                            coefficient=row[1].split('=')[1],
-                            minValue=row[2].split('=')[1],
-                            heures=row[3].split('=')[1],
+                            coefficient=get_cell_int_value(row[1]),
+                            minValue=get_cell_int_value(row[2]),
+                            heures=get_cell_int_value(row[3]),
                             ue=ue
                             )
 
-def run():
-    file_path = "media/excel/data/maquette_general_2022_2023.xlsx"
-    load_maquette(file_path)
-    file_path = "media/excel/data/maquette_S1_2022_2023.xlsx"
-    load_matieres(file_path)
-    file_path = "media/excel/notesS4-2021-2022.xlsx"
-    return
-    # Créer ou récupérer le programme
-    # Ouvrerture du classeur Excel
-    workbook = openpyxl.load_workbook(file_path)
-    semestre = Semestre.objects.all().first()
+def load_notes_from_matiere(path):
+    Evaluation.objects.all().delete()
+    # Charger le fichier excel des différentes notes d'une matière
+    workbook = openpyxl.load_workbook(path)
+    
+    # Initialiser les variable de base
+    annee = None
+    semestre = None
+    matiere = None
+    
     for sheet in workbook:
-        print(f':::::::::::::::::::::::::::::{sheet.title}:::::::::::::::::::::::::::::::')
-        if sheet.title.lower() in ["entreprise"]:
-            # Créer les Ues
-            # Ajouter les ues au programme
-            max_row = sheet.max_row
-            columns = {
-                'evaluations' : [],
-                'nom' : -1,
-                'prénom' : -1,
-            }
-            ###---  itérer sur le tableau des notes ----###
-            for row in sheet.iter_rows(values_only=True, max_row=max_row//2):
-                #print(row)
-                if "UE" in row:
-                    # Créer ou récupérer les matière
-                    print(row)
-                    matieres_names = get_row_value(row, ['ue'])
-                    columns['evaluations'] = { matiere : [] for matiere in matieres_names }
-                    
-                elif "Nom" in row:
-                    # Créer ou récupérer les evaluations
-                    evaluations_names = get_row_key_value(row)
-                    evaluations_names = [('prénom', 0), ('nom', 1), ('contrat_note_1', 2), ('contrat_note_2', 3), ('Partiel', 4), ('Moyenne', 5), ('salaire_note_1', 6), ('Moyenne', 7), ('Rattrapage', 8)]
-                    for i in range(len(evaluations_names)):
-                        if 'note' in evaluations_names[i][0]:
-                            data = evaluations_names[i][0].split("_")
-                            name = "_".join(data[1:3])
-                            #evaluation = Evaluation.objects.get_or_create()
-                            columns['evaluations'][data[0]].append((name, evaluations_names[i][1]))
-                        elif 'nom' == evaluations_names[i][0]:
-                            columns['nom'] = evaluations_names[i][1]
-                        elif 'prénom' == evaluations_names[i][0]:
-                            columns['prénom'] = evaluations_names[i][1]
-                    # Créer les evaluations
-                    print(columns)
-                else:
-                    pass
-                    # index_nom = columns['nom']
-                    # index_prenom = columns['prénom']
-                    # print(row[index_nom], " ", row[index_prenom])
-                    # for matiere_name in columns['evaluations']:
-                    #     # Ajouter des notes aux évaluations
-                    #     # Créer ou récupérer l' étudiants
-                    #     for evaluation, index in columns['evaluations'][matiere_name]:
-                    #         note = row[index]
-                    #         print(evaluation, " ", note)
-                
-            print("::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::")
-            ###---  itérer sur le tableau des rattrapages ----###
+        columns = {
+            'prenom_cell' : 0,
+            'nom_cell' : 1,
+            'evaluations' : [],
+        }
+        nb_evaluation = columns['nom_cell']
+        for row in sheet.iter_rows(values_only=True):
+            if row[0]:
+                firts_row_elt_value = trim_str(row[0])
+                second_row_elt_value = row[1]
+                if "annee:" in firts_row_elt_value:
+                    annee = trim_str(second_row_elt_value)
+                    annee = AnneeUniversitaire.objects.get(annee=annee)
+                elif "semestre:" in firts_row_elt_value:
+                    if annee:
+                        semestre = trim_str(second_row_elt_value)
+                        print(semestre)
+                        semestre = annee.semestre_set.get(libelle=semestre.upper())
+                elif "matière:" in firts_row_elt_value:
+                    matiere = second_row_elt_value.strip()
+                    matiere = Matiere.objects.get(libelle=matiere, ue__programme__semestre=semestre)
+                elif 'évaluation' in firts_row_elt_value:
+                    # Créer les evaluations 
+                    if annee and semestre and matiere:
+                        print(row)
+                        evaluation = Evaluation.objects.create(libelle=trim_str(row[2]), matiere=matiere, semestre=semestre, ponderation=int(trim_str(row[3])), date="2023-11-12")
+                        nb_evaluation += 1
+                        columns['evaluations'].append({ 
+                                                        'evaluation' : evaluation,
+                                                        'cell' : nb_evaluation,
+                                                        })
+                    else:
+                        raise Exception("Le format de votre fichier est ivalide !")
+                elif firts_row_elt_value != "prénom":
+                        nom = str(row[columns['nom_cell']])
+                        prenom = str(row[columns['prenom_cell']])
+                        try:
+                            etudiant = Etudiant.objects.get(nom__icontains=nom, prenom__icontains=prenom)
+                            print(etudiant)
+                            for evaluataion_data in columns['evaluations']:
+                                Note.objects.create(valeurNote=int(trim_str(row[evaluataion_data['cell']])), etudiant=etudiant, evaluation=evaluataion_data['evaluation'])
+                        except Exception as e:
+                            raise Etudiant.DoesNotExist(f'username = {firts_row_elt_value}')
 
-            for row in sheet.iter_rows(values_only=True, min_row=max_row//2, max_row=max_row):
-                #print(row)
-                if "UE" in row:
-                    # Créer ou récupérer les matière
-                    pass 
-                elif "Nom" in row:
-                    # Créer ou récupérer les evaluations
-                    pass
-                else:
-                    # Créer les notes
-                    pass
+def run():
+    load_data_from_excel('media/backup/ue_backup.xlsx')
+    pass
+    
+def load_data_from_excel_files(files):
+    clean_data_base()
+    init_data_base()
+    for file in files:
+        load_data_from_excel_file(file)
+        os.remove(file)
+
+def load_data_from_excel_file(file_path):
+    # Lire le fichier Excel en un dataframe pandas
+    df = pd.read_excel(file_path)
+
+    # Récupérer le nom du fichier
+    model_name = file_path.split('/') 
+    model_name = model_name[len(model_name)-1].split('_')[2]
+    model_name = model_name.split('.')[0]
+    # Obtenez le modèle correspondant à partir du nom du modèle
+
+    model = None
+    try:
+        model = MODEL_DICT[model_name.lower()]
+    except:
+        print("::::::::::::::::::::::::::Error:::::::::::::::::::::::::")
+        print(model_name.lower())
+
+    if model:
+        # Remplacez les valeurs None par null dans le dataframe
+        df = df.applymap(lambda cell_value: None if pd.isna(cell_value) else cell_value)
+
+        # Convertissez le dataframe en list de dictionnaires
+        data = df.to_dict(orient='records')
+
+        # Supprimez toutes les instances existantes du modèle
+        model.objects.all().delete()
+
+        # Créez de nouvelles instances à partir des données du dataframe
+        #print([item for item in data])
+        try:
+            model.objects.bulk_create([model(**item) for item in data])
+        except:
+            for item in data:
+                print(item)
+
+        print(f"Données chargées depuis {file_path} vers {model.__name__}")
+    else:
+        print(f"Modèle non reconnu pour le fichier {file_path}")
+
+    print("Chargement terminé.")
 
 
-def get_row_value(row, exculd_list):
-    return [ cell.lower() for cell in row if cell and cell.lower() not in exculd_list]
+def save_all_models():
+    backup_directory = 'backup'
+    
+    # Assurez-vous que le répertoire de sauvegarde existe, sinon créez-le
+    os.makedirs(backup_directory, exist_ok=True)
 
-def get_row_key_value(row):
-    return [ (row[i], i)  for i in range(len(get_row_value(row, []))) ]
+    # Itération sur la liste des modèles
+    for model in MODEL:
+        model_name = model.__name__.lower()
+        resource = get_resource_by_name(model_name)
+
+        if resource:
+            dataset = resource().export()
+
+            # Chemin complet du fichier de sauvegarde
+            file_path = os.path.join(backup_directory, f'{model_name}_backup.xls')
+
+            # Exportez le fichier dans le répertoire de sauvegarde
+            with open(file_path, 'wb') as file:
+                file.write(dataset.xls)
+
+# def import_all_models():
+#     temp_directory = 'media/temp'
+#     for model in MODEL:
+#         model_name = model.__name__.lower()
+#         resource = get_resource_by_name(model_name)
+        
+#         if resource:
+#             # Chemin complet du fichier à importer
+#             file_path = os.path.join(temp_directory, f'{model_name}_backup.xls')
+#             # Assurez-vous que le fichier à importer existe
+#             if os.path.exists(file_path):
+#                 with open(file_path, 'rb') as file:
+#                     dataset = Dataset().load(file.read(), format='xls')
+
+#                     # Créer une instance RowResult pour suivre les résultats de l'importation
+#                     row_result = RowResult()
+
+#                     # L'objet admin n'est pas utilisé ici, donc nous passons None
+#                     import_export_admin = ImportExportModelAdmin(None, model)
+
+#                     # Importer les données
+#                     result = import_export_admin.process_dataset(dataset, row_result=row_result, using_transactions=True)
+
+#                     # Vérifier si l'importation était réussie
+#                     if result.has_errors():
+#                         print(f"Échec de l'importation pour le modèle {model_name}: {result.base_errors}")
+#                     else:
+#                         print(f"Importation réussie pour le modèle {model_name}")
+
+
+def clean_data_base():
+    print("Drop all object ..... 7")
+    Programme.objects.all().delete()
+    print("Drop all object ..... 7")
+    Seance.objects.all().delete()
+    print("Drop all object ..... 1")
+    Personnel.objects.all().delete()
+    print("Drop all object ..... 2")
+    Enseignant.objects.all().delete()
+    print("Drop all object ..... 3")
+    Etudiant.objects.all().delete()
+    print("Drop all object ..... 4")
+    Comptable.objects.all().delete()
+    print("Drop all object ..... 5")
+    Tuteur.objects.all().delete()
+    print("Drop all object ..... 6")
+    Ue.objects.all().delete()
+    print("Drop all object ..... 7")
+    Matiere.objects.all().delete()
+    print("Drop all object ..... 8")
+    Evaluation.objects.all().delete()
+    print("Drop all object ..... 9")
+    Competence.objects.all().delete()
+    print("Drop all object ..... 10")
+    Semestre.objects.all().delete()
+    print("Drop all object ..... 11")
+    Domaine.objects.all().delete()
+    print("Drop all object ..... 12")
+    Parcours.objects.all().delete()
+    print("Drop all object ..... 13")
+    Note.objects.all().delete()
+    print("Drop all object .....")
+    AnneeUniversitaire.objects.all().delete()
+    print("Drop all object ..... end")
+
+def init_data_base():
+     # Génération des fausses instances pour le modèle AnneeUniversitaire
+    current = False
+    for i in range(1,10):
+        if i == 9:
+            current = True
+        annee_universitaire = AnneeUniversitaire(
+            annee=2013+i,
+            annee_courante=current
+        )
+        annee_universitaire.save()
+        print(f"AnneeUniversitaire créé : {annee_universitaire}")
+    
+    # Génération des fausses instances pour le modèle Domaine
+    domaine = Domaine(
+        nom="Siences et technologie",
+        description="Siences et technologie"
+    )
+    domaine.save()
+    print(f"Domaine créé : {domaine}")
+
+    # Génération des fausses instances pour le modèle Parcours
+    domaines = Domaine.objects.all()
+
+    parcours = Parcours(
+        nom="Licence en génie logiciel",
+        domaine=domaine,
+        description="Licence en génie logiciel"
+    )
+    
+    parcours.save()
+    print(f"Parcours créé : {parcours}")
+
 

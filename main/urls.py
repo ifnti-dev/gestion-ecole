@@ -171,16 +171,4 @@ urlpatterns = [
           views.liste_etudiants_par_semestre, name='liste_etudiants_par_semestre'),
 
      path('passage_etudiants/', views.passage_etudiants, name='passage_etudiants'),
-
-
-
-
-
-
-
-
-
-
-
-
 ]

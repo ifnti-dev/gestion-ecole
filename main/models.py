@@ -14,12 +14,9 @@ from datetime import datetime
 import datetime
 from django.db.models import Max
 from django.contrib.auth.models import Group
-from django.shortcuts import get_object_or_404
 from django.db.models import Sum  
 from num2words import num2words
 from decimal import Decimal
-from django.db.models import Q
-
 
 class Utilisateur(models.Model):
     SEXE_CHOISE = [
@@ -121,11 +118,10 @@ class Etudiant(Utilisateur):
                 self.id = self.nom[0] + self.prenom[0] + \
                     str(self.anneeentree) + "0" + str(1)
             # Création de l'utilisateur associé à l'instance de l'étudiant
-            username = (self.prenom + self.nom).lower()
+            username = trim_str((self.prenom + self.nom).lower())
             year = date.today().year
             password = 'ifnti' + str(year) + '!'
-            user = User.objects.create_user(username=username, password=password,
-                                            email=self.email, last_name=self.nom, first_name=self.prenom, is_staff=False)
+            user = User.objects.create_user(username=username, password=password,email=self.email, last_name=self.nom, first_name=self.prenom, is_staff=False)
             self.user = user  # association de l'utilisateur à l'instance de l'étudiant
             group_etudiant = Group.objects.get(name="etudiant")
             self.user.groups.add(group_etudiant)
@@ -230,12 +226,12 @@ class Etudiant(Utilisateur):
             return 0.0, False
         
         for matiere in matieres:
-            print(matiere, matiere.coefficient)
+            #print(matiere, matiere.coefficient)
             note, _ = self.moyenne_etudiant_matiere(matiere, semestre)
             somme_note += float(note) * float(matiere.coefficient)
             somme_coef += matiere.coefficient
-            print('sous-total ',somme_coef)
-        print('total', somme_coef)
+            #print('sous-total ',somme_coef)
+        #print('total', somme_coef)
         moyenne = round(somme_note/somme_coef, 2)
         matiere_principale = ue.matiere_principacle()
         a_valide = moyenne >= matiere_principale.minValue

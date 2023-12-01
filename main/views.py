@@ -15,18 +15,19 @@ from .custom_permission_required import evaluation_permission, show_recapitulati
 
 
 @login_required(login_url=settings.LOGIN_URL)
-def index(request):
-    annees_univ = AnneeUniversitaire.objects.all()
-    etudiants = Etudiant.objects.filter(is_active=True)
-    if request.method == 'POST':
-        annee_univ_id = request.POST.get('annee_univ')
-
-    context = {
-        'annees_univ': annees_univ,
-        'etudiants': etudiants,
+def dashboard(request):
+    id_annee_selectionnee = request.session.get('id_annee_selectionnee')
+    print(id_annee_selectionnee)
+    annee_selectionnee = get_object_or_404(
+        AnneeUniversitaire, pk=id_annee_selectionnee)
+    semestres = annee_selectionnee.get_semestres()
+    data = {
+        'nb_etudiants': len(Etudiant.objects.filter(semestres__in=semestres).distinct()),
+        'nb_enseignants': len(Enseignant.objects.filter(matiere__ue__programme__semestre__in=semestres).distinct()),
+        'nb_matieres': len(Matiere.objects.filter(ue__programme__semestre__in=semestres).distinct()),
+        'nb_ues': len(Ue.objects.filter(programme__semestre__in=semestres).distinct()),
     }
-    return render(request,  'dashboard.html', context)
-
+    return render(request, 'dashboard.html', context=data)
 
 def change_annee_universitaire(request):
     if 'annee_universitaire' in request.GET:

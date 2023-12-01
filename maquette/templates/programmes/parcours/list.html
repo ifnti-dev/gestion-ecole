@@ -1,16 +1,24 @@
 {% extends 'index.html' %}
-{% block content_title %} Parcours du domaine {{ domaine }} {% endblock content_title %}
+{% block content_title %} Parcours du domaine {{ domaine }} 
+<h1>
+    <a href="{% url 'maquette:domaines' %}" class="btn btn-outline-warning">
+        <i class="fas fa-chevron-left fa-lg"></i> Retour
+    </a>
+</h1>
+{% endblock content_title %}
 {% block content_title_description %} {% endblock content_title_description %}
 {% block content %}
-<div class="block block-rounded">
-        <div class="block-header">
-            <div class="block-title"></div>
-            <a href="{% url 'maquette:add_parcours' domaine.id %}">
-                <button class="btn btn-outline-primary mt-4" id="add">
-                    <i class="fas fa-plus"></i> Ajouter un parcours
-                </button>
-            </a>
-        </div>
+<div>
+    <div class="block-header">
+        <div class="block-title"></div>
+        <a href="{% url 'maquette:add_parcours' domaine.id %}">
+            <button class="btn btn-outline-primary mt-4" id="add">
+                <i class="fas fa-plus"></i> Ajouter un parcours
+            </button>
+        </a>
+    </div>
+
+    <div class="block block-rounded">
         <div class="block-content block-content-full">
             <table class="table table-bordered table-striped table-vcenter js-dataTable-full-pagination">
                 <thead>
@@ -27,22 +35,24 @@
                         <td class="text-center font-size-sm">{{ parcours.id }}</td>
                         <td class="text-center font-w600 font-size-sm">{{ parcours.nom }}</td>
                         <td class="text-center font-w600 font-size-sm">{{ parcours.description }}</td>
-                        <td class="text-center">                                       
-                            <a href="{% url 'maquette:semestres_by_parcours' parcours.id %}">
-                                <button type="button" class="update-book btn btn-sm btn-success">
-                                    <span><i class="far fa-eye fa-lg"></i></span>
-                                </button>  
-                            </a>                                      
-                            <a href="{% url 'maquette:edit_parcours' parcours.id %}">
-                                <button type="button" class="update-book btn btn-sm btn-warning">
-                                    <span><i class="far fa-edit fa-lg"></i></span>
-                                </button>  
-                            </a>
-                            <a style="color: blanchedalmond;" href="{% url 'maquette:delete_parcours' parcours.id %}">
-                                <button type="button" class="delete-evaluation btn btn-sm btn-danger">
-                                        <span><i class="fa fa-fw fa-times mr-1"></i></span>
-                                </button>   
-                            </a>                                   
+                        <td class="text-center">   
+                            <button type="button" class="btn btn-secondary dropdown-toggle" id="dropdown-default-secondary" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="fa fa-bars" aria-hidden="true"></i>
+                            </button>
+                            <div class="dropdown-menu font-size-sm" aria-labelledby="dropdown-default-secondary">
+                                <li class="nav-main-item">
+                                    <a class="nav-main-link nav-main-link-name" data-toggle="" aria-haspopup="true" aria-expanded="false" href="{% url 'maquette:edit_parcours' parcours.id %}">
+                                        <i class="fa fa-edit mr-1 text-primary" aria-hidden="true"></i>
+                                        <span class="nav-main-link-name">Editer</span>
+                                    </a>                   
+                                </li>
+                                <li class="nav-main-item">
+                                    <a class="nav-main-link nav-main-link-name" data-toggle="" aria-haspopup="true" aria-expanded="false" href="{% url 'maquette:delete_parcours' parcours.id %}">
+                                        <i class="fa fa-trash mr-1 text-danger" aria-hidden="true"></i>
+                                        <span class="nav-main-link-name">Supprimer</span>
+                                    </a>                   
+                                </li>
+                            </div>                                                                                            
                         </td> 
                     </tr>
                     {% endfor %}

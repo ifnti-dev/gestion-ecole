@@ -30,7 +30,15 @@ class GenerateMaquetteForm(forms.Form):
             self._errors['type_maquette'] = "Type_maquette invalide"
         
         return cleaned_data
-    
+
+class DataForm(forms.Form):
+    enseignants_excel_file = forms.FileField(widget=forms.FileInput(attrs={'class': 'form-control'}), required=False, label="Fichier enseignants")
+    maquette_excel_file = forms.FileField(widget=forms.FileInput(attrs={'class': 'form-control'}), required=False, label="Fichier maquette")
+    matieres_excel_file = forms.FileField(widget=forms.FileInput(attrs={'class': 'form-control'}), required=False, label="Fichier matières")
+    notes_excel_file = forms.FileField(widget=forms.FileInput(attrs={'class': 'form-control'}), required=False, label="Fichier notes")
+    database_excel_file = forms.FileField(widget=forms.FileInput(attrs={'class': 'form-control'}), required=False, label="Base de donnée")
+
+
 class ProgrammeForm(forms.ModelForm):
     semestre = forms.ModelChoiceField(
         queryset=Semestre.static_get_current_semestre(),
@@ -42,7 +50,7 @@ class ProgrammeForm(forms.ModelForm):
     )
     ues = forms.ModelMultipleChoiceField(
         queryset=Ue.objects.all(),
-        widget=forms.SelectMultiple(attrs={'class' : 'form-control js-select2 form-control'})
+        widget=forms.SelectMultiple(attrs={'class' : 'form-control js-select2 form-control w-100'})
     )
     
     class Meta:
