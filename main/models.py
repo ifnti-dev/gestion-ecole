@@ -14,20 +14,9 @@ from datetime import datetime
 import datetime
 from django.db.models import Max
 from django.contrib.auth.models import Group
-from django.shortcuts import get_object_or_404
 from django.db.models import Sum  
 from num2words import num2words
 from decimal import Decimal
-from django.db.models import Q
-
-def trim_str(string):
-    result = ""
-    string = str(string)
-    string = string.lower()
-    for i in range(len(string)):
-        if string[i] != " ":
-            result += string[i]
-    return result
 
 class Utilisateur(models.Model):
     SEXE_CHOISE = [

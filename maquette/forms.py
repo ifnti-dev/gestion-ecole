@@ -36,7 +36,7 @@ class DataForm(forms.Form):
     maquette_excel_file = forms.FileField(widget=forms.FileInput(attrs={'class': 'form-control'}), required=False, label="Fichier maquette")
     matieres_excel_file = forms.FileField(widget=forms.FileInput(attrs={'class': 'form-control'}), required=False, label="Fichier matières")
     notes_excel_file = forms.FileField(widget=forms.FileInput(attrs={'class': 'form-control'}), required=False, label="Fichier notes")
-
+    database_excel_file = forms.FileField(widget=forms.FileInput(attrs={'class': 'form-control'}), required=False, label="Base de donnée")
 
 
 class ProgrammeForm(forms.ModelForm):

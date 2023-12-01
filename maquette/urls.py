@@ -6,6 +6,7 @@ app_name = 'maquette'
 urlpatterns = [
     path('<int:id_annee_selectionnee>/', views.generate_maquette, name=''),
     path('data/', views.data, name='data'),
+    path('backup/', views.global_backup, name='backup'),
     path('programmes/<int:id_annee_selectionnee>/', views.programmes, name='programmes'),
     path('add_programme/<int:id_annee_selectionnee>/', views.add_programme, name='add_programme'),
     path('edit_programme/<int:id>/<int:id_annee_selectionnee>/', views.edit_programme, name='edit_programme'),

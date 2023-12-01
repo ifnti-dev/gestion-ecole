@@ -1,6 +1,8 @@
+from numpy import NaN
 import openpyxl
 import pandas as pd
-from main.models import Etudiant, Note, Semestre, Ue, Evaluation, Parcours, AnneeUniversitaire, Programme, Matiere
+from main.helpers import trim_str
+from main.models import Charge, Comptable, CompteBancaire, CompteEtudiant, Conge, DirecteurDesEtudes, Domaine, Enseignant, Etudiant, FicheDePaie, Fournisseur, Frais, Information, Note, Paiement, Personnel, Salaire, Seance, Semestre, Ue, Evaluation, Parcours, AnneeUniversitaire, Programme, Matiere
 
 CODE_UE = {
     'p_u_e_i_a': 'Politiques universitaires et intégrité académique', 
@@ -34,7 +36,39 @@ CODE_UE = {
     'c_d_c_/_c_c_2': 'Cours de concentration / Cours complémentaire 2', 
     'c_d_c_/_c_c_3': 'Cours de concentration / Cours complémentaire 3', 
     's_d_e_s_(_i': "Stage/Projets d'entreprise et soutenance (Stage III)"
-    }
+
+}
+
+MODEL = [
+    AnneeUniversitaire,
+    Domaine,
+    Enseignant,
+    Comptable,
+    DirecteurDesEtudes,
+    Evaluation,
+    Matiere,
+    Personnel,
+    Etudiant,
+    Ue,
+    Semestre,
+    Domaine,
+    Seance,
+    Parcours,
+    Programme,
+    Note,
+    Frais,
+    CompteEtudiant,
+    Paiement,
+    CompteBancaire,
+    Salaire,
+    Fournisseur,
+    Information,
+    FicheDePaie,
+    Charge,
+    Conge,
+]
+
+MODEL_DICT = {model.__name__.lower(): model for model in MODEL}
 
 def clean_evaluation_data():
     Evaluation.objects.all().delete()
@@ -145,60 +179,48 @@ def load_notes_from_matiere(path):
                                 Note.objects.create(valeurNote=int(trim_str(row[evaluataion_data['cell']])), etudiant=etudiant, evaluation=evaluataion_data['evaluation'])
                         except Exception as e:
                             raise Etudiant.DoesNotExist(f'username = {firts_row_elt_value}')
-            
 
-def trim_str(string):
-    result = ""
-    string = str(string)
-    string = string.lower()
-    for i in range(len(string)):
-        if string[i] != " " and string[i] != "=":
-            result += string[i]
-    return result
-
-
-   
 def run():
+    load_data_from_excel('media/backup/ue_backup.xlsx')
     pass
 
-
-
 def backup_models_to_excel():
-    models = [Ue, Matiere, Evaluation] 
-    
-    for model in models:
+    index = 0
+    for model in MODEL:
         instances = model.objects.all()
         if instances:
+            index += 1
             # Convertissez les instances en dataframe pandas
             data = model.objects.values()
             df = pd.DataFrame.from_records(data)
 
             # Sauvegardez le dataframe dans un fichier Excel
-            file_name = f"{model.__name__.lower()}_backup.xlsx"
+            file_name = f"media/backup/backup_{index}_{model.__name__.lower()}.xlsx"
             df.to_excel(file_name, index=False)
 
             print(f"Sauvegarde de {model.__name__} dans {file_name}")
-
     print("Sauvegarde terminée.")
 
 def load_data_from_excel(file_path):
-    # Lisez le fichier Excel en un dataframe pandas
+    # Lire le fichier Excel en un dataframe pandas
     df = pd.read_excel(file_path)
 
-    model_name = file_path.split('_')[0]  # Obtenez le nom du modèle à partir du nom du fichier
-
+    # Récupérer le nom du fichier
+    model_name = file_path.split('/') 
+    model_name = model_name[len(model_name)-1].split('_')[2]
+    model_name = model_name.split('.')[0]
     # Obtenez le modèle correspondant à partir du nom du modèle
+
     model = None
-    if model_name.lower() == 'ue':
-        model = Ue
-    elif model_name.lower() == 'matiere':
-        model = Matiere
-    elif model_name.lower() == 'evaluation':
-        model = Evaluation
+    try:
+        model = MODEL_DICT[model_name.lower()]
+    except:
+        print("::::::::::::::::::::::::::Error:::::::::::::::::::::::::")
+        print(model_name.lower())
 
     if model:
         # Remplacez les valeurs None par null dans le dataframe
-        df = df.where(pd.notna(df), None)
+        df = df.applymap(lambda cell_value: None if pd.isna(cell_value) else cell_value)
 
         # Convertissez le dataframe en list de dictionnaires
         data = df.to_dict(orient='records')
@@ -207,10 +229,16 @@ def load_data_from_excel(file_path):
         model.objects.all().delete()
 
         # Créez de nouvelles instances à partir des données du dataframe
-        model.objects.bulk_create([model(**item) for item in data])
+        #print([item for item in data])
+        try:
+            model.objects.bulk_create([model(**item) for item in data])
+        except:
+            for item in data:
+                print(item)
 
         print(f"Données chargées depuis {file_path} vers {model.__name__}")
     else:
         print(f"Modèle non reconnu pour le fichier {file_path}")
 
     print("Chargement terminé.")
+
