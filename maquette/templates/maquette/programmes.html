@@ -10,11 +10,23 @@
                 <option value="{{ parcours.id }}" {% if parcours_selected == parcours.id %}selected{% endif %}>{{ parcours }}</option>
             {% endfor %}
         </select>
-        <form action="{% url 'maquette:add_programme' id_annee_selectionnee %}" method="get">
-            <button type="submit" class="btn btn-outline-primary ml-3" id="add-form-row">
-                <i class="fas fa-plus"></i>
-            </button>
-        </form>
+        <div class="d-flex">
+            <form action="{% url 'maquette:add_programme' id_annee_selectionnee %}" method="get">
+                <button type="submit" class="btn btn-outline-primary ml-3" id="add-form-row">
+                    Domaines
+                </button>
+            </form>
+            <form action="{% url 'maquette:add_programme' id_annee_selectionnee %}" method="get">
+                <button type="submit" class="btn btn-outline-primary ml-3" id="add-form-row">
+                    Parcours
+                </button>
+            </form>
+            <form action="{% url 'maquette:add_programme' id_annee_selectionnee %}" method="get">
+                <button type="submit" class="btn btn-outline-primary ml-3" id="add-form-row">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </form>
+        </div>
     </div>
     <div class="block-content block-content-full">
         <form action="" method="POST">
