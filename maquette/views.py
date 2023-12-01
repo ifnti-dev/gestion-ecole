@@ -4,13 +4,14 @@ from django.shortcuts import render, get_object_or_404, redirect
 from main.helpers import range_folder_file
 from main.pdfMaker import generate_pdf
 from main.models import AnneeUniversitaire, Programme, Semestre, Ue, Domaine, Parcours
-from scripts.utils import backup_models_to_excel, load_data_from_excel, load_maquette, load_matieres, load_notes_from_matiere
-from .forms import DataForm, GenerateMaquetteForm, ProgrammeForm
+from scripts.utils import load_maquette, load_matieres, load_notes_from_matiere, save_all_models
+from .forms import DataForm, GenerateMaquetteForm, ProgrammeForm, DomaineForm, ParcoursForm
 import os
 from django.conf import settings
 from django.utils.encoding import smart_str
 
-def programmes(request, id_annee_selectionnee):
+def programmes(request):
+    id_annee_selectionnee = request.session.get('id_annee_selectionnee')
     annee_universitaire = get_object_or_404(AnneeUniversitaire, pk=id_annee_selectionnee)
     print(annee_universitaire)
     list_parcours = Parcours.objects.all()
@@ -34,8 +35,9 @@ def programmes(request, id_annee_selectionnee):
     }
     return render(request, 'maquette/programmes.html', context=data)
 
-def add_programme(request, id_annee_selectionnee):
+def add_programme(request):
     data = {}
+    id_annee_selectionnee = request.session.get('id_annee_selectionnee')
     annee_universitaire = get_object_or_404(AnneeUniversitaire, pk=id_annee_selectionnee)
     if request.POST:
         form = ProgrammeForm(request.POST)
@@ -49,8 +51,9 @@ def add_programme(request, id_annee_selectionnee):
     
     return render(request, 'maquette/create_or_edit.html', context=data)
 
-def edit_programme(request, id, id_annee_selectionnee):
+def edit_programme(request, id):
     data = {}
+    id_annee_selectionnee = request.session.get('id_annee_selectionnee')
     programme = get_object_or_404(Programme, pk=id)
     annee_universitaire = get_object_or_404(AnneeUniversitaire, pk=id_annee_selectionnee)
     if request.POST:
@@ -65,7 +68,8 @@ def edit_programme(request, id, id_annee_selectionnee):
     
     return render(request, 'maquette/create_or_edit.html', context=data)
 
-def delete_programme(request, id, id_annee_selectionnee):
+def delete_programme(request, id):
+    id_annee_selectionnee = request.session.get('id_annee_selectionnee')
     programme = get_object_or_404(Programme, pk=id)
     programme.delete()
     return redirect('maquette:programmes', id_annee_selectionnee=id_annee_selectionnee)
@@ -92,25 +96,28 @@ def data(request):
             if notes_excel_file:
                 load_notes_from_matiere(notes_excel_file)
             if database_excel_file:
-                extract_path = 'media/tmp/'
-                os.makedirs(extract_path, exist_ok=True)
-                upload_zip_path = os.path.join(extract_path, database_excel_file.name)
-                with open(upload_zip_path, 'wb') as zip_file:
-                    for chunk in database_excel_file.chunks():
-                        zip_file.write(chunk)
+                pass
+                # extract_path = 'media/tmp/'
+                # os.makedirs(extract_path, exist_ok=True)
+                # upload_zip_path = os.path.join(extract_path, database_excel_file.name)
+                # with open(upload_zip_path, 'wb') as zip_file:
+                #     for chunk in database_excel_file.chunks():
+                #         zip_file.write(chunk)
                 
-                with zipfile.ZipFile(upload_zip_path, 'r') as zip_ref:
-                    zip_ref.extractall(extract_path)
+                # with zipfile.ZipFile(upload_zip_path, 'r') as zip_ref:
+                #     zip_ref.extractall(extract_path)
                     
-                os.remove(upload_zip_path)
+                # os.remove(upload_zip_path)
                  
-                files_path = os.listdir(extract_path)
-                for path in files_path:
-                    path = extract_path+path
-                    load_data_from_excel(path)
-                    os.remove(path)
+                # files_path = os.listdir(extract_path)
+                # paths = []
+                # for path in files_path:
+                #     path = extract_path+path
+                #     paths.append(path)
+                #import_all_models()
+                #load_data_from_excel_files(paths)
                 
-                os.removedirs(extract_path)
+                #os.removedirs(extract_path)
         return redirect('maquette:data')
     data = {
         'form' : DataForm()
@@ -119,8 +126,8 @@ def data(request):
     return render(request, 'data/index.html', context=data)
 
 def global_backup(request):
-    backup_models_to_excel()
-    backup_directory = os.path.join(settings.MEDIA_ROOT, 'backup')
+    save_all_models()
+    backup_directory = os.path.join('backup')
     zip_filename = 'backup_database_excel_files.zip'
     zip_path = os.path.join(settings.MEDIA_ROOT, zip_filename)
     zipf = zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED)
@@ -129,6 +136,7 @@ def global_backup(request):
             file_path = os.path.join(foldername, filename)
             arcname = os.path.relpath(file_path, backup_directory)
             zipf.write(file_path, arcname)
+            os.remove(file_path)
     zipf.close()
 
     response = HttpResponse(content_type='application/zip')
@@ -219,3 +227,90 @@ def generate_maquette_pdf(context):
         response['Content-Disposition'] = 'inline;filename=pdf_file.pdf'
         return response
     
+
+def domaines(request):
+    domaines =Domaine.objects.all()
+    
+    data = {
+        'domaines' : domaines,
+    }
+    return render(request, 'domaines/list.html', context=data)
+
+def add_domaine(request):
+    data = {}
+    if request.POST:
+        form = DomaineForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('maquette:domaines')
+        data['form'] = form
+    else:
+        data['form'] = DomaineForm()
+    
+    return render(request, 'domaines/create_or_edit.html', context=data)
+
+def edit_domaine(request, id):
+    data = {}
+    domaine = get_object_or_404(Domaine, pk=id)
+    if request.POST:
+        form = ProgrammeForm(request.POST, instance=domaine)
+        if form.is_valid():
+            form.save()
+            return redirect('maquette:domaines')
+        data['form'] = form
+    else:
+        data['form'] = DomaineForm(instance=domaine)
+    
+    return render(request, 'domaines/create_or_edit.html', context=data)
+
+def delete_domaine(request, id):
+    domaine = get_object_or_404(Domaine, pk=id)
+    domaine.delete()
+    return redirect('maquette:domaines')
+
+
+
+def parcours(request, id_domaine):
+    domaine = get_object_or_404(Domaine, pk=id_domaine)
+    parcours = domaine.parcours_set.all()
+    data = {
+        'parcours_list' : parcours,
+        'domaine': domaine,
+    }
+    return render(request, 'parcours/list.html', context=data)
+
+def add_parcours(request, id_domaine):
+    domaine = get_object_or_404(Domaine, pk=id_domaine)
+    data = {}
+    if request.POST:
+        form = ParcoursForm(request.POST)
+        if form.is_valid():
+            parcours = form.save(commit=False)
+            parcours.domaine = domaine
+            parcours.save()
+            return redirect('maquette:parcours', domaine.id)
+        data['form'] = form
+    else:
+        data['form'] = ParcoursForm()
+    
+    return render(request, 'parcours/create_or_edit.html', context=data)
+
+def edit_parcours(request, id):
+    data = {}
+    parcours = get_object_or_404(Parcours, pk=id)
+    if request.POST:
+        form = ParcoursForm(request.POST, instance=parcours)
+        if form.is_valid():
+            form.save()
+            return redirect('maquette:parcours')
+        data['form'] = form
+    else:
+        data['form'] = ParcoursForm(instance=parcours)
+    
+    return render(request, 'domaines/create_or_edit.html', context=data)
+
+def delete_parcours(request, id):
+    parcours = get_object_or_404(Parcours, pk=id)
+    parcours.delete()
+    return redirect('maquette:domaines')
+

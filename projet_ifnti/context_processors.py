@@ -17,12 +17,6 @@ def bootstrap(request):
     else:
         niveau = ''
         
-    if 'id_annee_selectionnee' not in request.session:
-        id_annee_selectionnee = current_annee_accademique.id if current_annee_accademique else 0
-        request.session["id_annee_selectionnee"] = id_annee_selectionnee
-    
-    print(request.session["id_annee_selectionnee"])
-        
     id_auth_model = get_id_authenticate_user_model(request)
     
     return {

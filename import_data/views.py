@@ -7,33 +7,7 @@ from main.resources import EtudiantResource
 from tablib import Dataset
 from django.shortcuts import render, HttpResponse
 from tablib import Dataset
-import openpyxl
 
-
-def load_excel_file(request):
-    # if request.method == 'POST':
-    #     if 'files' in request.FILES:
-    #         files = request.FILES['files']
-    #         dataset = Dataset()
-    #         data = dataset.load(files.read())
-    #         return HttpResponse(data) 
-    
-    file_path = "/home/enseignant/malik/ifnti-gestion/media/excel/test_etud.xlsx"
-    # Ouvrerture du classeur Excel
-    workbook = openpyxl.load_workbook(file_path)
-    for sheet in workbook:
-        print(f':::::::::::::::::::::::::::::{sheet.title}:::::::::::::::::::::::::::::::')
-        # Créer les Ues
-        for row in sheet.iter_rows():
-            for cell in row:
-                if cell.value:
-                    print(cell.value)   
-           
-    return render(request, 'load_data.html', context={})
-
-
-def main(request):
-    pass
 
 # Cette vue permet d'importer les données etudiants via un fichier xlsx
 def importer_data(request):

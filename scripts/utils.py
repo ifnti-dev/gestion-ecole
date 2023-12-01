@@ -1,8 +1,16 @@
+import os
 from numpy import NaN
 import openpyxl
 import pandas as pd
 from main.helpers import trim_str
-from main.models import Charge, Comptable, CompteBancaire, CompteEtudiant, Conge, DirecteurDesEtudes, Domaine, Enseignant, Etudiant, FicheDePaie, Fournisseur, Frais, Information, Note, Paiement, Personnel, Salaire, Seance, Semestre, Ue, Evaluation, Parcours, AnneeUniversitaire, Programme, Matiere
+from main.models import Charge, Competence, Comptable, CompteBancaire, CompteEtudiant, Conge, DirecteurDesEtudes, Domaine, Enseignant, Etudiant, FicheDePaie, Fournisseur, Frais, Information, Note, Paiement, Personnel, Salaire, Seance, Semestre, Tuteur, Ue, Evaluation, Parcours, AnneeUniversitaire, Programme, Matiere
+from main.resources import get_model_by_name, get_resource_by_name
+from tablib import Dataset
+from import_export import resources, fields
+from import_export.widgets import ForeignKeyWidget
+from import_export.admin import ImportExportModelAdmin
+from import_export.results import RowResult
+
 
 CODE_UE = {
     'p_u_e_i_a': 'Politiques universitaires et intégrité académique', 
@@ -40,17 +48,19 @@ CODE_UE = {
 }
 
 MODEL = [
-    AnneeUniversitaire,
+    #AnneeUniversitaire,
     Domaine,
+    Tuteur,
     Enseignant,
     Comptable,
     DirecteurDesEtudes,
     Evaluation,
     Matiere,
+    Competence,
     Personnel,
     Etudiant,
     Ue,
-    Semestre,
+    #Semestre,
     Domaine,
     Seance,
     Parcours,
@@ -70,11 +80,11 @@ MODEL = [
 
 MODEL_DICT = {model.__name__.lower(): model for model in MODEL}
 
-def clean_evaluation_data():
-    Evaluation.objects.all().delete()
-    print("Drop all evaluations data ")
+def get_cell_int_value(value):
+    return int(trim_str(value))
 
 def load_maquette(path):
+    print('llllll:::::::::::::')
     # Clean ue and programme data
     Ue.objects.all().delete()
     Programme.objects.all().delete()
@@ -99,6 +109,10 @@ def load_maquette(path):
     # Create programme
     annee_universitaires = AnneeUniversitaire.objects.all()
     parcours = Parcours.objects.all().first()
+    if not parcours:
+        init_data_base()
+        parcours = Parcours.objects.all().first()
+        
     for anne_universitaire in annee_universitaires:
         semestres = anne_universitaire.semestre_set.all()
         for semestre in semestres:
@@ -183,25 +197,15 @@ def load_notes_from_matiere(path):
 def run():
     load_data_from_excel('media/backup/ue_backup.xlsx')
     pass
+    
+def load_data_from_excel_files(files):
+    clean_data_base()
+    init_data_base()
+    for file in files:
+        load_data_from_excel_file(file)
+        os.remove(file)
 
-def backup_models_to_excel():
-    index = 0
-    for model in MODEL:
-        instances = model.objects.all()
-        if instances:
-            index += 1
-            # Convertissez les instances en dataframe pandas
-            data = model.objects.values()
-            df = pd.DataFrame.from_records(data)
-
-            # Sauvegardez le dataframe dans un fichier Excel
-            file_name = f"media/backup/backup_{index}_{model.__name__.lower()}.xlsx"
-            df.to_excel(file_name, index=False)
-
-            print(f"Sauvegarde de {model.__name__} dans {file_name}")
-    print("Sauvegarde terminée.")
-
-def load_data_from_excel(file_path):
+def load_data_from_excel_file(file_path):
     # Lire le fichier Excel en un dataframe pandas
     df = pd.read_excel(file_path)
 
@@ -241,4 +245,125 @@ def load_data_from_excel(file_path):
         print(f"Modèle non reconnu pour le fichier {file_path}")
 
     print("Chargement terminé.")
+
+
+def save_all_models():
+    backup_directory = 'backup'
+    
+    # Assurez-vous que le répertoire de sauvegarde existe, sinon créez-le
+    os.makedirs(backup_directory, exist_ok=True)
+
+    # Itération sur la liste des modèles
+    for model in MODEL:
+        model_name = model.__name__.lower()
+        resource = get_resource_by_name(model_name)
+
+        if resource:
+            dataset = resource().export()
+
+            # Chemin complet du fichier de sauvegarde
+            file_path = os.path.join(backup_directory, f'{model_name}_backup.xls')
+
+            # Exportez le fichier dans le répertoire de sauvegarde
+            with open(file_path, 'wb') as file:
+                file.write(dataset.xls)
+
+# def import_all_models():
+#     temp_directory = 'media/temp'
+#     for model in MODEL:
+#         model_name = model.__name__.lower()
+#         resource = get_resource_by_name(model_name)
+        
+#         if resource:
+#             # Chemin complet du fichier à importer
+#             file_path = os.path.join(temp_directory, f'{model_name}_backup.xls')
+#             # Assurez-vous que le fichier à importer existe
+#             if os.path.exists(file_path):
+#                 with open(file_path, 'rb') as file:
+#                     dataset = Dataset().load(file.read(), format='xls')
+
+#                     # Créer une instance RowResult pour suivre les résultats de l'importation
+#                     row_result = RowResult()
+
+#                     # L'objet admin n'est pas utilisé ici, donc nous passons None
+#                     import_export_admin = ImportExportModelAdmin(None, model)
+
+#                     # Importer les données
+#                     result = import_export_admin.process_dataset(dataset, row_result=row_result, using_transactions=True)
+
+#                     # Vérifier si l'importation était réussie
+#                     if result.has_errors():
+#                         print(f"Échec de l'importation pour le modèle {model_name}: {result.base_errors}")
+#                     else:
+#                         print(f"Importation réussie pour le modèle {model_name}")
+
+
+def clean_data_base():
+    print("Drop all object ..... 7")
+    Programme.objects.all().delete()
+    print("Drop all object ..... 7")
+    Seance.objects.all().delete()
+    print("Drop all object ..... 1")
+    Personnel.objects.all().delete()
+    print("Drop all object ..... 2")
+    Enseignant.objects.all().delete()
+    print("Drop all object ..... 3")
+    Etudiant.objects.all().delete()
+    print("Drop all object ..... 4")
+    Comptable.objects.all().delete()
+    print("Drop all object ..... 5")
+    Tuteur.objects.all().delete()
+    print("Drop all object ..... 6")
+    Ue.objects.all().delete()
+    print("Drop all object ..... 7")
+    Matiere.objects.all().delete()
+    print("Drop all object ..... 8")
+    Evaluation.objects.all().delete()
+    print("Drop all object ..... 9")
+    Competence.objects.all().delete()
+    print("Drop all object ..... 10")
+    Semestre.objects.all().delete()
+    print("Drop all object ..... 11")
+    Domaine.objects.all().delete()
+    print("Drop all object ..... 12")
+    Parcours.objects.all().delete()
+    print("Drop all object ..... 13")
+    Note.objects.all().delete()
+    print("Drop all object .....")
+    AnneeUniversitaire.objects.all().delete()
+    print("Drop all object ..... end")
+
+def init_data_base():
+     # Génération des fausses instances pour le modèle AnneeUniversitaire
+    current = False
+    for i in range(1,10):
+        if i == 9:
+            current = True
+        annee_universitaire = AnneeUniversitaire(
+            annee=2013+i,
+            annee_courante=current
+        )
+        annee_universitaire.save()
+        print(f"AnneeUniversitaire créé : {annee_universitaire}")
+    
+    # Génération des fausses instances pour le modèle Domaine
+    domaine = Domaine(
+        nom="Siences et technologie",
+        description="Siences et technologie"
+    )
+    domaine.save()
+    print(f"Domaine créé : {domaine}")
+
+    # Génération des fausses instances pour le modèle Parcours
+    domaines = Domaine.objects.all()
+
+    parcours = Parcours(
+        nom="Licence en génie logiciel",
+        domaine=domaine,
+        description="Licence en génie logiciel"
+    )
+    
+    parcours.save()
+    print(f"Parcours créé : {parcours}")
+
 

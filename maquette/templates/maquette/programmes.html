@@ -11,14 +11,9 @@
             {% endfor %}
         </select>
         <div class="d-flex">
-            <form action="{% url 'maquette:add_programme' id_annee_selectionnee %}" method="get">
+            <form action="{% url 'maquette:domaines' %}" method="get">
                 <button type="submit" class="btn btn-outline-primary ml-3" id="add-form-row">
                     Domaines
-                </button>
-            </form>
-            <form action="{% url 'maquette:add_programme' id_annee_selectionnee %}" method="get">
-                <button type="submit" class="btn btn-outline-primary ml-3" id="add-form-row">
-                    Parcours
                 </button>
             </form>
             <form action="{% url 'maquette:add_programme' id_annee_selectionnee %}" method="get">
