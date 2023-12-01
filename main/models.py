@@ -118,10 +118,11 @@ class Etudiant(Utilisateur):
                 self.id = self.nom[0] + self.prenom[0] + \
                     str(self.anneeentree) + "0" + str(1)
             # Création de l'utilisateur associé à l'instance de l'étudiant
-            username = trim_str((self.prenom + self.nom).lower())
+            username = (self.prenom + self.nom).lower()
             year = date.today().year
             password = 'ifnti' + str(year) + '!'
-            user = User.objects.create_user(username=username, password=password,email=self.email, last_name=self.nom, first_name=self.prenom, is_staff=False)
+            user = User.objects.create_user(username=username, password=password,
+                                            email=self.email, last_name=self.nom, first_name=self.prenom, is_staff=False)
             self.user = user  # association de l'utilisateur à l'instance de l'étudiant
             group_etudiant = Group.objects.get(name="etudiant")
             self.user.groups.add(group_etudiant)
