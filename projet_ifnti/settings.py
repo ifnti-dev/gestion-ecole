@@ -45,11 +45,13 @@ INSTALLED_APPS = [
     'main.apps.MainConfig',
     'maquette.apps.MaquetteConfig',
     'paiement.apps.PaiementConfig',
+    'conges',
     'import_data.apps.ImportDataConfig',
     'import_export',
     'django_extensions',
+    'dbbackup',
+    'django_crontab',
     'solo',
-    'conges',
  ]
 
 
@@ -110,7 +112,16 @@ DATABASES = {
     }
 }
 
+# Database bacup
 
+DBBACKUP_STORAGE = 'django.core.files.storage.FileSystemStorage'
+DBBACKUP_STORAGE_OPTIONS = {'location': BASE_DIR / 'backup'}
+
+# Cron Jobs for run process on background 
+
+CRONJOBS = [
+    ('*/30 * * * *', 'projet_ifnti.cron.backup') , # Backup database evry 5 minute
+]
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators

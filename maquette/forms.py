@@ -1,6 +1,7 @@
+from typing import Any
 from django import forms
 
-from main.models import Domaine, Parcours, Programme, Semestre, Ue
+from main.models import CorrespondanceMaquette, Domaine, Parcours, Programme, Semestre, Ue
 
 class GenerateMaquetteForm(forms.Form):
    # The code is defining two fields, `semestre` and `parcours`, for a form.
@@ -36,8 +37,21 @@ class DataForm(forms.Form):
     maquette_excel_file = forms.FileField(widget=forms.FileInput(attrs={'class': 'form-control'}), required=False, label="Fichier maquette")
     matieres_excel_file = forms.FileField(widget=forms.FileInput(attrs={'class': 'form-control'}), required=False, label="Fichier matières")
     notes_excel_file = forms.FileField(widget=forms.FileInput(attrs={'class': 'form-control'}), required=False, label="Fichier notes")
-    database_excel_file = forms.FileField(widget=forms.FileInput(attrs={'class': 'form-control'}), required=False, label="Base de donnée")
 
+class CorrespondanceMaquetteForm(forms.ModelForm):
+    class Meta:
+        model = CorrespondanceMaquette
+        fields = '__all__'
+    
+        widgets = {
+            'nature' : forms.Select(attrs={'class':'form-control'}),
+            'ponderation' : forms.TextInput(attrs={'class':'form-control'}),
+            'rattrapage' : forms.CheckboxInput(attrs={'class':'form-control col-md-6'}),
+        }
+    
+    def clean(self):
+        cleaned_data = super(CorrespondanceMaquetteForm, self).clean()
+        return cleaned_data
 
 class ProgrammeForm(forms.ModelForm):
     semestre = forms.ModelChoiceField(

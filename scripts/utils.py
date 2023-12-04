@@ -48,7 +48,8 @@ CODE_UE = {
 }
 
 MODEL = [
-    #AnneeUniversitaire,
+    AnneeUniversitaire,
+    Semestre,
     Domaine,
     Tuteur,
     Enseignant,
@@ -60,7 +61,6 @@ MODEL = [
     Personnel,
     Etudiant,
     Ue,
-    #Semestre,
     Domaine,
     Seance,
     Parcours,
@@ -195,108 +195,10 @@ def load_notes_from_matiere(path):
                             raise Etudiant.DoesNotExist(f'username = {firts_row_elt_value}')
 
 def run():
-    load_data_from_excel('media/backup/ue_backup.xlsx')
+    #clean_data_base()
+    print("::: Import begining :::::")
     pass
     
-def load_data_from_excel_files(files):
-    clean_data_base()
-    init_data_base()
-    for file in files:
-        load_data_from_excel_file(file)
-        os.remove(file)
-
-def load_data_from_excel_file(file_path):
-    # Lire le fichier Excel en un dataframe pandas
-    df = pd.read_excel(file_path)
-
-    # Récupérer le nom du fichier
-    model_name = file_path.split('/') 
-    model_name = model_name[len(model_name)-1].split('_')[2]
-    model_name = model_name.split('.')[0]
-    # Obtenez le modèle correspondant à partir du nom du modèle
-
-    model = None
-    try:
-        model = MODEL_DICT[model_name.lower()]
-    except:
-        print("::::::::::::::::::::::::::Error:::::::::::::::::::::::::")
-        print(model_name.lower())
-
-    if model:
-        # Remplacez les valeurs None par null dans le dataframe
-        df = df.applymap(lambda cell_value: None if pd.isna(cell_value) else cell_value)
-
-        # Convertissez le dataframe en list de dictionnaires
-        data = df.to_dict(orient='records')
-
-        # Supprimez toutes les instances existantes du modèle
-        model.objects.all().delete()
-
-        # Créez de nouvelles instances à partir des données du dataframe
-        #print([item for item in data])
-        try:
-            model.objects.bulk_create([model(**item) for item in data])
-        except:
-            for item in data:
-                print(item)
-
-        print(f"Données chargées depuis {file_path} vers {model.__name__}")
-    else:
-        print(f"Modèle non reconnu pour le fichier {file_path}")
-
-    print("Chargement terminé.")
-
-
-def save_all_models():
-    backup_directory = 'backup'
-    
-    # Assurez-vous que le répertoire de sauvegarde existe, sinon créez-le
-    os.makedirs(backup_directory, exist_ok=True)
-
-    # Itération sur la liste des modèles
-    for model in MODEL:
-        model_name = model.__name__.lower()
-        resource = get_resource_by_name(model_name)
-
-        if resource:
-            dataset = resource().export()
-
-            # Chemin complet du fichier de sauvegarde
-            file_path = os.path.join(backup_directory, f'{model_name}_backup.xls')
-
-            # Exportez le fichier dans le répertoire de sauvegarde
-            with open(file_path, 'wb') as file:
-                file.write(dataset.xls)
-
-# def import_all_models():
-#     temp_directory = 'media/temp'
-#     for model in MODEL:
-#         model_name = model.__name__.lower()
-#         resource = get_resource_by_name(model_name)
-        
-#         if resource:
-#             # Chemin complet du fichier à importer
-#             file_path = os.path.join(temp_directory, f'{model_name}_backup.xls')
-#             # Assurez-vous que le fichier à importer existe
-#             if os.path.exists(file_path):
-#                 with open(file_path, 'rb') as file:
-#                     dataset = Dataset().load(file.read(), format='xls')
-
-#                     # Créer une instance RowResult pour suivre les résultats de l'importation
-#                     row_result = RowResult()
-
-#                     # L'objet admin n'est pas utilisé ici, donc nous passons None
-#                     import_export_admin = ImportExportModelAdmin(None, model)
-
-#                     # Importer les données
-#                     result = import_export_admin.process_dataset(dataset, row_result=row_result, using_transactions=True)
-
-#                     # Vérifier si l'importation était réussie
-#                     if result.has_errors():
-#                         print(f"Échec de l'importation pour le modèle {model_name}: {result.base_errors}")
-#                     else:
-#                         print(f"Importation réussie pour le modèle {model_name}")
-
 
 def clean_data_base():
     print("Drop all object ..... 7")

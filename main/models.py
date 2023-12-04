@@ -921,7 +921,18 @@ class Programme(models.Model):
     class Meta:
         unique_together = ["parcours", "semestre"]
 
-
+class CorrespondanceMaquette(models.Model):
+    class Nature(models.TextChoices):
+        UE = "U", "UE"
+        MATIERE = "M", "Matière"
+    
+    nature = models.CharField(max_length=1, choices=Nature.choices)
+    ancienne = models.IntegerField(blank=True, null=True)
+    nouvelle = models.IntegerField(blank=True, null=True)
+    
+    def save(self):
+        super().save()
+    
 
 class Note(models.Model):
     """
