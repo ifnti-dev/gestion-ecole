@@ -1,14 +1,12 @@
 import zipfile
 from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404, redirect
-from main.helpers import range_folder_file
 from main.pdfMaker import generate_pdf
-from main.models import AnneeUniversitaire, Programme, Semestre, Ue, Domaine, Parcours
-from scripts.utils import load_maquette, load_matieres, load_notes_from_matiere, save_all_models
-from .forms import DataForm, GenerateMaquetteForm, ProgrammeForm, DomaineForm, ParcoursForm
+from main.models import AnneeUniversitaire, CorrespondanceMaquette, Matiere, Programme, Semestre, Ue, Domaine, Parcours
+from scripts.utils import load_maquette, load_matieres, load_notes_from_matiere
+from .forms import CorrespondanceMaquetteForm, DataForm, GenerateMaquetteForm, ProgrammeForm, DomaineForm, ParcoursForm
 import os
-from django.conf import settings
-from django.utils.encoding import smart_str
+from django.core import serializers
 
 def programmes(request):
     id_annee_selectionnee = request.session.get('id_annee_selectionnee')
@@ -82,11 +80,10 @@ def data(request):
         if form.is_valid():
             cleaned_data = form.clean()
             #print(cleaned_data)
-            enseignants_excel_file = cleaned_data.get('enseignants_excel_file')
+            # enseignants_excel_file = cleaned_data.get('enseignants_excel_file')
             maquette_excel_file = cleaned_data.get('maquette_excel_file')
             matieres_excel_file = cleaned_data.get('matieres_excel_file')
             notes_excel_file = cleaned_data.get('notes_excel_file')
-            database_excel_file = cleaned_data.get('database_excel_file')
             
             
             if maquette_excel_file:
@@ -95,29 +92,7 @@ def data(request):
                 load_matieres(matieres_excel_file)
             if notes_excel_file:
                 load_notes_from_matiere(notes_excel_file)
-            if database_excel_file:
-                pass
-                # extract_path = 'media/tmp/'
-                # os.makedirs(extract_path, exist_ok=True)
-                # upload_zip_path = os.path.join(extract_path, database_excel_file.name)
-                # with open(upload_zip_path, 'wb') as zip_file:
-                #     for chunk in database_excel_file.chunks():
-                #         zip_file.write(chunk)
-                
-                # with zipfile.ZipFile(upload_zip_path, 'r') as zip_ref:
-                #     zip_ref.extractall(extract_path)
-                    
-                # os.remove(upload_zip_path)
-                 
-                # files_path = os.listdir(extract_path)
-                # paths = []
-                # for path in files_path:
-                #     path = extract_path+path
-                #     paths.append(path)
-                #import_all_models()
-                #load_data_from_excel_files(paths)
-                
-                #os.removedirs(extract_path)
+           
         return redirect('maquette:data')
     data = {
         'form' : DataForm()
@@ -125,29 +100,19 @@ def data(request):
     
     return render(request, 'data/index.html', context=data)
 
-def global_backup(request):
-    save_all_models()
-    backup_directory = os.path.join('backup')
-    zip_filename = 'backup_database_excel_files.zip'
-    zip_path = os.path.join(settings.MEDIA_ROOT, zip_filename)
-    zipf = zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED)
-    for foldername, subfolders, filenames in os.walk(backup_directory):
-        for filename in filenames:
-            file_path = os.path.join(foldername, filename)
-            arcname = os.path.relpath(file_path, backup_directory)
-            zipf.write(file_path, arcname)
-            os.remove(file_path)
-    zipf.close()
-
-    response = HttpResponse(content_type='application/zip')
-    response['Content-Disposition'] = f'attachment; filename={smart_str(zip_filename)}'
-
-    with open(zip_path, 'rb') as zip_file:
-        response.write(zip_file.read())
-        
-    os.remove(zip_path)
-        
-    return response
+def correspondances(request):
+    if request.method == "POST":
+        form = CorrespondanceMaquetteForm(request.POST)
+        if form.is_valid():
+            form.save()
+            
+    data = {
+        'form': CorrespondanceMaquetteForm(),
+        'correspondances' : CorrespondanceMaquette.objects.all(),
+        'ues' : Ue.objects.all(),
+        'matieres' : Matiere.objects.all(),
+    }
+    return render(request, 'maquette/correspondances.html', context=data)
 
 def generate_maquette(request, id_annee_selectionnee):
     data = {}
