@@ -102,17 +102,32 @@ def data(request):
 
 def correspondances(request):
     if request.method == "POST":
-        form = CorrespondanceMaquetteForm(request.POST)
+        if 'form_id' in request.POST and request.POST.get('form_id') != '-1':
+            correspondance = get_object_or_404(CorrespondanceMaquette, pk=request.POST.get('form_id'))
+            form = CorrespondanceMaquetteForm(request.POST, instance=correspondance)
+        else:
+            form = CorrespondanceMaquetteForm(request.POST)
+            
         if form.is_valid():
             form.save()
+            form = CorrespondanceMaquetteForm()
+            request.POST = None
+    else:
+        form = CorrespondanceMaquetteForm()
+        request.POST = None
             
     data = {
-        'form': CorrespondanceMaquetteForm(),
+        'form': form,
         'correspondances' : CorrespondanceMaquette.objects.all(),
         'ues' : Ue.objects.all(),
         'matieres' : Matiere.objects.all(),
     }
     return render(request, 'maquette/correspondances.html', context=data)
+
+def delete_correspondance(request, id):
+    correspondance = get_object_or_404(CorrespondanceMaquette, pk=id)
+    correspondance.delete()
+    return redirect('maquette:correspondances')
 
 def generate_maquette(request, id_annee_selectionnee):
     data = {}

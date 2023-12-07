@@ -21,7 +21,7 @@ def bootstrap(request):
     
     return {
         'annee_universitaire': current_annee_accademique if current_annee_accademique else "-",
-        'annees_universitaire': AnneeUniversitaire.objects.all(),
+        'annees_universitaire': AnneeUniversitaire.objects.all().order_by('-annee'),
         'auth_user_role': auth_user_role,
         'is_etudiant': role_name == 'etudiant',
         'is_directeur_des_etudes': role_name == 'directeur_des_etudes',
@@ -36,19 +36,19 @@ def bootstrap(request):
         'MEDIA_URL' : '/media/',
     }
 
-
 def create_groups_if_exist(request):
     permissions = [
         'view', 'add', 'change', 'delete', "diplome", "carte", "releve_details", "releve_synthetique",
     ]
-
     applications = "main"
-    permissions_all_directeur_des_etudes = ["annee universitaire", "competence",
-                                            "comptable", "conge", "Directeur des études",
-                                            "domaine", "enseignant", "Etudiant", "evaluation",
-                                            "fiche de paie", "information", "matiere", "note",
-                                            "paiement", "parcours", "personnel", "programme",
-                                            "salaire", "seance", "semestre", "tuteur", "ue"]
+    permissions_all_directeur_des_etudes = [
+        "annee universitaire", "competence",
+        "comptable", "conge", "Directeur des études",
+        "domaine", "enseignant", "Etudiant", "evaluation",
+        "fiche de paie", "information", "matiere", "note",
+        "paiement", "parcours", "personnel", "programme",
+        "salaire", "seance", "semestre", "tuteur", "ue"
+        ]
 
     permissions_directeur_des_etudes = {
         "view": permissions_all_directeur_des_etudes,
@@ -60,8 +60,7 @@ def create_groups_if_exist(request):
         "releve_synthetique": ["Etudiant"],
         "carte": ["Etudiant"],
         "attestation": ["Etudiant"]
-
-    }
+        }
 
     permissions_etudiant = {
         "view": ["etudiant", "matiere", "ue", "evaluation", "note", "seance"],

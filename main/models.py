@@ -927,11 +927,20 @@ class CorrespondanceMaquette(models.Model):
         MATIERE = "M", "Matière"
     
     nature = models.CharField(max_length=1, choices=Nature.choices)
-    ancienne = models.IntegerField(blank=True, null=True)
-    nouvelle = models.IntegerField(blank=True, null=True)
+    ancienne = models.CharField(blank=True, null=True)
+    nouvelle = models.CharField(blank=True, null=True)
     
     def save(self):
         super().save()
+    
+    def afficher_nature(self):
+        return "UE" if self.nature.lower() == 'u' else "Matière"
+    
+    def get_ancienne(self):
+        return Ue.objects.get(id=self.ancienne) if self.nature.lower() == 'u' else Matiere.objects.get(id=self.ancienne)
+    
+    def get_nouvelle(self):
+        return Ue.objects.get(id=self.nouvelle) if self.nature.lower() == 'u' else Matiere.objects.get(id=self.nouvelle)
     
 
 class Note(models.Model):
