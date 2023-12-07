@@ -16,5 +16,6 @@ python-decouple
 Werkzeug
 python-dotenv
 pandas
+
 django-dbbackup
 django-crontab

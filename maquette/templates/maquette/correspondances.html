@@ -5,43 +5,15 @@
 <div class="block block-rounded">
     <div class="block-header">
         <div class="d-flex">
-            <form class="d-flex" action="{% url 'maquette:correspondances' %}" method="post">
-                {% csrf_token %}
-                <div class="d-flex flex-column mr-3">
-                    {{ form.nature.label_tag }}
-                    {{ form.nature }}
-                    {{ form.nature.errors }}
-                    {{ form.ancienne }}
-                    {{ form.nouvelle }}
-                </div>
-                <div class="mr-3">
-                    <label for="">Ancienne Ue</label>
-                    <select name="ancien_ue" id="ancien" class="form-control">
-                        <option value="">Sélectionner</option>
-                        {% for ue in ues %}
-                            <option value="{{ ue }}"> {{ ue }} </option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="mr-3">
-                    <label for="">Nouvelle Ue</label>
-                    <select name="nouvelle_ue" id="ancien" class="form-control">
-                        <option value="">Sélectionner</option>
-                        {% for ue in ues %}
-                            <option value="{{ ue }}"> {{ ue }} </option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <button type="submit" class="btn btn-outline-primary" id="add-form-row">
-                    <i class="fas fa-plus"></i>
-                </button>
-                {% comment %} <button type="button" class="btn btn-alt-primary push" data-toggle="modal" data-target="#modal-block-normal">Launch Modal</button> {% endcomment %}
-            </form>
+            <button type="button" class="btn btn-outline-primary" data-toggle="modal" data-target="#modal-block-normal">
+                <i class="fas fa-plus"></i>
+            </button>
         </div>
     </div>
     <div class="block-content block-content-full">
         <form action="" method="POST">
             {% csrf_token %}
+            {{ form.errors }}
             <table class="table table-bordered table-striped table-vcenter js-dataTable-full-pagination">
                 <table class="table table-bordered table-striped table-vcenter js-dataTable-full-pagination">
                     <thead>
@@ -54,29 +26,29 @@
                     </thead>
                     <tbody>
                         {% for correspondance in correspondances  %}
-                        <tr class="model-form-row">
+                        <tr class="model-form-row" id="row{{ correspondance.id }}">
                             <td style="text-align: center;">
-                                {{ programme.semestre }}
+                                {{ correspondance.afficher_nature }}
                             </td>
                             <td style="text-align: center;">
-                                {% for ue in programme.ues.all  %}
-                                <span class="badge badge-primary">{{ ue.libelle }}</span>
-                                {% endfor %}
+                                {{ correspondance.get_ancienne.libelle }}
                             </td>
-                            <td></td>
+                            <td>
+                                {{ correspondance.get_nouvelle.libelle }}
+                            </td>
                             <td style="text-align: center;"> 
                                 <button type="button" class="btn btn-secondary dropdown-toggle" id="dropdown-default-secondary" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     <i class="fa fa-bars" aria-hidden="true"></i>
                                 </button>
                                 <div class="dropdown-menu font-size-sm" aria-labelledby="dropdown-default-secondary">
                                     <li class="nav-main-item">
-                                        <a class="nav-main-link nav-main-link-name" data-toggle="" aria-haspopup="true" aria-expanded="false" href="">
+                                        <span class="nav-main-link nav-main-link-name" data-toggle="" aria-haspopup="true" aria-expanded="false"  onclick="EditLine('{{ correspondance.id }}', '{{ correspondance.nature }}', '{{ correspondance.ancienne }}', '{{ correspondance.nouvelle }}')">
                                             <i class="fa fa-edit mr-1 text-primary" aria-hidden="true"></i>
                                             <span class="nav-main-link-name">Editer</span>
-                                        </a>                   
+                                        </span>                   
                                     </li>
                                     <li class="nav-main-item">
-                                        <a class="nav-main-link nav-main-link-name" data-toggle="" aria-haspopup="true" aria-expanded="false" href="">
+                                        <a class="nav-main-link nav-main-link-name" data-toggle="" aria-haspopup="true" aria-expanded="false" href="{% url 'maquette:correspondance_delete' correspondance.id %}">
                                             <i class="fa fa-trash mr-1 text-danger" aria-hidden="true"></i>
                                             <span class="nav-main-link-name">Supprimer</span>
                                         </a>                   
@@ -95,47 +67,152 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="block block-rounded block-themed block-transparent mb-0">
-                <div class="block-header bg-primary-dark">
-                    <h3 class="block-title">Modal Title</h3>
-                    <div class="block-options">
-                        <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
-                            <i class="fa fa-fw fa-times"></i>
+                <form class="" action="{% url 'maquette:correspondances' %}" method="post">
+                    <div class="block-header bg-primary-dark">
+                        <h3 class="block-title text-white">Ajouter une correspondance</h3>
+                        <div class="block-options">
+                            <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
+                                <i class="fa fa-fw fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="block-content font-size-sm d-flex flex-column">
+                            {% csrf_token %}
+                            <div class="d-flex flex-column mb-3">
+                                {{ form.nature.label_tag }}
+                                {{ form.nature }}
+                                {{ form.nature.errors }}
+                                {{ form.ancienne }}
+                                {{ form.nouvelle }}
+                                <input type="text" name="form_id" id="form_id" value="-1" hidden>
+                            </div>
+                            <div class="d-flex mb-3" id="id_ue">
+                                <div class="mr-3">
+                                    <label for="">Ancienne Ue</label>
+                                    <select id="ancienne_ue" class="form-control">
+                                        <option value="">Sélectionner</option>
+                                        {% for ue in ues %}
+                                            <option value="{{ ue.id }}"> {{ ue }} </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="mr-3">
+                                    <label for="">Nouvelle Ue</label>
+                                    <select id="nouvelle_ue" class="form-control">
+                                        <option value="">Sélectionner</option>
+                                        {% for ue in ues %}
+                                            <option value="{{ ue.id }}"> {{ ue }} </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="d-flex mb-3" id="id_matiere">
+                                <div class="mr-3">
+                                    <label for="">Ancienne Matiere</label>
+                                    <select id="ancienne_matiere" class="form-control">
+                                        <option value="">Sélectionner</option>
+                                        {% for matiere in matieres %}
+                                            <option value="{{ matiere.id }}"> {{ matiere }} </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="mr-3">
+                                    <label for="">Nouvelle Matiere</label>
+                                    <select  id="nouvelle_matiere" class="form-control">
+                                        <option value="">Sélectionner</option>
+                                        {% for matiere in matieres %}
+                                            <option value="{{ matiere.id }}"> {{ matiere }} </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                    </div>
+                    <div class="block-content block-content-full text-right border-top">
+                        <button type="button" class="btn btn-alt-primary mr-1" data-dismiss="modal">Fermer</button>
+                        <button type="submit" class="btn btn-outline-primary" id="add-form-row">
+                            Enregistrer
                         </button>
                     </div>
-                </div>
-                <div class="block-content font-size-sm">
-                    <form class="d-flex" action="{% url 'maquette:correspondances' %}" method="post">
-                        {% csrf_token %}
-                        <div class="d-flex flex-column mr-3">
-                            {{ form.nature.label_tag }}
-                            {{ form.nature }}
-                            {{ form.nature.errors }}
-                        </div>
-                        <div class="mr-3">
-                            <label for="">Ancienne</label>
-                            <select name="ancien" id="ancien" class="form-control">
-                                <option value="">Sélectionner</option>
-                            </select>
-                        </div>
-                        <div class="mr-3">
-                            <label for="">Nouvelle</label>
-                            <select name="ancien" id="ancien" class="form-control">
-                                <option value="">Sélectionner</option>
-                            </select>
-                        </div>
-                    </form>
-                </div>
-                <div class="block-content block-content-full text-right border-top">
-                    <button type="button" class="btn btn-alt-primary mr-1" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" data-dismiss="modal">Ok</button>
-                </div>
+                </form>
             </div>
         </div>
     </div>
 </div>
-<script text="text/javaScript">
-    let ues = JSON.parse('{{ ues }}');
-    console.log(ues);
-</script>
-
 {% endblock content %}
+{% block scripts %}
+    <script text="text/javaScript">
+        const nature_tag = $('#id_nature');
+        const old_tag = $('#id_ancienne');
+        const new_tag = $('#id_nouvelle');
+        const matiere_tag = $('#id_matiere');
+        const ue_tag = $('#id_ue');
+        const nouvelle_matiere = $('#nouvelle_matiere');
+        const ancienne_matiere = $('#ancienne_matiere');
+        const nouvelle_ue = $('#nouvelle_ue');
+        const ancienne_ue = $('#ancienne_ue');
+        const form_id = $('#form_id');
+
+        const showCorrespondanceForm = () => {
+            if (nature_tag.val()==='M') {
+                ue_tag.removeClass('d-flex');
+                ue_tag.hide();
+                matiere_tag.addClass('d-flex');
+                matiere_tag.show();
+            } else {
+                matiere_tag.removeClass('d-flex');
+                matiere_tag.hide();
+                ue_tag.addClass('d-flex');
+                ue_tag.show();
+            }
+        }
+        showCorrespondanceForm();
+        nouvelle_matiere.val(new_tag.val());
+        ancienne_matiere.val(old_tag.val());
+        nouvelle_ue.val(new_tag.val());
+        ancienne_ue.val(old_tag.val());
+
+        //console.log(old_tag);
+        nature_tag.on('change', function () {
+            console.log(nature_tag.val());
+            showCorrespondanceForm();
+            new_tag.val('');
+            old_tag.val('');
+        });
+        nouvelle_matiere.on('change', function (){
+            new_tag.val(nouvelle_matiere.val());;           
+        });
+        ancienne_matiere.on('change', function (){
+            old_tag.val(ancienne_matiere.val());
+        });
+        nouvelle_ue.on('change', function (){
+            new_tag.val(nouvelle_ue.val());;       
+        });
+        ancienne_ue.on('change', function (){
+            old_tag.val(ancienne_ue.val());
+        });
+
+        const EditLine = (id, nature, ancienne, nouvelle) => {
+            //console.log(id);
+            form_id.val(id);
+            nature_tag.val(nature.toUpperCase());
+            if (ancienne == "None") {
+                ancienne = "";
+            }
+
+            if (nouvelle == "None") {
+                nouvelle = "";
+            }
+
+            if (nature.toLowerCase() === 'u') {
+                nouvelle_ue.val(ancienne)
+                ancienne_ue.val(nouvelle)
+            } else {
+                nouvelle_matiere.val(ancienne)
+                ancienne_matiere.val(nouvelle)
+            }
+            showCorrespondanceForm();
+            console.log(ancienne);
+        }
+
+    </script>    
+{% endblock scripts %}

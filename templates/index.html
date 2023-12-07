@@ -116,7 +116,6 @@
 <script>jQuery(function () { One.helpers('notify'); });</script>
 <!-- Page JS Helpers (Flatpickr + BS Datepicker + BS Colorpicker + BS Maxlength + Select2 + Masked Inputs + Ion Range Slider plugins) -->
 <script>jQuery(function () { One.helpers(['flatpickr', 'datepicker', 'colorpicker', 'maxlength', 'select2', 'masked-inputs', 'rangeslider']);  });</script>
-{% block scripts %}{% endblock scripts %}
 <script type="text/javascript">
     form_tag_annee = $('#form-annee-universitaire');
     $('#annee-universitaire').on('change', function() {
@@ -142,4 +141,5 @@
     // Afficher l'élément de chargement au chargement initial de la page
     showLoadingOverlay();
 </script>
+{% block scripts %}{% endblock scripts %}
 </html>
