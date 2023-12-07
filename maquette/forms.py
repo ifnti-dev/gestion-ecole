@@ -1,7 +1,7 @@
 from typing import Any
 from django import forms
 
-from main.models import CorrespondanceMaquette, Domaine, Parcours, Programme, Semestre, Ue
+from main.models import CorrespondanceMaquette, Domaine, Matiere, Parcours, Programme, Semestre, Ue
 
 class GenerateMaquetteForm(forms.Form):
    # The code is defining two fields, `semestre` and `parcours`, for a form.
@@ -39,19 +39,34 @@ class DataForm(forms.Form):
     notes_excel_file = forms.FileField(widget=forms.FileInput(attrs={'class': 'form-control'}), required=False, label="Fichier notes")
 
 class CorrespondanceMaquetteForm(forms.ModelForm):
+    error = forms.CharField(max_length=255, required=False) 
     class Meta:
         model = CorrespondanceMaquette
         fields = '__all__'
     
         widgets = {
             'nature' : forms.Select(attrs={'class':'form-control'}),
-            'ponderation' : forms.TextInput(attrs={'class':'form-control'}),
-            'rattrapage' : forms.CheckboxInput(attrs={'class':'form-control col-md-6'}),
+            'ancienne' : forms.TextInput(attrs={'hidden': True}),
+            'nouvelle' : forms.TextInput(attrs={'hidden': True}),
         }
     
     def clean(self):
         cleaned_data = super(CorrespondanceMaquetteForm, self).clean()
+        nature = cleaned_data.get('nature');
+        ancienne = cleaned_data.get('ancienne');
+        nouvelle = cleaned_data.get('nouvelle');
+        model = None
+        if nature == "" and nature == ancienne == nouvelle:
+            self._errors['errors'] = "Veuillez remplire le formulaire."
+            
+        if nature.lower() == "u" :
+            model = Ue
+        elif nature.lower() == "m" :
+            model = Matiere
+        else:
+            self._errors['error'] = "Veuillez selectionner la nature de la correspondance."
         return cleaned_data
+
 
 class ProgrammeForm(forms.ModelForm):
     semestre = forms.ModelChoiceField(
