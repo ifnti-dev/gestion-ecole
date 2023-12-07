@@ -16,4 +16,5 @@ python-decouple
 channels[daphne]
 Werkzeug
 python-dotenv
-pandas
+django-dbbackup
+django-crontab
