@@ -15,5 +15,6 @@ urlpatterns = [
     path('paiement/', include('paiement.urls')),
     path('import_data/', include('import_data.urls')),
     path('conges/', include('conges.urls')),
+    path('planning/', include('planning.urls')),
     path("__reload__/", include("django_browser_reload.urls")),
 ] + static(prefix=settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

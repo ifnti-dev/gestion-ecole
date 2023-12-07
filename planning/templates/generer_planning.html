@@ -1,0 +1,103 @@
+{% extends './index.html' %}
+{% block content_title %}Plannifier {% endblock content_title %}
+{% load static %}
+{% block content %}
+        <div class="block-content">
+            <div class="row items-push">
+                <div class="col-md-8 col-lg-7 col-xl-9">
+                    <!-- Calendar Container -->
+                    <div id="js-calendar"></div>
+                </div>
+                <div class="col-md-4 col-lg-5 col-xl-3">
+                    <!-- Add Event Form -->
+                    <form class="js-form-add-event push">
+                        {% for semestre, ue_infos in planification.items %}
+                        <h2>{{ semestre }}</h2>
+                        <ul>
+                            {% for ue_info in ue_infos %}
+                                <li>{{ ue_info.ue }}</li>
+                                <ul>
+                                    {% for matiere in ue_info.matieres %}
+                                        <li>{{ matiere }}</li>
+                                    {% endfor %}
+                                </ul>
+                            {% endfor %}
+                        </ul>
+                        {% endfor %}
+                        <div class="input-group">
+                            <input type="text" class="js-add-event form-control" placeholder="Add Event..">
+                            <div class="input-group-append">
+                                   <button type="submit"><i class="fa fa-fw fa-plus-circle"></i></button> 
+   
+                            </div>
+                        </div>
+                    </form>
+                    <!-- END Add Event Form -->
+
+                    <!-- Event List -->
+                    <ul id="js-events" class="list list-events">
+                        <li>
+                            <div class="js-event p-2 text-white font-size-sm font-w500 bg-info">Codename X</div>
+                        </li>
+                        <li>
+                            <div class="js-event p-2 text-white font-size-sm font-w500 bg-success">Weekend Adventure</div>
+                        </li>
+                        <li>
+                            <div class="js-event p-2 text-white font-size-sm font-w500 bg-info">Project Mars</div>
+                        </li>
+                        <li>
+                            <div class="js-event p-2 text-white font-size-sm font-w500 bg-warning">Meeting</div>
+                        </li>
+                        <li>
+                            <div class="js-event p-2 text-white font-size-sm font-w500 bg-success">Walk the dog</div>
+                        </li>
+                        <li>
+                            <div class="js-event p-2 text-white font-size-sm font-w500 bg-info">AI schedule</div>
+                        </li>
+                        <li>
+                            <div class="js-event p-2 text-white font-size-sm font-w500 bg-success">Cinema</div>
+                        </li>
+                        <li>
+                            <div class="js-event p-2 text-white font-size-sm font-w500 bg-danger">Project X</div>
+                        </li>
+                        <li>
+                            <div class="js-event p-2 text-white font-size-sm font-w500 bg-warning">Skype Meeting</div>
+                        </li>
+                    </ul>
+                    <div class="text-center">
+                        <p class="font-size-sm text-muted">
+                            <i class="fa fa-arrows-alt"></i> Drag and drop events on the calendar
+                        </p>
+                    </div>
+                    <select id="semestreDropdown">
+                        {% for semestre in semestres %}
+                            <option value="{{ semestre.id }}">{{ semestre.libelle }}</option>
+                        {% endfor %}
+                    </select>
+                    
+                    <select id="ueDropdown">
+                        <!-- Options de l'UE seront ajoutées ici avec JavaScript -->
+                    </select>
+                    
+                    <select id="matiereDropdown">
+                        <!-- Options de la matière seront ajoutées ici avec JavaScript -->
+                    </select>
+                    
+                    <script>
+                        // Ajoutez votre script JavaScript ici pour gérer les changements de liste déroulante
+                    </script>
+                    
+                   
+                    <!-- END Event List -->
+                </div>
+            </div>
+        </div>
+
+
+
+
+<script src="{% static 'assets/js/plugins/fullcalendar/main.min.js' %}"></script>
+<script src="{% static 'assets/js/jquery-3.7.1.min.js' %}"></script>
+<script src="{% static 'assets/js/pages/be_comp_calendar.min.js' %}"></script>
+
+{% endblock %}
