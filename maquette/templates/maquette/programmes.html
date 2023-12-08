@@ -11,11 +11,11 @@
             {% endfor %}
         </select>
         <div class="d-flex">
-            {% comment %} <form action="{% url 'maquette:correspondances' %}" method="get">
+            <form action="{% url 'maquette:correspondances' %}" method="get">
                 <button type="submit" class="btn btn-outline-primary ml-3" id="add-form-row">
                     Correspondances
                 </button>
-            </form> {% endcomment %}
+            </form>
             <form action="{% url 'maquette:domaines' %}" method="get">
                 <button type="submit" class="btn btn-outline-primary ml-3" id="add-form-row">
                     Domaines
