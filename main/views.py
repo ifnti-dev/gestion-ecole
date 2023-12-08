@@ -749,8 +749,15 @@ def releve_notes(request, id, id_semestre):
     context['credits_obtenus'] = credits_obtenus
     context['etudiant'] = etudiant
     context['semestre'] = semestre
-    context['annee'] = AnneeUniversitaire.static_get_current_annee_universitaire()
+    context['annee'] = semestre.annee_universitaire
 
+
+    
+    # if request.user.groups.all().first().name == 'directeur_des_etudes':
+    #     context['directeur'] = request.user.utilisateur.nom + ' ' + request.user.prenom
+
+    
+    
     # nom des fichiers d'entrée et de sortie
 
     latex_input = 'releve_notes'
@@ -805,7 +812,7 @@ def releve_notes_semestre(request, id_semestre):
 
     context = {}
 
-    context['annee'] = AnneeUniversitaire.static_get_current_annee_universitaire()
+    context['annee'] = semestre.annee_universitaire
     context['releves_notes'] = releves_notes_tab
     context['semestre'] = semestre
 
