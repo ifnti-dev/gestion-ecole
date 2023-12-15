@@ -11,7 +11,6 @@ from django.core import serializers
 def programmes(request):
     id_annee_selectionnee = request.session.get('id_annee_selectionnee')
     annee_universitaire = get_object_or_404(AnneeUniversitaire, pk=id_annee_selectionnee)
-    print(annee_universitaire)
     list_parcours = Parcours.objects.all()
     parcours_selected = ""
     if 'parcours' in request.GET:
@@ -41,8 +40,7 @@ def add_programme(request):
         form = ProgrammeForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('maquette:programmes', id_annee_selectionnee=id_annee_selectionnee)
-        print(form.errors)
+            return redirect('maquette:programmes')
         data['form'] = form
     else:
         data['form'] = ProgrammeForm()
@@ -58,8 +56,7 @@ def edit_programme(request, id):
         form = ProgrammeForm(request.POST, instance=programme)
         if form.is_valid():
             form.save()
-            return redirect('maquette:programmes', id_annee_selectionnee=id_annee_selectionnee)
-        print(form.errors)
+            return redirect('maquette:programmes')
         data['form'] = form
     else:
         data['form'] = ProgrammeForm(instance=programme)
@@ -70,7 +67,7 @@ def delete_programme(request, id):
     id_annee_selectionnee = request.session.get('id_annee_selectionnee')
     programme = get_object_or_404(Programme, pk=id)
     programme.delete()
-    return redirect('maquette:programmes', id_annee_selectionnee=id_annee_selectionnee)
+    return redirect('maquette:programmes')
 
 
 def data(request):
@@ -79,7 +76,6 @@ def data(request):
         form = DataForm(request.POST, request.FILES)
         if form.is_valid():
             cleaned_data = form.clean()
-            #print(cleaned_data)
             # enseignants_excel_file = cleaned_data.get('enseignants_excel_file')
             maquette_excel_file = cleaned_data.get('maquette_excel_file')
             matieres_excel_file = cleaned_data.get('matieres_excel_file')
@@ -172,7 +168,6 @@ def generateDictFromProgrammeData(semestre, parcours, annee_accademique):
                     enseignants.append(matiere.enseignant)
                 else:
                     enseignants.append("pas de prof")
-            #print(enseignants)
             enseignant_principale = ue.enseignant
             ue_dict = {
                     "semestre" : programme.semestre.libelle,
@@ -233,7 +228,7 @@ def edit_domaine(request, id):
     data = {}
     domaine = get_object_or_404(Domaine, pk=id)
     if request.POST:
-        form = ProgrammeForm(request.POST, instance=domaine)
+        form = DomaineForm(request.POST, instance=domaine)
         if form.is_valid():
             form.save()
             return redirect('maquette:domaines')
@@ -268,7 +263,7 @@ def add_parcours(request, id_domaine):
             parcours = form.save(commit=False)
             parcours.domaine = domaine
             parcours.save()
-            return redirect('maquette:parcours', domaine.id)
+            return redirect('maquette:parcours', id_domaine=domaine.id)
         data['form'] = form
     else:
         data['form'] = ParcoursForm()
@@ -282,7 +277,7 @@ def edit_parcours(request, id):
         form = ParcoursForm(request.POST, instance=parcours)
         if form.is_valid():
             form.save()
-            return redirect('maquette:parcours')
+            return redirect('maquette:parcours', id_domaine=parcours.domaine.id)
         data['form'] = form
     else:
         data['form'] = ParcoursForm(instance=parcours)
