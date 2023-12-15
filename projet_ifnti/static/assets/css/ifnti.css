@@ -200,3 +200,8 @@ box-shadow: 0 0 0 0.2rem rgba(233, 186, 126, 0.5);
         transform: rotate(360deg);
     }
 }
+
+ul.select2-selection__rendered > li.select2-selection__choice {
+    color: red;
+    background-color: #007bff;
+}
