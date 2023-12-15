@@ -1582,7 +1582,7 @@ def importer_les_enseignants(request):
                         specialite=specialite,                   
                     )
                 enseignant.save()
-                return render(request, 'etudiants/message_erreur.html', {'message': "Données importées avec succès."})
+            return render(request, 'etudiants/message_erreur.html', {'message': "Données importées avec succès."})
         
         except Exception as e:
             return render(request, 'etudiants/message_erreur.html', {'message': "Erreur lors de l importation du fichier Excel."})
