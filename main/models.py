@@ -206,13 +206,14 @@ class Etudiant(Utilisateur):
             return 0, 0
 
         rattrapages = Evaluation.objects.filter(matiere=matiere, rattrapage=True)
-        for rattrapage in rattrapages:
-            note = rattrapage.note_set.filter(etudiant=self)
-            if note:
-                if note.get().valeurNote >= matiere.minValue:
-                    moyenne = note.get().valeurNote
-                    a_valide = True
-                    return moyenne, a_valide
+        if rattrapages:
+            for rattrapage in rattrapages:
+                note = rattrapage.note_set.filter(etudiant=self)
+                if note:
+                    if note.get().valeurNote >= matiere.minValue:
+                        moyenne = note.get().valeurNote
+                        a_valide = True
+                        return moyenne, a_valide
                 
         note_ponderation = {}
         somme = 0
