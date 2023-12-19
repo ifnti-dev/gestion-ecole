@@ -120,7 +120,7 @@ DBBACKUP_STORAGE_OPTIONS = {'location': BASE_DIR / 'backup'}
 # Cron Jobs for run process on background 
 
 CRONJOBS = [
-    ('*/30 * * * *', 'projet_ifnti.cron.backup') , # Backup database evry 5 minute
+    ('*/30- * * * *', 'projet_ifnti.cron.backup') , # Backup database evry 5 minute
 ]
 
 # Password validation
