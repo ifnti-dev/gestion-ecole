@@ -1,8 +1,8 @@
 from main.helpers import get_user_role
 from django.utils.deprecation import MiddlewareMixin
 from django.shortcuts import redirect
-
 from main.models import AnneeUniversitaire
+from datetime import datetime
 
 class AuthUserMiddleware(MiddlewareMixin):
     def process_request(self, request):

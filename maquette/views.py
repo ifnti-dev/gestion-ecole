@@ -1,6 +1,7 @@
 import zipfile
 from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404, redirect
+from main.helpers import load_notes_from_ue_file, pre_load_note_ues_template_data
 from main.pdfMaker import generate_pdf
 from main.models import AnneeUniversitaire, CorrespondanceMaquette, Matiere, Programme, Semestre, Ue, Domaine, Parcours
 from scripts.utils import load_maquette, load_matieres, load_notes_from_matiere
@@ -88,7 +89,6 @@ def data(request):
                 load_matieres(matieres_excel_file)
             if notes_excel_file:
                 load_notes_from_matiere(notes_excel_file)
-           
         return redirect('maquette:data')
     data = {
         'form' : DataForm()
@@ -289,3 +289,17 @@ def delete_parcours(request, id):
     parcours.delete()
     return redirect('maquette:domaines')
 
+def generate_note_template(request):
+    zip_path = pre_load_note_ues_template_data(request.session.get('id_annee_selectionnee'))
+    zip_file = open(zip_path, 'r')
+    with open(zip_path, 'rb') as zip_file:
+        response = HttpResponse(zip_file.read(), content_type='application/force-download')
+        response['Content-Disposition'] = 'attachment; filename="{}"'.format(os.path.basename(zip_path))
+        return response
+
+def number(request, number):
+    if number==1:
+        return render(request, "data/1.html", context={})
+    if number==2:
+        return render(request, "data/2.html", context={})
+    return render(request, "data/2.html", context={})

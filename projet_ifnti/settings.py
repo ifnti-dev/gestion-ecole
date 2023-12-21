@@ -29,7 +29,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
-LOGIN_URL = "/main/connexion"
+LOGIN_URL = "/maquette/number/1/" #"/main/connexion"
 
 # Application definition
 
@@ -159,6 +159,7 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'projet_ifnti/static'),
 )
+
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 
