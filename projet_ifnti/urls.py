@@ -17,4 +17,7 @@ urlpatterns = [
     path('conges/', include('conges.urls')),
     path('planning/', include('planning.urls')),
     path("__reload__/", include("django_browser_reload.urls")),
-] + static(prefix=settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+] 
+
+urlpatterns += static(prefix=settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+urlpatterns += static(prefix=settings.STATIC_URL, document_root=settings.STATIC_ROOT)

@@ -88,7 +88,6 @@ class Etudiant(Utilisateur):
         verbose_name_plural = "Etudiants"
         unique_together = [["nom", "prenom", "datenaissance", "email"]]
 
-
     def generate_email(self):
         prenoms = "-".join(self.prenom.split()).lower()
         return f"{prenoms}.{self.nom.lower()}@ifnti.com"
@@ -177,7 +176,7 @@ class Etudiant(Utilisateur):
         """
         # Verifier si l'étudiant suis cette matiere
         # Récupérerer toute les évaluations de l'étuidant dans cette matière
-        evaluations = Evaluation.objects.filter(matiere=matiere, rattrapage=False, semestre=semestre)
+        evaluations = Evaluation.objects.filter(matiere=matiere, semestre=semestre)
         if not evaluations:
             return []
 
@@ -705,9 +704,10 @@ class Matiere(models.Model):
                 print(_, a_valide, semestre)
                 if not a_valide:
                     etudiants.update([etudiant])
-        print(etudiants)
         return list(etudiants)
 
+    def get_etudiant_semestre(self, semestre):
+        return semestre.etudiant_set.all()
 
 # class EnseignantsMatiere(models.Model):
 #     enseignant = models.ForeignKey(Enseignant, on_delete=models.CASCADE, verbose_name="Enseignant")

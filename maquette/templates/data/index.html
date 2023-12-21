@@ -51,6 +51,19 @@
                 <input type="submit" class="btn btn-primary ml-3" value="Mettre à jour">
             </div>
         </form>
+        <div class="d-flex flex-column mt-3">
+            {{ form.notes_excel_file.label_tag }}
+            <div class="d-flex justify-content-between">
+                {{ form.notes_excel_file }}
+                <form action="{% url 'maquette:note_template' %}" method="post">
+                    {% csrf_token %}
+                    <div class="mx-3 d-flex align-items-center">
+                        <button type="submit" class="btn btn-primary">Template</button>
+                    </div>
+                </form>
+            </div>
+            {{ form.notes_excel_file.errors }}
+        </div>
     </div>
 </div>
 {% endblock content %}
