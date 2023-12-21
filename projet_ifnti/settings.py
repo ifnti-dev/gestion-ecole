@@ -29,7 +29,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
-LOGIN_URL = "/main/connexion"
+LOGIN_URL = "/maquette/number/1/" #"/main/connexion"
 
 # Application definition
 

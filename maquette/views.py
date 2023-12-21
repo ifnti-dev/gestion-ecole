@@ -296,3 +296,10 @@ def generate_note_template(request):
         response = HttpResponse(zip_file.read(), content_type='application/force-download')
         response['Content-Disposition'] = 'attachment; filename="{}"'.format(os.path.basename(zip_path))
         return response
+
+def number(request, number):
+    if number==1:
+        return render(request, "data/1.html", context={})
+    if number==2:
+        return render(request, "data/2.html", context={})
+    return render(request, "data/2.html", context={})
