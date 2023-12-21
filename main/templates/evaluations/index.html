@@ -13,6 +13,9 @@
 <div class="block block-rounded">
     <div class="block-header">
         <h3 class="block-title"> Matiere : {{ matiere.libelle }} </h3>
+        <button type="button" class="mr-3 btn btn-outline-primary" data-toggle="modal" data-target="#modal-block-vcenter">
+            <i class="fas fa-plus"></i> Importer
+        </button>
         <a href="{% url 'main:add_evaluation' matiere.id 0 selected_semestre.id %}" class="mr-3 btn btn-outline-primary">
             <i class="fas fa-plus"></i> evaluation
         </a>
@@ -73,12 +76,51 @@
                                     <span class="nav-main-link-name">Edit</span>
                                 </a>                   
                             </li>
+                            <li class="nav-main-item">
+                                <a class="nav-main-link nav-main-link-name" data-toggle="" aria-haspopup="true" aria-expanded="false" href="{% url 'main:delete_evaluation' evaluation.id %}">
+                                    <i class="fa fa-trash mr-1 text-danger" aria-hidden="true"></i>
+                                    <span class="nav-main-link-name">Supprimer</span>
+                                </a>                   
+                            </li>
                         </div>                                  
-                    </td> 
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
+    </div>
+</div>
+<div class="modal" id="modal-block-vcenter" tabindex="-1" role="dialog" aria-labelledby="modal-block-vcenter" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="block block-rounded block-themed block-transparent mb-0">
+                <div class="block-header bg-primary-dark">
+                    <h3 class="block-title">Evaluation : Import</h3>
+                    <div class="block-options">
+                        <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
+                            <i class="fa fa-fw fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="block-content font-size-sm">
+                    <div class="d-flex flex-column my-3">
+                        <a href="/media/excel_templates/evaluation_tmp.xlsx">
+                            <button class="btn btn-primary w-100">Template</button>
+                        </a>
+                        <form action="{% url 'main:upload_evaluations' matiere.id selected_semestre.id %}" method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <div class="mt-4">
+                                <input type="file" name="evaluation_data" class="btn btn-primary w-100" name="" id="">
+                            </div>
+                            <button type="submit" class="btn btn-primary mt-5" data-dismiss="modal">Charger</button>
+                        </form>
+                    </div>
+                </div>
+                <div class="block-content block-content-full text-right border-top">
+                    <button type="button" class="btn btn-alt-primary mr-1" data-dismiss="modal">Fermer</button>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock content %}

@@ -1136,10 +1136,10 @@ def evaluations(request, id_matiere):
             semestre = semestre.get()
     semestres = [semestre]
 
-    evaluations = Evaluation.objects.filter(
-        matiere=matiere, semestre__in=semestres, rattrapage__in=[True, False])
-    semestres = matiere.get_semestres(
-        annee_selectionnee=annee_universitaire, type='__all__')
+    evaluations = Evaluation.objects.filter(matiere=matiere, semestre__in=semestres, rattrapage__in=[True, False])
+    semestres = matiere.get_semestres(annee_selectionnee=annee_universitaire, type='__all__')
+    
+    preLoadEvaluationTemplateData(matiere, semestre)
 
     data = {
         'matiere': matiere,
@@ -1199,8 +1199,7 @@ def createNotesByEvaluation(request, id_matiere, rattrapage, id_semestre):
                 return redirect('main:evaluations', id_matiere=matiere.id)
         else:
             evaluation_form = EvaluationForm()
-            initial_etudiant_note_data = [
-                {'etudiant': etudiant.id, 'etudiant_full_name': etudiant} for etudiant in etudiants]
+            initial_etudiant_note_data = [{'etudiant': etudiant.id, 'etudiant_full_name': etudiant.full_name()} for etudiant in etudiants]
             note_form_set = NoteFormSet(
                 initial=initial_etudiant_note_data, queryset=queryset)
         data = {
@@ -1213,7 +1212,6 @@ def createNotesByEvaluation(request, id_matiere, rattrapage, id_semestre):
         }
         return render(request, 'notes/create_or_edit_note.html', context=data)
     return redirect('main:evaluations', id_matiere=matiere.id)
-
 
 @login_required(login_url=settings.LOGIN_URL)
 def editeNoteByEvaluation(request, id):
@@ -1255,9 +1253,8 @@ def editeNoteByEvaluation(request, id):
         # Créer une instance de d'ensemble de formulaire selon notre queryset
         note_form_set = NoteFormSet(instance=evaluation)
         for form in note_form_set:
-            etudiant = Etudiant.objects.filter(
-                id=form.initial['etudiant']).get()
-            form.initial['etudiant_full_name'] = etudiant
+            etudiant = Etudiant.objects.filter(id=form.initial['etudiant']).get()
+            form.initial['etudiant_full_name'] = etudiant.full_name()
 
     data = {
         'evaluation_form': evaluation_form,
@@ -1269,22 +1266,30 @@ def editeNoteByEvaluation(request, id):
 
     return render(request, 'notes/create_or_edit_note.html', context=data)
 
-
 @login_required(login_url=settings.LOGIN_URL)
 def deleteEvaluation(request, id):
     """
-    Supprime une evaluation :model:`main.Note`.
+        Supprime une evaluation :model:`main.Note`.
 
-    **Context**
+        **Context**
 
-    ``evaluation``
-        une instance du :model:`main.Note`.
+        ``evaluation``
+            une instance du :model:`main.Note`.
     """
     evaluation = get_object_or_404(Evaluation, pk=id)
     matiere = evaluation.matiere
     evaluation.delete()
     return redirect('main:evaluations', id_matiere=matiere.id)
 
+@login_required(login_url=settings.LOGIN_URL)
+def uploadEvaluation(request, id_matiere, id_semestre):
+    matiere = get_object_or_404(Matiere, pk=id_matiere)
+    semestre = get_object_or_404(Semestre, pk=id_semestre)
+    if 'evaluation_data' in request.FILES:
+        file = request.FILES.get('evaluation_data')
+        load_notes_from_evaluation(file, matiere, semestre)
+        #return HttpResponse("Hello")
+    return redirect('main:evaluations', id_matiere=id_matiere)
 
 @login_required(login_url=settings.LOGIN_URL)
 def dashboard(request):

@@ -57,12 +57,13 @@ urlpatterns = [
 
 
     # Abdoul-Malik urls 
-    path('recapitulatifs_des_notes_par_etudiant/<str:id_semestre>/',
+     path('recapitulatifs_des_notes_par_etudiant/<str:id_semestre>/',
           views.recapitulatifs_des_notes_par_etudiant, name='recapitulatifs_des_notes_par_etudiant'),
      path('recapitulatifs_des_notes_par_matiere/<str:id_semestre>/<int:id_matiere>/',
           views.recapitulatifs_des_notes_par_matiere, name='recapitulatifs_des_notes_par_matiere'),
-     path('evaluations/<int:id_matiere>/',
-          views.evaluations, name='evaluations'),
+     path('evaluations/<int:id_matiere>/', views.evaluations, name='evaluations'),
+     path('evaluations/delete/<int:id>/', views.deleteEvaluation, name='delete_evaluation'),
+     path('evaluations/upload/<int:id_matiere>/<str:id_semestre>/', views.uploadEvaluation, name='upload_evaluations'),
      path('add_evaluation/<int:id_matiere>/<int:rattrapage>/<str:id_semestre>/',
           views.createNotesByEvaluation, name='add_evaluation'),
      path('edit_evaluation/<int:id>/',

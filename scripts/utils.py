@@ -6,6 +6,7 @@ from main.helpers import trim_str
 from main.models import Charge, Competence, Comptable, CompteBancaire, CompteEtudiant, Conge, DirecteurDesEtudes, Domaine, Enseignant, Etudiant, FicheDePaie, Fournisseur, Frais, Information, Note, Paiement, Personnel, Salaire, Semestre, Tuteur, Ue, Evaluation, Parcours, AnneeUniversitaire, Programme, Matiere
 from cahier_de_texte.models import Seance
 from main.resources import get_model_by_name, get_resource_by_name
+from scripts.factory import clean_data_base
 from tablib import Dataset
 from import_export import resources, fields
 from import_export.widgets import ForeignKeyWidget
@@ -48,38 +49,6 @@ CODE_UE = {
 
 }
 
-MODEL = [
-    AnneeUniversitaire,
-    Semestre,
-    Domaine,
-    Tuteur,
-    Enseignant,
-    Comptable,
-    DirecteurDesEtudes,
-    Evaluation,
-    Matiere,
-    Competence,
-    Personnel,
-    Etudiant,
-    Ue,
-    Domaine,
-    Seance,
-    Parcours,
-    Programme,
-    Note,
-    Frais,
-    CompteEtudiant,
-    Paiement,
-    CompteBancaire,
-    Salaire,
-    Fournisseur,
-    Information,
-    FicheDePaie,
-    Charge,
-    Conge,
-]
-
-MODEL_DICT = {model.__name__.lower(): model for model in MODEL}
 
 def get_cell_int_value(value):
     return int(trim_str(value))
@@ -111,7 +80,7 @@ def load_maquette(path):
     annee_universitaires = AnneeUniversitaire.objects.all()
     parcours = Parcours.objects.all().first()
     if not parcours:
-        init_data_base()
+        clean_data_base()
         parcours = Parcours.objects.all().first()
         
     for anne_universitaire in annee_universitaires:
@@ -200,73 +169,3 @@ def run():
     print("::: Import begining :::::")
     pass
     
-
-def clean_data_base():
-    print("Drop all object ..... 7")
-    Programme.objects.all().delete()
-    print("Drop all object ..... 7")
-    Seance.objects.all().delete()
-    print("Drop all object ..... 1")
-    Personnel.objects.all().delete()
-    print("Drop all object ..... 2")
-    Enseignant.objects.all().delete()
-    print("Drop all object ..... 3")
-    Etudiant.objects.all().delete()
-    print("Drop all object ..... 4")
-    Comptable.objects.all().delete()
-    print("Drop all object ..... 5")
-    Tuteur.objects.all().delete()
-    print("Drop all object ..... 6")
-    Ue.objects.all().delete()
-    print("Drop all object ..... 7")
-    Matiere.objects.all().delete()
-    print("Drop all object ..... 8")
-    Evaluation.objects.all().delete()
-    print("Drop all object ..... 9")
-    Competence.objects.all().delete()
-    print("Drop all object ..... 10")
-    Semestre.objects.all().delete()
-    print("Drop all object ..... 11")
-    Domaine.objects.all().delete()
-    print("Drop all object ..... 12")
-    Parcours.objects.all().delete()
-    print("Drop all object ..... 13")
-    Note.objects.all().delete()
-    print("Drop all object .....")
-    AnneeUniversitaire.objects.all().delete()
-    print("Drop all object ..... end")
-
-def init_data_base():
-     # Génération des fausses instances pour le modèle AnneeUniversitaire
-    current = False
-    for i in range(1,10):
-        if i == 9:
-            current = True
-        annee_universitaire = AnneeUniversitaire(
-            annee=2013+i,
-            annee_courante=current
-        )
-        annee_universitaire.save()
-        print(f"AnneeUniversitaire créé : {annee_universitaire}")
-    
-    # Génération des fausses instances pour le modèle Domaine
-    domaine = Domaine(
-        nom="Siences et technologie",
-        description="Siences et technologie"
-    )
-    domaine.save()
-    print(f"Domaine créé : {domaine}")
-
-    # Génération des fausses instances pour le modèle Parcours
-    domaines = Domaine.objects.all()
-
-    parcours = Parcours(
-        nom="Licence en génie logiciel",
-        domaine=domaine,
-        description="Licence en génie logiciel"
-    )
-    
-    parcours.save()
-    print(f"Parcours créé : {parcours}")
-
-
