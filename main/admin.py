@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import Enseignant, Evaluation, CompteBancaire, Fournisseur, Domaine,Information, Parcours,Programme, Matiere, Etudiant, Competence, Note, Comptable, Semestre, Ue, AnneeUniversitaire, Personnel, Tuteur, Paiement, FicheDePaie, DirecteurDesEtudes, Seance, Frais, CompteEtudiant, Salaire, Conge
+from .models import Enseignant, Evaluation, CompteBancaire, Fournisseur, Domaine,Information, Parcours,Programme, Matiere, Etudiant, Competence, Note, Comptable, Semestre, Ue, AnneeUniversitaire, Personnel, Tuteur, Paiement, FicheDePaie, DirecteurDesEtudes, Frais, CompteEtudiant, Salaire, Conge
+from cahier_de_texte.models import Seance
 from main.forms import EnseignantForm
 from import_export.admin import ImportExportModelAdmin
 

@@ -1,10 +1,11 @@
-
 import json
+from django.core.serializers import serialize
 import datetime 
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
-from main.models import Enseignant, Matiere, Etudiant,Seance ,AnneeUniversitaire , Semestre
+from main.models import Enseignant, Matiere, Etudiant ,AnneeUniversitaire , Semestre
+from cahier_de_texte.models import Seance
 from django.contrib.auth import authenticate, login , get_user_model
 
 import datetime
@@ -12,21 +13,36 @@ import datetime
 from collections import defaultdict
 
 def index(request):
-    annee = AnneeUniversitaire.static_get_current_annee_universitaire().annee
-    semestres = Semestre.objects.filter(courant=True, pk__contains=annee)
+    return render(request, 'planning.html')
+
+def save_a_planning():
     
-    # Structure de données pour stocker les informations organisées
+    return
+
+def new_planning(request,semestreId):
+    semestreId=semestreId
+    annee = AnneeUniversitaire.static_get_current_annee_universitaire().annee
+    semestre = Semestre.objects.filter(courant=True, pk__contains=annee,id=semestreId).first()
+    print(semestre)
     planification = defaultdict(list)
+    ues = semestre.get_all_ues()
 
-    for semestre in semestres:
-        ues = semestre.get_all_ues()
+    for ue in ues:
+        print(ue)
+        matieres_json = serialize('json', ue.matiere_set.all())
+        matieres = json.loads(matieres_json)
+        for matiere in matieres :
+            seances=Seance.objects.filter(semestre=semestre,matiere=matiere['pk'])
+            temps=0
+            for seance in seances:
+                temps+=(seance.date_et_heure_fin - seance.date_et_heure_debut).total_seconds()/3600
+            matiere['temps']=temps
+            print(matiere)
+                 
+        planification[str(ue)].append({'matieres': matieres})
+        planification_json = json.dumps(planification)
 
-        for ue in ues:
-            matieres = list(ue.matiere_set.all())
-            planification[semestre].append({'ue': ue, 'matieres': matieres})
-
-    # Vous pouvez désormais transmettre 'planification' au modèle
-    return render(request, 'generer_planning.html', {'planification': dict(planification)})
+    return render(request, 'generer_planning.html', {'planification_json': planification_json,'semestre':semestre,'ues':ues})
 
 
 def getMatieresEtudiant(etudiant):

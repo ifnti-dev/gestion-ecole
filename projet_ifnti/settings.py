@@ -51,7 +51,8 @@ INSTALLED_APPS = [
     'dbbackup',
     'django_crontab',
     'solo',
-    'planning'
+    'planning',
+    'cahier_de_texte',
  ]
 
 
