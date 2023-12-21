@@ -160,7 +160,7 @@ class Etudiant(Utilisateur):
             matieres.update(ue.matiere_set.all())
         
         for matiere in matieres:
-            moyenne, a_valider = self.moyenne_etudiant_matiere(matiere, semestre)
+            moyenne, a_valider, _ = self.moyenne_etudiant_matiere(matiere, semestre)
             #print(moyenne, a_valider)
             result.append({
                 'matiere' : matiere.libelle,
@@ -202,7 +202,25 @@ class Etudiant(Utilisateur):
         evaluations = Evaluation.objects.filter(
             matiere=matiere, rattrapage=False, semestre=semestre)
         if not evaluations:
-            return 0, 0
+            return 0,0, semestre.annee_universitaire.annee
+
+
+       
+        # on récupère tous les rattrapages faits dans cette matière au cours des différentes années scolaires
+        rattrapages = Evaluation.objects.filter(matiere=matiere, rattrapage=True)
+        # s'il il y'a eu des rattrapages alors on recherche les notes de l'étudiant au cours de ces rattrapages
+        if rattrapages:
+            for rattrapage in rattrapages:
+                note = rattrapage.note_set.filter(etudiant=self)
+                # si l'étudiant a eu à passer alors un ou plusieurs rattrapage on prend uniquement la note la plus élevée 
+                # par la suite on retourne alors la note minimale comme sa moyenne de la matière ainsi que l'année de validation
+                # l'année de validation servira à déterminer en quelle année l'étudiant à validé l'UE.
+                if note:
+                    if note.get().valeurNote >= matiere.minValue:
+                        moyenne = matiere.minValue
+                        a_valide = True
+                        anneeValidation = rattrapage.semestre.annee_universitaire.annee
+                        return moyenne, a_valide, anneeValidation
 
         note_ponderation = {}
         somme = 0
@@ -212,30 +230,37 @@ class Etudiant(Utilisateur):
                 note = notes.get()
                 somme += note.valeurNote * evaluation.ponderation
                 note_ponderation[evaluation.libelle] = (note, evaluation.ponderation)
-        moyenne = somme/100
+        moyenne = round(somme/100, 2)
         a_valide = moyenne >= matiere.minValue
-        return moyenne, a_valide
+        return moyenne, a_valide, semestre.annee_universitaire.annee
 
     def moyenne_etudiant_ue(self, ue, semestre):
         moyenne = 0
         somme_note = 0
         somme_coef = 0
         matieres = ue.matiere_set.all()
+        # on fixe tout d'abord l'année de validation par défaut à l'année actuelle
+        # si l'étudiant à tout validé orrectement alors l'année est maintenue
+        # dans le cas contraire il s'agit de l'année de validation du dernier rattrapage qu'il à réussi
+        anneeValidation = semestre.annee_universitaire.annee
 
         if not matieres:
-            return 0.0, False
-        
+            return 0.0, False, anneeValidation
+
+
         for matiere in matieres:
-            #print(matiere, matiere.coefficient)
-            note, _ = self.moyenne_etudiant_matiere(matiere, semestre)
+            note, _, annee = self.moyenne_etudiant_matiere(matiere, semestre)
             somme_note += float(note) * float(matiere.coefficient)
             somme_coef += matiere.coefficient
-            #print('sous-total ',somme_coef)
-        #print('total', somme_coef)
+            # ici on effectue une comparaison pou récupérer l'année scolaire la plus élevée
+            # il s'agit en réalité de l'année de la validation du dernier rattrapage 
+            if anneeValidation < annee:
+                anneeValidation = annee
+
         moyenne = round(somme_note/somme_coef, 2)
         matiere_principale = ue.matiere_principacle()
         a_valide = moyenne >= matiere_principale.minValue
-        return moyenne, a_valide
+        return moyenne, a_valide, anneeValidation
 
 
 # Calcule le nombre de crédits obtenus par l'étudiant dans un semestre donné.
@@ -249,7 +274,7 @@ class Etudiant(Utilisateur):
  
         for ue in programme.ues.all():
             # Calculer la moyenne de l'UE
-            moyenne_ue, a_valide_ue = self.moyenne_etudiant_ue(ue, semestre)
+            moyenne_ue, a_valide_ue, _ = self.moyenne_etudiant_ue(ue, semestre)
 
             # Si l'étudiant a validé l'UE, ajouter les crédits de l'UE aux crédits obtenus
             if a_valide_ue:
@@ -700,8 +725,7 @@ class Matiere(models.Model):
         semestres = self.get_semestres('__all__', '__all__')
         for semestre in semestres:
             for etudiant in semestre.etudiant_set.all():
-                _, a_valide = etudiant.moyenne_etudiant_matiere(self, semestre)
-                print(_, a_valide, semestre)
+                _, a_valide, _ = etudiant.moyenne_etudiant_matiere(self, semestre)
                 if not a_valide:
                     etudiants.update([etudiant])
         return list(etudiants)

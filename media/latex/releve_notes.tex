@@ -84,7 +84,7 @@
 	\textbf{Unité d'enseignement} & \textbf{Note} & \textbf{Crédits} & \textbf{Année d'obtention}\\
 	\hline
 \BLOCK{for ue in ues}
-\VAR{ue['ue'].libelle} & \VAR{ue['moyenne']} & \BLOCK{if ue['validation'] == True} \VAR{ue['ue'].nbreCredits} \BLOCK{else} 0  \BLOCK{endif} & \VAR{annee}\\
+\VAR{ue['ue'].libelle} & \VAR{ue['moyenne']} & \BLOCK{if ue['validation'] == True} \VAR{ue['ue'].nbreCredits} \BLOCK{else} 0  \BLOCK{endif} & \VAR{ue['anneeValidation']}\\
 \hline
 \BLOCK{endfor}
 
@@ -99,7 +99,7 @@
 
 \vspace{2cm}
 
-\null\hfill Sabirou TÉOURI
+\null\hfill \VAR{directeur}
 
 \vfill
 

@@ -93,7 +93,7 @@
 \textbf{Unité d'enseignement} & \textbf{Note} & \textbf{Crédits} & \textbf{Année d'obtention}\\
 \hline
 \BLOCK{for ligne in releve_note['lignes']}
-\VAR{ligne['ue'].libelle} & \VAR{ligne['moyenne']} & \BLOCK{if ligne['validation'] == True} \VAR{ligne['ue'].nbreCredits} \BLOCK{else} 0  \BLOCK{endif} & \VAR{annee}\\
+\VAR{ligne['ue'].libelle} & \VAR{ligne['moyenne']} & \BLOCK{if ligne['validation'] == True} \VAR{ligne['ue'].nbreCredits} \BLOCK{else} 0  \BLOCK{endif} & \VAR{ligne['anneeValidation']}\\
 \hline
 \BLOCK{endfor}
 

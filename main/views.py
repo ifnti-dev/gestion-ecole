@@ -735,9 +735,9 @@ def releve_notes(request, id, id_semestre):
     semestre_ues = semestre.get_all_ues()
     ues = []
     for ue in semestre_ues:
-        moyenne, validation = etudiant.moyenne_etudiant_ue(ue, semestre)
+        moyenne, validation, anneeValidation = etudiant.moyenne_etudiant_ue(ue, semestre)
         ues.append({'ue': ue, 'moyenne': round(
-            moyenne, 2), 'validation': validation})
+            moyenne, 2), 'validation': validation, 'anneeValidation': anneeValidation})
 
     # calcul du nombre de crédits obtenus par l'étudiant
     credits_obtenus = 0
@@ -749,8 +749,15 @@ def releve_notes(request, id, id_semestre):
     context['credits_obtenus'] = credits_obtenus
     context['etudiant'] = etudiant
     context['semestre'] = semestre
-    context['annee'] = AnneeUniversitaire.static_get_current_annee_universitaire()
+    context['annee'] = semestre.annee_universitaire
 
+
+    
+    # if request.user.groups.all().first().name == 'directeur_des_etudes':
+    #     context['directeur'] = request.user.utilisateur.nom + ' ' + request.user.prenom
+
+    
+    
     # nom des fichiers d'entrée et de sortie
 
     latex_input = 'releve_notes'
@@ -790,10 +797,10 @@ def releve_notes_semestre(request, id_semestre):
         releve_note['lignes'] = []
         credits_obtenus = 0
         for ue in semestre_ues:
-            moyenne, validation = etudiant.moyenne_etudiant_ue(ue, semestre)
+            moyenne, validation, anneeValidation = etudiant.moyenne_etudiant_ue(ue, semestre)
             releve_note['lignes'].append(
                 {'ue': ue, 'moyenne': round(
-                    moyenne, 2), 'validation': validation}
+                    moyenne, 2), 'validation': validation, 'anneeValidation': anneeValidation}
             )
             # calcul de nombre de crédits obtenus
             if validation:
@@ -805,7 +812,7 @@ def releve_notes_semestre(request, id_semestre):
 
     context = {}
 
-    context['annee'] = AnneeUniversitaire.static_get_current_annee_universitaire()
+    context['annee'] = semestre.annee_universitaire
     context['releves_notes'] = releves_notes_tab
     context['semestre'] = semestre
 
@@ -1005,6 +1012,7 @@ def recapitulatif_notes(request, id_matiere, id_semestre):
         liste_etudiants.append(
             {'etudiant': etudiant, 'moyenne': etudiant.moyenne_etudiant_matiere(matiere, semestre)[0]})
 
+    context['annee'] = semestre.annee_universitaire
     context['liste_etudiants'] = liste_etudiants
     context['matiere'] = matiere
     context['semestre'] = semestre
@@ -1052,7 +1060,7 @@ def recapitulatifs_des_notes_par_matiere(request, id_semestre, id_matiere):
     }
 
     for etudiant in etudiants:
-        moyenne, a_valider = etudiant.moyenne_etudiant_matiere(
+        moyenne, a_valider, _ = etudiant.moyenne_etudiant_matiere(
             matiere, semestre)
         data['etudiants'].append({
             'full_name': etudiant.full_name(),
