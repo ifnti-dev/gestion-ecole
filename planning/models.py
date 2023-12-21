@@ -12,5 +12,6 @@ class Planning(models.Model):
     professeur = models.ForeignKey(Enseignant, on_delete=models.CASCADE)
     valider = models.BooleanField(default=False)
 
+       
     def __str__(self):
         return f"{self.matiere} - {self.professeur} - {self.semaine} - {self.semestre}"
