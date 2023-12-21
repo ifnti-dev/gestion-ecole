@@ -951,8 +951,8 @@ class CorrespondanceMaquette(models.Model):
         MATIERE = "M", "Matière"
     
     nature = models.CharField(max_length=1, choices=Nature.choices)
-    ancienne = models.CharField(blank=True, null=True)
-    nouvelle = models.CharField(blank=True, null=True)
+    ancienne = models.CharField(max_length=225, blank=True, null=True)
+    nouvelle = models.CharField(max_length=225, blank=True, null=True)
     
     def save(self):
         super().save()
