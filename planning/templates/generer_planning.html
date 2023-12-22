@@ -1,5 +1,5 @@
 {% extends './index.html' %}
-{% block content_title %}Plannifier {{semestre.libelle}} {{semestre.annee_universitaire}} {% endblock content_title %}
+{% block content_title %}Plannifier {{semestre.libelle}} {{semestre.annee_universitaire}}  {% endblock content_title %}
 {% load static %}
 {% block content %}
 <style>
@@ -19,7 +19,7 @@
                 </div>
                 <div class="col-md-4 col-lg-5 col-xl-3">
                     <form class="testtest" id="myForm">
-                        <h4>Creez un cour</h4>
+                        <h4>Creer un cour</h4>
                         <div class="form-group">
                             <select class="js-select2 form-control" id="selectUE" name="selectUE" style="width: 100%;" data-placeholder="Choose one..">
                                 <option>Selectionnnez une UE</option>
@@ -51,7 +51,11 @@
                             <i class="fa fa-arrows-alt"></i> Drag and drop events on the calendar
                         </p>
                     </div>
-                </div>
+                    <div class="form-group">
+                        <a id="btnEnregistrer" class="btn btn-success">Enregistrer</a>
+                        <input id="semaine" type="number" class="form-control" placeholder="semaine">
+                    </div>
+                    </div>
             </div>
         </div>
 
@@ -92,14 +96,14 @@
                         $('input[name="matiereRadio"]').prop("checked", false);
                     }
 
-                // Ajouter un gestionnaire d'événements pour les changements d'état des boutons radio
-                $('#matieresList').on('change', 'input[name="matiereRadio"]', function () {
-                    // Désélectionner tous les autres boutons radio dans la liste
-                    $('input[name="matiereRadio"]').prop('checked', false);
+                    // Ajouter un gestionnaire d'événements pour les changements d'état des boutons radio
+                    $('#matieresList').on('change', 'input[name="matiereRadio"]', function () {
+                        // Désélectionner tous les autres boutons radio dans la liste
+                        $('input[name="matiereRadio"]').prop('checked', false);
 
-                    // Sélectionner le bouton radio cliqué
-                    $(this).prop('checked', true);
-                });
+                        // Sélectionner le bouton radio cliqué
+                        $(this).prop('checked', true);
+                    });
 
 
 
@@ -168,7 +172,8 @@
 
                                         // Ajouter les détails de la matière au contenu
                                         blockContentDiv.innerHTML = 'Heures prévues : ' + matiere.fields.heures +
-                                            '<br> Heures Consommées : ' + matiere.temps +
+                                            '<br> Heures Plannifier : ' + matiere.temps_plannifier +    
+                                            '<br> Heures Consommées : ' + matiere.temps_effectuer +
                                             '<br> Enseignant : ' + matiere.fields.enseignant;
 
                                         // Ajouter le contenu au bloc
@@ -197,7 +202,39 @@
                             }
                         }
 
-                        
+ 
+                        $("#btnEnregistrer").on("click", function() {
+                            // Récupérer la valeur de la semaine
+                            var semaine = $("#semaine").val();
+                            // Vérifier si le champ semaine est vide
+                            if (semaine === '') {
+                                console.log('Le champ semaine est vide.');
+                            } else {
+                                // Récupérer tous les événements du calendrier
+                                var events = r.getEvents();
+                                console.log(events);
+
+                                // Créer un objet avec les données à envoyer
+                                var data = {
+                                    semaine: semaine,
+                                    events: events
+                                };
+
+                                // Effectuer la requête POST vers /planning/save
+                                $.ajax({
+                                    type: 'POST',
+                                    url: '/planning/save',
+                                    data: JSON.stringify(data),
+                                    contentType: 'application/json',
+                                    success: function(response) {
+                                        console.log('Enregistrement réussi:', response);
+                                    },
+                                    error: function(error) {
+                                        console.error('Erreur lors de l\'enregistrement:', error);
+                                    }
+                                });
+                            }
+                        });
 
                 });
             </script>

@@ -6,6 +6,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
 from main.models import Enseignant, Matiere, Etudiant ,AnneeUniversitaire , Semestre
 from cahier_de_texte.models import Seance
+from planning.models import Planning
 from django.contrib.auth import authenticate, login , get_user_model
 
 import datetime
@@ -36,9 +37,17 @@ def new_planning(request,semestreId):
             temps=0
             for seance in seances:
                 temps+=(seance.date_et_heure_fin - seance.date_et_heure_debut).total_seconds()/3600
-            matiere['temps']=temps
+            matiere['temps_effectuer']=temps
             print(matiere)
+            
+            plannings=Planning.objects.filter(semestre=semestre,matiere=matiere['pk'])
+            temps_x=0
+            for planning in plannings:
+                temps_x+=(planning.date_et_heure_fin - planning.date_et_heure_debut).total_seconds()/3600
+            matiere['temps_plannifier']=temps_x
                  
+            print(matiere)
+
         planification[str(ue)].append({'matieres': matieres})
         planification_json = json.dumps(planification)
 
@@ -53,3 +62,39 @@ def getMatieresEtudiant(etudiant):
     for ue in ues :
         matieres.update(ue.matiere_set.all())         
     return matieres
+
+def save(request):
+    if request.method == 'POST':
+        # Retrieve all the events from the calendar
+        events = request.POST.getlist('events')
+
+        # Process the events and save them to the database
+        for event in events:
+            # Extract the event data from the submitted form
+            intitule = event['intitule']
+            semaine = event['semaine']
+            semestre = event['semestre']
+            date_heure_debut = event['date_heure_debut']
+            date_heure_fin = event['date_heure_fin']
+            matiere = event['matiere']
+            precision = event['precision']
+            professeur = event['professeur']
+
+            # Create a Planning object and save it to the database
+            planning = Planning(
+                intitule=intitule,
+                semaine=semaine,
+                semestre=semestre,
+                date_heure_debut=date_heure_debut,
+                date_heure_fin=date_heure_fin,
+                matiere=matiere,
+                precision=precision,
+                professeur=professeur
+            )
+            planning.save()
+
+        # Redirect to the planning list page
+        return redirect('planning-list')
+
+    else:
+        return render(request, 'planning/save.html')
