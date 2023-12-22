@@ -4,53 +4,79 @@
 {% block content %}
         <div class="block-content">
             <div id="js-calendar"></div>
-             <!-- <div class="row items-push">
-                
-                <div class="col-md-12">
-                    
-                </div>
-               <div class="col-md-4 col-lg-5 col-xl-3">
-                    <form class="js-form-add-event push">
-                        <h4>Creez un evenement</h4>
-                        <div class="form-group">
-                            <select class="js-select2 form-control" id="selectUE" name="selectUE" style="width: 100%;" data-placeholder="Choose one..">
-                                <option>Selectionnnez une UE</option>
-                                {% for ue in ues %}
-                                    <option value="{{ ue }}">{{ ue.libelle }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div id="matieresList">
-
-                        </div>
-
-                        <div id="noMatiereMessage" style="display: none;">
-                            Aucune matière dans cet UE.
-                        </div>
-
-                        <div class="input-group">
-                            <input type="text" class="js-add-event form-control" placeholder="Add Event..">
-                            <div class="input-group-append">
-                                   <button type="submit"><i class="fa fa-fw fa-plus-circle"></i></button> 
-                            </div>
-                        </div>
-                    </form>
-
-                    <ul id="js-events" class="list list-events">
-                    </ul>
-                    
-                    <div class="text-center">
-                        <p class="font-size-sm text-muted">
-                            <i class="fa fa-arrows-alt"></i> Drag and drop events on the calendar
-                        </p>
-                    </div> 
-                </div>
-            </div>-->
+            
         </div>
         
+        <script>
+            var events = {{ events|safe }};
+            
+            var calendar;
 
+            (function ($) {
+                var Planning = function () {
+                    // ... (autres fonctions et initialisations)
+
+                    return {
+                        init: function () {
+                            this.initEvents();
+                            this.initCalendar();
+                        },
+                        initEvents: function () {
+                            new FullCalendar.Draggable(document.getElementById("js-events"), {
+                                    itemSelector: ".js-event", eventData: function (e) {
+                                        return {
+                                            title: e.innerText,
+                                            backgroundColor: getComputedStyle(e).backgroundColor,
+                                            borderColor: getComputedStyle(e).backgroundColor
+                                        };
+                                    }
+                                });
+                        },
+                        initCalendar: function () {
+                            var e = new Date, t = e.getDate(), n = e.getMonth(), r = e.getFullYear();
+                            calendar = new FullCalendar.Calendar(document.getElementById("js-calendar"), {
+                                locale: 'fr',
+                                themeSystem: "bootstrap",
+                                firstDay: 1,
+                                editable: !0,
+                                droppable: !0,
+                                headerToolbar: {
+                                    left: "title",
+                                    right: "prev,next today dayGridMonth,timeGridWeek,timeGridDay,listWeek"
+                                },
+                                slotMinTime: "06:00:00",
+                                slotMaxTime: "20:00:00",
+                                slotDuration: "00:15:00",
+                                initialView: "timeGridWeek",
+                                hiddenDays: [0],
+                                drop: function (e) {
+                                    e.draggedEl.parentNode.remove();
+                                },
+                                eventRemove: function (info) {
+                                    that.removeEvent(info.event);
+                                },
+                                events: [
+                                ]
+                            });
+
+                            calendar.render();
+                        },
+                        
+                    };
+                };
+
+                var planning = Planning();
+                $(function () {
+                    planning.init();
+                  
+               
+
+            })(jQuery);
+
+
+    });
+</script>
 <script src="{% static 'assets/js/plugins/fullcalendar/main.min.js' %}"></script>
 <script src="{% static 'assets/js/jquery-3.7.1.min.js' %}"></script>
-<script src="{% static 'assets/js/pages/planning.min.js' %}"></script>
 
 {% endblock %}

@@ -9,7 +9,7 @@ class Planning(models.Model):
     date_heure_fin = models.DateTimeField()
     matiere = models.ForeignKey(Matiere, on_delete=models.CASCADE)
     precision = models.CharField(max_length=255)
-    professeur = models.ForeignKey(Enseignant, on_delete=models.CASCADE)
+    professeur = models.ForeignKey(Enseignant, on_delete=models.CASCADE,null=True)
     valider = models.BooleanField(default=False)
 
        
