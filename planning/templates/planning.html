@@ -1,80 +1,71 @@
 {% extends './index.html' %}
-{% block content_title %}Planning {{semestre.libelle}} {{semestre.annee_universitaire}} {% endblock content_title %}
+{% block content_title %}Planning || Semaine {{planning.semaine}} || Semestre {{planning.semestre}} {% endblock content_title %}
 {% load static %}
 {% block content %}
         <div class="block-content">
             <div id="js-calendar"></div>
             
         </div>
-        
         <script>
-            var events = {{ events|safe }};
-            
-            var calendar;
+document.addEventListener('DOMContentLoaded', function() {
+  var event_data = JSON.parse('{{ event_data|safe }}');
+  var calendar;
 
-            (function ($) {
-                var Planning = function () {
-                    // ... (autres fonctions et initialisations)
+  (function ($) {
+    var Planning = function () {
+      return {
+        init: function () {
+          this.initCalendar();
+        },
 
-                    return {
-                        init: function () {
-                            this.initEvents();
-                            this.initCalendar();
-                        },
-                        initEvents: function () {
-                            new FullCalendar.Draggable(document.getElementById("js-events"), {
-                                    itemSelector: ".js-event", eventData: function (e) {
-                                        return {
-                                            title: e.innerText,
-                                            backgroundColor: getComputedStyle(e).backgroundColor,
-                                            borderColor: getComputedStyle(e).backgroundColor
-                                        };
-                                    }
-                                });
-                        },
-                        initCalendar: function () {
-                            var e = new Date, t = e.getDate(), n = e.getMonth(), r = e.getFullYear();
-                            calendar = new FullCalendar.Calendar(document.getElementById("js-calendar"), {
-                                locale: 'fr',
-                                themeSystem: "bootstrap",
-                                firstDay: 1,
-                                editable: !0,
-                                droppable: !0,
-                                headerToolbar: {
-                                    left: "title",
-                                    right: "prev,next today dayGridMonth,timeGridWeek,timeGridDay,listWeek"
-                                },
-                                slotMinTime: "06:00:00",
-                                slotMaxTime: "20:00:00",
-                                slotDuration: "00:15:00",
-                                initialView: "timeGridWeek",
-                                hiddenDays: [0],
-                                drop: function (e) {
-                                    e.draggedEl.parentNode.remove();
-                                },
-                                eventRemove: function (info) {
-                                    that.removeEvent(info.event);
-                                },
-                                events: [
-                                ]
-                            });
+        initCalendar: function () {
+          var mostRecentEventDate = null;
+          for (var i = 0; i < event_data.length; i++) {
+            var startDate = event_data[i].start;
+            if (!mostRecentEventDate || startDate > mostRecentEventDate) {
+              mostRecentEventDate = startDate;
+            }
+          }
 
-                            calendar.render();
-                        },
-                        
-                    };
-                };
+          console.log(mostRecentEventDate);
 
-                var planning = Planning();
-                $(function () {
-                    planning.init();
-                  
-               
+          var e = new Date(mostRecentEventDate);
+          var t = e.getDate();
+          var n = e.getMonth();
+          var r = e.getFullYear();
 
-            })(jQuery);
+          calendar = new FullCalendar.Calendar(document.getElementById("js-calendar"), {
+            locale: 'fr',
+            themeSystem: "bootstrap",
+            firstDay:1,
+            headerToolbar: {
+              left: "title",
+              right: "prev,next today dayGridMonth,timeGridWeek,timeGridDay,listWeek"
+            },
+            slotMinTime: "06:00:00",
+            slotMaxTime: "20:00:00",
+            slotDuration: "00:15:00",
+            initialView: "timeGridWeek",
+            hiddenDays: [0],
+            initialDate: mostRecentEventDate, //
+            events: event_data
+          });
 
+          calendar.render();
+        }
+      };
+    };
 
+    var planning = Planning();
+    $(function () {
+      planning.init();
+     
     });
+
+  })(jQuery);
+
+});
+
 </script>
 <script src="{% static 'assets/js/plugins/fullcalendar/main.min.js' %}"></script>
 <script src="{% static 'assets/js/jquery-3.7.1.min.js' %}"></script>

@@ -3,16 +3,8 @@
 {% load static %}
 {% block content %}
 <div class="block block-rounded">
-    <div class="mx-4 d-flex justify-content-between">
-        <form action="" method="get" class="form-row" id="form-semestre">
-            <select name="semestre" id="semestre" class="form-control col-md-5">
-                <option value="">Semestres</option>
-                {% for semester, plannings_by_week in plannings_by_semester.items %}
-                    <option value="{{ semester }}" {% if selected_semestre == semester %}selected{% endif %}>Semestre {{ semester }}</option>
-                {% endfor %}
-            </select>
-        </form>
-    </div>
+    
+    
     <div class="block-content block-content-full">
         <table class="table table-bordered table-striped table-vcenter js-dataTable-full-pagination">
             <thead>
@@ -25,9 +17,9 @@
                 </tr>
             </thead>
             <tbody>
-                {% for planning in plannings_by_semester.items %}
+                {% for planning in plannings %}
                                 <td class="text-center font-size-sm">{{ planning.id }}</td>
-                                <td class="text-center font-w600 font-size-sm">{{ planning.semaine }}</td>
+                                <td class="text-center font-w600 font-size-sm"> <a href="details/{{planning.id}}" target="_blank">{{ planning.semaine }}</a></td>
                                 <td class="text-center font-w600 font-size-sm">{{ planning.semestre }}</td>
                                 <td class="text-center font-w600 font-size-sm">{{ planning.intervalle }}</td>
                                 <td class="text-center">
@@ -36,19 +28,19 @@
                                     </button>
                                     <div class="dropdown-menu font-size-sm" aria-labelledby="dropdown-default-secondary">
                                         <li class="nav-main-item">
-                                            <a class="nav-main-link nav-main-link-name" data-toggle="" aria-haspopup="true" aria-expanded="false" href="">
-                                                <i class="fa fa-edit mr-1" aria-hidden="true"></i>
+                                            <a class="nav-main-link nav-main-link-name" data-toggle="" aria-haspopup="true" aria-expanded="false" href="print/{{planning.id}}">
+                                                <i class="fa fa-print mr-1" aria-hidden="true"></i>
                                                 <span class="nav-main-link-name">Imprimer</span>
                                             </a>
                                         </li>
                                         <li class="nav-main-item">
-                                            <a class="nav-main-link nav-main-link-name" data-toggle="" aria-haspopup="true" aria-expanded="false" href="">
+                                            <a class="nav-main-link nav-main-link-name" data-toggle="" aria-haspopup="true" aria-expanded="false" href="edit/{{planning.id}}">
                                                 <i class="fa fa-edit mr-1" aria-hidden="true"></i>
-                                                <span class="nav-main-link-name">Edit</span>
+                                                <span class="nav-main-link-name">Modifier</span>
                                             </a>
                                         </li>
                                         <li class="nav-main-item">
-                                            <a class="nav-main-link nav-main-link-name" data-toggle="" aria-haspopup="true" aria-expanded="false" href="">
+                                            <a class="nav-main-link nav-main-link-name" data-toggle="" aria-haspopup="true" aria-expanded="false" href="delete/{{planning.id}}">
                                                 <i class="fa fa-trash mr-1 text-danger" aria-hidden="true"></i>
                                                 <span class="nav-main-link-name">Supprimer</span>
                                             </a>
@@ -56,7 +48,7 @@
                                     </div>
                                 </td>
                             </tr>
-                {% endfor %}
+                    {% endfor %}
             </tbody>
         </table>
     </div>

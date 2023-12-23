@@ -52,7 +52,7 @@ def assign_week_number(plannings):
     return plannings
 
 
-def index(request):
+def index454(request):
     # Récupérer tous les plannings
     all_plannings = Planning.objects.all()
 
@@ -78,7 +78,6 @@ def index(request):
 
 
 def index2(request):
-
     all_plannings = Planning.objects.all()
     plannings_by_semester = {}
     for planning in all_plannings:
@@ -88,9 +87,8 @@ def index2(request):
         else:
             plannings_by_semester[semestre] = [planning]
 
-    print(plannings_by_semester)
 
-    return render(request, 'planning_list.html', {'plannings_by_semester': plannings_by_semester})
+    return render(request, 'planning_list.html', {'plannings_by_semester': plannings_by_semester,'plannings':all_plannings})
 
 
 
@@ -128,9 +126,21 @@ def new_planning(request,semestreId):
 
     return render(request, 'generer_planning.html', {'planification_json': planification_json,'semestre':semestre,'ues':ues})
 
+
+def datetime_serializer(obj):
+    if isinstance(obj, datetime.datetime):
+        return obj.strftime('%Y-%m-%dT%H:%M:%S')
+    raise TypeError("Type not serializable")
+
+import datetime
 def details(request,planningId):
     planning = Planning.objects.filter(id=planningId).first()
-    return render(request, 'details_planning.html', {'planning': planning})
+    seances=SeancePlannifier.objects.filter(planning=planning)
+    print(seances )
+    event_data = [{'title': seance.intitule, 'start': seance.date_heure_debut , 'end':seance.date_heure_fin ,'url': '/planning/seance/' + str(seance.id) + ''} for seance in seances]
+    event_data = json.dumps(event_data, default=datetime_serializer)
+            
+    return render(request, 'planning.html', {'event_data': event_data,'planning':planning})
 
 
 def getMatieresEtudiant(etudiant):
@@ -142,6 +152,9 @@ def getMatieresEtudiant(etudiant):
         matieres.update(ue.matiere_set.all())         
     return matieres
 
+
+import datetime
+import pytz
 def save(request):
     if request.method == 'POST':
         # Retrieve all the events from the calendar
@@ -151,12 +164,16 @@ def save(request):
         events = data.get('events')
         semestre=Semestre.objects.filter(id=semestre).first()
 
-        print('Semaine:', semaine)
-        print('Événements:', events)
+        print( semaine)
+        print(events)
         planning = Planning(
                 semaine=semaine,
                 semestre=semestre,
-                intervalle=max(event.get('start') for event in events) - min(event.get('start') for event in events),
+                # intervalle=(datetime.datetime.fromtimestamp(
+                #     max(datetime.datetime.fromtimestamp(event.get('start'), tz=pytz.timezone('Europe/Paris')) for event in events) -
+                #     datetime.datetime.fromtimestamp(min(datetime.datetime.fromtimestamp(event.get('start'), tz=pytz.timezone('Europe/Paris')) for event in events))
+                # ),)
+                intervalle="zap d'abord"
         )
         planning.save()
         for event in events:
@@ -181,16 +198,30 @@ def save(request):
             seance.save()
         
 
-        return redirect('planning:planning')
+        return render(request,'planning_list.html')
     
 
 
 
-def update(request):
-    return
+def update(request,planningId):
+    return HttpResponse("En devellopement")
 
-def print(request):
-    return
+def seance(request,seanceId):
+    seance=SeancePlannifier.objects.filter(id=seanceId).first()
+    return render(request,'details_planning.html',{'seance':seance})
 
-def delete(request):
-    return
+def print(request,planningId):
+    return HttpResponse("En devellopement")
+
+def delete(request,planningId):
+    planning=Planning.objects.filter(id=planningId)
+    planning.delete()
+    return  render(request,'planning_list.html')
+
+def enregistrer_seance(request, seance_id):
+    # Logique pour enregistrer la séance
+    return redirect('seance_detail', seance_id=seance_id)
+
+def retirer_seance(request, seance_id):
+    # Logique pour retirer la séance
+    return redirect('seance_detail', seance_id=seance_id)
