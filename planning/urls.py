@@ -5,5 +5,6 @@ app_name = 'planning'
 
 urlpatterns = [
     path('', views.index, name='planning'),
-
+    path('new/<str:semestreId>', views.new_planning, name='creer_planning'),
+    path('planning/save', views.save, name='save'),
 ]

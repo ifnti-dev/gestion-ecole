@@ -1,103 +1,248 @@
 {% extends './index.html' %}
-{% block content_title %}Plannifier {% endblock content_title %}
+{% block content_title %}Plannifier {{semestre.libelle}} {{semestre.annee_universitaire}}  {% endblock content_title %}
 {% load static %}
 {% block content %}
+<style>
+.my-custom-title {
+    font-size: 8px;
+}
+.my-custom-button {
+    background-color: rgb(0, 0, 0);
+}
+
+
+</style>
         <div class="block-content">
             <div class="row items-push">
                 <div class="col-md-8 col-lg-7 col-xl-9">
-                    <!-- Calendar Container -->
                     <div id="js-calendar"></div>
                 </div>
                 <div class="col-md-4 col-lg-5 col-xl-3">
-                    <!-- Add Event Form -->
-                    <form class="js-form-add-event push">
-                        {% for semestre, ue_infos in planification.items %}
-                        <h2>{{ semestre }}</h2>
-                        <ul>
-                            {% for ue_info in ue_infos %}
-                                <li>{{ ue_info.ue }}</li>
-                                <ul>
-                                    {% for matiere in ue_info.matieres %}
-                                        <li>{{ matiere }}</li>
-                                    {% endfor %}
-                                </ul>
-                            {% endfor %}
-                        </ul>
-                        {% endfor %}
-                        <div class="input-group">
-                            <input type="text" class="js-add-event form-control" placeholder="Add Event..">
-                            <div class="input-group-append">
-                                   <button type="submit"><i class="fa fa-fw fa-plus-circle"></i></button> 
-   
-                            </div>
+                    <form class="testtest" id="myForm">
+                        <h4>Creer un cour</h4>
+                        <div class="form-group">
+                            <select class="js-select2 form-control" id="selectUE" name="selectUE" style="width: 100%;" data-placeholder="Choose one..">
+                                <option>Selectionnnez une UE</option>
+                                {% for ue in ues %}
+                                    <option value="{{ ue }}">{{ ue.libelle }}</option>
+                                {% endfor %}
+                            </select>
                         </div>
-                    </form>
-                    <!-- END Add Event Form -->
+                        <div  id="matieresList">
+                            
+                        </div>
+                        
+                        
 
-                    <!-- Event List -->
+                        <div id="noMatiereMessage" style="display: none;">
+                            Aucune matière dans cet UE.
+                        </div>
+
+                        
+
+                        <button class="btn-secondary" type="submit">Ajouter un cours</button> 
+                    </form>
+
                     <ul id="js-events" class="list list-events">
-                        <li>
-                            <div class="js-event p-2 text-white font-size-sm font-w500 bg-info">Codename X</div>
-                        </li>
-                        <li>
-                            <div class="js-event p-2 text-white font-size-sm font-w500 bg-success">Weekend Adventure</div>
-                        </li>
-                        <li>
-                            <div class="js-event p-2 text-white font-size-sm font-w500 bg-info">Project Mars</div>
-                        </li>
-                        <li>
-                            <div class="js-event p-2 text-white font-size-sm font-w500 bg-warning">Meeting</div>
-                        </li>
-                        <li>
-                            <div class="js-event p-2 text-white font-size-sm font-w500 bg-success">Walk the dog</div>
-                        </li>
-                        <li>
-                            <div class="js-event p-2 text-white font-size-sm font-w500 bg-info">AI schedule</div>
-                        </li>
-                        <li>
-                            <div class="js-event p-2 text-white font-size-sm font-w500 bg-success">Cinema</div>
-                        </li>
-                        <li>
-                            <div class="js-event p-2 text-white font-size-sm font-w500 bg-danger">Project X</div>
-                        </li>
-                        <li>
-                            <div class="js-event p-2 text-white font-size-sm font-w500 bg-warning">Skype Meeting</div>
-                        </li>
                     </ul>
+                    
                     <div class="text-center">
                         <p class="font-size-sm text-muted">
                             <i class="fa fa-arrows-alt"></i> Drag and drop events on the calendar
                         </p>
                     </div>
-                    <select id="semestreDropdown">
-                        {% for semestre in semestres %}
-                            <option value="{{ semestre.id }}">{{ semestre.libelle }}</option>
-                        {% endfor %}
-                    </select>
-                    
-                    <select id="ueDropdown">
-                        <!-- Options de l'UE seront ajoutées ici avec JavaScript -->
-                    </select>
-                    
-                    <select id="matiereDropdown">
-                        <!-- Options de la matière seront ajoutées ici avec JavaScript -->
-                    </select>
-                    
-                    <script>
-                        // Ajoutez votre script JavaScript ici pour gérer les changements de liste déroulante
-                    </script>
-                    
-                   
-                    <!-- END Event List -->
-                </div>
+                    <div class="form-group">
+                        <a id="btnEnregistrer" class="btn btn-success">Enregistrer</a>
+                        <input id="semaine" type="number" class="form-control" placeholder="semaine">
+                    </div>
+                    </div>
             </div>
         </div>
 
+      
+            <script>
+                        var planification = {{ planification_json|safe }};
+                        
+
+        
+                document.addEventListener('DOMContentLoaded', function() {
+                    $('#myForm').submit(function (event) {
+                    event.preventDefault();
+
+                    var selectedRadio = $('input[name="matiereRadio"]:checked');
+
+                    if (selectedRadio.length > 0) {
+                        // Afficher la valeur dans la console (vous pouvez la traiter selon vos besoins)
+                        addEvent(selectedRadio.val());
+                        } 
+                    else {
+                            One.helpers('notify', {type: 'danger', icon: 'fa fa-info-circle mr-1', message: 'Aucune matière sélectionnée !'});
+                    }
+                        
+                    });
+
+  
+               
+                                  // Fonction pour ajouter un événement à la liste
+                    function addEvent(value) {
+                        var jsEvents = $("#js-events");
+                        var inputValue = value && jQuery("<div />").text(value).html();
+
+                        if (inputValue) {
+                            jsEvents.prepend('<li><div class="js-event p-2 text-white font-size-sm font-w500 bg-warning">' + inputValue + "</div></li>");
+                        }
+
+                        // Réinitialiser la valeur du champ radio
+                        $('input[name="matiereRadio"]').prop("checked", false);
+                    }
+
+                    // Ajouter un gestionnaire d'événements pour les changements d'état des boutons radio
+                    $('#matieresList').on('change', 'input[name="matiereRadio"]', function () {
+                        // Désélectionner tous les autres boutons radio dans la liste
+                        $('input[name="matiereRadio"]').prop('checked', false);
+
+                        // Sélectionner le bouton radio cliqué
+                        $(this).prop('checked', true);
+                    });
 
 
+
+                        $("#selectUE").on('change',function (){
+                            var selectedUEId = this.value;
+                            console.log(selectedUEId);
+                            console.log(planification[selectedUEId].matieres);
+                            var selectedUEMatieres = planification[selectedUEId];
+                            updateMatiereList(selectedUEMatieres);
+                                    
+                        });
+                        function updateMatiereList(matieres) {
+                            console.log('je suis la ohh');
+                            var matieresList = document.getElementById('matieresList');
+                            var noMatiereMessage = document.getElementById('noMatiereMessage');
+                        
+                            // Effacez la liste actuelle des matières
+                            matieresList.innerHTML = '';
+                        
+                            // Assurez-vous que matieres est défini
+                            if (matieres && matieres.length > 0) {
+                                // Accédez à la première entrée dans matieres
+                                var premierObjet = matieres[0];
+
+                                // Assurez-vous que premierObjet.matieres est défini
+                                if (premierObjet && premierObjet.matieres && premierObjet.matieres.length > 0) {
+                                    // Accédez à chaque objet à l'intérieur de premierObjet.matieres
+                                    premierObjet.matieres.forEach(function (matiere) {
+                                        var blockDiv = document.createElement('div');
+                                        blockDiv.className = 'block block-rounded';
+
+                                        // Créer l'en-tête du bloc
+                                        var blockHeaderDiv = document.createElement('div');
+                                        blockHeaderDiv.className = 'block-header';
+
+                                        // Ajouter le titre de l'en-tête
+                                        var blockTitle = document.createElement('h3');
+                                        blockTitle.className = 'block-title my-custom-title';
+                                        blockTitle.innerHTML = matiere.fields.libelle;
+
+                                        // Ajouter les options du bloc
+                                        var blockOptionsDiv = document.createElement('div');
+                                        blockOptionsDiv.className = 'block-options';
+
+                                        // Ajouter le bouton pour basculer le contenu du bloc
+                                        var blockOptionButton = document.createElement('button');
+                                        blockOptionButton.type = 'button';
+                                        blockOptionButton.className = 'btn-block-option my-custom-button';
+                                        blockOptionButton.setAttribute('data-toggle', 'collapse');
+                                        blockOptionButton.setAttribute('data-target', '#matiereContent' + matiere.pk);
+
+                                        // Ajouter le bouton à la section des options
+                                        blockOptionsDiv.appendChild(blockOptionButton);
+
+                                        // Ajouter l'en-tête au bloc
+                                        blockHeaderDiv.appendChild(blockTitle);
+                                        blockHeaderDiv.appendChild(blockOptionsDiv);
+
+                                        // Ajouter l'en-tête au bloc
+                                        blockDiv.appendChild(blockHeaderDiv);
+
+                                        // Créer le contenu du bloc
+                                        var blockContentDiv = document.createElement('div');
+                                        blockContentDiv.className = 'block-content collapse';
+                                        blockContentDiv.id = 'matiereContent' +  matiere.pk ;
+
+                                        // Ajouter les détails de la matière au contenu
+                                        blockContentDiv.innerHTML = 'Heures prévues : ' + matiere.fields.heures +
+                                            '<br> Heures Plannifier : ' + matiere.temps_plannifier +    
+                                            '<br> Heures Consommées : ' + matiere.temps_effectuer +
+                                            '<br> Enseignant : ' + matiere.fields.enseignant;
+
+                                        // Ajouter le contenu au bloc
+                                        blockDiv.appendChild(blockContentDiv);
+
+                                        // Créer le bouton radio
+                                        var radioInput = document.createElement('input');
+                                        radioInput.type = 'radio';
+                                        radioInput.name = 'matiereRadio'; // Nom du groupe de boutons radio
+                                        radioInput.value = matiere.fields.libelle + ' ('+matiere.fields.enseignant+')'; // La valeur du bouton radio, peut être l'ID ou toute autre information unique
+
+                                        // Ajouter le bouton radio à la section des options (avant le titre)
+                                        blockOptionsDiv.insertBefore(radioInput, blockOptionsDiv.firstChild);
+
+                                        // Ajouter le bloc à la liste des matières
+                                        matieresList.appendChild(blockDiv);
+                                    });
+
+
+                                    matieresList.style.display = 'block';
+                                    noMatiereMessage.style.display = 'none';
+                                } else {
+                                    matieresList.style.display = 'none';
+                                    noMatiereMessage.style.display = 'block';
+                                }
+                            }
+                        }
+
+ 
+                        $("#btnEnregistrer").on("click", function() {
+                            // Récupérer la valeur de la semaine
+                            var semaine = $("#semaine").val();
+                            // Vérifier si le champ semaine est vide
+                            if (semaine === '') {
+                                console.log('Le champ semaine est vide.');
+                            } else {
+                                // Récupérer tous les événements du calendrier
+                                var events = r.getEvents();
+                                console.log(events);
+
+                                // Créer un objet avec les données à envoyer
+                                var data = {
+                                    semaine: semaine,
+                                    events: events
+                                };
+
+                                // Effectuer la requête POST vers /planning/save
+                                $.ajax({
+                                    type: 'POST',
+                                    url: '/planning/save',
+                                    data: JSON.stringify(data),
+                                    contentType: 'application/json',
+                                    success: function(response) {
+                                        console.log('Enregistrement réussi:', response);
+                                    },
+                                    error: function(error) {
+                                        console.error('Erreur lors de l\'enregistrement:', error);
+                                    }
+                                });
+                            }
+                        });
+
+                });
+            </script>
+
+         
 
 <script src="{% static 'assets/js/plugins/fullcalendar/main.min.js' %}"></script>
 <script src="{% static 'assets/js/jquery-3.7.1.min.js' %}"></script>
-<script src="{% static 'assets/js/pages/be_comp_calendar.min.js' %}"></script>
+<script src="{% static 'assets/js/pages/planning.min.js' %}"></script>
 
 {% endblock %}
