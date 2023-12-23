@@ -1,6 +1,6 @@
 from django.db import models
 from main.models import Etudiant,Matiere,Semestre,Enseignant
-from planning.models import Planning
+from planning.models import SeancePlannifier
 
 class Seance(models.Model):
     intitule = models.CharField(max_length=200)
@@ -14,7 +14,7 @@ class Seance(models.Model):
     enseignant = models.ForeignKey(Enseignant, on_delete=models.SET_NULL, null=True)
     commentaire = models.TextField(null=True)
     eleves_presents = models.ManyToManyField(Etudiant, related_name='seances_presents')
-    planning=models.ForeignKey(Planning,on_delete=models.SET_NULL,null=True)
+    seancePlannifier=models.ForeignKey(SeancePlannifier,on_delete=models.SET_NULL,null=True)
 
     def __str__(self):
         return self.intitule
