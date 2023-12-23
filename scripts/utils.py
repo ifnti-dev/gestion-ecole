@@ -3,7 +3,7 @@ from numpy import NaN
 import openpyxl
 import pandas as pd
 from main.helpers import trim_str
-from main.models import Charge, Competence, Comptable, CompteBancaire, CompteEtudiant, Conge, DirecteurDesEtudes, Domaine, Enseignant, Etudiant, FicheDePaie, Fournisseur, Frais, Information, Note, Paiement, Personnel, Salaire, Seance, Semestre, Tuteur, Ue, Evaluation, Parcours, AnneeUniversitaire, Programme, Matiere
+from main.models import Charge, Competence, Comptable, CompteBancaire, CompteEtudiant, Conge, DirecteurDesEtudes, Domaine, Enseignant, Etudiant, FicheDePaie, Fournisseur, Frais, Information, Note, Paiement, Personnel, Salaire, Semestre, Tuteur, Ue, Evaluation, Parcours, AnneeUniversitaire, Programme, Matiere
 from main.resources import get_model_by_name, get_resource_by_name
 from scripts.factory import clean_data_base
 from tablib import Dataset
