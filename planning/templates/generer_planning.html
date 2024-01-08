@@ -61,61 +61,68 @@
 
       
             <script>
-                        var planification = {{ planification_json|safe }};
+                    var planification = {{ planification_json|safe }};
                         
-
+                    var semestre = '{{ semestre.id|safe}}';
         
-                document.addEventListener('DOMContentLoaded', function() {
-                    $('#myForm').submit(function (event) {
-                    event.preventDefault();
+                    document.addEventListener('DOMContentLoaded', function() {
+                        $('#myForm').submit(function (event) {
+                        event.preventDefault();
 
-                    var selectedRadio = $('input[name="matiereRadio"]:checked');
+                        var selectedRadio = $('input[name="matiereRadio"]:checked');
 
-                    if (selectedRadio.length > 0) {
-                        // Afficher la valeur dans la console (vous pouvez la traiter selon vos besoins)
-                        addEvent(selectedRadio.val());
-                        } 
-                    else {
-                            One.helpers('notify', {type: 'danger', icon: 'fa fa-info-circle mr-1', message: 'Aucune matière sélectionnée !'});
-                    }
-                        
-                    });
+                        if (selectedRadio.length > 0) {
+                            var selectedRadioValue = JSON.parse(selectedRadio.val());
+                            addEvent(selectedRadioValue);
+                            } 
+                        else {
+                                One.helpers('notify', {type: 'danger', icon: 'fa fa-info-circle mr-1', message: 'Aucune matière sélectionnée !'});
+                        }
+                            
+                        });
 
   
                
                                   // Fonction pour ajouter un événement à la liste
-                    function addEvent(value) {
-                        var jsEvents = $("#js-events");
-                        var inputValue = value && jQuery("<div />").text(value).html();
+                        function addEvent(value) {
+                            console.log("ue : "+value.ueId )
+                            var jsEvents = $("#js-events");
+                            var inputValue = value.title && jQuery("<div />").text(value.title).html();
 
-                        if (inputValue) {
-                            jsEvents.prepend('<li><div class="js-event p-2 text-white font-size-sm font-w500 bg-warning">' + inputValue + "</div></li>");
+                            if (inputValue) {
+                                // Créez un objet eventData avec le titre et d'autres informations
+                                var eventData = {
+                                    title: inputValue,
+                                    ueId: value.ueId  // Ajoutez d'autres propriétés selon vos besoins
+                                };
+
+                                jsEvents.prepend('<li><div class="js-event p-2 text-white font-size-sm font-w500 bg-warning" data-event-data="' + JSON.stringify(eventData) + '">' + inputValue + "</div></li>");
+                            }
+
+                            // Réinitialiser la valeur du champ radio
+                            $('input[name="matiereRadio"]').prop("checked", false);
                         }
 
-                        // Réinitialiser la valeur du champ radio
-                        $('input[name="matiereRadio"]').prop("checked", false);
-                    }
+
 
                     // Ajouter un gestionnaire d'événements pour les changements d'état des boutons radio
-                    $('#matieresList').on('change', 'input[name="matiereRadio"]', function () {
-                        // Désélectionner tous les autres boutons radio dans la liste
-                        $('input[name="matiereRadio"]').prop('checked', false);
+                        $('#matieresList').on('change', 'input[name="matiereRadio"]', function () {
+                            // Désélectionner tous les autres boutons radio dans la liste
+                            $('input[name="matiereRadio"]').prop('checked', false);
 
-                        // Sélectionner le bouton radio cliqué
-                        $(this).prop('checked', true);
-                    });
+                            // Sélectionner le bouton radio cliqué
+                            $(this).prop('checked', true);
+                        });
 
 
 
                         $("#selectUE").on('change',function (){
                             var selectedUEId = this.value;
-                            console.log(selectedUEId);
-                            console.log(planification[selectedUEId].matieres);
                             var selectedUEMatieres = planification[selectedUEId];
-                            updateMatiereList(selectedUEMatieres);
+                            updateMatiereList(selectedUEMatieres,selectedUEId);
                                     
                         });
-                        function updateMatiereList(matieres) {
+                        function updateMatiereList(matieres,ueId) {
                             console.log('je suis la ohh');
                             var matieresList = document.getElementById('matieresList');
                             var noMatiereMessage = document.getElementById('noMatiereMessage');
@@ -183,7 +190,11 @@
                                         var radioInput = document.createElement('input');
                                         radioInput.type = 'radio';
                                         radioInput.name = 'matiereRadio'; // Nom du groupe de boutons radio
-                                        radioInput.value = matiere.fields.libelle + ' ('+matiere.fields.enseignant+')'; // La valeur du bouton radio, peut être l'ID ou toute autre information unique
+                                        radioInput.value =  JSON.stringify({
+                                            'title': matiere.fields.libelle + ' ('+matiere.fields.enseignant+')',
+                                            'ueId':ueId
+                                        
+                                        }); // La valeur du bouton radio, peut être l'ID ou toute autre information unique
 
                                         // Ajouter le bouton radio à la section des options (avant le titre)
                                         blockOptionsDiv.insertBefore(radioInput, blockOptionsDiv.firstChild);
@@ -203,28 +214,125 @@
                         }
 
  
-                        $("#btnEnregistrer").on("click", function() {
+                        
+
+                        // Déclarez calendar en dehors de toute fonction pour qu'il soit accessible globalement
+                        var calendar;
+
+                        (function ($) {
+                            var Planning = function () {
+                                // ... (autres fonctions et initialisations)
+
+                                return {
+                                    init: function () {
+                                        this.addEvent();
+                                        this.initEvents();
+                                        this.initCalendar();
+                                        this.getEvents();
+                                    },
+                                    addEvent: function () {
+                                        var e = $(".js-add-event"), t = "";
+                                        $(".js-form-add-event").on("submit", function (n) {
+                                            return (t = e.prop("value")) && ($("#js-events").prepend('<li><div class="js-event p-2 text-white font-size-sm font-w500 bg-warning">' + $("<div />").text(t).html() + "</div></li>"), e.prop("value", "")), !1;
+                                        });
+                                    },
+                                    initEvents: function () {
+                                        new FullCalendar.Draggable(document.getElementById("js-events"), {
+                                                itemSelector: ".js-event", eventData: function (e) {
+                                                    return {
+                                                        title: e.innerText,
+                                                        backgroundColor: getComputedStyle(e).backgroundColor,
+                                                        borderColor: getComputedStyle(e).backgroundColor
+                                                    };
+                                                }
+                                            });
+                                    },
+                                    initCalendar: function () {
+                                        var e = new Date, t = e.getDate(), n = e.getMonth(), r = e.getFullYear();
+                                        calendar = new FullCalendar.Calendar(document.getElementById("js-calendar"), {
+                                            locale: 'fr',
+                                            themeSystem: "bootstrap",
+                                            firstDay: 1,
+                                            editable: !0,
+                                            droppable: !0,
+                                            headerToolbar: {
+                                                left: "title",
+                                                right: "prev,next today dayGridMonth,timeGridWeek,timeGridDay,listWeek"
+                                            },
+                                            slotMinTime: "06:00:00",
+                                            slotMaxTime: "20:00:00",
+                                            slotDuration: "00:15:00",
+                                            initialView: "timeGridWeek",
+                                            hiddenDays: [0],
+                                            drop: function (e) {
+                                                e.draggedEl.parentNode.remove();
+                                            },
+                                            eventRemove: function (info) {
+                                                that.removeEvent(info.event);
+                                            },
+                                            events: [
+                                            ]
+                                        });
+
+                                        calendar.render();
+                                    },
+                                    getEvents: function () {
+                                        // Récupérer tous les événements du calendrier
+                                        var calendarEvents = calendar.getEvents();
+                                        var formattedEvents = [];
+                                        
+
+                                        // Formater les événements selon vos besoins
+                                        calendarEvents.forEach(function (event) {
+                                            console.log('yoyo',event);
+                                            formattedEvents.push({
+                                                title: event.title,
+                                                start: event.start,
+                                                end: event.end,
+                                                ue: event.eventData
+                                            });
+                                        });
+                                        return formattedEvents;
+                                        // Afficher les événements dans la console
+
+                                        // Vous pouvez maintenant envoyer formattedEvents à votre backend via AJAX
+                                    }
+                                };
+                            };
+
+                            var planning = Planning();
+                            $(function () {
+                                planning.init();
+                                $("#btnEnregistrer").on("click", function() {
                             // Récupérer la valeur de la semaine
                             var semaine = $("#semaine").val();
+                            var csrftoken = Cookies.get('csrftoken');
+                            console.log('crsf' ,csrftoken);
                             // Vérifier si le champ semaine est vide
                             if (semaine === '') {
                                 console.log('Le champ semaine est vide.');
                             } else {
-                                // Récupérer tous les événements du calendrier
-                                var events = r.getEvents();
-                                console.log(events);
+                                // Récupérer tous les événements du calendrier à partir de l'objet planning
+                                var events = planning.getEvents();
+                                console.log('bien ',events);
 
                                 // Créer un objet avec les données à envoyer
                                 var data = {
                                     semaine: semaine,
-                                    events: events
+                                    events: events,
+                                    semestre : semestre,
                                 };
+                                console.log('data : ',data);
 
                                 // Effectuer la requête POST vers /planning/save
                                 $.ajax({
                                     type: 'POST',
-                                    url: '/planning/save',
+                                    url: '/planning/save/',
                                     data: JSON.stringify(data),
+                                    headers: {
+                                        'X-CSRFToken': csrftoken,
+                                        'Content-Type': 'application/json',
+                                    },
                                     contentType: 'application/json',
                                     success: function(response) {
                                         console.log('Enregistrement réussi:', response);
@@ -235,14 +343,17 @@
                                 });
                             }
                         });
+                            });
+
+                        })(jQuery);
+
 
                 });
             </script>
 
          
 
-<script src="{% static 'assets/js/plugins/fullcalendar/main.min.js' %}"></script>
-<script src="{% static 'assets/js/jquery-3.7.1.min.js' %}"></script>
-<script src="{% static 'assets/js/pages/planning.min.js' %}"></script>
+        <script src="{% static 'assets/js/plugins/fullcalendar/main.min.js' %}"></script>
+        <script src="{% static 'assets/js/jquery-3.7.1.min.js' %}"></script>
 
 {% endblock %}
