@@ -423,6 +423,7 @@ def les_bulletins_de_paye(request, id_annee_selectionnee):
         'annee_universitaire': annee_universitaire,
         'bulletins': bulletins,
     }
+    #return HttpResponse('')
     return render(request, 'salaires/bulletins_de_paye.html', context)
 
 

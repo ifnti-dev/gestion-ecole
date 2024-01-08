@@ -1,25 +1,21 @@
 {% extends 'index.html' %}
 {% block content_title %}
-
-Enregistrement d'une demande de congés
-
+  Enregistrement d'une demande de congés
   <h1>
-     <a href="{% url 'conges:liste_mes_conges' id_annee_selectionnee %}" class="btn btn-outline-warning">
-        <i class="fas fa-chevron-left fa-lg"></i> Retour
-      </a>
+    <a href="{% url 'conges:liste_mes_conges' id_annee_selectionnee %}" class="btn btn-outline-warning">
+      <i class="fas fa-chevron-left fa-lg"></i> Retour
+    </a>
   </h1>
 {% endblock %}
 {% block content_title_description %}
-
 
 {% endblock %}
 {% block content %}
   <div class="d-flex justify-content-center">
     <div class="block-content card m-4 col-md-10 col-lg-8 col-xl-6">
       <div class="d-flex justify-content-between">
-        <h3>         
-        </h3>
-    </div>
+        <h3></h3>
+      </div>
       <form class="container-fluid p-3" action="#" method="POST">
         {% csrf_token %}
 
@@ -37,7 +33,6 @@ Enregistrement d'une demande de congés
             {{ form.nature }}
             <span class="text-danger">{{ form.nature.errors }}</span>
           </div>
-
         </div>
 
         <br>
@@ -62,4 +57,28 @@ Enregistrement d'une demande de congés
       </form> 
     </div>
   </div>
+
+  <!-- Ajout du script jQuery -->
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+  <script>
+    $(document).ready(function(){
+      // Fonction pour afficher/cacher le champ autre_nature
+      function toggleAutreNature() {
+        var natureValue = $('#id_nature').val();
+        if (natureValue === 'Autres') {
+          $('#id_autre_nature').show();
+        } else {
+          $('#id_autre_nature').hide();
+        }
+      }
+
+      // Appeler la fonction au chargement de la page
+      toggleAutreNature();
+
+      // Ajouter un gestionnaire d'événements pour détecter les changements dans le champ nature
+      $('#id_nature').change(function() {
+        toggleAutreNature();
+      });
+    });
+  </script>
 {% endblock %}

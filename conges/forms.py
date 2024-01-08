@@ -12,16 +12,25 @@ from django.forms.utils import ErrorList,ErrorDict
 from django.utils.translation import gettext_lazy as _
 
 
-
+# class CongeForm(forms.ModelForm):
+#     class Meta:
+#         model = Conge
+#         fields = ['nature', 'date_et_heure_debut', 'date_et_heure_fin']
+#         widgets = {
+#             'nature': forms.Select(attrs={'class': 'form-control'}),       
+#             'date_et_heure_debut': forms.DateTimeInput(attrs={'type': 'date'}),
+#             'date_et_heure_fin': forms.DateTimeInput (attrs={'type': 'date'}),
+#         }
 
 class CongeForm(forms.ModelForm):
     class Meta:
         model = Conge
-        fields = ['nature', 'date_et_heure_debut', 'date_et_heure_fin']
+        fields = ['nature', 'autre_nature', 'date_et_heure_debut', 'date_et_heure_fin']
         widgets = {
-            'nature': forms.Select(attrs={'class': 'form-control'}),       
+            'nature': forms.Select(attrs={'class': 'form-control', 'onchange': 'checkNature()'}),
+            'autre_nature': forms.TextInput(attrs={'class': 'form-control', 'style': 'display:none;'}),
             'date_et_heure_debut': forms.DateTimeInput(attrs={'type': 'date'}),
-            'date_et_heure_fin': forms.DateTimeInput (attrs={'type': 'date'}),
+            'date_et_heure_fin': forms.DateTimeInput(attrs={'type': 'date'}),
         }
 
 

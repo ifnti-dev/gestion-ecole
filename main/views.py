@@ -29,6 +29,8 @@ def dashboard(request):
     }
     return render(request, 'dashboard.html', context=data)
 
+
+
 def change_annee_universitaire(request):
     if 'annee_universitaire' in request.GET:
         request.session["id_annee_selectionnee"] = request.GET.get(
@@ -36,13 +38,29 @@ def change_annee_universitaire(request):
         # print(request.session["id_annee_selectionnee"])
     return redirect(request.GET.get('origin_path'))
 
+
+
 @login_required(login_url=settings.LOGIN_URL)
 @permission_required("main.view_etudiant")
 def etudiants(request):
+    """
+    Affiche la liste des étudiants en fonction des filtres de semestre et d'état sélectionnés.
+
+    :param request: L'objet de requête Django.
+    :return: Une réponse HTTP avec la liste des étudiants et des informations associées.
+    """
+
+    # Récupérer l'identifiant de l'année universitaire sélectionnée à partir de la session
     id_annee_selectionnee = request.session.get("id_annee_selectionnee")
+
+    # Récupérer le rôle de l'utilisateur
     role = get_user_role(request)
+
+    # Récupérer l'objet AnneeUniversitaire en fonction de l'identifiant fourni
     annee_universitaire = get_object_or_404(
         AnneeUniversitaire, pk=id_annee_selectionnee)
+
+    # Initialiser des variables
     data = {}
     etats = [{'id': 1, 'value': 'Actif'}, {'id': 0, 'value': 'Suspendue'}]
     etats_selected = [True, False]
@@ -50,7 +68,9 @@ def etudiants(request):
     semestres = annee_universitaire.semestre_set.all()
     semestres_selected = semestres
     semestre_id = "__all__"
+    niveau = ""
 
+    # Traitement des filtres de semestre
     if 'semestre' in request.POST:
         semestre_id = request.POST.get('semestre')
         if semestre_id != "" and semestre_id != "__all__":
@@ -58,18 +78,21 @@ def etudiants(request):
             niveau = AnneeUniversitaire.getNiveau(
                 semestres_selected[0].libelle)
 
+    # Traitement des filtres d'état
     if 'etat' in request.POST:
         etat_id = request.POST.get('etat')
         if etat_id != "" and etat_id != "__all__":
             etat_id = int(etat_id)
             etats_selected = [bool(etat_id)]
 
+    # Logique pour filtrer les étudiants en fonction du rôle de l'utilisateur
     if role:
-        if role.name == "etudiant" or role.name == "enseignant" :
+        if role.name in ["etudiant", "enseignant"]:
             niveau = "Mes camarades"
-            if role.name == "enseignant" :
+            if role.name == "enseignant":
                 niveau = "Nos Étudiants"
-            etudiants = Etudiant.objects.filter(is_active=True, semestres__in=semestres_selected).distinct()
+            etudiants = Etudiant.objects.filter(
+                is_active=True, semestres__in=semestres_selected).distinct()
         elif role.name in ["directeur_des_etudes", "secretaire", "comptable"]:
             niveau = "Nos Étudiants"
             etudiants = Etudiant.objects.filter(
@@ -79,22 +102,20 @@ def etudiants(request):
             etudiants = Etudiant.objects.filter(
                 is_active__in=etats_selected, semestres__in=semestres_selected).distinct()
 
+    # Gérer les erreurs si aucun semestre n'est sélectionné
     try:
         semestres_selected = semestres_selected.get()
     except:
         semestres_selected = {'id': semestre_id}
     etats_selected = {'id': etat_id}
 
-    # etudiants = Etudiant.objects.filter(
-    #     semestres__in=semestres_selected, is_active=True).distinct()
+    # Construire une liste temporaire d'étudiants avec des informations de niveau
     temp_etudiants = []
     for etudiant in etudiants:
-        # sanitized_input = ''.join(
-        #     char for char in etudiant.id if char.isalnum() or char in "+-./")
-        # input_bytes = sanitized_input.encode()
         temp_etudiants.append({'etudiant': etudiant, 'niveau': etudiant.get_niveau_annee(
             annee_universitaire=annee_universitaire)[0]})
 
+    # Construire le contexte pour le rendu de la page
     data = {
         'etudiants': temp_etudiants,
         'semestres': semestres,
@@ -104,54 +125,102 @@ def etudiants(request):
         'selected_etat': etats_selected
     }
 
+    # Rendre la page avec le contexte
     return render(request, 'etudiants/etudiants.html', context=data)
+
+
 
 
 @login_required(login_url=settings.LOGIN_URL)
 @permission_required("main.change_etudiant")
 def etudiants_suspendu(request):
+    """
+    Affiche la liste des étudiants suspendus pour l'année universitaire courante.
+
+    :param request: L'objet de requête Django.
+    :return: Une réponse HTTP avec la liste des étudiants suspendus.
+    """
+
     # Obtenez l'année universitaire courante
     annee_courante = AnneeUniversitaire.static_get_current_annee_universitaire()
 
     if annee_courante != "-":
-        # Obtenez la liste des étudiants pour l'année universitaire courante
+        # Obtenez la liste des étudiants suspendus pour l'année universitaire courante
         etudiants = Etudiant.objects.filter(
             semestres__annee_universitaire=annee_courante, is_active=False)
+    else:
+        # Si l'année universitaire courante n'est pas définie, initialisez la liste des étudiants comme vide
+        etudiants = []
 
+    # Contexte pour le rendu de la page
     context = {
         'etudiants': etudiants,
         'annee_courante': annee_courante,
     }
+
+    # Rendre le modèle avec le contexte
     return render(request, 'etudiants/etudiants_suspendu.html', context)
+
 
 
 @login_required(login_url=settings.LOGIN_URL)
 @permission_required("main.view_etudiant")
-def detailEtudiant(request, id):  # Retourne le détail d'un etudiant donnée
+def detailEtudiant(request, id):
+    """
+    Affiche le détail d'un étudiant en fonction de son identifiant.
+
+    :param request: L'objet de requête Django.
+    :param id: L'identifiant unique de l'étudiant.
+    :return: Une réponse HTTP avec les détails de l'étudiant.
+    :raises Http404: Renvoie une erreur 404 si l'étudiant avec l'identifiant spécifié n'est pas trouvé.
+    """
+
+    # Récupérer l'objet étudiant en fonction de son identifiant
     etudiant = get_object_or_404(Etudiant, id=id)
-    return render(request, "etudiants/detailEtudiant.html", {"etudiant": etudiant})
+
+    # Contexte pour le rendu de la page
+    context = {"etudiant": etudiant}
+
+    # Rendre le modèle avec le contexte
+    return render(request, "etudiants/detailEtudiant.html", context)
 
 
 @login_required(login_url=settings.LOGIN_URL)
 @permission_required("main.add_etudiant")
 def create_etudiant(request, id=0):
+    """
+    Affiche le formulaire de création ou de modification d'un étudiant.
+
+    :param request: L'objet de requête Django.
+    :param id: L'identifiant de l'étudiant à modifier. Par défaut, 0 indique la création d'un nouvel étudiant.
+    :return: Une réponse HTTP redirigeant vers la liste des étudiants après création ou modification réussie.
+    """
+
     if request.method == "GET":
+        # Gestion de la requête GET
         if id == 0:
+            # Création d'un nouveau formulaire pour un nouvel étudiant
             form = EtudiantForm()
         else:
+            # Modification d'un étudiant existant, préremplir le formulaire avec les données existantes
             etudiant = Etudiant.objects.get(pk=id)
             form = EtudiantForm(instance=etudiant)
+
         return render(request, 'etudiants/create_etudiant.html', {'form': form})
     else:
+        # Gestion de la requête POST
         if id == 0:
+            # Création d'un nouvel étudiant à partir des données POST
             form = EtudiantForm(request.POST)
         else:
+            # Modification d'un étudiant existant avec les données POST
             etudiant = Etudiant.objects.get(pk=id)
             form = EtudiantForm(request.POST, instance=etudiant)
+
         if form.is_valid():
-            # Ne pas sauvegarder l'étudiant pour le moment
+            # Sauvegarde de l'étudiant pour générer un ID
             etudiant = form.save(commit=False)
-            etudiant.save()  # Sauvegarder l'étudiant pour générer un ID
+            etudiant.save()
 
             # Trouver l'année universitaire en cours
             annee_universitaire_courante = AnneeUniversitaire.objects.get(
@@ -170,49 +239,72 @@ def create_etudiant(request, id=0):
                     annee_universitaire=annee_universitaire_courante
                 )
                 semestre_s1.save()
+
             # Attacher l'étudiant au Semestre 1 (S1) de l'année universitaire en cours
             etudiant.semestres.add(semestre_s1)
-            etudiant.save()  # Enregistrez l'étudiant après l'association    
-           # id_annee_selectionnee = AnneeUniversitaire.static_get_current_annee_universitaire().id
+            etudiant.save()
+
+            # Rediriger vers la liste des étudiants après création ou modification réussie
             return redirect('main:etudiants')
         else:
+            # Le formulaire n'est pas valide, réafficher le formulaire avec les erreurs
             return render(request, 'etudiants/create_etudiant.html', {'form': form})
+
 
 
 @login_required(login_url=settings.LOGIN_URL)
 @permission_required("main.view_etudiant")
-# Cette vue permet d'afficher la liste des étudiants par semestre
 def liste_etudiants_par_semestre(request, id_annee_selectionnee):
+    """
+    Affiche la liste des étudiants pour un semestre sélectionné dans une année universitaire donnée.
+
+    :param request: L'objet de requête Django.
+    :param id_annee_selectionnee: L'identifiant de l'année universitaire sélectionnée.
+    :return: Une réponse HTTP avec la liste des étudiants et des informations associées.
+    """
+
+    # Récupérer le rôle de l'utilisateur
     role = get_user_role(request)
+
+    # Récupérer l'objet AnneeUniversitaire en fonction de l'identifiant fourni
     annee_universitaire = get_object_or_404(
         AnneeUniversitaire, pk=id_annee_selectionnee)
+
+    # Récupérer l'année universitaire actuelle
     current_annee = AnneeUniversitaire.static_get_current_annee_universitaire()
+
+    # Initialiser des variables
     niveau = ""
     data = {}
     semestre_id = None
+    semestres_selected = None
 
+    # Logique pour les directeurs des études
     if role.name == "directeur_des_etudes":
         niveau = "IFNTI"
         semestres = annee_universitaire.semestre_set.all()
         semestres_selected = semestres
 
+    # Vérifier si un semestre est spécifié dans la requête
     if 'semestre' in request.GET:
         semestre_id = request.GET.get('semestre')
         semestres_selected = semestres.filter(pk=semestre_id)
 
+    # Filtrer les étudiants en fonction des semestres sélectionnés et qui sont actifs
     etudiants = Etudiant.objects.filter(
         semestres__in=semestres_selected, is_active=True).distinct()
 
+    # Initialiser une liste pour les étudiants insuffisants
     etudiants_insuffisants = []
 
-    # Ajoutez cette partie pour calculer les crédits obtenus par chaque étudiant
+    # Calculer les crédits obtenus par chaque étudiant pour le semestre sélectionné
     for etudiant in etudiants:
         credits_obtenus = etudiant.credits_obtenus_semestre(
-            semestres_selected[0])  # Utilisez le premier semestre sélectionné
-        # Créez un attribut pour stocker les crédits obtenus
+            semestres_selected[0])  # Utiliser le premier semestre sélectionné
+        # Créer un attribut pour stocker les crédits obtenus
         etudiant.credits_obtenus = credits_obtenus
 
-    # Ajoutez cette partie pour récupérer le semestre actuel de chaque étudiant
+    # Récupérer le semestre actuel de chaque étudiant dans l'année universitaire
     for etudiant in etudiants:
         semestres_etudiant = etudiant.semestres.filter(
             annee_universitaire=annee_universitaire)
@@ -222,6 +314,7 @@ def liste_etudiants_par_semestre(request, id_annee_selectionnee):
         else:
             etudiant.semestre_actuel = None
 
+    # Construire le contexte pour le rendu de la page
     data = {
         'etudiants': etudiants,
         'semestres': semestres,
@@ -230,6 +323,7 @@ def liste_etudiants_par_semestre(request, id_annee_selectionnee):
         'selected_semestre': semestres_selected
     }
 
+    # Rendre la page avec le contexte
     return render(request, 'etudiants/liste_etudiants_par_semestre.html', context=data)
 
 
@@ -237,6 +331,14 @@ def liste_etudiants_par_semestre(request, id_annee_selectionnee):
 @permission_required("main.change_etudiant")
 # Vue permettant le passage des étudiants au semestre suivant dans l'année universitaire courante
 def passage_etudiants(request):
+    """
+    Gère le passage des étudiants au semestre suivant en fonction des décisions du conseil.
+
+    :param request: L'objet de requête Django.
+    :return: Une réponse HTTP redirigeant vers la liste des étudiants après le passage de semestre.
+    """
+
+    # Mapping des semestres, indiquant le semestre suivant pour chaque semestre actuel
     semestre_mapping = {
         'S1': 'S2',
         'S2': 'S3',
@@ -250,7 +352,7 @@ def passage_etudiants(request):
             annee_courante=True)
         etudiant_ids = request.POST.getlist('passer_semestre_suivant')
 
-        # Vérifie combien de semestres l'étudiant est déjà inscrit et le nombre de crédits obtenus
+        # Itération sur les étudiants sélectionnés pour le passage au semestre suivant
         for etudiant_id in etudiant_ids:
             etudiant = Etudiant.objects.get(id=etudiant_id)
 
@@ -265,20 +367,21 @@ def passage_etudiants(request):
             credits_obtenus = etudiant.credits_obtenus_semestre(
                 semestre_actuel)
 
-            # Vérification du nombre de semestres déjà inscrits ainsi que le nombre de crédits obtenus
+            # Vérifier le nombre de semestres déjà inscrits ainsi que le nombre de crédits obtenus
             if semestres_deja_inscrits >= 2:
                 return render(request, 'etudiants/message_erreur.html', {'message': "Impossible de passer dans plus de deux semestres différents au cours d'une même année universitaire."})
 
             elif credits_obtenus == 0:
                 return render(request, 'etudiants/message_erreur.html', {'message': "L'étudiant ne peut pas passer au semestre suivant avec 0 crédit."})
 
-            # Ajoutez la saisie de la décision du conseil ici
+            # Récupérer la décision du conseil
             decision_conseil = request.POST.get(
                 'decision_conseil_' + etudiant_id)
             etudiant.decision_conseil = decision_conseil
             etudiant.passer_semestre_suivant = True
             etudiant.save()
 
+            # Ajouter l'étudiant au semestre suivant
             semestres = etudiant.semestres.filter(
                 annee_universitaire=annee_univ_courante)
             for semestre in semestres:
@@ -299,7 +402,6 @@ def passage_etudiants(request):
         else:
             semestre_suivant_test = None
 
-       # id_annee_selectionnee = AnneeUniversitaire.static_get_current_annee_universitaire().id
         return redirect('main:etudiants')
 
     return render(request, 'etudiants/liste_etudiants_par_semestre.html')
@@ -308,30 +410,70 @@ def passage_etudiants(request):
 @login_required(login_url=settings.LOGIN_URL)
 @permission_required("main.view_tuteur")
 def tuteurs(request):
+    """
+    Affiche la liste de tous les tuteurs associés aux étudiants de l'année universitaire courante.
+
+    :param request: L'objet de requête Django.
+    :return: Une réponse HTTP avec la liste des tuteurs et des informations associées.
+    """
+
     # Obtenez l'année universitaire courante
     annee_courante = AnneeUniversitaire.static_get_current_annee_universitaire()
 
+    # Vérifiez si une année universitaire courante est définie
     if annee_courante != "-":
         # Obtenez tous les tuteurs associés aux étudiants de l'année universitaire courante
         tuteurs = Tuteur.objects.all()
+    else:
+        # Gérer le cas où aucune année universitaire courante n'est définie
+        tuteurs = []
 
+    # Construire le contexte pour le rendu de la page
     context = {
         'tuteurs': tuteurs,
     }
+
+    # Rendre la page avec le contexte
     return render(request, 'tuteurs/tuteurs.html', context)
+
 
 
 @login_required(login_url=settings.LOGIN_URL)
 @permission_required("main.view_tuteur")
-def detailTuteur(request, id):  # Retourne le détail d'un tuteur donnée
+def detailTuteur(request, id):
+    """
+    Affiche les détails d'un tuteur spécifié par son identifiant.
+
+    :param request: L'objet de requête Django.
+    :param id: L'identifiant du tuteur dont les détails doivent être affichés.
+    :return: Une réponse HTTP avec les détails du tuteur.
+    """
+
+    # Récupérer l'objet Tuteur en fonction de l'identifiant fourni
     tuteur = get_object_or_404(Tuteur, id=id)
-    return render(request, "tuteurs/detailTuteur.html", {"tuteur": tuteur})
+
+    # Construire le contexte pour le rendu de la page
+    context = {"tuteur": tuteur}
+
+    # Rendre la page avec le contexte
+    return render(request, "tuteurs/detailTuteur.html", context)
+
 
 
 @login_required(login_url=settings.LOGIN_URL)
 @permission_required("main.add_tuteur")
-def create_tuteur(request, id=0):  # Création et modification d'un tuteur
+def create_tuteur(request, id=0):
+    """
+    Affiche un formulaire pour créer ou modifier un tuteur et enregistre les données du formulaire.
+
+    :param request: L'objet de requête Django.
+    :param id: L'identifiant du tuteur à modifier. Par défaut, id=0 indique la création d'un nouveau tuteur.
+    :return: Une réponse HTTP redirigeant vers la liste des tuteurs après la création ou la modification.
+    """
+
+    # Vérifier la méthode de la requête (GET ou POST)
     if request.method == "GET":
+        # Afficher le formulaire pour la création ou la modification d'un tuteur
         if id == 0:
             form = TuteurForm()
         else:
@@ -339,14 +481,23 @@ def create_tuteur(request, id=0):  # Création et modification d'un tuteur
             form = TuteurForm(instance=tuteur)
         return render(request, 'tuteurs/create_tuteur.html', {'form': form})
     else:
+        # Traitement des données du formulaire lorsqu'une requête POST est reçue
         if id == 0:
+            # Créer un nouveau tuteur
             form = TuteurForm(request.POST)
         else:
+            # Modifier un tuteur existant
             tuteur = Tuteur.objects.get(pk=id)
             form = TuteurForm(request.POST, instance=tuteur)
+
+        # Vérifier si le formulaire est valide
         if form.is_valid():
+            # Enregistrer les données du formulaire dans la base de données
             form.save()
+            # Rediriger vers la liste des tuteurs après la création ou la modification
             return redirect('main:liste_des_tuteurs')
+
+
 
 
 @login_required(login_url=settings.LOGIN_URL)
@@ -480,30 +631,66 @@ def ues_etudiants(request):
 @login_required(login_url=settings.LOGIN_URL)
 @permission_required("main.view_ue")
 def ues(request):
+    """
+    Affiche la liste des Unités d'Enseignement (UE) associées à l'année universitaire courante.
+
+    :param request: L'objet de requête Django.
+    :return: Une réponse HTTP avec la liste des UE pour l'année universitaire courante.
+    """
+
     # Récupérer l'année universitaire courante
     annee_universitaire_courante = AnneeUniversitaire.static_get_current_annee_universitaire()
 
+    # Vérifier si une année universitaire courante est définie
     if annee_universitaire_courante != "-":
         # Filtrer les UE associées à l'année universitaire courante
         ues_annee_courante = Ue.objects.filter(
             programme__semestre__annee_universitaire=annee_universitaire_courante)
     else:
+        # Gérer le cas où aucune année universitaire courante n'est définie
         ues_annee_courante = []
 
+    # Rendre la page avec la liste des UE pour l'année universitaire courante
     return render(request, 'ues/ues.html', {'ues': ues_annee_courante})
+
 
 
 @login_required(login_url=settings.LOGIN_URL)
 @permission_required("main.view_ue")
 def detailUe(request, id):
+    """
+    Affiche les détails d'une Unité d'Enseignement (UE) spécifiée par son identifiant.
+
+    :param request: L'objet de requête Django.
+    :param id: L'identifiant de l'UE dont les détails doivent être affichés.
+    :return: Une réponse HTTP avec les détails de l'UE.
+    """
+
+    # Récupérer l'objet UE en fonction de l'identifiant fourni
     ue = get_object_or_404(Ue, id=id)
-    return render(request, "ues/detailUe.html", {"ue": ue})
+
+    # Construire le contexte pour le rendu de la page
+    context = {"ue": ue}
+
+    # Rendre la page avec les détails de l'UE
+    return render(request, "ues/detailUe.html", context)
+
 
 
 @login_required(login_url=settings.LOGIN_URL)
 @permission_required("main.add_ue")
 def create_ue(request, id=0):
+    """
+    Affiche un formulaire pour créer ou modifier une Unité d'Enseignement (UE) et enregistre les données du formulaire.
+
+    :param request: L'objet de requête Django.
+    :param id: L'identifiant de l'UE à modifier. Par défaut, id=0 indique la création d'une nouvelle UE.
+    :return: Une réponse HTTP avec un message d'erreur ou le formulaire pour créer ou modifier une UE.
+    """
+
+    # Vérifier la méthode de la requête (GET ou POST)
     if request.method == "GET":
+        # Afficher le formulaire pour la création ou la modification d'une UE
         if id == 0:
             form = UeForm()
         else:
@@ -511,25 +698,51 @@ def create_ue(request, id=0):
             form = UeForm(instance=ue)
         return render(request, 'ues/create_ue.html', {'form': form})
     else:
+        # Traitement des données du formulaire lorsqu'une requête POST est reçue
         if id == 0:
+            # Créer une nouvelle UE
             form = UeForm(request.POST)
         else:
+            # Modifier une UE existante
             ue = Ue.objects.get(pk=id)
             form = UeForm(request.POST, instance=ue)
+
+        # Vérifier si le formulaire est valide
         if form.is_valid():
+            # Enregistrer les données du formulaire dans la base de données
             form.save()
-            return render(request, 'etudiants/message_erreur.html', {'message': "Veuillez le ratacher à gestion maquette."})
+            # Afficher un message d'erreur spécifique pour inciter à attacher l'UE à la gestion maquette
+            return render(request, 'etudiants/message_erreur.html', {'message': "Veuillez le rattacher à gestion maquette."})
+
 
 
 @login_required(login_url=settings.LOGIN_URL)
 @permission_required("main.view_ue")
 def ues_semestre(request, semestre):
+    """
+    Affiche la liste des Unités d'Enseignement (UE) pour un semestre spécifié.
+
+    :param request: L'objet de requête Django.
+    :param semestre: Le libellé du semestre pour lequel afficher les UE.
+    :return: Une réponse HTTP avec la liste des UE pour le semestre spécifié.
+    """
+
+    # Récupérer l'année universitaire courante
     annee_courante = AnneeUniversitaire.static_get_current_annee_universitaire()
-    semestre_obj = Semestre.objects.get(
-        libelle=semestre, annee_universitaire=annee_courante)
+
+    # Récupérer l'objet Semestre en fonction du libellé et de l'année universitaire
+    semestre_obj = Semestre.objects.get(libelle=semestre, annee_universitaire=annee_courante)
+
+    # Filtrer les Programmes associés au semestre spécifié
     programmes = Programme.objects.filter(semestre=semestre_obj)
+
+    # Construire une liste d'UE à partir des Programmes associés
     ues = [programme.ue for programme in programmes]
+
+    # Construire le contexte pour le rendu de la page
     context = {"ues": ues}
+
+    # Rendre la page avec la liste des UE pour le semestre spécifié
     return render(request, 'ues/ues_par_semestre.html', context)
 
 
