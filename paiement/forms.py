@@ -184,6 +184,8 @@ class SalaireForm(forms.ModelForm):
             'prime_anciennete': forms.NumberInput(attrs={'class': 'form-control'}),
             'tcs': forms.NumberInput(attrs={'class': 'form-control'}),
             'irpp': forms.NumberInput(attrs={'class': 'form-control'}),
+            #'is_tcs': forms.CheckboxInput(attrs={'class': 'form-control'}),
+            #'is_irpp': forms.CheckboxInput(attrs={'class': 'form-control'}),
             'acomptes': forms.NumberInput(attrs={'class': 'form-control'}),
             'prime_forfaitaire': forms.NumberInput(attrs={'class': 'form-control'}),
         }

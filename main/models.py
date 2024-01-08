@@ -46,6 +46,9 @@ class Utilisateur(models.Model):
 
     def full_name(self):
         return self.nom.upper() + ' ' + self.prenom
+    
+    def getrole(self):
+        return self.user.groups.all()[0].name
 
     def suspendre(self):
         self.is_active = False
@@ -418,12 +421,19 @@ class Personnel(Utilisateur):
         super().save()
 
     def update_conge_counts(self):
-        conges_pris = Conge.objects.filter(personnel=self)
+        conges_pris = Conge.objects.filter(personnel=self, valider='Actif')  # Ajoutez la condition de validation ici
         total_jours_pris = conges_pris.aggregate(total=Sum('nombre_de_jours_de_conge'))['total'] or 0
-
         self.nbreJrsConsomme = total_jours_pris
-        self.nbreJrsCongesRestant = 30 - total_jours_pris 
+        self.nbreJrsCongesRestant = 30 - total_jours_pris if total_jours_pris <= 30 else 0  # Mise à zéro si dépassement
         self.save()
+
+    # def update_conge_counts(self):
+    #     conges_pris = Conge.objects.filter(personnel=self)
+    #     total_jours_pris = conges_pris.aggregate(total=Sum('nombre_de_jours_de_conge'))['total'] or 0
+
+    #     self.nbreJrsConsomme = total_jours_pris
+    #     self.nbreJrsCongesRestant = 30 - total_jours_pris 
+    #     self.save()
 
 
 
@@ -1041,6 +1051,8 @@ class Salaire(models.Model):
     frais_prestations_familiale_salsalaire = models.DecimalField(max_digits=10, decimal_places=3, default=0.04)
     tcs = models.DecimalField(max_digits=10, decimal_places=2, default=0, verbose_name="TCS")
     irpp = models.DecimalField(max_digits=10, decimal_places=2, default=0, verbose_name="IRPP")
+    is_tcs = models.BooleanField(default=False, null=True)
+    is_irpp = models.BooleanField(default=False, null=True)
     prime_forfaitaire = models.DecimalField(max_digits=10, decimal_places=2, default=0, verbose_name="Prime forfaitaires")
     acomptes = models.DecimalField(max_digits=10, decimal_places=2, default=0, verbose_name="Acomptes")
     salaire_net_a_payer = models.DecimalField(max_digits=10, decimal_places=2, default=0, verbose_name="Salaire Net à payer")
@@ -1049,7 +1061,7 @@ class Salaire(models.Model):
 
 
     def __str__(self):
-        return str(self.personnel.nom) + " " + str(self.personnel.prenom) + " Salaire : " +  str(self.date_debut) +  " au " + str(self.date_fin)
+        return str(self.personnel.nom) #+ " " + str(self.personnel.prenom) + " Salaire : " +  str(self.date_debut) +  " au " + str(self.date_fin)
     
     def save(self, *args, **kwargs):
         if not self.annee_universitaire:
@@ -1203,10 +1215,10 @@ class Charge(models.Model):
 
 class Conge(models.Model):
     NATURE_CHOICES = [
-        ('conge_annuel', 'Congé annuel'),
-        ('conge_maternite', 'Congé de maternité'),
-        ('conge_paternite', 'Congé de paternité'),
-        ('autres', 'Autres'),
+        ('Congé annuel', 'Congé annuel'),
+        ('Congé de maternité', 'Congé de maternité'),
+        ('Congé de paternité', 'Congé de paternité'),
+        ('Autres', 'Autres'),
     ]
     VALIDATION_CHOICES = [
         ('Actif', 'Actif'),
@@ -1215,6 +1227,7 @@ class Conge(models.Model):
     ]
 
     nature = models.CharField(max_length=30, choices=NATURE_CHOICES, verbose_name="Nature des congés")
+    autre_nature = models.CharField(max_length=100, blank=True, null=True, verbose_name="Autre nature des congés")
     date_et_heure_debut = models.DateField(default=timezone.now, verbose_name="Date de début")
     date_et_heure_fin = models.DateField(default=timezone.now, verbose_name="Date de fin")
     personnel = models.ForeignKey('Personnel', on_delete=models.CASCADE, verbose_name="Personnel")
@@ -1226,11 +1239,10 @@ class Conge(models.Model):
     def save(self, *args, **kwargs):
         if not self.annee_universitaire:
             self.annee_universitaire = AnneeUniversitaire.static_get_current_annee_universitaire()
-
         duree = self.date_et_heure_fin - self.date_et_heure_debut
-        self.nombre_de_jours_de_conge = duree.days if duree.days > 0 else 0
+        self.nombre_de_jours_de_conge = duree.days if duree.days > 0  else 0
         super(Conge, self).save(*args, **kwargs)
         self.personnel.update_conge_counts()
-
+    
     def __str__(self):
         return str(self.personnel.nom) + "  " +  str(self.personnel.prenom) + "  " + str(self.nombre_de_jours_de_conge) 

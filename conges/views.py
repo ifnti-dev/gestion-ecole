@@ -17,16 +17,51 @@ from django.utils.html import strip_tags
 from django.conf import settings
 from .forms import RefusCongeForm
 
+
+
 @login_required(login_url=settings.LOGIN_URL)
 def liste_mes_conges(request, id_annee_selectionnee):
     annee_universitaire = get_object_or_404(AnneeUniversitaire, pk=id_annee_selectionnee)    
-    conges = Conge.objects.filter(annee_universitaire=annee_universitaire, personnel__user=request.user)
-    
+    conges = Conge.objects.filter(annee_universitaire=annee_universitaire, personnel__user=request.user)   
+    personnel = Personnel.objects.get(user=request.user)  # Récupérer l'objet Personnel associé à l'utilisateur actuel
     context = {
         "conges": conges,
         "annee_universitaire": annee_universitaire,
+        "personnel": personnel  # Ajouter l'objet Personnel au contexte
     }
     return render(request, 'conges/liste_conges.html', context)
+
+
+
+@login_required(login_url=settings.LOGIN_URL)
+def formulaire_de_demande_de_conges(request, id):
+    conge = get_object_or_404(Conge, pk=id) 
+    role = conge.personnel.getrole().capitalize()
+    if conge.valider == 'Actif':
+        conge.valider = "Congés accordé"
+        conge.motif_refus = "none"
+    elif conge.valider == 'Inactif':
+        conge.valider = "Congés refusé"
+
+    context = {
+        "conge": conge,
+        "role" : role
+    }
+
+    latex_input = 'formulaire_de_demande_de_conges'
+    latex_ouput = 'generated_formulaire_de_demande_de_conges'
+    pdf_file = 'pdf_formulaire_de_demande_de_conges'
+
+    # génération du pdf
+    generate_pdf(context, latex_input, latex_ouput, pdf_file)
+
+    # visualisation du pdf dans le navigateur
+    with open('media/pdf/' + str(pdf_file) + '.pdf', 'rb') as f:
+        pdf_preview = f.read()
+        response = HttpResponse(pdf_preview, content_type='application/pdf')
+        response['Content-Disposition'] = 'inline;filename=pdf_file.pdf'
+        return response
+    
 
 
 @login_required(login_url=settings.LOGIN_URL)
@@ -60,13 +95,15 @@ def demander_conges(request, id=0):
             conge = form.save(commit=False)
             personnel = Personnel.objects.get(user=request.user)
             conge.personnel = personnel
-
             # Vérifier la durée du congé
             duree = conge.date_et_heure_fin - conge.date_et_heure_debut
             if duree.days > 30:
                 messages.error(request, "La durée du congé ne peut pas dépasser 30 jours.")
                 return render(request, 'conges/demander_conges.html', {'form': form})
-
+            
+            elif conge.date_et_heure_debut > conge.date_et_heure_fin :
+                messages.error(request, "La date de fin doit être supérieur à la date de début.")
+                return render(request, 'conges/demander_conges.html', {'form': form})
             conge.save()
 
             id_annee_selectionnee = AnneeUniversitaire.static_get_current_annee_universitaire().id
