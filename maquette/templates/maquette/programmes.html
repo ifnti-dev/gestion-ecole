@@ -11,6 +11,9 @@
             {% endfor %}
         </select>
         <div class="d-flex">
+            <button type="button" class="mr-3 btn btn-outline-primary" data-toggle="modal" data-target="#modal-block-vcenter">
+                <i class="fas fa-plus"></i> Importer
+            </button>
             <form action="{% url 'maquette:correspondances' %}" method="get">
                 <button type="submit" class="btn btn-outline-primary ml-3" id="add-form-row">
                     Correspondances
@@ -78,72 +81,37 @@
         </form>
     </div>
 </div>
+<div class="" id="modal-block-vcenter" tabindex="-1" role="dialog" aria-labelledby="modal-block-vcenter" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="block block-rounded block-themed block-transparent mb-0">
+                <div class="block-header bg-primary-dark">
+                    <h3 class="block-title">Maquette : Import</h3>
+                    <div class="block-options">
+                        <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
+                            <i class="fa fa-fw fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="block-content font-size-sm">
+                    <div class="d-flex flex-column my-3">
+                        <a href="/media/excel_templates/evaluation_tmp.xlsx">
+                            <button class="btn btn-primary w-100">Template</button>
+                        </a>
+                        <form action="{% url 'maquette:data' %}" method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <div class="mt-4">
+                                <input type="file" name="maquette_excel_file" class="btn btn-primary w-100" name="" id="">
+                            </div>
+                            <button type="submit" class="btn btn-primary mt-5" data-dismiss="modal">Charger</button>
+                        </form>
+                    </div>
+                </div>
+                <div class="block-content block-content-full text-right border-top">
+                    <button type="button" class="btn btn-alt-primary mr-1" data-dismiss="modal">Fermer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock content %}
-{% comment %} {% block scripts %}
-    <script type="text/javascript">
-        $(".delete").on('click', function(){
-            response = confirm("Voulez vous vraiment supprimer cet programme ?")
-            if (! response){
-                event.stopPropagation();
-                event.preventDefault();
-            }
-        });
-        form_tag = $('#form-semestre');
-        $('#semestre').on('change', function() {
-            form_tag.submit();
-        });
-    </script>
-    <script type="text/javascript">
-        let i = parseInt($('#id_form-TOTAL_FORMS').val());
-        $('#add-form-row').click(function() {
-            console.log("OKAY");
-            let old_row_children = $('.model-form-row:last').children()
-            var empty_form = $('.model-form-row:last').clone(true);
-            input_form = empty_form.find(':input');
-            empty_form.insertAfter('.model-form-row:last');
-            //empty_form.children()[0].children[0].value = "";
-            empty_form.children()[1].children[0].value = "";
-            empty_form.children()[2].children[0].value = "";
-            i = i+1;
-            $('#id_form-TOTAL_FORMS').val(i);
-            updateFormset();
-        });
-        /*
-        // Attacher un gestionnaire d'événements à tous les boutons de suppression
-        $(".delete-row").click(function() {
-            var rowCount = $('.content .commande-row').length;
-            if (rowCount == 1) { // 2 car il y a toujours une ligne d'entête
-                alert('Impossible de supprimer la dernière ligne.');
-                return false;
-            }
-            // Obtenir l'ID du formulaire à supprimer
-            var formId = $(this).closest(".commande-row").attr("id");
-            // Supprimer le formulaire du DOM
-            $(this).closest(".commande-row").remove();
-            // Mettre à jour le formset
-            updateFormset();
-        });*/
-
-        function updateFormset() {
-            // Obtenir tous les formulaires du formset
-            var forms = $(".model-form-row");
-            
-            // Mettre à jour les indices de chaque formulaire et ajouter les numéros
-            forms.each(function(index) {
-                
-                var isLastRow = (index === forms.length - 1);
-                
-                $(this).find(":input").each(function(i, tag) {
-                    if (tag.tagName.toLowerCase() !== 'button') {
-                        tag.id = tag.id.replace(/-\d+-/, "-" + index + "-");
-                        tag.name = tag.name.replace(/-\d+-/, "-" + index + "-");
-                        //console.log(tag.id);
-                        //console.log(tag.name);
-                    }
-                    //console.log(tag);
-                });
-            });
-            $('#id-form-TOTAL_FORMS').val(forms.length);
-        }
-    </script>
-{% endblock scripts %} {% endcomment %}

@@ -29,8 +29,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
-LOGIN_URL = "/main/connexion"
-
+LOGIN_URL = "/maquette/number/1/" #"/main/connexion"
+#LOGIN_URL = "/main/connexion"
 # Application definition
 
 INSTALLED_APPS = [
@@ -51,7 +51,8 @@ INSTALLED_APPS = [
     'dbbackup',
     'django_crontab',
     'solo',
-    'planning'
+    'planning',
+    'cahier_de_texte',
  ]
 
 
@@ -66,7 +67,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'projet_ifnti.middleware.AuthUserMiddleware',
 ]
-
+USE_ETAGS = True
 ROOT_URLCONF = 'projet_ifnti.urls'
 
 TEMPLATES = [
@@ -115,7 +116,7 @@ DBBACKUP_STORAGE_OPTIONS = {'location': BASE_DIR / 'backup'}
 # Cron Jobs for run process on background 
 
 CRONJOBS = [
-    ('*/30 * * * *', 'projet_ifnti.cron.backup') , # Backup database evry 5 minute
+    ('*/30- * * * *', 'projet_ifnti.cron.backup') , # Backup database evry 5 minute
 ]
 
 # Password validation
@@ -159,6 +160,7 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'projet_ifnti/static'),
 )
+
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 

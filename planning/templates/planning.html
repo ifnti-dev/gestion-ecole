@@ -1,0 +1,73 @@
+{% extends './index.html' %}
+{% block content_title %}Planning || Semaine {{planning.semaine}} || Semestre {{planning.semestre}} {% endblock content_title %}
+{% load static %}
+{% block content %}
+        <div class="block-content">
+            <div id="js-calendar"></div>
+            
+        </div>
+        <script>
+document.addEventListener('DOMContentLoaded', function() {
+  var event_data = JSON.parse('{{ event_data|safe }}');
+  var calendar;
+
+  (function ($) {
+    var Planning = function () {
+      return {
+        init: function () {
+          this.initCalendar();
+        },
+
+        initCalendar: function () {
+          var mostRecentEventDate = null;
+          for (var i = 0; i < event_data.length; i++) {
+            var startDate = event_data[i].start;
+            if (!mostRecentEventDate || startDate > mostRecentEventDate) {
+              mostRecentEventDate = startDate;
+            }
+          }
+
+          console.log(mostRecentEventDate);
+
+          var e = new Date(mostRecentEventDate);
+          var t = e.getDate();
+          var n = e.getMonth();
+          var r = e.getFullYear();
+
+          calendar = new FullCalendar.Calendar(document.getElementById("js-calendar"), {
+            locale: 'fr',
+            themeSystem: "bootstrap",
+            firstDay:1,
+            headerToolbar: {
+              left: "title",
+              right: "prev,next today dayGridMonth,timeGridWeek,timeGridDay,listWeek"
+            },
+            slotMinTime: "06:00:00",
+            slotMaxTime: "20:00:00",
+            slotDuration: "00:15:00",
+            initialView: "timeGridWeek",
+            hiddenDays: [0],
+            initialDate: mostRecentEventDate, //
+            events: event_data
+          });
+
+          calendar.render();
+        }
+      };
+    };
+
+    var planning = Planning();
+    $(function () {
+      planning.init();
+     
+    });
+
+  })(jQuery);
+
+});
+
+</script>
+<script src="{% static 'assets/js/plugins/fullcalendar/main.min.js' %}"></script>
+<script src="{% static 'assets/js/jquery-3.7.1.min.js' %}"></script>
+
+{% endblock %}

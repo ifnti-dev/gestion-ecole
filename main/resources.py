@@ -1,5 +1,6 @@
 from import_export import resources
-from .models import Enseignant, Frais, CompteEtudiant, CompteBancaire, Salaire, Fournisseur, Charge, Conge, Evaluation, Domaine,Information, Parcours,Programme, Matiere, Etudiant, Competence, Note, Comptable, Semestre, Ue, AnneeUniversitaire, Personnel, Tuteur, Paiement, FicheDePaie, DirecteurDesEtudes, Seance
+from .models import Enseignant, Frais, CompteEtudiant, CompteBancaire, Salaire, Fournisseur, Charge, Conge, Evaluation, Domaine,Information, Parcours,Programme, Matiere, Etudiant, Competence, Note, Comptable, Semestre, Ue, AnneeUniversitaire, Personnel, Tuteur, Paiement, FicheDePaie, DirecteurDesEtudes
+from cahier_de_texte.models import  Seance
 
 
 class AnneeUniversitaireResource(resources.ModelResource):

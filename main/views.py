@@ -4,7 +4,8 @@ from django.http import HttpResponse
 from main.pdfMaker import generate_pdf
 from django.conf import settings
 from main.forms import EnseignantForm, EtudiantForm, EvaluationForm, InformationForm, ProgrammeForm, NoteForm, TuteurForm, UeForm, MatiereForm
-from .models import Domaine, Enseignant, Evaluation, DirecteurDesEtudes, Personnel, Information, Matiere, Etudiant, Competence, Note, Comptable, Parcours, Programme, Semestre, Ue, AnneeUniversitaire, Tuteur, Seance
+from .models import Domaine, Enseignant, Evaluation, DirecteurDesEtudes, Personnel, Information, Matiere, Etudiant, Competence, Note, Comptable, Parcours, Programme, Semestre, Ue, AnneeUniversitaire, Tuteur
+from cahier_de_texte.models import Seance
 from django.shortcuts import get_object_or_404, redirect, render
 from main.helpers import *
 from django.contrib.auth.decorators import login_required, permission_required
@@ -948,9 +949,9 @@ def releve_notes(request, id, id_semestre):
     semestre_ues = semestre.get_all_ues()
     ues = []
     for ue in semestre_ues:
-        moyenne, validation = etudiant.moyenne_etudiant_ue(ue, semestre)
+        moyenne, validation, anneeValidation = etudiant.moyenne_etudiant_ue(ue, semestre)
         ues.append({'ue': ue, 'moyenne': round(
-            moyenne, 2), 'validation': validation})
+            moyenne, 2), 'validation': validation, 'anneeValidation': anneeValidation})
 
     # calcul du nombre de crédits obtenus par l'étudiant
     credits_obtenus = 0
@@ -1010,10 +1011,10 @@ def releve_notes_semestre(request, id_semestre):
         releve_note['lignes'] = []
         credits_obtenus = 0
         for ue in semestre_ues:
-            moyenne, validation = etudiant.moyenne_etudiant_ue(ue, semestre)
+            moyenne, validation, anneeValidation = etudiant.moyenne_etudiant_ue(ue, semestre)
             releve_note['lignes'].append(
                 {'ue': ue, 'moyenne': round(
-                    moyenne, 2), 'validation': validation}
+                    moyenne, 2), 'validation': validation, 'anneeValidation': anneeValidation}
             )
             # calcul de nombre de crédits obtenus
             if validation:
@@ -1225,6 +1226,7 @@ def recapitulatif_notes(request, id_matiere, id_semestre):
         liste_etudiants.append(
             {'etudiant': etudiant, 'moyenne': etudiant.moyenne_etudiant_matiere(matiere, semestre)[0]})
 
+    context['annee'] = semestre.annee_universitaire
     context['liste_etudiants'] = liste_etudiants
     context['matiere'] = matiere
     context['semestre'] = semestre
@@ -1272,7 +1274,7 @@ def recapitulatifs_des_notes_par_matiere(request, id_semestre, id_matiere):
     }
 
     for etudiant in etudiants:
-        moyenne, a_valider = etudiant.moyenne_etudiant_matiere(
+        moyenne, a_valider, _ = etudiant.moyenne_etudiant_matiere(
             matiere, semestre)
         data['etudiants'].append({
             'full_name': etudiant.full_name(),
@@ -1347,10 +1349,10 @@ def evaluations(request, id_matiere):
             semestre = semestre.get()
     semestres = [semestre]
 
-    evaluations = Evaluation.objects.filter(
-        matiere=matiere, semestre__in=semestres, rattrapage__in=[True, False])
-    semestres = matiere.get_semestres(
-        annee_selectionnee=annee_universitaire, type='__all__')
+    evaluations = Evaluation.objects.filter(matiere=matiere, semestre__in=semestres, rattrapage__in=[True, False])
+    semestres = matiere.get_semestres(annee_selectionnee=annee_universitaire, type='__all__')
+    
+    preLoadEvaluationTemplateData(matiere, semestre)
 
     data = {
         'matiere': matiere,
@@ -1410,8 +1412,7 @@ def createNotesByEvaluation(request, id_matiere, rattrapage, id_semestre):
                 return redirect('main:evaluations', id_matiere=matiere.id)
         else:
             evaluation_form = EvaluationForm()
-            initial_etudiant_note_data = [
-                {'etudiant': etudiant.id, 'etudiant_full_name': etudiant} for etudiant in etudiants]
+            initial_etudiant_note_data = [{'etudiant': etudiant.id, 'etudiant_full_name': etudiant.full_name()} for etudiant in etudiants]
             note_form_set = NoteFormSet(
                 initial=initial_etudiant_note_data, queryset=queryset)
         data = {
@@ -1424,7 +1425,6 @@ def createNotesByEvaluation(request, id_matiere, rattrapage, id_semestre):
         }
         return render(request, 'notes/create_or_edit_note.html', context=data)
     return redirect('main:evaluations', id_matiere=matiere.id)
-
 
 @login_required(login_url=settings.LOGIN_URL)
 def editeNoteByEvaluation(request, id):
@@ -1466,9 +1466,8 @@ def editeNoteByEvaluation(request, id):
         # Créer une instance de d'ensemble de formulaire selon notre queryset
         note_form_set = NoteFormSet(instance=evaluation)
         for form in note_form_set:
-            etudiant = Etudiant.objects.filter(
-                id=form.initial['etudiant']).get()
-            form.initial['etudiant_full_name'] = etudiant
+            etudiant = Etudiant.objects.filter(id=form.initial['etudiant']).get()
+            form.initial['etudiant_full_name'] = etudiant.full_name()
 
     data = {
         'evaluation_form': evaluation_form,
@@ -1480,22 +1479,30 @@ def editeNoteByEvaluation(request, id):
 
     return render(request, 'notes/create_or_edit_note.html', context=data)
 
-
 @login_required(login_url=settings.LOGIN_URL)
 def deleteEvaluation(request, id):
     """
-    Supprime une evaluation :model:`main.Note`.
+        Supprime une evaluation :model:`main.Note`.
 
-    **Context**
+        **Context**
 
-    ``evaluation``
-        une instance du :model:`main.Note`.
+        ``evaluation``
+            une instance du :model:`main.Note`.
     """
     evaluation = get_object_or_404(Evaluation, pk=id)
     matiere = evaluation.matiere
     evaluation.delete()
     return redirect('main:evaluations', id_matiere=matiere.id)
 
+@login_required(login_url=settings.LOGIN_URL)
+def uploadEvaluation(request, id_matiere, id_semestre):
+    matiere = get_object_or_404(Matiere, pk=id_matiere)
+    semestre = get_object_or_404(Semestre, pk=id_semestre)
+    if 'evaluation_data' in request.FILES:
+        file = request.FILES.get('evaluation_data')
+        load_notes_from_evaluation(file, matiere, semestre)
+        #return HttpResponse("Hello")
+    return redirect('main:evaluations', id_matiere=id_matiere)
 
 @login_required(login_url=settings.LOGIN_URL)
 def dashboard(request):

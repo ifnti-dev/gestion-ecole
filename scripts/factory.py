@@ -1,6 +1,7 @@
 import random
 from faker import Faker
-from main.models import Etudiant, Personnel, Enseignant, Comptable, Programme, Seance, Tuteur, Ue, Matiere, Evaluation, Competence, Semestre, Domaine, Parcours, AnneeUniversitaire, Note
+from main.models import Etudiant, Personnel, Enseignant, Comptable, Programme,  Tuteur, Ue, Matiere, Evaluation, Competence, Semestre, Domaine, Parcours, AnneeUniversitaire, Note
+from cahier_de_texte.models import Seance
 from django.contrib.auth.models import User 
 
 def run():

@@ -1,0 +1,67 @@
+{% extends './index.html' %}
+{% block content_title %}Planning {{semestre.libelle}} {{semestre.annee_universitaire}} {% endblock content_title %}
+{% load static %}
+{% block content %}
+<div class="block block-rounded">
+    
+    
+    <div class="block-content block-content-full">
+        <table class="table table-bordered table-striped table-vcenter js-dataTable-full-pagination">
+            <thead>
+                <tr>
+                    <th class="text-center" style="width: 80px;">Id</th>
+                    <th class="d-none d-sm-table-cell text-center">Semaine</th>
+                    <th class="d-none d-sm-table-cell text-center">Semestre</th>
+                    <th class="d-none d-sm-table-cell text-center">Intervalle date</th>
+                    <th style="width: 15%;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for planning in plannings %}
+                                <td class="text-center font-size-sm">{{ planning.id }}</td>
+                                <td class="text-center font-w600 font-size-sm"> <a href="details/{{planning.id}}" target="_blank">{{ planning.semaine }}</a></td>
+                                <td class="text-center font-w600 font-size-sm">{{ planning.semestre }}</td>
+                                <td class="text-center font-w600 font-size-sm">{{ planning.intervalle }}</td>
+                                <td class="text-center">
+                                    <button type="button" class="btn btn-secondary dropdown-toggle" id="dropdown-default-secondary" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <i class="fa fa-bars" aria-hidden="true"></i>
+                                    </button>
+                                    <div class="dropdown-menu font-size-sm" aria-labelledby="dropdown-default-secondary">
+                                        <li class="nav-main-item">
+                                            <a class="nav-main-link nav-main-link-name" data-toggle="" aria-haspopup="true" aria-expanded="false" href="print/{{planning.id}}">
+                                                <i class="fa fa-print mr-1" aria-hidden="true"></i>
+                                                <span class="nav-main-link-name">Imprimer</span>
+                                            </a>
+                                        </li>
+                                        <li class="nav-main-item">
+                                            <a class="nav-main-link nav-main-link-name" data-toggle="" aria-haspopup="true" aria-expanded="false" href="edit/{{planning.id}}">
+                                                <i class="fa fa-edit mr-1" aria-hidden="true"></i>
+                                                <span class="nav-main-link-name">Modifier</span>
+                                            </a>
+                                        </li>
+                                        <li class="nav-main-item">
+                                            <a class="nav-main-link nav-main-link-name" data-toggle="" aria-haspopup="true" aria-expanded="false" href="delete/{{planning.id}}">
+                                                <i class="fa fa-trash mr-1 text-danger" aria-hidden="true"></i>
+                                                <span class="nav-main-link-name">Supprimer</span>
+                                            </a>
+                                        </li>
+                                    </div>
+                                </td>
+                            </tr>
+                    {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+
+{% endblock content %}
+{% block scripts %}
+    <script type="text/javascript">
+        form_tag = $('#form-semestre');
+        $('#semestre').on('change', function() {
+            form_tag.submit();
+        });
+    </script>
+{% endblock scripts %}

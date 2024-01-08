@@ -4,7 +4,8 @@ import datetime
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
-from main.models import Enseignant, Matiere, Etudiant,Seance ,AnneeUniversitaire , Semestre
+from main.models import Enseignant, Matiere, Etudiant ,AnneeUniversitaire , Semestre
+from cahier_de_texte.models import Seance
 from django.contrib.auth import authenticate, login , get_user_model
 
 import datetime

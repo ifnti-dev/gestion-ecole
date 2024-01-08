@@ -24,27 +24,32 @@
                 <tr>
                     <th class="text-center">Etudiant</th>
                     {% for evaluation in evaluations  %}
-                        <th scope="col" class="" style="width: 15%;"> {{ evaluation.libelle }} </th>
+                        <th scope="col" class="" style="width: 15%;"> {{ evaluation.libelle }} {% if evaluation.rattrapage %} (rattrapage) {% endif %}</th>
                     {% endfor %}
                     <th scope="col" class="" style="width: 15%;"> Moyenne </th> 
-                    <th scope="col" class="" style="width: 15%;"> Validé </th> 
                 </tr>
             </thead>
             <tbody>
                 {% for etudiant in etudiants %}
                 <tr>
-                    <td class="text-center font-size-sm">{{etudiant.full_name}} </td>
+                    <td class="text-left font-size-sm d-flex justify-content-between">
+                        <span>{{etudiant.full_name}}</span>
+                        <span>
+                            {% if etudiant.a_valider %}
+                            <span class="text-success">
+                                <i class="fa fa-check"></i>
+                            </span>
+                            {% else %}
+                                <span class="text-danger">
+                                    <i class="fa fa-skull-crossbones"></i>
+                                </span>
+                            {% endif %}
+                        </span>
+                    </td>
                     {% for note in etudiant.notes  %}
-                    <td class="text-center font-size-sm"> {{ note.valeur }} </td>
+                        <td class="text-center font-size-sm"> {{ note.valeur }} </td>
                     {% endfor %}
                     <td class="text-center font-size-sm"> {{ etudiant.moyenne }} </td>
-                    <td class="text-center font-size-sm"> 
-                        {% if etudiant.a_valider %}
-                            <span class="text-success">Oui</span>
-                        {% else %}
-                            <span class="text-danger">Non</span>
-                        {% endif %}
-                    </td>
                 </tr>
                 {% endfor%}
             </tbody>
