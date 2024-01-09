@@ -605,6 +605,7 @@ def carte_etudiant_all(request, niveau):
     id_annee_selectionnee = request.session["id_annee_selectionnee"]
     annee_universitaire = get_object_or_404(
         AnneeUniversitaire, pk=id_annee_selectionnee)
+    annee_suiv = int(annee_universitaire.annee) + 1
 
     semestre = Semestre.objects.filter(id=niveau)
     if semestre:
@@ -613,18 +614,29 @@ def carte_etudiant_all(request, niveau):
         semestres = ['S1', 'S2', 'S3', 'S4', 'S5', 'S6']
 
     etudiants, semestre = Etudiant.get_Ln(semestres, annee_universitaire=annee_universitaire)
-    print(etudiants)
+   
     for etudiant in etudiants:
         etudiant.niveau, _ = etudiant.get_niveau_annee(annee_universitaire)
 
+    nbre_pages = len(etudiants) // 6
+
     # ajout des étudiants dans le dictionnaire
-    context = {'etudiants': etudiants, 'annee': annee_universitaire.annee}
+    context = {'etudiants': etudiants, 'annee': annee_universitaire.annee, 'nbre_pages': nbre_pages}
 
-    latex_input = 'carte_etudiant_all'
-    latex_ouput = 'generated_carte_etudiant_all'
-    pdf_file = 'pdf_carte_etudiant_all'
+    for etudiant in etudiants:
+        latex_input = 'carte_etudiant'
+        latex_ouput = 'generated_carte_etudiant'
+        pdf_file = 'carte_etudiant_' + str(etudiant.id)
 
-    # génération du pdf
+        temp_context = {'etudiant': etudiant, 'niveau': niveau, 'annee': str(annee_universitaire.annee) + '-' + str(annee_suiv)}
+
+        # génération du pdf
+        generate_pdf(temp_context, latex_input, latex_ouput, pdf_file)
+
+    latex_input = 'cartes_rassemblees'
+    latex_ouput = 'generated_cartes_rassemblees'
+    pdf_file = 'pdf_carte_etudiant_rassemblees'
+
     generate_pdf(context, latex_input, latex_ouput, pdf_file)
 
     # visualisation du pdf dans le navigateur
