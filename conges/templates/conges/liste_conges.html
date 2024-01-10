@@ -71,12 +71,14 @@
                         </button>
                         {% endif %}
 
-                        <button type="button" class="update-book btn btn-sm btn-primary">
+                        {% if conge.valider == "Inactif" or conge.valider == "Actif" %}
+                        <button type="button" class="update-book btn btn-sm btn-warning">
                             <a style="color: blanchedalmond;"
                                 href="{% url 'conges:formulaire_de_demande_de_conges' conge.id %}">
-                                <span>Print</span>
+                                <span class="fa fa-print"></span>
                             </a>
                         </button>
+                        {% endif %}
                     </td>
                     <!--td style="text-align: center;">
                         <button type="button" class="update-book btn btn-sm btn-warning">

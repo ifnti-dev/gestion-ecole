@@ -17,6 +17,8 @@ from django.contrib.auth.models import Group
 from django.db.models import Sum  
 from num2words import num2words
 from decimal import Decimal
+import math
+
 
 class Utilisateur(models.Model):
     SEXE_CHOISE = [
@@ -406,7 +408,7 @@ class Personnel(Utilisateur):
     dernierdiplome = models.ImageField(null=True, blank=True, verbose_name="Dernier diplome")
     nbreJrsCongesRestant = models.IntegerField(verbose_name="Nbre jours de congé restant", default=0)
     nbreJrsConsomme = models.IntegerField(verbose_name="Nombre de jours consommé", default=0)
-
+    nombre_de_personnes_en_charge = models.IntegerField(verbose_name="Nbre de pers pris en charge", default=0)
     
     def save(self):
         print(f'----{self.id}----')
@@ -426,15 +428,6 @@ class Personnel(Utilisateur):
         self.nbreJrsConsomme = total_jours_pris
         self.nbreJrsCongesRestant = 30 - total_jours_pris if total_jours_pris <= 30 else 0  # Mise à zéro si dépassement
         self.save()
-
-    # def update_conge_counts(self):
-    #     conges_pris = Conge.objects.filter(personnel=self)
-    #     total_jours_pris = conges_pris.aggregate(total=Sum('nombre_de_jours_de_conge'))['total'] or 0
-
-    #     self.nbreJrsConsomme = total_jours_pris
-    #     self.nbreJrsCongesRestant = 30 - total_jours_pris 
-    #     self.save()
-
 
 
 class DirecteurDesEtudes(Personnel):
@@ -1051,14 +1044,103 @@ class Salaire(models.Model):
     frais_prestations_familiale_salsalaire = models.DecimalField(max_digits=10, decimal_places=3, default=0.04)
     tcs = models.DecimalField(max_digits=10, decimal_places=2, default=0, verbose_name="TCS")
     irpp = models.DecimalField(max_digits=10, decimal_places=2, default=0, verbose_name="IRPP")
-    is_tcs = models.BooleanField(default=False, null=True)
-    is_irpp = models.BooleanField(default=False, null=True)
     prime_forfaitaire = models.DecimalField(max_digits=10, decimal_places=2, default=0, verbose_name="Prime forfaitaires")
     acomptes = models.DecimalField(max_digits=10, decimal_places=2, default=0, verbose_name="Acomptes")
     salaire_net_a_payer = models.DecimalField(max_digits=10, decimal_places=2, default=0, verbose_name="Salaire Net à payer")
     compte_bancaire = models.ForeignKey('CompteBancaire', on_delete=models.CASCADE, null=True, blank=True)
     annee_universitaire = models.ForeignKey('AnneeUniversitaire', on_delete=models.CASCADE, verbose_name="Année Universitaire", null=True, blank=True)
 
+    def calculer_salaire_brut_annuel(self):
+        salaire_de_base = self.personnel.salaireBrut
+        prime_efficacite = self.prime_efficacite
+        prime_qualite = self.prime_qualite
+        frais_travaux_complementaires = self.frais_travaux_complementaires
+        prime_anciennete = self.prime_anciennete
+        primes = (
+            prime_efficacite
+            + prime_qualite
+            + frais_travaux_complementaires
+            + prime_anciennete
+        )
+        salaire_brut_mensuel = salaire_de_base + primes
+        salaire_brut_annuel = salaire_brut_mensuel * 12
+        return salaire_brut_annuel
+
+    def calculer_total_A(self):
+        total_A = self.calculer_salaire_brut_annuel()
+        return total_A
+    
+    def calculer_total_B(self):
+        total_B = Decimal(self.calculer_salaire_brut_annuel()) * Decimal(0.04)
+        return total_B
+    
+    def calculer_total_C(self):
+        total_C = self.calculer_total_A() - self.calculer_total_B()
+        return total_C
+    
+    def calculer_total_D(self):
+        G41 = self.calculer_total_C()
+        if G41 < 10000000:
+            total_D = Decimal(0.28) * G41
+        elif G41 > 10000000:
+            total_D = 10000000 * 0.28
+        else:
+            total_D = 0
+        return total_D
+
+    def calculer_semi_net(self):
+        G41 = self.calculer_total_C()
+        G42 = self.calculer_total_D()
+        semi_net = G41 - G42
+        return semi_net
+        
+    def calculer_charges_de_familles(self):
+        F44 = self.personnel.nombre_de_personnes_en_charge
+        if F44 <= 6:
+            resultat = 120000 * F44
+        else:
+            resultat = 6 * 120000
+        return resultat
+
+    def calculer_net_taxable(self):
+        G43 = self.calculer_semi_net()
+        G44 = self.calculer_charges_de_familles()
+        net_taxable = G43 - G44
+        return net_taxable
+
+    def calculer_net_imposable(self):
+        net_imposable = self.calculer_net_taxable()
+        return net_imposable
+    
+    def calculer_net_imposable_arrondi(self):
+        G50 = self.calculer_net_imposable()
+        net_imposable_arrondi = round(G50, -3)
+        net_imposable_arrondi_str = "{:.0f}".format(net_imposable_arrondi)
+        return int(net_imposable_arrondi_str)
+
+    def calculer_irpp_annuel(self):
+        G51 = self.calculer_net_imposable_arrondi()
+        if G51 < 900000 or G51 == 900000:
+            irpp = G51 * 0
+        elif G51 < 3000000 or G51 == 3000000:
+            irpp = (G51 - 900000) * 0.03 + 0
+        elif G51 < 6000000 or G51 == 6000000:
+            irpp = (G51 - 3000000) * 0.1 + 63000
+        elif G51 < 9000000 or G51 == 9000000:
+            irpp = (G51 - 6000000) * 0.15 + 363000
+        elif G51 < 12000000 or G51 == 12000000:
+            irpp = (G51 - 9000000) * 0.2 + 813000
+        elif G51 < 15000000 or G51 == 15000000:
+            irpp = (G51 - 12000000) * 0.25 + 1413000
+        elif G51 < 20000000 or G51 == 20000000:
+            irpp = (G51 - 15000000) * 0.3 + 2163000
+        else:
+            irpp = (G51 - 20000000) * 0.35 + 3663000
+        return irpp 
+    
+    def calculer_irpp_mensuel(self):
+        irpp_mensuel = self.calculer_irpp_annuel() /12
+        return irpp_mensuel
 
     def __str__(self):
         return str(self.personnel.nom) #+ " " + str(self.personnel.prenom) + " Salaire : " +  str(self.date_debut) +  " au " + str(self.date_fin)
@@ -1073,6 +1155,8 @@ class Salaire(models.Model):
         frais_travaux_complementaires = self.frais_travaux_complementaires
         prime_anciennete = self.prime_anciennete
         tcs = self.tcs
+        irpp = self.calculer_irpp_mensuel()
+        self.irpp = irpp
         prime_forfaitaire = self.prime_forfaitaire
         acomptes = self.acomptes
         frais_prestations_familiale_salsalaire = Decimal(self.frais_prestations_familiale_salsalaire) * Decimal(self.personnel.salaireBrut)
@@ -1088,7 +1172,6 @@ class Salaire(models.Model):
             frais_prestations_familiale_salsalaire
             + tcs
         )
-        
         salaire_brut = salaire_de_base + primes
         salaire_net = salaire_brut - deductions
         pret = salaire_net - acomptes

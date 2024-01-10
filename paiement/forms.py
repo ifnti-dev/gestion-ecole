@@ -76,7 +76,7 @@ class ComptableForm(forms.ModelForm):
     datenaissance = DateField(widget=forms.SelectDateWidget(years=range(1990, 2006)), label='Date de naissance')
     class Meta:
         model = Comptable
-        fields = ['nom', 'prenom', 'contact', 'sexe', 'email', 'adresse', 'datenaissance', 'lieunaissance', 'prefecture', 'photo_passport', 'salaireBrut', 'dernierdiplome', 'is_active']
+        fields = ['nom', 'prenom', 'contact', 'sexe', 'email', 'adresse', 'datenaissance', 'lieunaissance', 'photo_passport', 'salaireBrut', 'nombre_de_personnes_en_charge', 'dernierdiplome', 'is_active']
         widgets = {
             'nom': forms.TextInput(attrs={'class': 'form-control'}),
             'prenom': forms.TextInput(attrs={'class': 'form-control'}),
@@ -86,9 +86,9 @@ class ComptableForm(forms.ModelForm):
             'adresse': forms.TextInput(attrs={'class': 'form-control'}),
             'datenaissance': DateField(widget=forms.SelectDateWidget(years=range(1900, 2006)), label="Date de naissance"),
             'lieunaissance': forms.TextInput(attrs={'class': 'form-control'}),
-            'prefecture': forms.TextInput(attrs={'class': 'form-control'}),
             'photo_passport': forms.FileInput(attrs={'class': 'form-control'}),
             'salaireBrut': forms.NumberInput(attrs={'class': 'form-control'}),
+            'nombre_de_personnes_en_charge': forms.NumberInput(attrs={'class': 'form-control'}),
             'dernierdiplome': forms.FileInput(attrs={'class': 'form-control'}),
             'is_active': forms.CheckboxInput(attrs={'class': 'form-control'}),
         }
@@ -102,7 +102,6 @@ class ComptableForm(forms.ModelForm):
         adresse = cleaned_data.get('adresse')
         lieunaissance = cleaned_data.get('lieunaissance')
         sexe = cleaned_data.get('sexe')
-        prefecture = cleaned_data.get('prefecture')
 
         if nom.find(';') != -1 or nom.find('/') != -1 or nom.find('.') != -1 or nom.find(',') != -1 or nom.find(':') != -1 or nom.find('!') != -1 or nom.find('?') != -1 or nom.find('*') != -1 or nom.find('+') != -1 or nom.find('=') != -1 or nom.find('@') != -1 or nom.find('#') != -1 or nom.find('$') != -1 or nom.find('%') != -1 or nom.find('&') != -1 or nom.find('(') != -1 or nom.find(')') != -1 or nom.find('_') != -1 or nom.find('<') != -1 or nom.find('>') != -1 or nom.find('|') != -1 or nom.find('~') != -1 or nom.find('^') != -1 or nom.find('{') != -1 or nom.find('}') != -1 or nom.find('[') != -1 or nom.find(']') != -1 or nom.find('"') != -1 or nom.find('\\') != -1 or nom.find('`') != -1:
             #forms.nom.errors = "Le nom ne doit pas contenir des caractères spéciaux"
@@ -162,30 +161,22 @@ class ComptableForm(forms.ModelForm):
                 self._errors['sexe'] = ErrorDict()
             self._errors['sexe'] = 'Le sexe ne doit pas contenir des chiffres'
 
-        if prefecture.find(';') != -1 or prefecture.find('/') != -1 or prefecture.find(',') != -1 or prefecture.find(':') != -1 or prefecture.find('!') != -1 or prefecture.find('?') != -1 or prefecture.find('*') != -1 or prefecture.find('+') != -1 or prefecture.find('=') != -1 or prefecture.find('#') != -1 or prefecture.find('$') != -1 or prefecture.find('%') != -1 or prefecture.find('&') != -1 or prefecture.find('(') != -1 or prefecture.find(')') != -1 or prefecture.find('_') != -1 or prefecture.find('<') != -1 or prefecture.find('>') != -1 or prefecture.find('|') != -1 or prefecture.find('~') != -1 or prefecture.find('^') != -1 or prefecture.find('{') != -1 or prefecture.find('}') != -1 or prefecture.find('[') != -1 or prefecture.find(']') != -1 or prefecture.find('"') != -1 or prefecture.find('\\') != -1 or prefecture.find("'") != -1 or prefecture.find('@') != -1 :
-            if not 'prefecture' in self._errors:
-                self._errors['prefecture'] = ErrorDict()
-            self._errors['prefecture'] = 'La préfecture ne doit pas contenir des caractères spéciaux'
-
-
+     
 class SalaireForm(forms.ModelForm):
     class Meta:
         model = Salaire
-        fields = ['date_debut','date_fin', 'personnel', 'numero_cnss', 'qualification_professionnel', 'prime_efficacite', 'prime_qualite', 'frais_travaux_complementaires', 'prime_anciennete', 'tcs', 'irpp', 'prime_forfaitaire', 'acomptes']
+        fields = ['date_debut','date_fin', 'personnel', 'numero_cnss', 'qualification_professionnel', 'tcs', 'prime_efficacite', 'prime_qualite', 'frais_travaux_complementaires', 'prime_anciennete', 'prime_forfaitaire', 'acomptes']
         widgets = {
             'date_debut': forms.DateInput(attrs={'type': 'date'}), 
             'date_fin': forms.DateInput(attrs={'type': 'date'}),
             'personnel': forms.Select(attrs={'class': 'form-control'}),
             'numero_cnss': forms.TextInput(attrs={'class': 'form-control'}),
             'qualification_professionnel': forms.Select(attrs={'class': 'form-control'}),
+            'tcs': forms.NumberInput(attrs={'class': 'form-control'}),
             'prime_efficacite': forms.NumberInput(attrs={'class': 'form-control'}),
             'prime_qualite': forms.NumberInput(attrs={'class': 'form-control'}),
             'frais_travaux_complementaires': forms.NumberInput(attrs={'class': 'form-control'}),
             'prime_anciennete': forms.NumberInput(attrs={'class': 'form-control'}),
-            'tcs': forms.NumberInput(attrs={'class': 'form-control'}),
-            'irpp': forms.NumberInput(attrs={'class': 'form-control'}),
-            #'is_tcs': forms.CheckboxInput(attrs={'class': 'form-control'}),
-            #'is_irpp': forms.CheckboxInput(attrs={'class': 'form-control'}),
             'acomptes': forms.NumberInput(attrs={'class': 'form-control'}),
             'prime_forfaitaire': forms.NumberInput(attrs={'class': 'form-control'}),
         }

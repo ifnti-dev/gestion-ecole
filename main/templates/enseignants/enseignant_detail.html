@@ -59,10 +59,10 @@
         <table id="etudiant">
             <thead class="thead-dark">
                 <tr>
-                    <th class="text-center" style="width: 20%;">Nationalité</th>
                     <th class="text-center" style="width: 15%;">Type</th>
                     <th class="text-center" style="width: 80px;">Spécialité</th>
                     <th class="text-center" style="width: 80px;">Salaire brut</th>
+                    <th class="text-center" style="width: 80px;">Nbre de personne pris en charge</th>
                     <th class="text-center" style="width: 80px;">Nbre jours de congés restant</th>
                     <th class="text-center" style="width: 15%;">Nombre de jours consommé</th>  
                 </tr>
@@ -70,12 +70,35 @@
             
             <tbody>
                 <tr>
-                    <td class="text-center font-size-sm">{{enseignant.nationalite}}</td>
                     <td class="text-center font-size-sm">{{enseignant.type}}</td>
                     <td class="text-center font-size-sm">{{enseignant.specialite}}</td>
                     <td class="text-center font-size-sm">{{enseignant.salaireBrut}}</td>
+                    <td class="text-center font-size-sm">{{enseignant.nombre_de_personnes_en_charge}}</td>
                     <td class="text-center font-size-sm">{{enseignant.nbreJrsCongesRestant}}</td>
                     <td class="text-center font-size-sm">{{enseignant.nbreJrsConsomme}}</td>
+                </tr>
+            </tbody>
+        </table>
+
+         <br>
+        <br>
+
+        <table id="etudiant">
+            <thead class="thead-dark">
+                <tr>
+                    <th class="text-center" style="width: 15%;">IRPP Annuel</th>
+                    <th class="text-center" style="width: 80px;">TCS Annuel</th>
+                    <th class="text-center" style="width: 80px;">Contributions CNSS Annuel</th>
+                    <th class="text-center" style="width: 80px;">Salaire Brut Annuel</th>
+                </tr>
+            </thead>
+            
+            <tbody>
+                <tr>
+                    <td class="text-center font-size-sm">{{enseignant.type}}</td>
+                    <td class="text-center font-size-sm">{{enseignant.salaireBrut}}</td>
+                    <td class="text-center font-size-sm">{{enseignant.nombre_de_personnes_en_charge}}</td>
+                    <td class="text-center font-size-sm">{{enseignant.nbreJrsCongesRestant}}</td>
                 </tr>
             </tbody>
         </table>

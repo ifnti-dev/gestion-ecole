@@ -19,7 +19,6 @@
                 <tr>
                     <th class="text-center" style="width: 25%;">Personnel</th>
                     <th class="text-center" style="width: 30%;">Période</th>
-                    <th class="text-center" style="width: 20%;">Net à payer</th>
                     <th class="text-center" style="width: 15%;">Actions</th>
                 </tr>
             </thead>
@@ -29,21 +28,25 @@
                     <td class="text-center font-size-sm">{{ bulletin.personnel.nom }} {{ bulletin.personnel.prenom }}
                     </td>
                     <td class="text-center font-size-sm">Du {{ bulletin.date_debut}} au {{ bulletin.date_fin}}</td>
-                    <td class="text-center font-size-sm">{{ bulletin.salaire_net_a_payer }} FCFA</td>
                     <td style="text-align: center;">
+                        <button type="button" class="update-book btn btn-sm btn-success">
+                            <a style="color: blanchedalmond;" href="{% url 'paiement:bulletin_de_paye' bulletin.id %}">
+                                <span><i class="fas fa-file-pdf"></i></span>
+                            </a>
+                        </button>
+
                         {% if is_comptable %}
                         <button type="button" class="update-book btn btn-sm btn-warning">
                             <a style="color: blanchedalmond;" href="{% url 'paiement:modifier_bulletin' bulletin.id %}">
                                 <span><i class="far fa-edit"></i></span>
                             </a>
                         </button>
-                        {% endif %}
 
-                        <button type="button" class="update-book btn btn-sm btn-success">
-                            <a style="color: blanchedalmond;" href="{% url 'paiement:bulletin_de_paye' bulletin.id %}">
-                                <span><i class="fas fa-file-pdf"></i></span>
-                            </a>
+                        <button type="button" class="delete-bulletin btn btn-sm btn-danger" onclick="showDeleteConfirmation('{{ bulletin.id }}')">
+                            <span><i class="far fa-trash-alt fa-lg"></i></span>
                         </button>
+
+                        {% endif %}
                     </td>
                 </tr>
                 {% endfor %}
@@ -52,4 +55,11 @@
     </div>
 </div>
 
+<script>
+    function showDeleteConfirmation(bulletinId) {
+        if (confirm("Voulez-vous vraiment supprimer ce bulletin ?")) {
+            window.location.href = "{% url 'paiement:delete_bulletin' %}?id=" + bulletinId;
+        }
+    }
+</script>
 {% endblock %}

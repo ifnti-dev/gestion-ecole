@@ -32,6 +32,16 @@
                             <span><i class="far fa-check-circle "></i></span> 
                           </a>
                       </button>
+
+                      {% if  conge.valider == "Actif" %}
+                        <button type="button" class="update-book btn btn-sm btn-warning">
+                            <a style="color: blanchedalmond;"
+                                href="{% url 'conges:formulaire_de_demande_de_conges' conge.id %}">
+                                <span class="fa fa-print"></span>
+                            </a>
+                        </button>
+                        {% endif %}
+                        
                     </td>
                 </tr>
                 {% endfor %}
