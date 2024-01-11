@@ -53,9 +53,10 @@ CODE_UE = {
 def get_cell_int_value(value):
     return int(trim_str(value))
 
-def load_maquette(path):
-    print('llllll:::::::::::::')
+def load_maquette(path, annee_selectionnee):
     # Clean ue and programme data
+    Ue.objects.filter(programme__semestre__annee_universitaire=annee_selectionnee).delete()
+    return
     Ue.objects.all().delete()
     Programme.objects.all().delete()
     
@@ -76,7 +77,6 @@ def load_maquette(path):
                 ue = Ue.objects.create(libelle=libelle, type=row[1], niveau=row[2].split('=')[1], nbreCredits=row[3].split('=')[1], heures=row[4].split('=')[1])
                 semestre_ue[semestre].append(ue)
                 
-    # Create programme
     annee_universitaires = AnneeUniversitaire.objects.all()
     parcours = Parcours.objects.all().first()
     if not parcours:

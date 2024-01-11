@@ -73,18 +73,30 @@ def delete_programme(request, id):
 
 def data(request):
     id_annee_selectionnee = request.session.get('id_annee_selectionnee')
+    annee_selectionnee = get_object_or_404(AnneeUniversitaire, pk=id_annee_selectionnee)
     if request.method == "POST":
         form = DataForm(request.POST, request.FILES)
         if form.is_valid():
             cleaned_data = form.clean()
-            # enseignants_excel_file = cleaned_data.get('enseignants_excel_file')
-            maquette_excel_file = cleaned_data.get('maquette_excel_file')
+
+            maquette_excel_file = request.FILES.getlist('maquette_excel_file')
             matieres_excel_file = cleaned_data.get('matieres_excel_file')
             notes_excel_file = cleaned_data.get('notes_excel_file')
             
-            
             if maquette_excel_file:
-                load_maquette(maquette_excel_file)
+                for file_cache_tmp in maquette_excel_file:
+                    name = str(file_cache_tmp)
+                    name_part = name.split('_')
+                    if len(name_part) == 3:
+                        year_part = name_part[2].split('-')
+                        if len(year_part) == 2:
+                            annee_selectionnee = year_part[0]
+                            #annee_selectionnee = AnneeUniversitaire.objects.get(annee=annee_selectionnee)
+                            print(annee_selectionnee)
+                            #load_maquette(file_cache_tmp, annee_selectionnee)
+                return HttpResponse('OK')
+                #load_maquette(maquette_excel_file, annee_selectionnee)
+                
             if matieres_excel_file:
                 load_matieres(matieres_excel_file)
             if notes_excel_file:
@@ -201,7 +213,6 @@ def generate_maquette_pdf(context):
         response = HttpResponse(pdf_preview, content_type='application/pdf')
         response['Content-Disposition'] = 'inline;filename=pdf_file.pdf'
         return response
-    
 
 def domaines(request):
     domaines =Domaine.objects.all()
@@ -242,7 +253,6 @@ def delete_domaine(request, id):
     domaine = get_object_or_404(Domaine, pk=id)
     domaine.delete()
     return redirect('maquette:domaines')
-
 
 
 def parcours(request, id_domaine):
@@ -303,3 +313,4 @@ def number(request, number):
     if number==2:
         return render(request, "data/2.html", context={})
     return render(request, "data/2.html", context={})
+

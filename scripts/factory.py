@@ -50,7 +50,7 @@ def clean_data_base():
 
      # Génération des fausses instances pour le modèle AnneeUniversitaire
     current = False
-    for i in range(1,10):
+    for i in range(1,11):
         if i == 9:
             current = True
         annee_universitaire = AnneeUniversitaire(
