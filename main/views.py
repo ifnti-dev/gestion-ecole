@@ -6,6 +6,7 @@ from django.conf import settings
 from main.forms import EnseignantForm, EtudiantForm, EvaluationForm, InformationForm, ProgrammeForm, NoteForm, TuteurForm, UeForm, MatiereForm
 from .models import Domaine, Enseignant, Evaluation, DirecteurDesEtudes, Personnel, Information, Matiere, Etudiant, Competence, Note, Comptable, Parcours, Programme, Semestre, Ue, AnneeUniversitaire, Tuteur
 from cahier_de_texte.models import Seance
+from planning.models import Planning
 from django.shortcuts import get_object_or_404, redirect, render
 from main.helpers import *
 from django.contrib.auth.decorators import login_required, permission_required
@@ -22,13 +23,27 @@ def dashboard(request):
     annee_selectionnee = get_object_or_404(
         AnneeUniversitaire, pk=id_annee_selectionnee)
     semestres = annee_selectionnee.get_semestres()
-    data = {
-        'nb_etudiants': len(Etudiant.objects.filter(semestres__in=semestres).distinct()),
-        'nb_enseignants': len(Enseignant.objects.filter(matiere__ue__programme__semestre__in=semestres).distinct()),
-        'nb_matieres': len(Matiere.objects.filter(ue__programme__semestre__in=semestres).distinct()),
-        'nb_ues': len(Ue.objects.filter(programme__semestre__in=semestres).distinct()),
-    }
-    return render(request, 'dashboard.html', context=data)
+    if request.user.groups.all().first().name in ['directeur_des_etudes', 'secretaire']:
+        data = {
+            'nb_etudiants': len(Etudiant.objects.filter(semestres__in=semestres).distinct()),
+            'nb_enseignants': len(Enseignant.objects.filter(matiere__ue__programme__semestre__in=semestres).distinct()),
+            'nb_matieres': len(Matiere.objects.filter(ue__programme__semestre__in=semestres).distinct()),
+            'nb_ues': len(Ue.objects.filter(programme__semestre__in=semestres).distinct()),
+        }
+        return render(request, 'dashboard.html', context=data)
+    
+    elif request.user.groups.all().first().name =='etudiant' :
+        user_etudiant = request.user.etudiant
+        semestre=user_etudiant.semestres.filter(courant=True,pk__contains=annee_selectionnee).get()
+        current_date = datetime.today()
+        planning=Planning.objects.filter(semestre=semestre).get()
+        for plan in planning:
+            intervalle=plan.intervalle
+            
+            if plan.debut & plan.fin :
+                intervalle=plan.fin 
+        events = planning
+        return render(request, 'dashboard.html', context=events)
 
 def change_annee_universitaire(request):
     if 'annee_universitaire' in request.GET:
@@ -1309,19 +1324,19 @@ def uploadEvaluation(request, id_matiere, id_semestre):
         #return HttpResponse("Hello")
     return redirect('main:evaluations', id_matiere=id_matiere)
 
-@login_required(login_url=settings.LOGIN_URL)
-def dashboard(request):
-    id_annee_selectionnee = request.session.get('id_annee_selectionnee')
-    annee_selectionnee = get_object_or_404(
-        AnneeUniversitaire, pk=id_annee_selectionnee)
-    semestres = annee_selectionnee.get_semestres()
-    data = {
-        'nb_etudiants': len(Etudiant.objects.filter(semestres__in=semestres).distinct()),
-        'nb_enseignants': len(Enseignant.objects.filter(matiere__ue__programme__semestre__in=semestres).distinct()),
-        'nb_matieres': len(Matiere.objects.filter(ue__programme__semestre__in=semestres).distinct()),
-        'nb_ues': len(Ue.objects.filter(programme__semestre__in=semestres).distinct()),
-    }
-    return render(request, 'dashboard.html', context=data)
+# @login_required(login_url=settings.LOGIN_URL)
+# def dashboard(request):
+#     id_annee_selectionnee = request.session.get('id_annee_selectionnee')
+#     annee_selectionnee = get_object_or_404(
+#         AnneeUniversitaire, pk=id_annee_selectionnee)
+#     semestres = annee_selectionnee.get_semestres()
+#     data = {
+#         'nb_etudiants': len(Etudiant.objects.filter(semestres__in=semestres).distinct()),
+#         'nb_enseignants': len(Enseignant.objects.filter(matiere__ue__programme__semestre__in=semestres).distinct()),
+#         'nb_matieres': len(Matiere.objects.filter(ue__programme__semestre__in=semestres).distinct()),
+#         'nb_ues': len(Ue.objects.filter(programme__semestre__in=semestres).distinct()),
+#     }
+#     return render(request, 'dashboard.html', context=data)
 
 
 @login_required(login_url=settings.LOGIN_URL)
