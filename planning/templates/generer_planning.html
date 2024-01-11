@@ -1,5 +1,5 @@
 {% extends './index.html' %}
-{% block content_title %}Plannifier {{semestre.libelle}} {{semestre.annee_universitaire}}  {% endblock content_title %}
+{% block content_title %}Plannifier {{semestre.libelle}} {{semestre.annee_universitaire}} || Semaine {{semaine}} du {{datedebut}} au {{datefin}} {% endblock content_title %}
 {% load static %}
 {% block content %}
 <style>
@@ -53,7 +53,6 @@
                     </div>
                     <div class="form-group">
                         <a id="btnEnregistrer" class="btn btn-success">Enregistrer</a>
-                        <input id="semaine" type="number" class="form-control" placeholder="semaine">
                     </div>
                     </div>
             </div>
@@ -61,9 +60,11 @@
 
       
             <script>
-                    var planification = {{ planification_json|safe }};
-                        
+                    var planification = {{ planification_json|safe }};  
                     var semestre = '{{ semestre.id|safe}}';
+                    var semaine = '{{ semaine|safe}}';
+                    var datefin = '{{ datefin|safe}}';
+                    var datedebut = '{{ datedebut|safe}}';
         
                     document.addEventListener('DOMContentLoaded', function() {
                         $('#myForm').submit(function (event) {
@@ -304,45 +305,52 @@
                             $(function () {
                                 planning.init();
                                 $("#btnEnregistrer").on("click", function() {
-                            // Récupérer la valeur de la semaine
-                            var semaine = $("#semaine").val();
-                            var csrftoken = Cookies.get('csrftoken');
-                            console.log('crsf' ,csrftoken);
-                            // Vérifier si le champ semaine est vide
-                            if (semaine === '') {
-                                console.log('Le champ semaine est vide.');
-                            } else {
-                                // Récupérer tous les événements du calendrier à partir de l'objet planning
-                                var events = planning.getEvents();
-                                console.log('bien ',events);
+                                        // Récupérer la valeur de la semaine
+                                        var csrftoken = Cookies.get('csrftoken');
+                                        
+                                            // Récupérer tous les événements du calendrier à partir de l'objet planning
+                                            var events = planning.getEvents();
+                                            for (var i = 0; i < events.length; i++) {
+                                                var event = events[i];
+                                                if (!event.endDate) {
+                                                    console.log("L'événement " + (i+1) + " n'a pas de date de fin spécifiée.");
+                                                    // Ne pas valider la suite du processus
+                                                    return;
+                                                }
+                                            }
+                                            var data = {
+                                                semaine: semaine,
+                                                datedebut:datedebut,
+                                                datefin:datefin,
+                                                events: events,
+                                                semestre : semestre,
+                                            };
+                                            console.log('data : ',data);
 
-                                // Créer un objet avec les données à envoyer
-                                var data = {
-                                    semaine: semaine,
-                                    events: events,
-                                    semestre : semestre,
-                                };
-                                console.log('data : ',data);
-
-                                // Effectuer la requête POST vers /planning/save
-                                $.ajax({
-                                    type: 'POST',
-                                    url: '/planning/save/',
-                                    data: JSON.stringify(data),
-                                    headers: {
-                                        'X-CSRFToken': csrftoken,
-                                        'Content-Type': 'application/json',
-                                    },
-                                    contentType: 'application/json',
-                                    success: function(response) {
-                                        console.log('Enregistrement réussi:', response);
-                                    },
-                                    error: function(error) {
-                                        console.error('Erreur lors de l\'enregistrement:', error);
-                                    }
-                                });
-                            }
-                        });
+                                            // Effectuer la requête POST vers /planning/save
+                                            $.ajax({
+                                                type: 'POST',
+                                                url: '/planning/save/',
+                                                data: JSON.stringify(data),
+                                                headers: {
+                                                    'X-CSRFToken': csrftoken,
+                                                    'Content-Type': 'application/json',
+                                                },
+                                                contentType: 'application/json',
+                                                success: function(response) {
+                                                    if (response.status === 'reussite') {
+                                                        // Soumettre le formulaire initial
+                                                        window.location.href = '/planning/';
+                                                    } else {
+                                                        One.helpers('notify', {type: 'danger', icon: 'fa fa-info-circle mr-1', message: response.msg});
+                                                    }
+                                                },
+                                                error: function(error) {
+                                                    console.error('Erreur lors de l\'enregistrement:', error);
+                                                }
+                                            });
+                                      
+                                    });
                             });
 
                         })(jQuery);

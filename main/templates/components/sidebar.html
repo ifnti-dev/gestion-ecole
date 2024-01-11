@@ -440,6 +440,19 @@
                 </li>
                 {% endif %}
                 {% if is_directeur_des_etudes or is_secretaire %}
+                <li class="nav-main-item">
+                    <a
+                        class="nav-main-link"
+                        href="{% url 'planning:planning' %}"
+                    >
+                        <i class="nav-main-link-icon si si-energy"></i>
+                        <span class="nav-main-link-name text-capitalize"
+                            >Planning</span
+                        >
+                    </a>
+                </li>
+                {% endif %}
+                {% if is_directeur_des_etudes or is_secretaire %}
                 <li class="nav-main-heading text-white">Semestres</li>
                 <li class="nav-main-item">
                     <a
