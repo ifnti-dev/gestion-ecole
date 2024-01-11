@@ -1,0 +1,28 @@
+{% extends './index.html' %}
+{% block content_title %}Seance Plannifier {{seance.id}} || du {{seance.planning}}  {% endblock content_title %}
+{% load static %}
+{% block content %}
+
+<h1>Détails de la Séance</h1>
+    <p><strong>Intitulé:</strong> {{ seance.intitule }}</p>
+    <p><strong>Date et heure de début:</strong> {{ seance.date_heure_debut }}</p>
+    <p><strong>Date et heure de fin:</strong> {{ seance.date_heure_fin }}</p>
+    <p><strong>Matière:</strong> {{ seance.matiere }}</p>
+    <p><strong>UE:</strong> {{ seance.matiere.ue }}</p>
+    <p><strong>Précision:</strong> {{ seance.precision }}</p>
+    <p><strong>Professeur:</strong> {{ seance.professeur }}</p>
+    <p><strong>Planning associé:</strong> {{ seance.planning }}</p>
+
+    <form method="post" action="/planning/enregistrer_seance/seance.id">
+        {% csrf_token %}
+        <button type="submit">Enregistrer Séance</button>
+    </form>
+
+    <form method="post" action="/planning/retirer_seance/seance.id">
+        {% csrf_token %}
+        <button type="submit">Retirer Séance</button>
+    </form>
+
+
+
+{% endblock content %}

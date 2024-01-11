@@ -26,7 +26,7 @@ def generate_pdf(context, input_file, output_file, pdf_file) :
     template = fichier_in.read() #lecture du template
     monContext = context
     monContext["image_path"] =  os.path.join(BASE_DIR, 'media') + '/images/templates_assets/' #dirname(abspath(__file__)) + "/out/images/"
-    
+    monContext["pdf_path"] =  os.path.join(BASE_DIR, 'media') + '/pdf/'
     '''APPLICATION DE L’ENVIRONNEMENT EDITE SUR LE TEMPLATE'''
 
     

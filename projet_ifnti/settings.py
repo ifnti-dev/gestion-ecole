@@ -67,7 +67,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'projet_ifnti.middleware.AuthUserMiddleware',
 ]
-
+USE_ETAGS = True
 ROOT_URLCONF = 'projet_ifnti.urls'
 
 TEMPLATES = [
