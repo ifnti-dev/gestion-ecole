@@ -72,7 +72,7 @@
                 <tr>
                     <td class="text-center font-size-sm">{{enseignant.type}}</td>
                     <td class="text-center font-size-sm">{{enseignant.specialite}}</td>
-                    <td class="text-center font-size-sm">{{enseignant.salaireBrut}}</td>
+                    <td class="text-center font-size-sm">{{enseignant.salaireBrut}} FCFA</td>
                     <td class="text-center font-size-sm">{{enseignant.nombre_de_personnes_en_charge}}</td>
                     <td class="text-center font-size-sm">{{enseignant.nbreJrsCongesRestant}}</td>
                     <td class="text-center font-size-sm">{{enseignant.nbreJrsConsomme}}</td>
@@ -86,19 +86,17 @@
         <table id="etudiant">
             <thead class="thead-dark">
                 <tr>
-                    <th class="text-center" style="width: 15%;">IRPP Annuel</th>
-                    <th class="text-center" style="width: 80px;">TCS Annuel</th>
-                    <th class="text-center" style="width: 80px;">Contributions CNSS Annuel</th>
-                    <th class="text-center" style="width: 80px;">Salaire Brut Annuel</th>
+                    <th class="text-center" style="width: 25%;">Salaire Brut Total</th>
+                    <th class="text-center" style="width: 25%;">IRPP & TCS Total</th>
+                    <th class="text-center" style="width: 25%;">Contributions CNSS Total</th>
                 </tr>
             </thead>
             
             <tbody>
                 <tr>
-                    <td class="text-center font-size-sm">{{enseignant.type}}</td>
-                    <td class="text-center font-size-sm">{{enseignant.salaireBrut}}</td>
-                    <td class="text-center font-size-sm">{{enseignant.nombre_de_personnes_en_charge}}</td>
-                    <td class="text-center font-size-sm">{{enseignant.nbreJrsCongesRestant}}</td>
+                    <td class="text-center font-size-sm">{{enseignant.calculer_salaire_brut_annuel}} FCFA</td>
+                    <td class="text-center font-size-sm">{{enseignant.calculer_irpp_tcs_annuel}} FCFA</td>
+                    <td class="text-center font-size-sm">{{enseignant.calcule_deductions_cnss_annuel}} FCFA</td>
                 </tr>
             </tbody>
         </table>

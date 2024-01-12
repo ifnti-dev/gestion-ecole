@@ -16,7 +16,7 @@ from django.db.models import Max
 from django.contrib.auth.models import Group
 from django.db.models import Sum  
 from num2words import num2words
-from decimal import Decimal
+from decimal import Decimal, ROUND_DOWN
 import math
 
 
@@ -85,7 +85,7 @@ class Etudiant(Utilisateur):
     passer_semestre_suivant = models.BooleanField(default=False, verbose_name="Passer au semestre suivant")
     decision_conseil = models.TextField(verbose_name="Décision du conseil", null=True, default="Décision du conseil")
     profil = models.ImageField(null=True, blank=True, verbose_name="Photo de profil")
-    semestres = models.ManyToManyField('Semestre')
+    semestres = models.ManyToManyField('Semestre', null=True)
     tuteurs = models.ManyToManyField('Tuteur', related_name="Tuteurs", blank=True, null=True)
 
     class Meta:
@@ -429,6 +429,25 @@ class Personnel(Utilisateur):
         self.nbreJrsCongesRestant = 30 - total_jours_pris if total_jours_pris <= 30 else 0  # Mise à zéro si dépassement
         self.save()
 
+    def calculer_salaire_brut_annuel(self):
+        salaires = Salaire.objects.filter(personnel=self)
+        total_salaire_brut_annuel = sum(salaire.calculer_salaire_brut_mensuel() for salaire in salaires)
+        return total_salaire_brut_annuel
+    
+    def calculer_irpp_tcs_annuel(self):
+        salaires = Salaire.objects.filter(personnel=self)
+        total_irpp_annuel = sum(salaire.calculer_irpp_mensuel() for salaire in salaires)
+        total_tcs_annuel = sum(salaire.tcs for salaire in salaires)
+        total_irpp_tcs_annuel = Decimal(total_irpp_annuel) + Decimal(total_tcs_annuel)
+        total_irpp_tcs_annuel = total_irpp_tcs_annuel.quantize(Decimal('0.00'), rounding=ROUND_DOWN) 
+        return total_irpp_tcs_annuel
+
+    def calcule_deductions_cnss_annuel(self):
+        salaires = Salaire.objects.filter(personnel=self)
+        total_deductions_cnss = sum(salaire.calculer_deductions_cnss() for salaire in salaires)
+        total_deductions_cnss = total_deductions_cnss.quantize(Decimal('0.00'), rounding=ROUND_DOWN) 
+        return Decimal(total_deductions_cnss)
+    
 
 class DirecteurDesEtudes(Personnel):
    # actif = models.BooleanField(default=True)
@@ -1046,7 +1065,7 @@ class Salaire(models.Model):
     irpp = models.DecimalField(max_digits=10, decimal_places=2, default=0, verbose_name="IRPP")
     prime_forfaitaire = models.DecimalField(max_digits=10, decimal_places=2, default=0, verbose_name="Prime forfaitaires")
     acomptes = models.DecimalField(max_digits=10, decimal_places=2, default=0, verbose_name="Acomptes")
-    salaire_net_a_payer = models.DecimalField(max_digits=10, decimal_places=2, default=0, verbose_name="Salaire Net à payer")
+    salaire_net_a_payer = models.DecimalField(max_digits=15, decimal_places=2, default=0, verbose_name="Salaire Net à payer")
     compte_bancaire = models.ForeignKey('CompteBancaire', on_delete=models.CASCADE, null=True, blank=True)
     annee_universitaire = models.ForeignKey('AnneeUniversitaire', on_delete=models.CASCADE, verbose_name="Année Universitaire", null=True, blank=True)
 
@@ -1065,6 +1084,10 @@ class Salaire(models.Model):
         salaire_brut_mensuel = salaire_de_base + primes
         salaire_brut_annuel = salaire_brut_mensuel * 12
         return salaire_brut_annuel
+    
+    def calculer_salaire_brut_mensuel(self):
+        salaire_brut_mensuel = self.calculer_salaire_brut_annuel() / 12
+        return salaire_brut_mensuel
 
     def calculer_total_A(self):
         total_A = self.calculer_salaire_brut_annuel()
@@ -1141,43 +1164,34 @@ class Salaire(models.Model):
     def calculer_irpp_mensuel(self):
         irpp_mensuel = self.calculer_irpp_annuel() /12
         return irpp_mensuel
-
-    def __str__(self):
-        return str(self.personnel.nom) #+ " " + str(self.personnel.prenom) + " Salaire : " +  str(self.date_debut) +  " au " + str(self.date_fin)
     
+    def calculer_deductions_cnss(self):
+        frais_prestations_familiale_salsalaire = Decimal(self.frais_prestations_familiale_salsalaire) * Decimal(self.calculer_salaire_brut_mensuel())
+        deductions = (
+            frais_prestations_familiale_salsalaire
+        )
+        return deductions
+
     def save(self, *args, **kwargs):
         if not self.annee_universitaire:
             self.annee_universitaire = AnneeUniversitaire.static_get_current_annee_universitaire()
-
-        salaire_de_base = self.personnel.salaireBrut
-        prime_efficacite = self.prime_efficacite
-        prime_qualite = self.prime_qualite
-        frais_travaux_complementaires = self.frais_travaux_complementaires
-        prime_anciennete = self.prime_anciennete
-        tcs = self.tcs
+        
+        tcs = Decimal(self.tcs)
         irpp = self.calculer_irpp_mensuel()
-        self.irpp = irpp
+        self.irpp = Decimal(irpp)
         prime_forfaitaire = self.prime_forfaitaire
         acomptes = self.acomptes
-        frais_prestations_familiale_salsalaire = Decimal(self.frais_prestations_familiale_salsalaire) * Decimal(self.personnel.salaireBrut)
 
-        primes = (
-            prime_efficacite
-            + prime_qualite
-            + frais_travaux_complementaires
-            + prime_anciennete
-        )
-
-        deductions = (
-            frais_prestations_familiale_salsalaire
-            + tcs
-        )
-        salaire_brut = salaire_de_base + primes
+        salaire_brut =  self.calculer_salaire_brut_mensuel()
+        deductions = self.calculer_deductions_cnss() + irpp + tcs
         salaire_net = salaire_brut - deductions
         pret = salaire_net - acomptes
         self.salaire_net_a_payer = pret + prime_forfaitaire 
         super(Salaire, self).save(*args, **kwargs)
 
+    def __str__(self):
+        return str(self.personnel.nom) 
+    
 
 class Fournisseur(models.Model):
     TYPE = [
@@ -1310,7 +1324,7 @@ class Conge(models.Model):
     ]
 
     nature = models.CharField(max_length=30, choices=NATURE_CHOICES, verbose_name="Nature des congés")
-    autre_nature = models.CharField(max_length=100, blank=True, null=True, verbose_name="Autre nature des congés")
+    autre_nature = models.CharField(max_length=100, blank=True, null=True, verbose_name="Autre nature à préciser")
     date_et_heure_debut = models.DateField(default=timezone.now, verbose_name="Date de début")
     date_et_heure_fin = models.DateField(default=timezone.now, verbose_name="Date de fin")
     personnel = models.ForeignKey('Personnel', on_delete=models.CASCADE, verbose_name="Personnel")

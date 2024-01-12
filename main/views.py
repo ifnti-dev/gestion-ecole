@@ -97,11 +97,11 @@ def etudiants(request):
         elif role.name in ["directeur_des_etudes", "secretaire", "comptable"]:
             niveau = "Nos Étudiants"
             etudiants = Etudiant.objects.filter(
-                is_active__in=etats_selected, semestres__in=semestres_selected).distinct()
+                is_active=True, semestres__in=semestres_selected).distinct()
         elif role.name == "comptable":
             niveau = "Nos Étudiants"
             etudiants = Etudiant.objects.filter(
-                is_active__in=etats_selected, semestres__in=semestres_selected).distinct()
+                is_active=True, semestres__in=semestres_selected).distinct()
 
     # Gérer les erreurs si aucun semestre n'est sélectionné
     try:
