@@ -11,6 +11,7 @@ class AuthUserMiddleware(MiddlewareMixin):
             AnneeUniversitaire.objects.get(id=request.session.get('id_annee_selectionnee'))
         except:
             print('OKay')
+            print(current_annee_accademique)
             id_annee_selectionnee = current_annee_accademique.id if current_annee_accademique else 0
             request.session["id_annee_selectionnee"] = id_annee_selectionnee
         path = request.path

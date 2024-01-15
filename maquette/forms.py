@@ -33,7 +33,7 @@ class GenerateMaquetteForm(forms.Form):
         return cleaned_data
 
 class DataForm(forms.Form):
-    enseignants_excel_file = forms.FileField(widget=forms.FileInput(attrs={'class': 'form-control'}), required=False, label="Fichier enseignants")
+    # enseignants_excel_file = forms.FileField(widget=forms.FileInput(attrs={'class': 'form-control'}), required=False, label="Fichier enseignants")
     maquette_excel_file = forms.FileField(widget=forms.FileInput(attrs={'class': 'form-control'}), required=False, label="Fichier maquette")
     matieres_excel_file = forms.FileField(widget=forms.FileInput(attrs={'class': 'form-control'}), required=False, label="Fichier matières")
     notes_excel_file = forms.FileField(widget=forms.FileInput(attrs={'class': 'form-control'}), required=False, label="Fichier notes")
@@ -52,9 +52,9 @@ class CorrespondanceMaquetteForm(forms.ModelForm):
     
     def clean(self):
         cleaned_data = super(CorrespondanceMaquetteForm, self).clean()
-        nature = cleaned_data.get('nature');
-        ancienne = cleaned_data.get('ancienne');
-        nouvelle = cleaned_data.get('nouvelle');
+        nature = cleaned_data.get('nature')
+        ancienne = cleaned_data.get('ancienne')
+        nouvelle = cleaned_data.get('nouvelle')
         model = None
         if nature == "" and nature == ancienne == nouvelle:
             self._errors['errors'] = "Veuillez remplire le formulaire."

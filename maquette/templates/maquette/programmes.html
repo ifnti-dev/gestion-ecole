@@ -95,13 +95,13 @@
                 </div>
                 <div class="block-content font-size-sm">
                     <div class="d-flex flex-column my-3">
-                        <a href="/media/excel_templates/evaluation_tmp.xlsx">
+                        <a href="/media/excel_templates/maquette_general_[annee].xlsx">
                             <button class="btn btn-primary w-100">Template</button>
                         </a>
                         <form action="{% url 'maquette:data' %}" method="post" enctype="multipart/form-data">
                             {% csrf_token %}
                             <div class="mt-4">
-                                <input type="file" name="maquette_excel_file" class="btn btn-primary w-100" name="" id="">
+                                <input type="file" name="maquette_excel_file" multiple class="btn btn-primary w-100" name="" id="">
                             </div>
                             <button type="submit" class="btn btn-primary mt-5" data-dismiss="modal">Charger</button>
                         </form>

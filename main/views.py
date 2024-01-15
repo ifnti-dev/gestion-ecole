@@ -1396,8 +1396,6 @@ def createNotesByEvaluation(request, id_matiere, rattrapage, id_semestre):
                 return redirect('main:evaluations', id_matiere=matiere.id)
             etudiants = semestre.etudiant_set.all()
 
-        # NoteFormSet = forms.modelformset_factory(
-        #     Note, form=NoteForm, extra=len(etudiants))
         NoteFormSet = forms.inlineformset_factory(
             parent_model=Evaluation,
             model=Note,
@@ -1407,8 +1405,7 @@ def createNotesByEvaluation(request, id_matiere, rattrapage, id_semestre):
             min_num=0,
             validate_min=True,
         )
-        queryset = Note.objects.none()
-
+        
         if request.method == 'POST':
             evaluation_form = EvaluationForm(request.POST)
             evaluation_form.set_max_ponderation(
@@ -1426,6 +1423,7 @@ def createNotesByEvaluation(request, id_matiere, rattrapage, id_semestre):
                     note.save()
                 return redirect('main:evaluations', id_matiere=matiere.id)
         else:
+            queryset = Note.objects.none()
             evaluation_form = EvaluationForm()
             initial_etudiant_note_data = [{'etudiant': etudiant.id, 'etudiant_full_name': etudiant.full_name()} for etudiant in etudiants]
             note_form_set = NoteFormSet(
@@ -1446,21 +1444,30 @@ def editeNoteByEvaluation(request, id):
     """
     Affiche un formulaire d'édition d'une note :model:`main.Note`.
     """
-    # Rechercher l'evaluation
     evaluation = get_object_or_404(Evaluation, pk=id)
     matiere = evaluation.matiere
     semestre = evaluation.semestre
-    # Définir la class NoteFormSet
+    
+    if evaluation.rattrapage:
+        etudiants = matiere.get_etudiants_en_rattrapage()
+        nouveaux_etudiants = []
+    else:
+        etudiants = semestre.etudiant_set.all()
+        etudiants_dans_evaluation = evaluation.etudiants.all()
+        nouveaux_etudiants = etudiants.difference(etudiants_dans_evaluation)
+        for etudiant in nouveaux_etudiants: 
+            Note.objects.create(evaluation=evaluation, etudiant=etudiant)
+
     NoteFormSet = forms.inlineformset_factory(
         parent_model=Evaluation,
         model=Note,
         form=NoteForm,
-        extra=0,
+        extra=len(nouveaux_etudiants),
         can_delete=False,
         min_num=0,
         validate_min=True,
     )
-
+    
     if request.method == 'POST':
         evaluation_form = EvaluationForm(request.POST, instance=evaluation)
         note_form_set = NoteFormSet(request.POST, instance=evaluation)
@@ -1479,6 +1486,7 @@ def editeNoteByEvaluation(request, id):
     else:
         evaluation_form = EvaluationForm(instance=evaluation)
         # Créer une instance de d'ensemble de formulaire selon notre queryset
+        initial_etudiant_note_data = [{'etudiant': etudiant.id, 'etudiant_full_name': etudiant.full_name()} for etudiant in nouveaux_etudiants]
         note_form_set = NoteFormSet(instance=evaluation)
         for form in note_form_set:
             etudiant = Etudiant.objects.filter(id=form.initial['etudiant']).get()
