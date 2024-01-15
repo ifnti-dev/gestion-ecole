@@ -5,10 +5,10 @@ latex
 jinja2
 Faker
 watchdog
-num2words #permet de convertir en lettre le montant à payer
+num2words
 django-import-export
 django-browser-reload
-django_extensions # Pour excécuter des scripts
+django_extensions
 gunicorn
 django-solo
 requests
@@ -19,3 +19,6 @@ pandas
 
 django-dbbackup
 django-crontab
+
+sphinx
+furo
