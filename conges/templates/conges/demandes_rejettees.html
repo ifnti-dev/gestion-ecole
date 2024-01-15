@@ -31,6 +31,15 @@
                       <button type="submit" class="update-book btn btn-sm btn-danger">
                         <span><i class="far fa-calendar-times"></i></span>
                       </button>
+
+                      {% if conge.valider == "Inactif" %}
+                        <button type="button" class="update-book btn btn-sm btn-warning">
+                            <a style="color: blanchedalmond;"
+                                href="{% url 'conges:formulaire_de_demande_de_conges' conge.id %}">
+                                <span class="fa fa-print"></span>
+                            </a>
+                        </button>
+                        {% endif %}
                     </td>
                 </tr>
                 {% endfor %}

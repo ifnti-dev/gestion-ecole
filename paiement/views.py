@@ -11,6 +11,7 @@ from main.pdfMaker import generate_pdf
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
+from decimal import Decimal, ROUND_DOWN
 
 
 @login_required(login_url=settings.LOGIN_URL)
@@ -472,6 +473,14 @@ def enregistrer_bulletin(request, id=0):
             return render(request, 'salaires/enregistrer_bulletin.html', {'form': form})
 
 
+def delete_bulletin(request):
+    if request.method == 'GET':
+        bulletin_id = request.GET.get('id')
+        bulletin = get_object_or_404(Salaire, id=bulletin_id)
+        bulletin.delete()
+    id_annee_selectionnee = AnneeUniversitaire.static_get_current_annee_universitaire().id
+    return redirect('paiement:bulletins_de_paye', id_annee_selectionnee=id_annee_selectionnee)
+
 
 def detail_bulletin(request, id):
     bulletin = get_object_or_404(Salaire, id=id)
@@ -519,11 +528,15 @@ def bulletin_de_paye(request, id):
             + bulletin.prime_anciennete
     )
     Salaire_brut = bulletin.personnel.salaireBrut + primes 
-
     ## pour le salarié
     tcs = bulletin.tcs
-    retenues_cnss_personnel = frais_prestations_familiale_salsalaire + tcs
-    salaire_net = Salaire_brut - retenues_cnss_personnel
+    irpp = bulletin.calculer_irpp_mensuel()
+    print("calculer_irpp_mensuel   " + str(irpp))
+
+    retenues_cnss_personnel = Decimal(frais_prestations_familiale_salsalaire) + Decimal(tcs) + Decimal(irpp)
+    salaire_net = (Decimal(Salaire_brut) - Decimal(retenues_cnss_personnel))
+    salaire_net = salaire_net.quantize(Decimal('0.000'), rounding=ROUND_DOWN) 
+    bulletin.salaire_net_a_payer = salaire_net
 
     ## pour l'employeur
     frais_prestations_familiales = bulletin.frais_prestations_familiales * bulletin.personnel.salaireBrut
@@ -534,6 +547,8 @@ def bulletin_de_paye(request, id):
     context = {
         'bulletin' : bulletin,
         'Salaire_brut': Salaire_brut,
+        'irpp' : irpp,
+        'tcs' : tcs,
         'salaire_net' : salaire_net,
         'total_primes' : total_primes,
         'retenues_cnss_employeur' : retenues_cnss_employeur,
