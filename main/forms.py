@@ -85,7 +85,7 @@ class EtudiantForm(forms.ModelForm):
     datenaissance = DateField(widget=forms.SelectDateWidget(years=range(1900, 2006), attrs={'class': 'form-control'}), label="Date de naissance")
     class Meta:
         model = Etudiant
-        fields = ['nom', 'prenom', 'contact', 'sexe', 'adresse', 'datenaissance', 'lieunaissance', 'prefecture', 'is_active', 'seriebac1', 'seriebac2', 'anneebac1', 'anneebac2', 'etablissementSeconde', 'etablissementPremiere', 'etablissementTerminale', 'francaisSeconde', 'francaisPremiere','francaisTerminale', 'anglaisSeconde', 'anglaisPremiere', 'anglaisTerminale', 'mathematiqueSeconde', 'mathematiquePremiere', 'mathematiqueTerminale', 'tuteurs']
+        fields = ['nom', 'prenom', 'contact', 'sexe', 'adresse', 'datenaissance', 'lieunaissance', 'prefecture', 'is_active', 'seriebac1', 'seriebac2', 'anneebac1', 'anneebac2', 'etablissementSeconde', 'etablissementPremiere', 'etablissementTerminale', 'francaisSeconde', 'francaisPremiere','francaisTerminale', 'anglaisSeconde', 'anglaisPremiere', 'anglaisTerminale', 'mathematiqueSeconde', 'mathematiquePremiere', 'mathematiqueTerminale', 'semestres']
         widgets = {
             'nom': forms.TextInput(attrs={'class': 'form-control'}),
             'prenom': forms.TextInput(attrs={'class': 'form-control'}),
@@ -237,7 +237,7 @@ class EnseignantForm(forms.ModelForm):
     datenaissance = DateField(widget=forms.SelectDateWidget(years=range(1990, 2006)), label='Date de naissance')
     class Meta:
         model = Enseignant
-        fields = ['nom', 'prenom', 'contact', 'sexe', 'email', 'adresse', 'datenaissance', 'lieunaissance', 'prefecture', 'photo_passport', 'salaireBrut', 'dernierdiplome', 'is_active', 'type', 'specialite']
+        fields = ['nom', 'prenom', 'contact', 'sexe', 'email', 'adresse', 'datenaissance', 'lieunaissance', 'photo_passport', 'salaireBrut', 'nombre_de_personnes_en_charge', 'dernierdiplome', 'is_active', 'type', 'specialite']
         widgets = {
             'nom': forms.TextInput(attrs={'class': 'form-control'}),
             'prenom': forms.TextInput(attrs={'class': 'form-control'}),
@@ -247,9 +247,9 @@ class EnseignantForm(forms.ModelForm):
             'adresse': forms.TextInput(attrs={'class': 'form-control'}),
             'datenaissance': DateField(widget=forms.SelectDateWidget(years=range(1900, 2006)), label="Date de naissance"),
             'lieunaissance': forms.TextInput(attrs={'class': 'form-control'}),
-            'prefecture': forms.TextInput(attrs={'class': 'form-control'}),
             'photo_passport': forms.FileInput(attrs={'class': 'form-control'}),
             'salaireBrut': forms.NumberInput(attrs={'class': 'form-control'}),
+            'nombre_de_personnes_en_charge': forms.NumberInput(attrs={'class': 'form-control'}),
             'dernierdiplome': forms.FileInput(attrs={'class': 'form-control'}),
             'is_active': forms.CheckboxInput(attrs={'class': 'form-control'}),
             'type': forms.Select(attrs={'class': 'form-control'}),
@@ -264,9 +264,7 @@ class EnseignantForm(forms.ModelForm):
         contact = cleaned_data.get('contact')
         email = cleaned_data.get('email')
         adresse = cleaned_data.get('adresse')
-        lieunaissance = cleaned_data.get('lieunaissance')
         sexe = cleaned_data.get('sexe')
-        prefecture = cleaned_data.get('prefecture')
 
         if nom.find(';') != -1 or nom.find('/') != -1 or nom.find('.') != -1 or nom.find(',') != -1 or nom.find(':') != -1 or nom.find('!') != -1 or nom.find('?') != -1 or nom.find('*') != -1 or nom.find('+') != -1 or nom.find('=') != -1 or nom.find('@') != -1 or nom.find('#') != -1 or nom.find('$') != -1 or nom.find('%') != -1 or nom.find('&') != -1 or nom.find('(') != -1 or nom.find(')') != -1 or nom.find('_') != -1 or nom.find('<') != -1 or nom.find('>') != -1 or nom.find('|') != -1 or nom.find('~') != -1 or nom.find('^') != -1 or nom.find('{') != -1 or nom.find('}') != -1 or nom.find('[') != -1 or nom.find(']') != -1 or nom.find('"') != -1 or nom.find('\\') != -1 or nom.find('`') != -1:
             #forms.nom.errors = "Le nom ne doit pas contenir des caractères spéciaux"
@@ -311,11 +309,6 @@ class EnseignantForm(forms.ModelForm):
                 self._errors['adresse'] = ErrorDict()
             self._errors['adresse'] = 'L\'adresse ne doit pas contenir des caractères spéciaux'
 
-        if lieunaissance.find(';') != -1 or lieunaissance.find('/') != -1 or lieunaissance.find(',') != -1 or lieunaissance.find(':') != -1 or lieunaissance.find('!') != -1 or lieunaissance.find('?') != -1 or lieunaissance.find('*') != -1 or lieunaissance.find('+') != -1 or lieunaissance.find('=') != -1 or lieunaissance.find('#') != -1 or lieunaissance.find('$') != -1 or lieunaissance.find('%') != -1 or lieunaissance.find('&') != -1 or lieunaissance.find('(') != -1 or lieunaissance.find(')') != -1 or lieunaissance.find('_') != -1 or lieunaissance.find('<') != -1 or lieunaissance.find('>') != -1 or lieunaissance.find('|') != -1 or lieunaissance.find('~') != -1 or lieunaissance.find('^') != -1 or lieunaissance.find('{') != -1 or lieunaissance.find('}') != -1 or lieunaissance.find('[') != -1 or lieunaissance.find(']') != -1 or lieunaissance.find('"') != -1 or lieunaissance.find('\\') != -1 or lieunaissance.find("'") != -1 or lieunaissance.find('@') != -1 :
-            if not 'lieunaissance' in self._errors:
-                self._errors['lieunaissance'] = ErrorDict()
-            self._errors['lieunaissance'] = 'Le lieu de naissance ne doit pas contenir des caractères spéciaux'
-
         if sexe.find(';') != -1 or sexe.find('/') != -1 or sexe.find(',') != -1 or sexe.find(':') != -1 or sexe.find('!') != -1 or sexe.find('?') != -1 or sexe.find('*') != -1 or sexe.find('+') != -1 or sexe.find('=') != -1 or sexe.find('#') != -1 or sexe.find('$') != -1 or sexe.find('%') != -1 or sexe.find('&') != -1 or sexe.find('(') != -1 or sexe.find(')') != -1 or sexe.find('_') != -1 or sexe.find('<') != -1 or sexe.find('>') != -1 or sexe.find('|') != -1 or sexe.find('~') != -1 or sexe.find('^') != -1 or sexe.find('{') != -1 or sexe.find('}') != -1 or sexe.find('[') != -1 or sexe.find(']') != -1 or sexe.find('"') != -1 or sexe.find('\\') != -1 or sexe.find("'") != -1 or sexe.find('@') != -1 :
             if not 'sexe' in self._errors:
                 self._errors['sexe'] = ErrorDict()
@@ -326,15 +319,8 @@ class EnseignantForm(forms.ModelForm):
                 self._errors['sexe'] = ErrorDict()
             self._errors['sexe'] = 'Le sexe ne doit pas contenir des chiffres'
 
-        if prefecture.find(';') != -1 or prefecture.find('/') != -1 or prefecture.find(',') != -1 or prefecture.find(':') != -1 or prefecture.find('!') != -1 or prefecture.find('?') != -1 or prefecture.find('*') != -1 or prefecture.find('+') != -1 or prefecture.find('=') != -1 or prefecture.find('#') != -1 or prefecture.find('$') != -1 or prefecture.find('%') != -1 or prefecture.find('&') != -1 or prefecture.find('(') != -1 or prefecture.find(')') != -1 or prefecture.find('_') != -1 or prefecture.find('<') != -1 or prefecture.find('>') != -1 or prefecture.find('|') != -1 or prefecture.find('~') != -1 or prefecture.find('^') != -1 or prefecture.find('{') != -1 or prefecture.find('}') != -1 or prefecture.find('[') != -1 or prefecture.find(']') != -1 or prefecture.find('"') != -1 or prefecture.find('\\') != -1 or prefecture.find("'") != -1 or prefecture.find('@') != -1 :
-            if not 'prefecture' in self._errors:
-                self._errors['prefecture'] = ErrorDict()
-            self._errors['prefecture'] = 'La préfecture ne doit pas contenir des caractères spéciaux'
-
-        
 
 
-    
 class InformationForm(forms.ModelForm):
     class Meta:
         model = Information

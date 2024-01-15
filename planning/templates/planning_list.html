@@ -2,10 +2,20 @@
 {% block content_title %}Planning {{semestre.libelle}} {{semestre.annee_universitaire}} {% endblock content_title %}
 {% load static %}
 {% block content %}
+<style>
+
+.btn-primary {
+    /* custom styles for the button */
+    margin-left: auto;  /* This will push the button to the right */
+}
+</style>
 <div class="block block-rounded">
-    
-    
+  
     <div class="block-content block-content-full">
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#newPlanningModal">
+            Nouveau planning
+        </button>
+        
         <table class="table table-bordered table-striped table-vcenter js-dataTable-full-pagination">
             <thead>
                 <tr>
@@ -18,39 +28,77 @@
             </thead>
             <tbody>
                 {% for planning in plannings %}
-                                <td class="text-center font-size-sm">{{ planning.id }}</td>
-                                <td class="text-center font-w600 font-size-sm"> <a href="details/{{planning.id}}" target="_blank">{{ planning.semaine }}</a></td>
-                                <td class="text-center font-w600 font-size-sm">{{ planning.semestre }}</td>
-                                <td class="text-center font-w600 font-size-sm">{{ planning.intervalle }}</td>
-                                <td class="text-center">
-                                    <button type="button" class="btn btn-secondary dropdown-toggle" id="dropdown-default-secondary" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        <i class="fa fa-bars" aria-hidden="true"></i>
-                                    </button>
-                                    <div class="dropdown-menu font-size-sm" aria-labelledby="dropdown-default-secondary">
-                                        <li class="nav-main-item">
-                                            <a class="nav-main-link nav-main-link-name" data-toggle="" aria-haspopup="true" aria-expanded="false" href="print/{{planning.id}}">
-                                                <i class="fa fa-print mr-1" aria-hidden="true"></i>
-                                                <span class="nav-main-link-name">Imprimer</span>
-                                            </a>
-                                        </li>
-                                        <li class="nav-main-item">
-                                            <a class="nav-main-link nav-main-link-name" data-toggle="" aria-haspopup="true" aria-expanded="false" href="edit/{{planning.id}}">
-                                                <i class="fa fa-edit mr-1" aria-hidden="true"></i>
-                                                <span class="nav-main-link-name">Modifier</span>
-                                            </a>
-                                        </li>
-                                        <li class="nav-main-item">
-                                            <a class="nav-main-link nav-main-link-name" data-toggle="" aria-haspopup="true" aria-expanded="false" href="delete/{{planning.id}}">
-                                                <i class="fa fa-trash mr-1 text-danger" aria-hidden="true"></i>
-                                                <span class="nav-main-link-name">Supprimer</span>
-                                            </a>
-                                        </li>
-                                    </div>
-                                </td>
-                            </tr>
+                    <td class="text-center font-size-sm">{{ planning.id }}</td>
+                    <td class="text-center font-w600 font-size-sm"> <a href="details/{{planning.id}}" target="_blank">{{ planning.semaine }}</a></td>
+                    <td class="text-center font-w600 font-size-sm">{{ planning.semestre }}</td>
+                    <td class="text-center font-w600 font-size-sm">{{ planning.datedebut }} au {{ planning.datefin }} </td>
+                    <td class="text-center">
+                        <button type="button" class="btn btn-secondary dropdown-toggle" id="dropdown-default-secondary" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fa fa-bars" aria-hidden="true"></i>
+                        </button>
+                        <div class="dropdown-menu font-size-sm" aria-labelledby="dropdown-default-secondary">
+                            <li class="nav-main-item">
+                                <a class="nav-main-link nav-main-link-name" data-toggle="" aria-haspopup="true" aria-expanded="false" href="print/{{planning.id}}">
+                                    <i class="fa fa-print mr-1" aria-hidden="true"></i>
+                                    <span class="nav-main-link-name">Imprimer</span>
+                                </a>
+                            </li>
+                            <li class="nav-main-item">
+                                <a class="nav-main-link nav-main-link-name" data-toggle="" aria-haspopup="true" aria-expanded="false" href="edit/{{planning.id}}">
+                                    <i class="fa fa-edit mr-1" aria-hidden="true"></i>
+                                    <span class="nav-main-link-name">Modifier</span>
+                                </a>
+                            </li>
+                            <li class="nav-main-item">
+                                <a class="nav-main-link nav-main-link-name" data-toggle="" aria-haspopup="true" aria-expanded="false" href="delete/{{planning.id}}">
+                                    <i class="fa fa-trash mr-1 text-danger" aria-hidden="true"></i>
+                                    <span class="nav-main-link-name">Supprimer</span>
+                                </a>
+                            </li>
+                        </div>
+                    </td>
                     {% endfor %}
             </tbody>
         </table>
+    </div>
+</div>
+<div class="modal fade" id="newPlanningModal" tabindex="-1" role="dialog" aria-labelledby="newPlanningModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="newPlanningModalLabel">Nouveau planning</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form  id="newPlanningForm" method="post" action="/planning/new/" >
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="semestre">Semestre : </label>
+                        <select class="js-select2 form-control" id="semestre" name="semestre" style="width: 100%;" data-placeholder="Choose one..">
+                            <option></option>
+                            {% for semestre in semestres %}
+                                <option value="{{semestre.id}}">{{semestre.libelle}} - {{semestre.annee_universitaire}}</option>
+                            {% endfor %}
+                           
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="semaine">Semaine:</label>
+                        <input type="number" id="semaine" class="form-control" name="semaine">
+                    </div>
+                    <div class="form-group">
+                        <label for="intervalle">Intervalle date:</label>
+                        <input type="text" class="js-flatpickr form-control bg-white" id="intervalle" name="intervalle" placeholder="Select Date Range"  data-mode="range" >
+                  </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+                <button type="button" id="newPlanningFormBtn" form="newPlanningForm"   class="btn btn-primary">Créer</button>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -59,9 +107,82 @@
 {% endblock content %}
 {% block scripts %}
     <script type="text/javascript">
-        form_tag = $('#form-semestre');
-        $('#semestre').on('change', function() {
-            form_tag.submit();
+        
+
+       // ... Autres parties du script ...
+       function validateForm() {
+                // Get the values entered by the user
+                var semestre = document.getElementById("semestre").value;
+                var semaine = document.getElementById("semaine").value;
+                var intervalle = document.getElementById("intervalle").value;
+
+                // Validate each field
+                if (semestre == "") {
+                    alert("Veuillez sélectionner un semestre.");
+                    return false; // Prevent form submission
+                }
+                
+                if (semaine === "") {
+                    alert("Veuillez entrer le numéro de semaine.");
+                    return false;
+                } else if (semaine < 1 || semaine > 16) {
+                    alert("Le numéro de semaine doit être compris entre 1 et 16.");
+                    return false;
+                }
+                
+                if (!intervalle.includes("to")) {
+                    alert("Veuillez sélectionner un intervalle de dates valide.");
+                    return false;
+                }
+
+                return true ;
+        }
+
+        function postForm(){
+            var semaine = $("#semaine").val();
+            var semestre = $("#semestre").val();
+            var intervalle = $("#intervalle").val();
+            var csrftoken = Cookies.get('csrftoken');
+            var data = {
+                semestre: semestre,
+                semaine: semaine,
+                intervalle: intervalle
+            };
+
+            $.ajax({
+                type: 'POST',
+                url: '/planning/check/',
+                data: JSON.stringify(data),
+                headers: {
+                    'X-CSRFToken': csrftoken,
+                    'Content-Type': 'application/json',
+                },
+                contentType: 'application/json',
+                success: function (response) {
+                    if (response.status === 'reussite') {
+                        // Soumettre le formulaire initial
+                        $("#newPlanningForm").submit();
+                    } else {
+                        One.helpers('notify', {type: 'danger', icon: 'fa fa-info-circle mr-1', message: response.plan});
+                    }
+                },
+                error: function (error) {
+                    console.error('Erreur lors de l\'enregistrement:', error);
+                }
+            });
+        }
+
+        $(function () {
+            // Handle form submission
+            $("#newPlanningFormBtn").on("click", function () {
+                if (validateForm()) {
+                    postForm();
+                };
+               
+            });
         });
+
+        // ... Autres parties du script ...
+
     </script>
 {% endblock scripts %}

@@ -52,14 +52,19 @@ Enregistrement d'un bulletin
             {{ form.numero_cnss.label_tag }}
             {{ form.numero_cnss }}
             <span class="text-danger">{{ form.numero_cnss.errors }}</span>
+          </div> 
         </div> 
 
         <div class="form-row mb-3"> 
-          </div>
-           <div class="col-md-6">
+          <div class="col-md-6">
             {{ form.qualification_professionnel.label_tag }}
             {{ form.qualification_professionnel }}
             <span class="text-danger">{{ form.qualification_professionnel.errors }}</span>
+          </div>
+          <div class="col-md-6">
+            {{ form.tcs.label_tag }}
+            {{ form.tcs }}
+            <span class="text-danger">{{ form.tcs.errors }}</span>
           </div>
         </div>
 
@@ -89,18 +94,7 @@ Enregistrement d'un bulletin
           </div>      
         </div>
 
-        <div class="form-row mb-3"> 
-          <div class="col-md-6">
-            {{ form.tcs.label_tag }}
-            {{ form.tcs }}
-            <span class="text-danger">{{ form.tcs.errors }}</span>
-          </div>
-          <div class="col-md-6">
-            {{ form.irpp.label_tag }}
-            {{ form.irpp }}
-            <span class="text-danger">{{ form.irpp.errors }}</span>
-        </div>       
-
+        
         <div class="form-row mb-3"> 
           <div class="col-md-6">
             {{ form.acomptes.label_tag }}

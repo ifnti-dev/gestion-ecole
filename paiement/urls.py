@@ -43,6 +43,7 @@ urlpatterns = [
     path('bulletins_de_paye/<int:id_annee_selectionnee>/', views.les_bulletins_de_paye, name='bulletins_de_paye'),
     path('enregistrer_bulletin/', views.enregistrer_bulletin, name='enregistrer_bulletin'),
     path('modifier_bulletin/<int:id>/', views.enregistrer_bulletin, name='modifier_bulletin'),
+    path('delete_bulletin/', views.delete_bulletin, name='delete_bulletin'),
     path('detail_bulletin/<int:id>/', views.detail_bulletin, name='detail_bulletin'),
     path('bulletin_de_paye/<int:id>/', views.bulletin_de_paye, name='bulletin_de_paye'),
 

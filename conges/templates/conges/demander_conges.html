@@ -27,11 +27,17 @@
           </ul>
         {% endif %}
 
-        <div class="form-row mb-12">
-          <div class="col-md-12">
+        <div class="form-row mb-3">
+          <div class="col-md-6">
             {{ form.nature.label_tag }}
             {{ form.nature }}
             <span class="text-danger">{{ form.nature.errors }}</span>
+          </div>
+
+          <div class="col-md-6">
+            {{ form.autre_nature.label_tag }}
+            {{ form.autre_nature }}
+            <span class="text-danger">{{ form.autre_nature.errors }}</span>
           </div>
         </div>
 
@@ -58,27 +64,4 @@
     </div>
   </div>
 
-  <!-- Ajout du script jQuery -->
-  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-  <script>
-    $(document).ready(function(){
-      // Fonction pour afficher/cacher le champ autre_nature
-      function toggleAutreNature() {
-        var natureValue = $('#id_nature').val();
-        if (natureValue === 'Autres') {
-          $('#id_autre_nature').show();
-        } else {
-          $('#id_autre_nature').hide();
-        }
-      }
-
-      // Appeler la fonction au chargement de la page
-      toggleAutreNature();
-
-      // Ajouter un gestionnaire d'événements pour détecter les changements dans le champ nature
-      $('#id_nature').change(function() {
-        toggleAutreNature();
-      });
-    });
-  </script>
-{% endblock %}
+  {% endblock %}
