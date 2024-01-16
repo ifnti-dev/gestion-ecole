@@ -440,7 +440,7 @@ class Etudiant(Utilisateur):
     @staticmethod
     def static_get_L1(annee=None, semestres=['S1', 'S2']):
         """
-            Cette fonction permet de récupérer l'ensemebles des étudiants de L1 et les semestres de L1.
+            Cette fonction permet de récupérer l'ensemble des étudiants de L1 et les semestres de L1.
 
             :param annee: L'année universitaire de la classe de L1. 
             :type annee: AnneeUniversitaire
@@ -467,7 +467,7 @@ class Etudiant(Utilisateur):
     @staticmethod
     def static_get_L2(annee=None, semestres=['S3', 'S4']):
         """
-            Cette fonction permet de récupérer l'ensemebles des étudiants de L2 et les semestres de L2.
+            Cette fonction permet de récupérer l'ensemble des étudiants de L2 et les semestres de L2.
 
             :param annee: L'année universitaire de la classe de L2. 
             :type annee: AnneeUniversitaire
@@ -494,7 +494,7 @@ class Etudiant(Utilisateur):
     @staticmethod
     def static_get_L3(annee=None, semestres=['S5', 'S6']):
         """
-            Cette fonction permet de récupérer l'ensemebles des étudiants de L3 et les semestres de L3.
+            Cette fonction permet de récupérer l'ensemble des étudiants de L3 et les semestres de L3.
 
             :param annee: L'année universitaire de la classe de L3. 
             :type annee: AnneeUniversitaire
@@ -519,6 +519,16 @@ class Etudiant(Utilisateur):
         return list(etudiants), semestres
 
     def get_semestres(self, type='courant', annee=None):
+        """
+            Cette fonction permet de récupérer l'ensemble des semestres d'une Année universitaire.
+
+            :param type: Défini les types de semestres à récupérer. 
+            :type type: str
+            :param annee: Année universitaire des semestres. 
+            :type annee: AnneeUniversitaire
+            :return: Un tableau de semestres.
+            :retype: list[Semestre]
+        """
         if not annee:
             annee = AnneeUniversitaire.static_get_current_annee_universitaire()
         if type == 'tous':
