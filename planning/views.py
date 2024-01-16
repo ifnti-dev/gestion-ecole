@@ -13,72 +13,17 @@ from planning.models import Planning , SeancePlannifier
 from django.contrib.auth import authenticate, login , get_user_model
 
 import datetime
+from datetime import timedelta
 
 from collections import defaultdict
 
 
-from operator import itemgetter
-from itertools import groupby
-
-def group_plannings_by_semester(plannings):
-    # Grouper par semestre
-    plannings_by_semester = {}
-    for planning in plannings:
-        semester_id = planning.semestre.id
-        if semester_id not in plannings_by_semester:
-            plannings_by_semester[semester_id] = []
-        plannings_by_semester[semester_id].append(planning)
-    return plannings_by_semester
-
-def group_plannings_by_week(plannings):
-    # Grouper par semaine
-    plannings_by_week = {}
-    for planning in plannings:
-        week_number = planning.date_heure_debut.strftime("%U")
-        if week_number not in plannings_by_week:
-            plannings_by_week[week_number] = []
-        plannings_by_week[week_number].append(planning)
-    return plannings_by_week
-
-def sort_plannings_by_date(plannings):
-    
-    return  sorted(plannings, key=lambda x: x.date_heure_debut)
 
 
-def assign_week_number(plannings):
-    # Ajouter l'attribut 'semaine'
-    for i, planning in enumerate(plannings, start=1):
-        planning.semaine = i
-    return plannings
 
-
-def index454(request):
-    # Récupérer tous les plannings
+def index(request):
     all_plannings = Planning.objects.all()
-
-
-    # Étape 1 : Grouper par semestre
-    plannings_by_semester = group_plannings_by_semester(all_plannings)
-
-
-    for semester, plannings in plannings_by_semester.items():
-        plannings_by_week = group_plannings_by_week(plannings)
-
-
-        for week_number, week_plannings in plannings_by_week.items():
-            sorted_week_plannings = sort_plannings_by_date(week_plannings)
-
-            # Étape 4 : Ajouter un attribut 'semaine'
-            plannings_by_week[week_number] = assign_week_number(sorted_week_plannings)
-
-    # Maintenant, vous avez vos plannings organisés par semestre, semaine et triés par date
-    print(plannings_by_semester)
-    return render(request, 'planning_list.html', {'plannings_by_semester': plannings_by_semester})
-
-
-
-def index2(request):
-    all_plannings = Planning.objects.all()
+    semestres=Semestre.objects.filter(courant=True)
     plannings_by_semester = {}
     for planning in all_plannings:
         semestre = planning.semestre
@@ -88,43 +33,66 @@ def index2(request):
             plannings_by_semester[semestre] = [planning]
 
 
-    return render(request, 'planning_list.html', {'plannings_by_semester': plannings_by_semester,'plannings':all_plannings})
+    return render(request, 'planning_list.html', {'plannings_by_semester': plannings_by_semester,'semestres':semestres,'plannings':all_plannings})
 
 
 
-def save_a_planning():
+def verifier(request):
+    if request.method == 'POST':
+        data = json.loads(request.body.decode('utf-8'))
+        semaine = data.get('semaine')
+        semestreId = data.get('semestre')
+        annee = AnneeUniversitaire.static_get_current_annee_universitaire().annee
+        semestre = Semestre.objects.filter(courant=True, pk__contains=annee,id=semestreId).first()
+        plan = Planning.objects.filter(semestre=semestre, semaine=semaine).first()
+        if plan is None:
+            return JsonResponse({"status": "reussite"})
+        return JsonResponse({"plan": plan})
+        
+
     
-    return
 
-def new_planning(request,semestreId):
-    semestreId=semestreId
-    annee = AnneeUniversitaire.static_get_current_annee_universitaire().annee
-    semestre = Semestre.objects.filter(courant=True, pk__contains=annee,id=semestreId).first()
-    print(semestre)
-    planification = defaultdict(list)
-    ues = semestre.get_all_ues()
+def nouveau_planning(request):
+    if request.method == 'POST':
+        semestreId=request.POST.get("semestre")
+        semaine=request.POST.get("semaine")
+        intervalle=request.POST.get("intervalle")
+        intervalle = request.POST.get("intervalle")
+        # Divise la chaîne en deux parties en utilisant 'to' comme délimiteur
+        dates = intervalle.split('to')
+        # Récupère la date avant 'to' et la formate
+        datedebut = dates[0].strip()  # Supprime les espaces inutiles autour de la date
+        datedebut = datedebut[-2:] + '-' + datedebut[5:7] + '-' + datedebut[:4]  # Change le format de aaaa-mm-jj à jj-mm-aaaa
+        # Récupère la date après 'to' et la formate
+        datefin = dates[1].strip()  # Supprime les espaces inutiles autour de la date
+        datefin = datefin[-2:] + '-' + datefin[5:7] + '-' + datefin[:4]  # Change le format de aaaa-mm-jj à jj-mm-aaaa
+        annee = AnneeUniversitaire.static_get_current_annee_universitaire().annee
+        semestre = Semestre.objects.filter(courant=True, pk__contains=annee,id=semestreId).first()
+        planification = defaultdict(list)
+        ues = semestre.get_all_ues()
 
-    for ue in ues:
-        print(ue)
-        matieres_json = serialize('json', ue.matiere_set.all())
-        matieres = json.loads(matieres_json)
-        for matiere in matieres :
-            seances=Seance.objects.filter(semestre=semestre,matiere=matiere['pk'])
-            temps=0
-            for seance in seances:
-                temps+=(seance.date_et_heure_fin - seance.date_et_heure_debut).total_seconds()/3600
-            matiere['temps_effectuer']=temps
-            
-            # plannings=Planning.objects.filter(semestre=semestre,matiere=matiere['pk'])
-            temps_x=0
-            # for planning in plannings:
-            #     temps_x+=(planning.date_et_heure_fin - planning.date_et_heure_debut).total_seconds()/3600
-            matiere['temps_plannifier']=temps_x                         
+        for ue in ues:
+            matieres_json = serialize('json', ue.matiere_set.all())
+            matieres = json.loads(matieres_json)
+            for matiere in matieres :
+                seances=Seance.objects.filter(semestre=semestre,matiere=matiere['pk'])
+                temps=0
+                for seance in seances:
+                    temps+=(seance.date_et_heure_fin - seance.date_et_heure_debut).total_seconds()/3600
+                matiere['temps_effectuer']=temps
+                
+                planning=Planning.objects.filter(semestre=semestre)
+                for plan in planning :
+                    plannings=SeancePlannifier.objects.filter(planning=plan ,matiere=matiere)
+                    temps_x=0
+                    for planning in plannings:
+                        temps_x+=(planning.date_et_heure_fin - planning.date_et_heure_debut).total_seconds()/3600
+                    matiere['temps_plannifier']=temps_x                         
 
-        planification[str(ue)].append({'matieres': matieres})
-        planification_json = json.dumps(planification)
-
-    return render(request, 'generer_planning.html', {'planification_json': planification_json,'semestre':semestre,'ues':ues})
+            planification[str(ue)].append({'matieres': matieres})
+            planification_json = json.dumps(planification)
+        
+        return render(request, 'generer_planning.html', {'planification_json': planification_json,'semestre':semestre,'semaine':semaine,'datedebut':datedebut,'datefin':datefin,'ues':ues})
 
 
 def datetime_serializer(obj):
@@ -153,14 +121,14 @@ def getMatieresEtudiant(etudiant):
     return matieres
 
 
-import datetime
-import pytz
-def save(request):
+def sauvegarder(request):
     if request.method == 'POST':
         # Retrieve all the events from the calendar
         data = json.loads(request.body.decode('utf-8'))
         semaine = data.get('semaine')
         semestre = data.get('semestre')
+        datedebut = data.get('datedebut')
+        datefin = data.get('datefin')
         events = data.get('events')
         semestre=Semestre.objects.filter(id=semestre).first()
 
@@ -169,11 +137,8 @@ def save(request):
         planning = Planning(
                 semaine=semaine,
                 semestre=semestre,
-                # intervalle=(datetime.datetime.fromtimestamp(
-                #     max(datetime.datetime.fromtimestamp(event.get('start'), tz=pytz.timezone('Europe/Paris')) for event in events) -
-                #     datetime.datetime.fromtimestamp(min(datetime.datetime.fromtimestamp(event.get('start'), tz=pytz.timezone('Europe/Paris')) for event in events))
-                # ),)
-                intervalle="zap d'abord"
+                datedebut=datedebut,
+                datefin=datefin
         )
         planning.save()
         for event in events:
@@ -197,8 +162,8 @@ def save(request):
             # Sauvegardez l'objet Planning en base de données
             seance.save()
         
-
-        return render(request,'planning_list.html')
+        return JsonResponse({'status':"reussite"})
+        
     
 
 
@@ -210,7 +175,7 @@ def seance(request,seanceId):
     seance=SeancePlannifier.objects.filter(id=seanceId).first()
     return render(request,'details_planning.html',{'seance':seance})
 
-def print(request,planningId):
+def imprimer(request,planningId):
     return HttpResponse("En devellopement")
 
 def delete(request,planningId):

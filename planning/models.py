@@ -1,13 +1,15 @@
 from django.db import models
+from projet_ifnti import settings
 from main.models import Semestre, Matiere, Enseignant
 
 class Planning(models.Model):
     semaine = models.IntegerField()
     semestre = models.ForeignKey(Semestre, on_delete=models.CASCADE)
-    intervalle= models.CharField(max_length=50)
+    datedebut = models.DateField()
+    datefin = models.DateField()
        
     def __str__(self):
-        return f"{self.semaine} - {self.semestre}"
+        return f"Semaine {self.semaine} - {self.semestre}"
     
 class SeancePlannifier(models.Model):
     intitule = models.CharField(max_length=200)
@@ -18,4 +20,6 @@ class SeancePlannifier(models.Model):
     professeur = models.ForeignKey(Enseignant, on_delete=models.CASCADE,null=True)
     planning = models.ForeignKey(Planning, on_delete=models.CASCADE,null=True)
     valider = models.BooleanField(default=False)
+
+
 

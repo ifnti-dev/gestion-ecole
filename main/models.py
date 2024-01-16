@@ -984,12 +984,9 @@ class Note(models.Model):
     Methods:
         __str__() -> str: Renvoie une représentation en chaîne de caractères de l'objet Note.
     """
-    valeurNote = models.DecimalField(default=0.0, blank=False, max_digits=5, decimal_places=2,
-                                     verbose_name="note", validators=[MaxValueValidator(20), MinValueValidator(0.0)])
-    etudiant = models.ForeignKey(
-        Etudiant, on_delete=models.CASCADE, verbose_name="Étudiant")
-    evaluation = models.ForeignKey(
-        Evaluation, on_delete=models.CASCADE, verbose_name="Evaluation")
+    valeurNote = models.DecimalField(default=0.0, blank=False, max_digits=5, decimal_places=2,verbose_name="note", validators=[MaxValueValidator(20), MinValueValidator(0.0)])
+    etudiant = models.ForeignKey(Etudiant, on_delete=models.CASCADE, verbose_name="Étudiant")
+    evaluation = models.ForeignKey(Evaluation, on_delete=models.CASCADE, verbose_name="Evaluation")
 
     def __str__(self):
         """

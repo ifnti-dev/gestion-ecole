@@ -53,11 +53,14 @@ CODE_UE = {
 def get_cell_int_value(value):
     return int(trim_str(value))
 
-def load_maquette(path):
-    print('llllll:::::::::::::')
+def load_maquette(path, annee_selectionnee):
     # Clean ue and programme data
-    Ue.objects.all().delete()
-    Programme.objects.all().delete()
+    Ue.objects.filter(programme__semestre__annee_universitaire=annee_selectionnee).delete()
+    # print(Ue.objects.filter(programme__semestre__annee_universitaire=annee_selectionnee))
+    # return
+    # Ue.objects.all().delete()
+    # Programme.objects.all().delete()
+    Programme.objects.filter(semestre__annee_universitaire=annee_selectionnee).delete()
     
     # Upload ues data
     workbook = openpyxl.load_workbook(filename=path)
@@ -76,18 +79,11 @@ def load_maquette(path):
                 ue = Ue.objects.create(libelle=libelle, type=row[1], niveau=row[2].split('=')[1], nbreCredits=row[3].split('=')[1], heures=row[4].split('=')[1])
                 semestre_ue[semestre].append(ue)
                 
-    # Create programme
-    annee_universitaires = AnneeUniversitaire.objects.all()
     parcours = Parcours.objects.all().first()
-    if not parcours:
-        clean_data_base()
-        parcours = Parcours.objects.all().first()
-        
-    for anne_universitaire in annee_universitaires:
-        semestres = anne_universitaire.semestre_set.all()
-        for semestre in semestres:
-            programme = Programme.objects.create(semestre=semestre, parcours=parcours)
-            programme.ues.set(semestre_ue[semestre.libelle.lower()])
+    semestres = annee_selectionnee.semestre_set.all()
+    for semestre in semestres:
+        programme = Programme.objects.create(semestre=semestre, parcours=parcours)
+        programme.ues.set(semestre_ue[semestre.libelle.lower()])
     return code_ue
 
 def load_matieres(path):

@@ -6,6 +6,7 @@ from django.conf import settings
 from main.forms import EnseignantForm, EtudiantForm, EvaluationForm, InformationForm, ProgrammeForm, NoteForm, TuteurForm, UeForm, MatiereForm
 from .models import Domaine, Enseignant, Evaluation, DirecteurDesEtudes, Personnel, Information, Matiere, Etudiant, Competence, Note, Comptable, Parcours, Programme, Semestre, Ue, AnneeUniversitaire, Tuteur
 from cahier_de_texte.models import Seance
+from planning.models import Planning
 from django.shortcuts import get_object_or_404, redirect, render
 from main.helpers import *
 from django.contrib.auth.decorators import login_required, permission_required
@@ -22,13 +23,27 @@ def dashboard(request):
     annee_selectionnee = get_object_or_404(
         AnneeUniversitaire, pk=id_annee_selectionnee)
     semestres = annee_selectionnee.get_semestres()
-    data = {
-        'nb_etudiants': len(Etudiant.objects.filter(semestres__in=semestres).distinct()),
-        'nb_enseignants': len(Enseignant.objects.filter(matiere__ue__programme__semestre__in=semestres).distinct()),
-        'nb_matieres': len(Matiere.objects.filter(ue__programme__semestre__in=semestres).distinct()),
-        'nb_ues': len(Ue.objects.filter(programme__semestre__in=semestres).distinct()),
-    }
-    return render(request, 'dashboard.html', context=data)
+    if request.user.groups.all().first().name in ['directeur_des_etudes', 'secretaire']:
+        data = {
+            'nb_etudiants': len(Etudiant.objects.filter(semestres__in=semestres).distinct()),
+            'nb_enseignants': len(Enseignant.objects.filter(matiere__ue__programme__semestre__in=semestres).distinct()),
+            'nb_matieres': len(Matiere.objects.filter(ue__programme__semestre__in=semestres).distinct()),
+            'nb_ues': len(Ue.objects.filter(programme__semestre__in=semestres).distinct()),
+        }
+        return render(request, 'dashboard.html', context=data)
+    
+    elif request.user.groups.all().first().name =='etudiant' :
+        user_etudiant = request.user.etudiant
+        semestre=user_etudiant.semestres.filter(courant=True,pk__contains=annee_selectionnee).get()
+        current_date = datetime.today()
+        planning=Planning.objects.filter(semestre=semestre).get()
+        for plan in planning:
+            intervalle=plan.intervalle
+            
+            if plan.debut & plan.fin :
+                intervalle=plan.fin 
+        events = planning
+        return render(request, 'dashboard.html', context=events)
 
 
 
@@ -1381,8 +1396,6 @@ def createNotesByEvaluation(request, id_matiere, rattrapage, id_semestre):
                 return redirect('main:evaluations', id_matiere=matiere.id)
             etudiants = semestre.etudiant_set.all()
 
-        # NoteFormSet = forms.modelformset_factory(
-        #     Note, form=NoteForm, extra=len(etudiants))
         NoteFormSet = forms.inlineformset_factory(
             parent_model=Evaluation,
             model=Note,
@@ -1392,8 +1405,7 @@ def createNotesByEvaluation(request, id_matiere, rattrapage, id_semestre):
             min_num=0,
             validate_min=True,
         )
-        queryset = Note.objects.none()
-
+        
         if request.method == 'POST':
             evaluation_form = EvaluationForm(request.POST)
             evaluation_form.set_max_ponderation(
@@ -1411,6 +1423,7 @@ def createNotesByEvaluation(request, id_matiere, rattrapage, id_semestre):
                     note.save()
                 return redirect('main:evaluations', id_matiere=matiere.id)
         else:
+            queryset = Note.objects.none()
             evaluation_form = EvaluationForm()
             initial_etudiant_note_data = [{'etudiant': etudiant.id, 'etudiant_full_name': etudiant.full_name()} for etudiant in etudiants]
             note_form_set = NoteFormSet(
@@ -1431,21 +1444,30 @@ def editeNoteByEvaluation(request, id):
     """
     Affiche un formulaire d'édition d'une note :model:`main.Note`.
     """
-    # Rechercher l'evaluation
     evaluation = get_object_or_404(Evaluation, pk=id)
     matiere = evaluation.matiere
     semestre = evaluation.semestre
-    # Définir la class NoteFormSet
+    
+    if evaluation.rattrapage:
+        etudiants = matiere.get_etudiants_en_rattrapage()
+        nouveaux_etudiants = []
+    else:
+        etudiants = semestre.etudiant_set.all()
+        etudiants_dans_evaluation = evaluation.etudiants.all()
+        nouveaux_etudiants = etudiants.difference(etudiants_dans_evaluation)
+        for etudiant in nouveaux_etudiants: 
+            Note.objects.create(evaluation=evaluation, etudiant=etudiant)
+
     NoteFormSet = forms.inlineformset_factory(
         parent_model=Evaluation,
         model=Note,
         form=NoteForm,
-        extra=0,
+        extra=len(nouveaux_etudiants),
         can_delete=False,
         min_num=0,
         validate_min=True,
     )
-
+    
     if request.method == 'POST':
         evaluation_form = EvaluationForm(request.POST, instance=evaluation)
         note_form_set = NoteFormSet(request.POST, instance=evaluation)
@@ -1464,6 +1486,7 @@ def editeNoteByEvaluation(request, id):
     else:
         evaluation_form = EvaluationForm(instance=evaluation)
         # Créer une instance de d'ensemble de formulaire selon notre queryset
+        initial_etudiant_note_data = [{'etudiant': etudiant.id, 'etudiant_full_name': etudiant.full_name()} for etudiant in nouveaux_etudiants]
         note_form_set = NoteFormSet(instance=evaluation)
         for form in note_form_set:
             etudiant = Etudiant.objects.filter(id=form.initial['etudiant']).get()
@@ -1504,19 +1527,19 @@ def uploadEvaluation(request, id_matiere, id_semestre):
         #return HttpResponse("Hello")
     return redirect('main:evaluations', id_matiere=id_matiere)
 
-@login_required(login_url=settings.LOGIN_URL)
-def dashboard(request):
-    id_annee_selectionnee = request.session.get('id_annee_selectionnee')
-    annee_selectionnee = get_object_or_404(
-        AnneeUniversitaire, pk=id_annee_selectionnee)
-    semestres = annee_selectionnee.get_semestres()
-    data = {
-        'nb_etudiants': len(Etudiant.objects.filter(semestres__in=semestres).distinct()),
-        'nb_enseignants': len(Enseignant.objects.filter(matiere__ue__programme__semestre__in=semestres).distinct()),
-        'nb_matieres': len(Matiere.objects.filter(ue__programme__semestre__in=semestres).distinct()),
-        'nb_ues': len(Ue.objects.filter(programme__semestre__in=semestres).distinct()),
-    }
-    return render(request, 'dashboard.html', context=data)
+# @login_required(login_url=settings.LOGIN_URL)
+# def dashboard(request):
+#     id_annee_selectionnee = request.session.get('id_annee_selectionnee')
+#     annee_selectionnee = get_object_or_404(
+#         AnneeUniversitaire, pk=id_annee_selectionnee)
+#     semestres = annee_selectionnee.get_semestres()
+#     data = {
+#         'nb_etudiants': len(Etudiant.objects.filter(semestres__in=semestres).distinct()),
+#         'nb_enseignants': len(Enseignant.objects.filter(matiere__ue__programme__semestre__in=semestres).distinct()),
+#         'nb_matieres': len(Matiere.objects.filter(ue__programme__semestre__in=semestres).distinct()),
+#         'nb_ues': len(Ue.objects.filter(programme__semestre__in=semestres).distinct()),
+#     }
+#     return render(request, 'dashboard.html', context=data)
 
 
 @login_required(login_url=settings.LOGIN_URL)
