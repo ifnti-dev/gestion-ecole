@@ -439,6 +439,16 @@ class Etudiant(Utilisateur):
 
     @staticmethod
     def static_get_L1(annee=None, semestres=['S1', 'S2']):
+        """
+            Cette fonction permet de récupérer l'ensemebles des étudiants de L1 et les semestres de L1.
+
+            :param annee: L'année universitaire de la classe de L1. 
+            :type annee: AnneeUniversitaire
+            :param semestres: Tableau contenant les semestres de L1. 
+            :type semestres: list[Semestre]
+            :return: Un tuple contenant un tableau d'étudiant et un tableau contenant les semestres de L1.
+            :retype: tuple(list[Etudiant], list[Semestre])
+        """
         if not annee:
             annee = AnneeUniversitaire.static_get_current_annee_universitaire()
         semestres_pk = [f'{semestre}-{annee.annee}' for semestre in semestres]
