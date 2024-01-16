@@ -325,7 +325,6 @@ class Etudiant(Utilisateur):
     def moyenne_etudiant_ue(self, ue, semestre):
         """
 
-
             Cette fonction permet de calculer la moyenne de l'étudiant dans une UE et de donner l'année de validation. L'année de validation est déterminée dans les cas de rattrapage passé par l'étudinat dans une matière de l'ue par l'année du dernier rattrapage en date passé par l'étudiant et qui de surcroît a été validé.
 
             :param ue: L'UE dans laquelle la moyenne est calculée. 
@@ -367,6 +366,17 @@ class Etudiant(Utilisateur):
 # Calcule le nombre de crédits obtenus par l'étudiant dans un semestre donné.
 
     def credits_obtenus_semestre(self, semestre):
+        """
+
+            Cette fonction permet de calculer le nombre de crédits obtenus dans le semestre donné.
+
+            :param semestre: Semestre dans lequel calculer le nombe de crédits. 
+            :type semestre: Semestre
+            :return: Nombre de crédits obtenus au cours du semestre.
+            :retype: int
+
+
+        """
         credits_obtenus = 0
 
         # Récupérer tous les programmes liés à ce semestre
