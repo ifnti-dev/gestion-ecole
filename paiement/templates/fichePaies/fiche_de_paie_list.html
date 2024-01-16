@@ -34,19 +34,25 @@
                         <td class="text-center font-size-sm">{{ fiche.nombreHeure }} H</td>
                         <td class="text-center font-size-sm">{{ fiche.difference }} FCFA</td>
                         <td style="text-align: center;">
-                            {% if is_comptable %}
-                            <button type="button" class="update-book btn btn-sm btn-warning">
-                                <a style="color: blanchedalmond;" href="{% url 'paiement:modifier_fiche_de_paie' fiche.id %}">
-                                    <span><i class="far fa-edit"></i></span>
-                                </a>
-                            </button>
-                            {% endif %}
 
                             <button type="button" class="update-book btn btn-sm btn-success">
                                 <a  style="color: blanchedalmond;" href="{% url 'paiement:fiche_paie' fiche.id %}">
                                     <span><i class="fas fa-file-pdf"></i></span>
                                 </a>
                             </button>
+
+                            {% if is_comptable %}
+                            <button type="button" class="update-book btn btn-sm btn-warning">
+                                <a style="color: blanchedalmond;" href="{% url 'paiement:modifier_fiche_de_paie' fiche.id %}">
+                                    <span><i class="far fa-edit"></i></span>
+                                </a>
+                            </button>
+
+                            <button type="button" class="delete-fiche btn btn-sm btn-danger" onclick="showDeleteConfirmation('{{ fiche.id }}')">
+                                <span><i class="far fa-trash-alt fa-lg"></i></span>
+                            </button>
+                            {% endif %}
+
                         </td>
                     </tr>
                     {% endfor %}
@@ -56,4 +62,12 @@
     </div>
 </div>
 
+
+<script>
+    function showDeleteConfirmation(fiche_paieId) {
+        if (confirm("Voulez-vous vraiment supprimer cette fiche de paie ?")) {
+            window.location.href = "{% url 'paiement:delete_fiches_de_paie' %}?id=" + fiche_paieId;
+        }
+    }
+</script>
 {% endblock %}
