@@ -43,6 +43,7 @@ urlpatterns = [
     path('bulletins_de_paye/<int:id_annee_selectionnee>/', views.les_bulletins_de_paye, name='bulletins_de_paye'),
     path('enregistrer_bulletin/', views.enregistrer_bulletin, name='enregistrer_bulletin'),
     path('modifier_bulletin/<int:id>/', views.enregistrer_bulletin, name='modifier_bulletin'),
+    path('delete_bulletin/', views.delete_bulletin, name='delete_bulletin'),
     path('detail_bulletin/<int:id>/', views.detail_bulletin, name='detail_bulletin'),
     path('bulletin_de_paye/<int:id>/', views.bulletin_de_paye, name='bulletin_de_paye'),
 
@@ -58,14 +59,16 @@ urlpatterns = [
     path('enregistrer_fiche_de_paie/', views.enregistrer_fiche_de_paie, name='enregistrer_fiche_de_paie'),
     path('modifier_fiche_de_paie/<int:id>/', views.enregistrer_fiche_de_paie, name='modifier_fiche_de_paie'),
     path('fiche_paie/<int:id>/', views.fiche_paie, name='fiche_paie'),
-    
+    path('delete_fiches_de_paie/', views.delete_fiches_de_paie, name='delete_fiches_de_paie'),
+
 
                              #### Fiche de Prise en charge ####                        
     path('liste_fiches_de_prise_en_charge/<int:id_annee_selectionnee>/', views.liste_fiches_de_prise_en_charge, name='liste_fiches_de_prise_en_charge'),
     path('enregistrer_fiche_de_prise_en_charge/', views.enregistrer_fiche_de_prise_en_charge, name='enregistrer_fiche_de_prise_en_charge'),
     path('modifier_fiche_de_prise_en_charge/<int:id>/', views.enregistrer_fiche_de_prise_en_charge, name='modifier_fiche_de_prise_en_charge'),
     path('fiche_de_charge/<int:id>/', views.fiche_de_charge, name='fiche_de_charge'),
-    
+    path('delete_fiches_de_paie/', views.delete_fiches_de_paie, name='delete_fiches_de_paie'),
+
     
 
 ]

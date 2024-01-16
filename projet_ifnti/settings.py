@@ -29,6 +29,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
+
 LOGIN_URL = "/main/connexion"
 
 DATE_INPUT_FORMATS = ['%d-%m-%Y']

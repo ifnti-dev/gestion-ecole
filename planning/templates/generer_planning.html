@@ -1,5 +1,7 @@
 {% extends './index.html' %}
+
 {% block content_title %}Plannifier {{semestre.libelle}} {{semestre.annee_universitaire}} || Semaine {{semaine}} du {{intervalle}} {% endblock content_title %}
+
 {% load static %}
 {% block content %}
 <style>
@@ -66,6 +68,7 @@
                     var datefin = '{{ datefin|safe}}';
                     var datedebut = '{{ datedebut|safe}}';
                     var intervalle = '{{ intervalle|safe}}';
+
         
                     document.addEventListener('DOMContentLoaded', function() {
                         $('#myForm').submit(function (event) {
@@ -311,6 +314,7 @@
                                             var events = planning.getEvents();
                                             for (var i = 0; i < events.length; i++) {
                                                 var event = events[i];
+
                                                 if (!event.end) {
                                                     One.helpers('notify', {type: 'danger', icon: 'fa fa-info-circle mr-1', message: "L'événement " + (event.title) + " n'a pas d'heure de fin spécifiée."});
 
@@ -322,9 +326,11 @@
                                                 datedebut:datedebut,
                                                 datefin:datefin,
                                                 events: events,
+
                                                 intervalle:intervalle,
                                                 semestre : semestre,
                                             };
+
 
                                             // Effectuer la requête POST vers /planning/save
                                             $.ajax({

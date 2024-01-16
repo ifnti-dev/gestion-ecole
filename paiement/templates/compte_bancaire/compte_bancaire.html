@@ -3,7 +3,7 @@
 {% block content_title %}
  Compte bancaire de l'IFNTI 
 
-{% if is_comptable %}
+ {% if is_comptable and not compte_existe %}
   <h1>
      <a href="{% url 'paiement:create_compte' %}" class="btn btn-outline-primary">
         <i class="fas fa-plus"></i> Ajouter

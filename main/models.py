@@ -16,7 +16,9 @@ from django.db.models import Max
 from django.contrib.auth.models import Group
 from django.db.models import Sum  
 from num2words import num2words
-from decimal import Decimal
+from decimal import Decimal, ROUND_DOWN
+import math
+
 
 class Utilisateur(models.Model):
     SEXE_CHOISE = [
@@ -83,7 +85,7 @@ class Etudiant(Utilisateur):
     passer_semestre_suivant = models.BooleanField(default=False, verbose_name="Passer au semestre suivant")
     decision_conseil = models.TextField(verbose_name="Décision du conseil", null=True, default="Décision du conseil")
     profil = models.ImageField(null=True, blank=True, verbose_name="Photo de profil")
-    semestres = models.ManyToManyField('Semestre')
+    semestres = models.ManyToManyField('Semestre', null=True)
     tuteurs = models.ManyToManyField('Tuteur', related_name="Tuteurs", blank=True, null=True)
 
     class Meta:
@@ -406,7 +408,7 @@ class Personnel(Utilisateur):
     dernierdiplome = models.ImageField(null=True, blank=True, verbose_name="Dernier diplome")
     nbreJrsCongesRestant = models.IntegerField(verbose_name="Nbre jours de congé restant", default=0)
     nbreJrsConsomme = models.IntegerField(verbose_name="Nombre de jours consommé", default=0)
-
+    nombre_de_personnes_en_charge = models.IntegerField(verbose_name="Nbre de pers pris en charge", default=0)
     
     def save(self):
         print(f'----{self.id}----')
@@ -427,15 +429,25 @@ class Personnel(Utilisateur):
         self.nbreJrsCongesRestant = 30 - total_jours_pris if total_jours_pris <= 30 else 0  # Mise à zéro si dépassement
         self.save()
 
-    # def update_conge_counts(self):
-    #     conges_pris = Conge.objects.filter(personnel=self)
-    #     total_jours_pris = conges_pris.aggregate(total=Sum('nombre_de_jours_de_conge'))['total'] or 0
+    def calculer_salaire_brut_annuel(self):
+        salaires = Salaire.objects.filter(personnel=self)
+        total_salaire_brut_annuel = sum(salaire.calculer_salaire_brut_mensuel() for salaire in salaires)
+        return total_salaire_brut_annuel
+    
+    def calculer_irpp_tcs_annuel(self):
+        salaires = Salaire.objects.filter(personnel=self)
+        total_irpp_annuel = sum(salaire.calculer_irpp_mensuel() for salaire in salaires)
+        total_tcs_annuel = sum(salaire.tcs for salaire in salaires)
+        total_irpp_tcs_annuel = Decimal(total_irpp_annuel) + Decimal(total_tcs_annuel)
+        total_irpp_tcs_annuel = total_irpp_tcs_annuel.quantize(Decimal('0.00'), rounding=ROUND_DOWN) 
+        return total_irpp_tcs_annuel
 
-    #     self.nbreJrsConsomme = total_jours_pris
-    #     self.nbreJrsCongesRestant = 30 - total_jours_pris 
-    #     self.save()
-
-
+    def calcule_deductions_cnss_annuel(self):
+        salaires = Salaire.objects.filter(personnel=self)
+        total_deductions_cnss = sum(salaire.calculer_deductions_cnss() for salaire in salaires)
+        #total_deductions_cnss = total_deductions_cnss.quantize(Decimal('0.00'), rounding=ROUND_DOWN) 
+        return Decimal(total_deductions_cnss)
+    
 
 class DirecteurDesEtudes(Personnel):
    # actif = models.BooleanField(default=True)
@@ -972,12 +984,9 @@ class Note(models.Model):
     Methods:
         __str__() -> str: Renvoie une représentation en chaîne de caractères de l'objet Note.
     """
-    valeurNote = models.DecimalField(default=0.0, blank=False, max_digits=5, decimal_places=2,
-                                     verbose_name="note", validators=[MaxValueValidator(20), MinValueValidator(0.0)])
-    etudiant = models.ForeignKey(
-        Etudiant, on_delete=models.CASCADE, verbose_name="Étudiant")
-    evaluation = models.ForeignKey(
-        Evaluation, on_delete=models.CASCADE, verbose_name="Evaluation")
+    valeurNote = models.DecimalField(default=0.0, blank=False, max_digits=5, decimal_places=2,verbose_name="note", validators=[MaxValueValidator(20), MinValueValidator(0.0)])
+    etudiant = models.ForeignKey(Etudiant, on_delete=models.CASCADE, verbose_name="Étudiant")
+    evaluation = models.ForeignKey(Evaluation, on_delete=models.CASCADE, verbose_name="Evaluation")
 
     def __str__(self):
         """
@@ -1051,50 +1060,135 @@ class Salaire(models.Model):
     frais_prestations_familiale_salsalaire = models.DecimalField(max_digits=10, decimal_places=3, default=0.04)
     tcs = models.DecimalField(max_digits=10, decimal_places=2, default=0, verbose_name="TCS")
     irpp = models.DecimalField(max_digits=10, decimal_places=2, default=0, verbose_name="IRPP")
-    is_tcs = models.BooleanField(default=False, null=True)
-    is_irpp = models.BooleanField(default=False, null=True)
     prime_forfaitaire = models.DecimalField(max_digits=10, decimal_places=2, default=0, verbose_name="Prime forfaitaires")
     acomptes = models.DecimalField(max_digits=10, decimal_places=2, default=0, verbose_name="Acomptes")
-    salaire_net_a_payer = models.DecimalField(max_digits=10, decimal_places=2, default=0, verbose_name="Salaire Net à payer")
+    salaire_net_a_payer = models.DecimalField(max_digits=15, decimal_places=2, default=0, verbose_name="Salaire Net à payer")
     compte_bancaire = models.ForeignKey('CompteBancaire', on_delete=models.CASCADE, null=True, blank=True)
     annee_universitaire = models.ForeignKey('AnneeUniversitaire', on_delete=models.CASCADE, verbose_name="Année Universitaire", null=True, blank=True)
 
-
-    def __str__(self):
-        return str(self.personnel.nom) #+ " " + str(self.personnel.prenom) + " Salaire : " +  str(self.date_debut) +  " au " + str(self.date_fin)
-    
-    def save(self, *args, **kwargs):
-        if not self.annee_universitaire:
-            self.annee_universitaire = AnneeUniversitaire.static_get_current_annee_universitaire()
-
+    def calculer_salaire_brut_annuel(self):
         salaire_de_base = self.personnel.salaireBrut
         prime_efficacite = self.prime_efficacite
         prime_qualite = self.prime_qualite
         frais_travaux_complementaires = self.frais_travaux_complementaires
         prime_anciennete = self.prime_anciennete
-        tcs = self.tcs
-        prime_forfaitaire = self.prime_forfaitaire
-        acomptes = self.acomptes
-        frais_prestations_familiale_salsalaire = Decimal(self.frais_prestations_familiale_salsalaire) * Decimal(self.personnel.salaireBrut)
-
         primes = (
             prime_efficacite
             + prime_qualite
             + frais_travaux_complementaires
             + prime_anciennete
         )
+        salaire_brut_mensuel = salaire_de_base + primes
+        salaire_brut_annuel = salaire_brut_mensuel * 12
+        return salaire_brut_annuel
+    
+    def calculer_salaire_brut_mensuel(self):
+        salaire_brut_mensuel = self.calculer_salaire_brut_annuel() / 12
+        return salaire_brut_mensuel
 
+    def calculer_total_A(self):
+        total_A = self.calculer_salaire_brut_annuel()
+        return total_A
+    
+    def calculer_total_B(self):
+        total_B = Decimal(self.calculer_salaire_brut_annuel()) * Decimal(0.04)
+        return total_B
+    
+    def calculer_total_C(self):
+        total_C = self.calculer_total_A() - self.calculer_total_B()
+        return total_C
+    
+    def calculer_total_D(self):
+        G41 = self.calculer_total_C()
+        if G41 < 10000000:
+            total_D = Decimal(0.28) * G41
+        elif G41 > 10000000:
+            total_D = 10000000 * 0.28
+        else:
+            total_D = 0
+        return total_D
+
+    def calculer_semi_net(self):
+        G41 = self.calculer_total_C()
+        G42 = self.calculer_total_D()
+        semi_net = G41 - G42
+        return semi_net
+        
+    def calculer_charges_de_familles(self):
+        F44 = self.personnel.nombre_de_personnes_en_charge
+        if F44 <= 6:
+            resultat = 120000 * F44
+        else:
+            resultat = 6 * 120000
+        return resultat
+
+    def calculer_net_taxable(self):
+        G43 = self.calculer_semi_net()
+        G44 = self.calculer_charges_de_familles()
+        net_taxable = G43 - G44
+        return net_taxable
+
+    def calculer_net_imposable(self):
+        net_imposable = self.calculer_net_taxable()
+        return net_imposable
+    
+    def calculer_net_imposable_arrondi(self):
+        G50 = self.calculer_net_imposable()
+        net_imposable_arrondi = round(G50, -3)
+        net_imposable_arrondi_str = "{:.0f}".format(net_imposable_arrondi)
+        return int(net_imposable_arrondi_str)
+
+    def calculer_irpp_annuel(self):
+        G51 = self.calculer_net_imposable_arrondi()
+        if G51 < 900000 or G51 == 900000:
+            irpp = G51 * 0
+        elif G51 < 3000000 or G51 == 3000000:
+            irpp = (G51 - 900000) * 0.03 + 0
+        elif G51 < 6000000 or G51 == 6000000:
+            irpp = (G51 - 3000000) * 0.1 + 63000
+        elif G51 < 9000000 or G51 == 9000000:
+            irpp = (G51 - 6000000) * 0.15 + 363000
+        elif G51 < 12000000 or G51 == 12000000:
+            irpp = (G51 - 9000000) * 0.2 + 813000
+        elif G51 < 15000000 or G51 == 15000000:
+            irpp = (G51 - 12000000) * 0.25 + 1413000
+        elif G51 < 20000000 or G51 == 20000000:
+            irpp = (G51 - 15000000) * 0.3 + 2163000
+        else:
+            irpp = (G51 - 20000000) * 0.35 + 3663000
+        return irpp 
+    
+    def calculer_irpp_mensuel(self):
+        irpp_mensuel = self.calculer_irpp_annuel() /12
+        return irpp_mensuel
+    
+    def calculer_deductions_cnss(self):
+        frais_prestations_familiale_salsalaire = Decimal(self.frais_prestations_familiale_salsalaire) * Decimal(self.calculer_salaire_brut_mensuel())
         deductions = (
             frais_prestations_familiale_salsalaire
-            + tcs
         )
+        return deductions
+
+    def save(self, *args, **kwargs):
+        if not self.annee_universitaire:
+            self.annee_universitaire = AnneeUniversitaire.static_get_current_annee_universitaire()
         
-        salaire_brut = salaire_de_base + primes
+        tcs = Decimal(self.tcs)
+        irpp = self.calculer_irpp_mensuel()
+        self.irpp = Decimal(irpp)
+        prime_forfaitaire = self.prime_forfaitaire
+        acomptes = self.acomptes
+
+        salaire_brut =  self.calculer_salaire_brut_mensuel()
+        deductions = self.calculer_deductions_cnss() +Decimal(irpp) + tcs
         salaire_net = salaire_brut - deductions
         pret = salaire_net - acomptes
         self.salaire_net_a_payer = pret + prime_forfaitaire 
         super(Salaire, self).save(*args, **kwargs)
 
+    def __str__(self):
+        return str(self.personnel.nom) 
+    
 
 class Fournisseur(models.Model):
     TYPE = [
@@ -1227,7 +1321,7 @@ class Conge(models.Model):
     ]
 
     nature = models.CharField(max_length=30, choices=NATURE_CHOICES, verbose_name="Nature des congés")
-    autre_nature = models.CharField(max_length=100, blank=True, null=True, verbose_name="Autre nature des congés")
+    autre_nature = models.CharField(max_length=100, blank=True, null=True, verbose_name="Autre nature à préciser")
     date_et_heure_debut = models.DateField(default=timezone.now, verbose_name="Date de début")
     date_et_heure_fin = models.DateField(default=timezone.now, verbose_name="Date de fin")
     personnel = models.ForeignKey('Personnel', on_delete=models.CASCADE, verbose_name="Personnel")

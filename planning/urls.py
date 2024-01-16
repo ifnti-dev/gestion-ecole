@@ -12,7 +12,9 @@ urlpatterns = [
     path('seance/<int:seance_id>/retirer/', views.retirer_seance, name='retirer_seance'),
 
     path('save/', views.sauvegarder, name='sauvegarder'),
+
     path('modifier/', views.modifier, name='modifier'),
+
     path('details/<str:planningId>', views.details, name='afficher'),
     path('imprimer/<str:planningId>', views.imprimer, name='imprimer'),
     path('delete/<str:planningId>', views.delete, name='supprimer'),
