@@ -365,6 +365,7 @@ class Etudiant(Utilisateur):
 
 # Calcule le nombre de crédits obtenus par l'étudiant dans un semestre donné.
 
+
     def credits_obtenus_semestre(self, semestre):
         """
             Cette fonction permet de calculer le nombre de crédits obtenus dans le semestre donné.
@@ -466,6 +467,17 @@ class Etudiant(Utilisateur):
 
     @staticmethod
     def static_get_L2(annee=None, semestres=['S3', 'S4']):
+        """
+            Cette fonction permet de récupérer l'ensemebles des étudiants de L2 et les semestres de L2.
+
+            :param annee: L'année universitaire de la classe de L2. 
+            :type annee: AnneeUniversitaire
+            :param semestres: Tableau contenant les semestres de L2. 
+            :type semestres: list[Semestre]
+            :return: Un tuple contenant un tableau d'étudiant et un tableau contenant les semestres de L2.
+            :retype: tuple(list[Etudiant], list[Semestre])
+        """
+
         if not annee:
             annee = AnneeUniversitaire.static_get_current_annee_universitaire()
         semestres_pk = [f'{semestre}-{annee.annee}' for semestre in semestres]
