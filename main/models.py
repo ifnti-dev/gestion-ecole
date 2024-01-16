@@ -367,15 +367,12 @@ class Etudiant(Utilisateur):
 
     def credits_obtenus_semestre(self, semestre):
         """
-
             Cette fonction permet de calculer le nombre de crédits obtenus dans le semestre donné.
 
             :param semestre: Semestre dans lequel calculer le nombe de crédits. 
             :type semestre: Semestre
             :return: Nombre de crédits obtenus au cours du semestre.
             :retype: int
-
-
         """
         credits_obtenus = 0
 
@@ -393,9 +390,15 @@ class Etudiant(Utilisateur):
 
     @staticmethod
     def get_Ln(semestres, annee_universitaire=None):
-        """ 
-        semestre : liste de chaîne de caractère
-        annee_universitaire : instance de la classe AnneUniversitaire
+        """
+            C'est une fonction statique qui permet de récupérer les étudiants de plusieurs semestres d'une année universitaire.
+
+            :param semestres: Liste des semestres. 
+            :type semestres: list
+            :param annee_universitaire: Année universitaire . 
+            :type annee_universitaire: AnneeUniversitaire
+            :return: Liste des étudiants ainsi que les semestres
+            :retype: tuple(list[Etudiant], list[Semestre])
         """
         if not annee_universitaire:
             annee_universitaire = AnneeUniversitaire.static_get_current_annee_universitaire()
@@ -403,7 +406,6 @@ class Etudiant(Utilisateur):
             f'{semestre}-{annee_universitaire.annee}' for semestre in semestres]
 
         programmes = Programme.objects.filter(semestre__in=semestres_pk)
-        print(programmes)
 
         if programmes:
             semestres = set()
@@ -418,9 +420,13 @@ class Etudiant(Utilisateur):
 
     @staticmethod
     def get_etudiants_semestre(semestre, id_annee_selectionnee=None):
-        """ 
-        semestre : chaîne de caractère
-        id_annee_selectionnee : entier
+        """
+            Cette fonction permet de calculer le nombre de crédits obtenus dans le semestre donné.
+
+            :param semestre: Semestre dans lequel calculer le nombe de crédits. 
+            :type semestre: Semestre
+            :return: Nombre de crédits obtenus au cours du semestre.
+            :retype: int
         """
         try:
             annee_universitaire = AnneeUniversitaire.objects.get(
