@@ -211,6 +211,15 @@ class Etudiant(Utilisateur):
         return niveau, semestres
 
     def moyenne_etudiant_matieres(self, semestre):
+        """
+            Cette fonction retourne les moyennes dans toutes les matières suivies par un étudiant au cours d'un trimestre donné, pour chaque matière défini un attribut booléen pour déterminer s'il à validé ou non. 
+
+            :param semestre: Année Universitaire de l'étudiant
+            :type semestre: Semestre
+            :return: Retourne un tableau de dictionnaires, chaque dictionnaire composé du libellé de la matière, la moyenne obtenue et la validation.
+            :retype: list[dict()] 
+        """
+
         result = []
         programmes = Programme.objects.filter(semestre=semestre)
         if not programmes:
