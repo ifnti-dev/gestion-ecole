@@ -6,7 +6,7 @@ from django.conf import settings
 from main.forms import EnseignantForm, EtudiantForm, EvaluationForm, InformationForm, ProgrammeForm, NoteForm, TuteurForm, UeForm, MatiereForm
 from .models import Domaine, Enseignant, Evaluation, DirecteurDesEtudes, Personnel, Information, Matiere, Etudiant, Competence, Note, Comptable, Parcours, Programme, Semestre, Ue, AnneeUniversitaire, Tuteur
 from cahier_de_texte.models import Seance
-from planning.models import Planning
+from planning.models import Planning ,SeancePlannifier
 from django.shortcuts import get_object_or_404, redirect, render
 from main.helpers import *
 from django.contrib.auth.decorators import login_required, permission_required
@@ -16,6 +16,12 @@ from tablib import Dataset
 from .custom_permission_required import evaluation_permission, show_recapitulatif_note_permission
 
 
+def datetime_serializer(obj):
+    if isinstance(obj, datetime.datetime):
+        return obj.strftime('%Y-%m-%dT%H:%M:%S')
+    raise TypeError("Type not serializable")
+
+import datetime
 @login_required(login_url=settings.LOGIN_URL)
 def dashboard(request):
     id_annee_selectionnee = request.session.get('id_annee_selectionnee')
@@ -32,18 +38,28 @@ def dashboard(request):
         }
         return render(request, 'dashboard.html', context=data)
     
-    elif request.user.groups.all().first().name =='etudiant' :
-        user_etudiant = request.user.etudiant
-        semestre=user_etudiant.semestres.filter(courant=True,pk__contains=annee_selectionnee).get()
-        current_date = datetime.today()
-        planning=Planning.objects.filter(semestre=semestre).get()
-        for plan in planning:
-            intervalle=plan.intervalle
-            
-            if plan.debut & plan.fin :
-                intervalle=plan.fin 
-        events = planning
-        return render(request, 'dashboard.html', context=events)
+    # elif request.user.groups.all().first().name =='etudiant' :
+    #     user_etudiant = request.user.etudiant
+    #     semestre=user_etudiant.semestres.filter(courant=True,pk__contains=annee_selectionnee).get()
+    #     seances=Planning.objects.filter(semestre=semestre).get()
+
+    #     planning = Planning.objects.filter(semestre=semestre)
+    #     event_data=[]
+    #     for plan in planning :                
+    #         seances=SeancePlannifier.objects.filter(planning=plan)
+    #         event_data = [{'title': seance.intitule, 'start': seance.date_heure_debut , 'end':seance.date_heure_fin ,'url': '/planning/seance/' + str(seance.id) + ''} for seance in seances]
+    #         event_data = json.dumps(event_data, default=datetime_serializer)
+
+    #     return render(request, 'dashboard.html', context=event_data)
+    
+    # elif request.user.groups.all().first().name =='enseignant' :
+    #     user_enseignant = request.user.enseignant             
+    #     seances=SeancePlannifier.objects.filter(enseignant=user_enseignant)
+    #     event_data = [{'title': seance.intitule, 'start': seance.date_heure_debut , 'end':seance.date_heure_fin ,'url': '/planning/seance/' + str(seance.id) + ''} for seance in seances]
+    #     event_data = json.dumps(event_data, default=datetime_serializer)
+
+    #     return render(request, 'dashboard.html', context=event_data)
+
 
 def change_annee_universitaire(request):
     if 'annee_universitaire' in request.GET:
