@@ -167,8 +167,8 @@ class SalaireForm(forms.ModelForm):
         model = Salaire
         fields = ['date_debut','date_fin', 'personnel', 'numero_cnss', 'qualification_professionnel', 'tcs', 'prime_efficacite', 'prime_qualite', 'frais_travaux_complementaires', 'prime_anciennete', 'prime_forfaitaire', 'acomptes']
         widgets = {
-            'date_debut': forms.DateInput(attrs={'type': 'date'}), 
-            'date_fin': forms.DateInput(attrs={'type': 'date'}),
+            'date_debut': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}), 
+            'date_fin': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
             'personnel': forms.Select(attrs={'class': 'form-control'}),
             'numero_cnss': forms.TextInput(attrs={'class': 'form-control'}),
             'qualification_professionnel': forms.Select(attrs={'class': 'form-control'}),
@@ -201,8 +201,8 @@ class FicheDePaieForm(forms.ModelForm):
         model = FicheDePaie
         fields = ['dateDebut', 'dateFin',  'enseignant', 'prixUnitaire', 'acomptes', 'matiere', 'nombreHeureL1', 'nombreHeureL2', 'nombreHeureL3']   
         widgets = {
-            'dateDebut': forms.DateInput(attrs={'type': 'date'}),
-            'dateFin': forms.DateInput(attrs={'type': 'date'}),
+            'dateDebut': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'dateFin': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
             'matiere': forms.Select(attrs={'class': 'form-control'}),
             'enseignant': forms.Select(attrs={'class': 'form-control'}),
             'nombreHeureL1': forms.NumberInput(attrs={'class': 'form-control'}),
@@ -219,8 +219,8 @@ class ChargeForm(forms.ModelForm):
         model = Charge
         fields = ['dateDebut', 'dateFin',  'personnel', 'frais_de_vie', 'frais_nourriture']   
         widgets = {
-            'dateDebut': forms.DateInput(attrs={'type': 'date'}),
-            'dateFin': forms.DateInput(attrs={'type': 'date'}),
+            'dateDebut': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'dateFin': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
             'personnel': forms.Select(attrs={'class': 'form-control'}),
             'frais_de_vie': forms.NumberInput(attrs={'class': 'form-control'}),
             'frais_nourriture': forms.NumberInput(attrs={'class': 'form-control'}),

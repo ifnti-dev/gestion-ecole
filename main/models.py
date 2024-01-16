@@ -445,7 +445,7 @@ class Personnel(Utilisateur):
     def calcule_deductions_cnss_annuel(self):
         salaires = Salaire.objects.filter(personnel=self)
         total_deductions_cnss = sum(salaire.calculer_deductions_cnss() for salaire in salaires)
-        total_deductions_cnss = total_deductions_cnss.quantize(Decimal('0.00'), rounding=ROUND_DOWN) 
+        #total_deductions_cnss = total_deductions_cnss.quantize(Decimal('0.00'), rounding=ROUND_DOWN) 
         return Decimal(total_deductions_cnss)
     
 
@@ -1183,7 +1183,7 @@ class Salaire(models.Model):
         acomptes = self.acomptes
 
         salaire_brut =  self.calculer_salaire_brut_mensuel()
-        deductions = self.calculer_deductions_cnss() + irpp + tcs
+        deductions = self.calculer_deductions_cnss() +Decimal(irpp) + tcs
         salaire_net = salaire_brut - deductions
         pret = salaire_net - acomptes
         self.salaire_net_a_payer = pret + prime_forfaitaire 
