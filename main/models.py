@@ -214,7 +214,7 @@ class Etudiant(Utilisateur):
         """
             Cette fonction retourne les moyennes dans toutes les matières suivies par un étudiant au cours d'un trimestre donné, pour chaque matière défini un attribut booléen pour déterminer s'il à validé ou non. 
 
-            :param semestre: Année Universitaire de l'étudiant
+            :param semestre: Semestre de l'étudiant.
             :type semestre: Semestre
             :return: Retourne un tableau de dictionnaires, chaque dictionnaire composé du libellé de la matière, la moyenne obtenue et la validation.
             :retype: list[dict()] 
@@ -242,9 +242,15 @@ class Etudiant(Utilisateur):
         return result
 
     def notes_etudiant_matiere(self, matiere, semestre):
-        """_summary_
-        Returns:
-            _type_: _description_
+        """
+            Cette fonction retourne les notes obtenues par un étudiant dans une matière au cours d'un semestre. 
+
+            :param matiere: Matière contenant les notes.
+            :type matiere: Matiere
+            :param semestre: Semestre des notes.
+            :type semestre: Semestre
+            :return: Retourne un tableau de dictionnaires, chaque dictionnaire composé du libellé de l'évaluation, la note obtenue.
+            :retype: list[dict()]
         """
         # Verifier si l'étudiant suis cette matiere
         # Récupérerer toute les évaluations de l'étuidant dans cette matière
