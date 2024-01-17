@@ -37,9 +37,10 @@ def dashboard(request):
             'nb_matieres': len(Matiere.objects.filter(ue__programme__semestre__in=semestres).distinct()),
             'nb_ues': len(Ue.objects.filter(programme__semestre__in=semestres).distinct()),
         }
+
         return render(request, 'dashboard.html', context=data)
     
-
+    return render(request, 'dashboard.html')
     # elif request.user.groups.all().first().name =='etudiant' :
     #     user_etudiant = request.user.etudiant
     #     semestre=user_etudiant.semestres.filter(courant=True,pk__contains=annee_selectionnee).get()
@@ -1233,7 +1234,6 @@ def releve_notes_details_all(request, id_semestre):
 
 
 @login_required(login_url=settings.LOGIN_URL)
-# methode générant le récapitulatif des notes du semestre
 def recapitulatif_notes(request, id_matiere, id_semestre):
     print(request.user.groups.all().first().name)
     if request.user.groups.all().first().name not in ['enseignant', 'directeur_des_etudes']:
@@ -1288,9 +1288,7 @@ def recapitulatifs_des_notes_par_etudiant(request, id_semestre):
         'matieres': etudiant.moyenne_etudiant_matieres(semestre),
         'etudiant': etudiant
     }
-
     return render(request, 'evaluations/recapitulatifs_des_notes_etudiant.html', context=data)
-
 
 @show_recapitulatif_note_permission("show_recapitulatif")
 def recapitulatifs_des_notes_par_matiere(request, id_semestre, id_matiere):
@@ -1543,21 +1541,6 @@ def uploadEvaluation(request, id_matiere, id_semestre):
         load_notes_from_evaluation(file, matiere, semestre)
         #return HttpResponse("Hello")
     return redirect('main:evaluations', id_matiere=id_matiere)
-
-# @login_required(login_url=settings.LOGIN_URL)
-# def dashboard(request):
-#     id_annee_selectionnee = request.session.get('id_annee_selectionnee')
-#     annee_selectionnee = get_object_or_404(
-#         AnneeUniversitaire, pk=id_annee_selectionnee)
-#     semestres = annee_selectionnee.get_semestres()
-#     data = {
-#         'nb_etudiants': len(Etudiant.objects.filter(semestres__in=semestres).distinct()),
-#         'nb_enseignants': len(Enseignant.objects.filter(matiere__ue__programme__semestre__in=semestres).distinct()),
-#         'nb_matieres': len(Matiere.objects.filter(ue__programme__semestre__in=semestres).distinct()),
-#         'nb_ues': len(Ue.objects.filter(programme__semestre__in=semestres).distinct()),
-#     }
-#     return render(request, 'dashboard.html', context=data)
-
 
 @login_required(login_url=settings.LOGIN_URL)
 def affectation_matieres_professeur(request):

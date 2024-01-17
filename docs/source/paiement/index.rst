@@ -1,13 +1,11 @@
-Documentation de l'application principale : main
+Documentation de l'application : paiement
 ================================================
 
 .. toctree::
     :maxdepth: 2
     :caption: Table des matières:
 
-    model
     views
-    urls
 
 .. code-block:: python
     :caption: Exemple de code Python

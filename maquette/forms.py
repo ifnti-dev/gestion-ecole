@@ -33,7 +33,6 @@ class GenerateMaquetteForm(forms.Form):
         return cleaned_data
 
 class DataForm(forms.Form):
-    # enseignants_excel_file = forms.FileField(widget=forms.FileInput(attrs={'class': 'form-control'}), required=False, label="Fichier enseignants")
     maquette_excel_file = forms.FileField(widget=forms.FileInput(attrs={'class': 'form-control'}), required=False, label="Fichier maquette")
     matieres_excel_file = forms.FileField(widget=forms.FileInput(attrs={'class': 'form-control'}), required=False, label="Fichier matières")
     notes_excel_file = forms.FileField(widget=forms.FileInput(attrs={'class': 'form-control'}), required=False, label="Fichier notes")
