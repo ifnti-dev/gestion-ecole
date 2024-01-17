@@ -29,6 +29,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
+
 LOGIN_URL = "/main/connexion"
 
 DATE_INPUT_FORMATS = ['%d-%m-%Y']
@@ -55,7 +56,7 @@ INSTALLED_APPS = [
     'solo',
     'planning',
     'cahier_de_texte',
- ]
+]
 
 
 MIDDLEWARE = [

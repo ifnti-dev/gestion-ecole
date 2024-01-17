@@ -1,10 +1,9 @@
 import zipfile
 from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404, redirect
-from main.helpers import load_notes_from_ue_file, pre_load_note_ues_template_data
 from main.pdfMaker import generate_pdf
 from main.models import AnneeUniversitaire, CorrespondanceMaquette, Matiere, Programme, Semestre, Ue, Domaine, Parcours
-from scripts.utils import load_maquette, load_matieres, load_notes_from_matiere
+from scripts.utils import load_maquette,load_notes_from_ue_file, pre_load_note_ues_template_data
 from .forms import CorrespondanceMaquetteForm, DataForm, GenerateMaquetteForm, ProgrammeForm, DomaineForm, ParcoursForm
 import os
 from django.core import serializers
@@ -70,31 +69,6 @@ def delete_programme(request, id):
     programme.delete()
     return redirect('maquette:programmes')
 
-
-def data(request):
-    id_annee_selectionnee = request.session.get('id_annee_selectionnee')
-    if request.method == "POST":
-        form = DataForm(request.POST, request.FILES)
-        if form.is_valid():
-            cleaned_data = form.clean()
-            # enseignants_excel_file = cleaned_data.get('enseignants_excel_file')
-            maquette_excel_file = cleaned_data.get('maquette_excel_file')
-            matieres_excel_file = cleaned_data.get('matieres_excel_file')
-            notes_excel_file = cleaned_data.get('notes_excel_file')
-            
-            
-            if maquette_excel_file:
-                load_maquette(maquette_excel_file)
-            if matieres_excel_file:
-                load_matieres(matieres_excel_file)
-            if notes_excel_file:
-                load_notes_from_matiere(notes_excel_file)
-        return redirect('maquette:data')
-    data = {
-        'form' : DataForm()
-    }
-    
-    return render(request, 'data/index.html', context=data)
 
 def correspondances(request):
     if request.method == "POST":
@@ -201,7 +175,6 @@ def generate_maquette_pdf(context):
         response = HttpResponse(pdf_preview, content_type='application/pdf')
         response['Content-Disposition'] = 'inline;filename=pdf_file.pdf'
         return response
-    
 
 def domaines(request):
     domaines =Domaine.objects.all()
@@ -242,7 +215,6 @@ def delete_domaine(request, id):
     domaine = get_object_or_404(Domaine, pk=id)
     domaine.delete()
     return redirect('maquette:domaines')
-
 
 
 def parcours(request, id_domaine):
@@ -289,6 +261,38 @@ def delete_parcours(request, id):
     parcours.delete()
     return redirect('maquette:domaines')
 
+def data(request):
+    id_annee_selectionnee = request.session.get('id_annee_selectionnee')
+    annee_selectionnee = get_object_or_404(AnneeUniversitaire, pk=id_annee_selectionnee)
+    if request.method == "POST":
+        form = DataForm(request.POST, request.FILES)
+        if form.is_valid():
+            cleaned_data = form.clean()
+            maquette_excel_file = request.FILES.getlist('maquette_excel_file')
+            matieres_excel_file = cleaned_data.get('matieres_excel_file')
+            notes_excel_file = cleaned_data.get('notes_excel_file')
+            
+            if maquette_excel_file:
+                for file_cache_tmp in maquette_excel_file:
+                    name = str(file_cache_tmp)
+                    name_part = name.split('_')
+                    if len(name_part) == 3:
+                        year_part = name_part[2].split('-')
+                        if len(year_part) == 2:
+                            annee_selectionnee = int(year_part[0])
+                            annee_selectionnee = AnneeUniversitaire.objects.get(annee=2022)
+                            print(annee_selectionnee)
+                            load_maquette(file_cache_tmp, annee_selectionnee)
+            if matieres_excel_file:
+                load_matieres(matieres_excel_file)
+            if notes_excel_file:
+                load_notes_from_matiere(notes_excel_file)
+        return redirect('maquette:data')
+    data = {
+        'form' : DataForm()
+    }
+    return render(request, 'data/index.html', context=data)
+
 def generate_note_template(request):
     zip_path = pre_load_note_ues_template_data(request.session.get('id_annee_selectionnee'))
     zip_file = open(zip_path, 'r')
@@ -297,9 +301,11 @@ def generate_note_template(request):
         response['Content-Disposition'] = 'attachment; filename="{}"'.format(os.path.basename(zip_path))
         return response
 
-def number(request, number):
-    if number==1:
-        return render(request, "data/1.html", context={})
-    if number==2:
-        return render(request, "data/2.html", context={})
-    return render(request, "data/2.html", context={})
+def generate_maquette_template(request):
+    file_name = 'maquette_general_[annee].xlsx'
+    file_path = 'media/excel_templates/'+file_name
+    with open(file_path, 'rb') as file:
+        response = HttpResponse(file.read(), content_type="application/force-download")
+        response['Content-Disposition'] = 'attachment; filename="{}"'.format(os.path.basename(file_name))
+        return response
+

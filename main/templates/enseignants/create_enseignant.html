@@ -75,15 +75,16 @@ Enregistrement d'un enseignant
         </div>
 
       <div class="form-row mb-3">
-          <div class="col-md-6">
-            {{ form.prefecture.label_tag }}
-            <div class="d-flex">{{ form.prefecture }}</div>
-            <span class="text-danger">{{ form.prefecture.errors }}</span>
-          </div>
+          
            <div class="col-md-6">
             {{ form.salaireBrut.label_tag }}
             <div class="d-flex">{{ form.salaireBrut }}</div>
             <span class="text-danger">{{ form.salaireBrut.errors }}</span>
+          </div>
+           <div class="col-md-6">
+            {{ form.nombre_de_personnes_en_charge.label_tag }}
+            <div class="d-flex">{{ form.nombre_de_personnes_en_charge }}</div>
+            <span class="text-danger">{{ form.nombre_de_personnes_en_charge.errors }}</span>
           </div>
         </div>
 
