@@ -21,6 +21,5 @@ urlpatterns = [
     path('edit_parcours/<int:id>', views.edit_parcours, name='edit_parcours'),
     path('delete_parcours/<int:id>/', views.delete_parcours, name='delete_parcours'),
     path('notes/ues/template/', views.generate_note_template, name='note_template'),
-    path('number/<int:number>/', views.number, name="number")
-    # path('semestres_by_parcours/<int:id_parcours>', views.semestres_by_parcours, name='semestres_by_parcours'),
+    path('template/', views.generate_maquette_template, name='maquette_template'),
 ]

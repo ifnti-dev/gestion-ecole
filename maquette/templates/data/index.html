@@ -3,9 +3,7 @@
 {% block content_title_description %}{% endblock content_title_description %}
 {% block content %}
 <div class="block block-rounded">
-    <div class="block-header">
-       
-    </div>
+    <div class="block-header"></div>
     <div class="block-content block-content-full">
         <form action="" method="POST" enctype="multipart/form-data">
             {% csrf_token %}
@@ -22,7 +20,7 @@
                 <div class="d-flex justify-content-between">
                     {{ form.maquette_excel_file }}
                     <div class="mx-3 d-flex align-items-center">
-                        <a href="{{ MEDIA_URL }}/excel_templates/maquette_general.xlsx" download="excel">Template</a>
+                        <a href="{{ MEDIA_URL }}/excel_templates/ues_matiere.xlsx" download="excel" class="ml-3">Template</a>
                     </div>
                 </div>
                 {{ form.maquette_excel_file.errors }}
@@ -51,6 +49,18 @@
                 <input type="submit" class="btn btn-primary ml-3" value="Mettre à jour">
             </div>
         </form>
+        <div class="d-flex flex-column mt-3">
+            {{ form.maquette_excel_file.label_tag }}
+            <div class="d-flex justify-content-between">
+                {{ form.maquette_excel_file }}
+                <div class="mx-3 d-flex align-items-center">
+                    <a href="{% url 'maquette:maquette_template' %}">
+                        <button type="submit" class="btn btn-primary">Template</button>
+                    </a>
+                </div>
+            </div>
+            {{ form.maquette_excel_file.errors }}
+        </div>
         <div class="d-flex flex-column mt-3">
             {{ form.notes_excel_file.label_tag }}
             <div class="d-flex justify-content-between">
