@@ -14,5 +14,3 @@ Documentation de l'application principale : main
 
     def hello_world():
         print("Hello, world!")
-
-:copybutton:`Copier le code`
