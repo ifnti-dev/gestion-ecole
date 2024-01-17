@@ -11,6 +11,8 @@ urlpatterns = [
     path('seance/<int:seance_id>/enregistrer/', views.enregistrer_seance, name='enregistrer_seance'),
     path('seance/<int:seance_id>/retirer/', views.retirer_seance, name='retirer_seance'),
 
+    path('summary/<str:semestreId>',views.resume,name='resume'),
+
     path('save/', views.sauvegarder, name='sauvegarder'),
     path('modifier/', views.modifier, name='modifier'),
     path('details/<str:planningId>', views.details, name='afficher'),

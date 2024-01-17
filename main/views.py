@@ -36,7 +36,9 @@ def dashboard(request):
             'nb_matieres': len(Matiere.objects.filter(ue__programme__semestre__in=semestres).distinct()),
             'nb_ues': len(Ue.objects.filter(programme__semestre__in=semestres).distinct()),
         }
+
         return render(request, 'dashboard.html', context=data)
+    return render(request, 'dashboard.html')
     
     # elif request.user.groups.all().first().name =='etudiant' :
     #     user_etudiant = request.user.etudiant
