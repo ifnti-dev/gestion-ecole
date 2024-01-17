@@ -25,7 +25,7 @@ def convert_serial_temporel_number_to_date(numero_serie_temporelle):
     # Date de référence d'Excel
     date_reference = datetime(1899, 12, 30)  
     # Ajouter le nombre de jours au format de série temporelle à la date de référence
-    date_resultat = date_reference + timedelta(days=numero_serie_temporelle)
+    date_resultat = date_reference + datetime.timedelta(days=numero_serie_temporelle)
     
     return date_resultat
 
@@ -276,28 +276,98 @@ def load_maquette(path, annee):
 
         for row in sheet.iter_rows(values_only=True):
             if row[0] and row[0] != "libelle":
-                libelle = trim_str(row[0]) # Remplacer les espaces multiples par un seul espace
-
-                # Utiliser get_or_create pour éviter les doublons
-                ue, created = Ue.objects.get_or_create(
-                    libelle=libelle,
-                    type=trim_str(row[1]),
-                    niveau=trim_str(row[2]),
-                    nbreCredits=trim_str(row[3]),
-                    heures=trim_str(row[4])
-                )
+                libelle = row[0].strip()
+                libelle = libelle.replace("  ", " ")
+                code  = "_".join([mot[0].lower() for mot in libelle.split(' ')])
+                code_ue[code] = libelle
+                ue = Ue.objects.create(libelle=libelle, type=row[1], niveau=row[2].split('=')[1], nbreCredits=row[3].split('=')[1], heures=row[4].split('=')[1])
                 semestre_ue[semestre].append(ue)
 
     parcours = Parcours.objects.all().first()
     semestres = annee.semestre_set.all()
 
     for semestre in semestres:
-        programme = Programme.objects.create(semestre=semestre, parcours=parcours)
+        programme = Programme.objects.create(
+            semestre=semestre, parcours=parcours)
         programme.ues.set(semestre_ue[semestre.libelle.lower()])
+    return code_ue
 
+def load_matieres(path):
+    # Clean matières data
+    Matiere.objects.all().delete()
+    workbook = openpyxl.load_workbook(filename=path)
+    for ue_sheet in workbook:
+        ue = Ue.objects.filter(libelle=CODE_UE[ue_sheet.title]).get()
+        for row in ue_sheet.iter_rows(values_only=True):
+           if row[0] and row[0] != "libelle" and 'nom:' not in trim_str(row[0]).lower():
+                libelle = row[0].strip()
+                libelle = libelle.replace("  ", " ")
+                
+                Matiere.objects.create(
+                            libelle=libelle,
+                            coefficient=get_cell_int_value(row[1]),
+                            minValue=get_cell_int_value(row[2]),
+                            heures=get_cell_int_value(row[3]),
+                            ue=ue
+                            )
+
+def load_notes_from_matiere(path):
+    Evaluation.objects.all().delete()
+    # Charger le fichier excel des différentes notes d'une matière
+    workbook = openpyxl.load_workbook(path)
+    
+    # Initialiser les variable de base
+    annee = None
+    semestre = None
+    matiere = None
+    
+    for sheet in workbook:
+        columns = {
+            'prenom_cell' : 0,
+            'nom_cell' : 1,
+            'evaluations' : [],
+        }
+        nb_evaluation = columns['nom_cell']
+        for row in sheet.iter_rows(values_only=True):
+            if row[0]:
+                firts_row_elt_value = trim_str(row[0])
+                second_row_elt_value = row[1]
+                if "annee:" in firts_row_elt_value:
+                    annee = trim_str(second_row_elt_value)
+                    annee = AnneeUniversitaire.objects.get(annee=annee)
+                elif "semestre:" in firts_row_elt_value:
+                    if annee:
+                        semestre = trim_str(second_row_elt_value)
+                        print(semestre)
+                        semestre = annee.semestre_set.get(libelle=semestre.upper())
+                elif "matière:" in firts_row_elt_value:
+                    matiere = second_row_elt_value.strip()
+                    matiere = Matiere.objects.get(libelle=matiere, ue__programme__semestre=semestre)
+                elif 'évaluation' in firts_row_elt_value:
+                    # Créer les evaluations 
+                    if annee and semestre and matiere:
+                        print(row)
+                        evaluation = Evaluation.objects.create(libelle=trim_str(row[2]), matiere=matiere, semestre=semestre, ponderation=int(trim_str(row[3])), date="2023-11-12")
+                        nb_evaluation += 1
+                        columns['evaluations'].append({ 
+                                                        'evaluation' : evaluation,
+                                                        'cell' : nb_evaluation,
+                                                        })
+                    else:
+                        raise Exception("Le format de votre fichier est ivalide !")
+                elif firts_row_elt_value != "prénom":
+                        nom = str(row[columns['nom_cell']])
+                        prenom = str(row[columns['prenom_cell']])
+                        try:
+                            etudiant = Etudiant.objects.get(nom__icontains=nom, prenom__icontains=prenom)
+                            print(etudiant)
+                            for evaluataion_data in columns['evaluations']:
+                                Note.objects.create(valeurNote=int(trim_str(row[evaluataion_data['cell']])), etudiant=etudiant, evaluation=evaluataion_data['evaluation'])
+                        except Exception as e:
+                            raise Etudiant.DoesNotExist(f'username = {firts_row_elt_value}')
 
 def run():
+    #clean_data_base()
     print("::: Import begining :::::")
-    pre_load_note_ues_template_data(0)
-
-
+    pass
+    

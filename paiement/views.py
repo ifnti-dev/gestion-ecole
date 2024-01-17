@@ -262,6 +262,7 @@ def compte_bancaire(request, id_annee_selectionnee):
     total_salaires = (total_charges + total_fiche_de_paies) + montant_total_salaires
 
     compte_bancaire_obj = CompteBancaire.objects.first()
+    compte_existe = compte_bancaire_obj is not None
 
     context = {
         'id_annee_selectionnee': id_annee_selectionnee,
@@ -276,6 +277,7 @@ def compte_bancaire(request, id_annee_selectionnee):
         'total_fiche_de_paies': total_fiche_de_paies,
         'total_charges': total_charges,
         'total_salaires': total_salaires,
+        'compte_existe': compte_existe,
     }
     return render(request, 'compte_bancaire/compte_bancaire.html', context)
 
@@ -457,17 +459,19 @@ def enregistrer_bulletin(request, id=0):
                 return render(request, 'salaires/enregistrer_bulletin.html', {'form': form})
 
             compte_universite = CompteBancaire.objects.first()
-            bulletin.compte_bancaire = compte_universite
-            bulletin.save()
-            taxes_cnss = Decimal(bulletin.frais_prestations_familiale_salsalaire) * Decimal(bulletin.personnel.salaireBrut) + Decimal(bulletin.frais_prestations_familiales) * Decimal(bulletin.personnel.salaireBrut) + Decimal(bulletin.frais_risques_professionnel) * Decimal(bulletin.personnel.salaireBrut) + Decimal(bulletin.frais_pension_vieillesse_emsalaire) * Decimal(bulletin.personnel.salaireBrut) 
-            deductions = taxes_cnss + bulletin.tcs
-            montant_a_prelever = bulletin.salaire_net_a_payer + deductions 
-           # print(montant_a_prelever)
-            compte_universite.solde_bancaire -= montant_a_prelever
-            compte_universite.save()
-            
-            id_annee_selectionnee = AnneeUniversitaire.static_get_current_annee_universitaire().id
-            return redirect('paiement:bulletins_de_paye', id_annee_selectionnee=id_annee_selectionnee)
+            if compte_universite is not None:
+                bulletin.compte_bancaire = compte_universite
+                bulletin.save()
+                taxes_cnss = Decimal(bulletin.frais_prestations_familiale_salsalaire) * Decimal(bulletin.personnel.salaireBrut) + Decimal(bulletin.frais_prestations_familiales) * Decimal(bulletin.personnel.salaireBrut) + Decimal(bulletin.frais_risques_professionnel) * Decimal(bulletin.personnel.salaireBrut) + Decimal(bulletin.frais_pension_vieillesse_emsalaire) * Decimal(bulletin.personnel.salaireBrut) 
+                deductions = taxes_cnss + bulletin.tcs
+                montant_a_prelever = bulletin.salaire_net_a_payer + deductions 
+                compte_universite.solde_bancaire -= montant_a_prelever
+                compte_universite.save()
+                
+                id_annee_selectionnee = AnneeUniversitaire.static_get_current_annee_universitaire().id
+                return redirect('paiement:bulletins_de_paye', id_annee_selectionnee=id_annee_selectionnee)
+            else :
+                return render(request, 'etudiants/message_erreur.html', {'message': "Le compte bancaire n\'existe pas."})
         else:
             print(form.errors)
             return render(request, 'salaires/enregistrer_bulletin.html', {'form': form})
@@ -631,6 +635,15 @@ def liste_fiches_de_paie(request, id_annee_selectionnee):
     return render(request, 'fichePaies/fiche_de_paie_list.html', context)
 
 
+def delete_fiches_de_paie(request):
+    if request.method == 'GET':
+        fiche_paie_id = request.GET.get('id')
+        fiche_paie = get_object_or_404(FicheDePaie, id=fiche_paie_id)
+        fiche_paie.delete()
+    id_annee_selectionnee = AnneeUniversitaire.static_get_current_annee_universitaire().id
+    return redirect('paiement:liste_fiches_de_paie', id_annee_selectionnee=id_annee_selectionnee)
+
+
 @login_required(login_url=settings.LOGIN_URL)
 def enregistrer_fiche_de_paie(request, id=0):
     if request.method == "GET":
@@ -660,14 +673,17 @@ def enregistrer_fiche_de_paie(request, id=0):
                 return render(request, 'fichePaies/create_fiche_de_paie.html', {'form': form})
             
             compte_universite = CompteBancaire.objects.first()
-            fiche_de_paie.compte_bancaire = compte_universite
-            fiche_de_paie.save()
+            if compte_universite is not None :
+                fiche_de_paie.compte_bancaire = compte_universite
+                fiche_de_paie.save()
 
-            compte_universite.solde_bancaire -= fiche_de_paie.montant 
-            compte_universite.save()
+                compte_universite.solde_bancaire -= fiche_de_paie.montant 
+                compte_universite.save()
 
-            id_annee_selectionnee = AnneeUniversitaire.static_get_current_annee_universitaire().id
-            return redirect('paiement:liste_fiches_de_paie', id_annee_selectionnee=id_annee_selectionnee)                                          
+                id_annee_selectionnee = AnneeUniversitaire.static_get_current_annee_universitaire().id
+                return redirect('paiement:liste_fiches_de_paie', id_annee_selectionnee=id_annee_selectionnee)           
+            else:
+                return render(request, 'etudiants/message_erreur.html', {"message": "Le compte bancaire n'existe pas"})                               
         else:
             return render(request, 'fichePaies/create_fiche_de_paie.html', {'form': form})
 
@@ -706,6 +722,14 @@ def liste_fiches_de_prise_en_charge(request, id_annee_selectionnee):
     return render(request, 'charges/liste_fiches_de_prise_en_charge.html', context)
 
 
+def delete_fiches_de_paie(request):
+    if request.method == 'GET':
+        fiche_de_charge_id = request.GET.get('id')
+        fiche_de_charge = get_object_or_404(Charge, id=fiche_de_charge_id)
+        fiche_de_charge.delete()
+    id_annee_selectionnee = AnneeUniversitaire.static_get_current_annee_universitaire().id
+    return redirect('paiement:liste_fiches_de_prise_en_charge', id_annee_selectionnee=id_annee_selectionnee)
+
 
 @login_required(login_url=settings.LOGIN_URL)
 def enregistrer_fiche_de_prise_en_charge(request, id=0):
@@ -736,14 +760,17 @@ def enregistrer_fiche_de_prise_en_charge(request, id=0):
                 return render(request, 'charges/create_fiche_de_prise_en_charge.html', {'form': form})
             
             compte_universite = CompteBancaire.objects.first()
-            fiche_de_charge.compte_bancaire = compte_universite
-            fiche_de_charge.save()
+            if compte_universite is not None :
+                fiche_de_charge.compte_bancaire = compte_universite
+                fiche_de_charge.save()
 
-            compte_universite.solde_bancaire -= fiche_de_charge.montant 
-            compte_universite.save()
+                compte_universite.solde_bancaire -= fiche_de_charge.montant 
+                compte_universite.save()
 
-            id_annee_selectionnee = AnneeUniversitaire.static_get_current_annee_universitaire().id
-            return redirect('paiement:liste_fiches_de_prise_en_charge', id_annee_selectionnee=id_annee_selectionnee)                                          
+                id_annee_selectionnee = AnneeUniversitaire.static_get_current_annee_universitaire().id
+                return redirect('paiement:liste_fiches_de_prise_en_charge', id_annee_selectionnee=id_annee_selectionnee)         
+            else:
+                return render(request, 'etudiants/message_erreur.html', {"message": "Le compte bancaire n'existe pas"})                               
         else:
             return render(request, 'charges/create_fiche_de_prise_en_charge.html', {'form': form})
 
