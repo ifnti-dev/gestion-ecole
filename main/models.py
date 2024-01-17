@@ -21,6 +21,34 @@ import math
 
 
 class Utilisateur(models.Model):
+    """
+    Modèle représentant un utilisateur du système.
+
+    Attributes:
+        SEXE_CHOISE (list): Liste des choix de sexe pour l utilisateur.
+        nom (str): Nom de l'utilisateur.
+        prenom (str): Prénom de l'utilisateur.
+        sexe (str): Sexe de l'utilisateur (F pour féminin, M pour masculin).
+        datenaissance (date): Date de naissance de l'utilisateur.
+        lieunaissance (str): Lieu de naissance de l'utilisateur.
+        contact (str): Numéro de contact de l'utilisateur.
+        email (str): Adresse e-mail de l'utilisateur.
+        adresse (str): Adresse de l'utilisateur.
+        prefecture (str): Préfecture de l'utilisateur.
+        is_active (bool): Statut d'activation de l'utilisateur.
+        carte_identity (str): Numéro de carte d'identité de l'utilisateur.
+        nationalite (str): Nationalité de l'utilisateur.
+        user (User): Référence à l'utilisateur authentifié associé.
+        photo_passport (ImageField): Photo de passeport de l'utilisateur.
+
+    Methods:
+        __str__(): Renvoie une représentation en chaîne de caractères de l'utilisateur.
+        full_name(): Renvoie le nom complet de l'utilisateur en majuscules.
+        getrole(): Renvoie le rôle de l'utilisateur.
+        suspendre(): Suspend l'utilisateur.
+        reactiver(): Réactive l'utilisateur.
+
+    """
     SEXE_CHOISE = [
         ('F', 'Feminin'),
         ('M', 'Masculin')
@@ -70,12 +98,7 @@ class Utilisateur(models.Model):
 
 
 class Etudiant(Utilisateur):
-
-    """
-        Classe étudiant
-    """
-    id = models.CharField(primary_key=True, blank=True,
-                          max_length=12, editable=False)
+    id = models.CharField(primary_key=True, blank=True, max_length=12, editable=False)
     CHOIX_SERIE = [('A', 'A'), ('C', 'C'), ('D', 'D'), ('E', 'E'), ('F1', 'F1'), ('F2', 'F2'), ('F3', 'F3'),
                    ('F4', 'F4'), ('G2', 'G2')]
     seriebac1 = models.CharField(
@@ -559,19 +582,13 @@ def create_compte_etudiant(sender, instance, created, **kwargs):
 
 
 class Personnel(Utilisateur):
-    id = models.CharField(primary_key=True, blank=True,
-                          max_length=12, editable=False)
-    salaireBrut = models.DecimalField(
-        max_digits=15, decimal_places=2,  verbose_name="Salaire Brut", default=0)
-    dernierdiplome = models.ImageField(
-        null=True, blank=True, verbose_name="Dernier diplome")
-    nbreJrsCongesRestant = models.IntegerField(
-        verbose_name="Nbre jours de congé restant", default=0)
-    nbreJrsConsomme = models.IntegerField(
-        verbose_name="Nombre de jours consommé", default=0)
-    nombre_de_personnes_en_charge = models.IntegerField(
-        verbose_name="Nbre de pers pris en charge", default=0)
-
+    id = models.CharField(primary_key=True, blank=True, max_length=12, editable=False)
+    salaireBrut = models.DecimalField(max_digits=15, decimal_places=2,  verbose_name="Salaire Brut", default=0)
+    dernierdiplome = models.ImageField(null=True, blank=True, verbose_name="Dernier diplome")
+    nbreJrsCongesRestant = models.IntegerField(verbose_name="Nbre jours de congé restant", default=0)
+    nbreJrsConsomme = models.IntegerField(verbose_name="Nombre de jours consommé", default=0)
+    nombre_de_personnes_en_charge = models.IntegerField(verbose_name="Nbre de pers pris en charge", default=0)
+    
     def save(self):
         print(f'----{self.id}----')
         if self.id == "" or self.id == None:
@@ -621,8 +638,26 @@ class Personnel(Utilisateur):
 
 
 class DirecteurDesEtudes(Personnel):
-   # actif = models.BooleanField(default=True)
+    """
+    Modèle représentant le directeur des études de l'organisation.
 
+    Attributes:
+        id (str): Identifiant unique du directeur des études.
+        nom (str): Nom du directeur des études.
+        prenom (str): Prénom du directeur des études.
+        email (str): Adresse e-mail du directeur des études.
+        is_active (bool): Indique si le directeur des études est actif ou non.
+
+    Methods:
+        save(*args, **kwargs): Enregistre le directeur des études dans la base de données.
+        delete(*args, **kwargs): Supprime le directeur des études de la base de données.
+        __str__(): Renvoie une représentation en chaîne du directeur des études.
+
+    Meta:
+        verbose_name = "Directeur des études"
+        verbose_name_plural = "Directeurs des études"
+
+    """
     def save(self, *args, **kwargs):
         if not self.id:
             directeurs = DirecteurDesEtudes.objects.all()
@@ -660,8 +695,24 @@ class DirecteurDesEtudes(Personnel):
         verbose_name = "Directeur des études"
         verbose_name_plural = "Directeurs des études"
 
-
 class Enseignant(Personnel):
+    """
+    Modèle représentant un enseignant dans l'organisation.
+
+    Attributes:
+        id (str): Identifiant unique de l'enseignant.
+        nom (str): Nom de l'enseignant.
+        prenom (str): Prénom de l'enseignant.
+        email (str): Adresse e-mail de l'enseignant.
+        type (str): Type d'enseignant (vacataire ou permanent).
+        specialite (str): Spécialité de l'enseignant.
+
+    Methods:
+        save(force_insert=False, force_update=False, using=None): Enregistre l'enseignant dans la base de données.
+        niveaux(): Renvoie les niveaux d'enseignement de l'enseignant.
+        __str__(): Renvoie une représentation en chaîne de l'enseignant.
+
+    """
     CHOIX_TYPE = (('Vacataire', 'Vacataire'), ('Permanent', 'Permanent'))
     type = models.CharField(null=True, blank=True,
                             max_length=9, choices=CHOIX_TYPE)
@@ -747,6 +798,26 @@ class Comptable(Personnel):
 
 
 class Tuteur(models.Model):
+    """
+    Modèle représentant un tuteur ou un parent d'un étudiant.
+
+    Attributes:
+        CHOIX_SEX (list): Liste des choix de sexe pour le tuteur.
+        CHOIX_TYPE (list): Liste des choix de type de tuteur (père, mère, tuteur).
+
+        nom (str): Nom du tuteur.
+        prenom (str): Prénom du tuteur.
+        sexe (str): Sexe du tuteur (F pour féminin, M pour masculin).
+        adresse (str): Adresse du tuteur.
+        contact (str): Numéro de contact du tuteur.
+        profession (str): Profession du tuteur.
+        type (str): Type de tuteur (père, mère, tuteur).
+
+    Methods:
+        save(): Enregistre le tuteur dans la base de données et crée un utilisateur associé.
+        __str__(): Renvoie une représentation en chaîne de caractères du tuteur.
+
+    """
     CHOIX_SEX = [
         ("F", "Féminin"),
         ("M", "Masculin")
@@ -945,15 +1016,11 @@ class Matiere(models.Model):
 
 class Evaluation(models.Model):
     libelle = models.CharField(max_length=258, verbose_name="Nom")
-    ponderation = models.IntegerField(
-        default=1, verbose_name="Pondération (1-100)", validators=[MinValueValidator(1), MaxValueValidator(100)])
+    ponderation = models.IntegerField(default=1, verbose_name="Pondération (1-100)", validators=[MinValueValidator(1), MaxValueValidator(100)])
     date = models.DateField(verbose_name="Date évaluation")
-    matiere = models.ForeignKey(
-        Matiere, on_delete=models.CASCADE, verbose_name='Matiere')
-    etudiants = models.ManyToManyField(
-        Etudiant, through='Note', verbose_name="Étudiants")
-    semestre = models.ForeignKey(
-        'Semestre', on_delete=models.CASCADE, null=True)
+    matiere = models.ForeignKey(Matiere, on_delete=models.CASCADE, verbose_name='Matiere')
+    etudiants = models.ManyToManyField(Etudiant, through='Note', verbose_name="Étudiants")
+    semestre = models.ForeignKey('Semestre', on_delete=models.CASCADE, null=True)
     rattrapage = models.BooleanField(verbose_name="Rattrapage", default=False)
 
     def save(self, *args, **kwargs):
@@ -978,10 +1045,8 @@ class Competence(models.Model):
 
 
 class AnneeUniversitaire(models.Model):
-    annee = models.DecimalField(
-        max_digits=4, decimal_places=0, verbose_name="Année universitaire")
-    annee_courante = models.BooleanField(
-        default=False, verbose_name="Année universitaire acutuelle", null=True)
+    annee = models.DecimalField(max_digits=4, decimal_places=0, verbose_name="Année universitaire")
+    annee_courante = models.BooleanField(default=False, verbose_name="Année universitaire acutuelle", null=True)
 
     def save(self, *args, **kwargs):
         annee = AnneeUniversitaire.objects.filter(annee=self.annee)
@@ -1186,18 +1251,27 @@ class Note(models.Model):
 
 
 class Frais(models.Model):
-    annee_universitaire = models.ForeignKey(
-        AnneeUniversitaire, on_delete=models.CASCADE)
-    montant_inscription = models.DecimalField(
-        max_digits=10, decimal_places=2, verbose_name="Frais d'inscription")
-    montant_scolarite = models.DecimalField(
-        max_digits=10, decimal_places=2, verbose_name="Frais de scolarité")
+    annee_universitaire = models.ForeignKey(AnneeUniversitaire, on_delete=models.CASCADE)
+    montant_inscription = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Frais d'inscription")
+    montant_scolarite = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Frais de scolarité")
 
     def __str__(self):
         return "Année universitaire: " + str(self.annee_universitaire) + "  Frais d'inscription : " + str(self.montant_inscription) + "     " + " Frais de scolarité : " + str(self.montant_scolarite)
 
 
 class CompteEtudiant(models.Model):
+    """
+    Modèle représentant le compte associé à un étudiant pour une année universitaire donnée.
+
+    Attributes:
+        etudiant (Etudiant): Référence à l'étudiant associé au compte.
+        annee_universitaire (AnneeUniversitaire): Année universitaire associée au compte.
+        solde (Decimal): Solde du compte.
+
+    Methods:
+        __str__(): Renvoie une représentation en chaîne de caractères du compte étudiant.
+
+    """
     etudiant = models.ForeignKey(Etudiant, on_delete=models.CASCADE)
     annee_universitaire = models.ForeignKey(
         AnneeUniversitaire, on_delete=models.CASCADE)
@@ -1208,6 +1282,25 @@ class CompteEtudiant(models.Model):
 
 
 class Paiement(models.Model):
+    """
+    Modèle représentant les versements effectués par les étudiants.
+
+    Attributes:
+        TYPE_CHOICES (list): Liste des choix de type de versement.
+
+        type (str): Type de versement (frais de scolarité, frais d'inscription, etc.).
+        montant (Decimal): Montant versé.
+        dateversement (date): Date du versement.
+        etudiant (Etudiant): Référence à l'étudiant effectuant le versement.
+        comptable (Comptable): Référence au comptable en charge du versement.
+        compte_bancaire (CompteBancaire): Référence au compte bancaire utilisé pour le versement (optionnel).
+        numerobordereau (str): Numéro de bordereau du versement.
+        annee_universitaire (AnneeUniversitaire): Année universitaire associée au versement.
+
+    Methods:
+        __str__(): Renvoie une représentation en chaîne de caractères du versement.
+
+    """
     TYPE_CHOICES = [
         ('Frais de scolarité', 'Frais de scolarité'),
         ("Frais d'inscription", "Frais d'inscription"),
@@ -1233,6 +1326,17 @@ class Paiement(models.Model):
 
 
 class CompteBancaire(models.Model):
+    """
+    Modèle représentant un compte bancaire.
+
+    Attributes:
+        numero (str): Le numéro du compte bancaire.
+        solde_bancaire (decimal): Le solde du compte bancaire.
+        frais_tenue_de_compte (decimal): Les frais de tenue de compte.
+
+    Methods:
+        __str__() -> str: Renvoie une représentation en chaîne de caractères de l'objet CompteBancaire.
+    """
     numero = models.CharField(max_length=100, verbose_name="Numéro du compte")
     solde_bancaire = models.DecimalField(
         max_digits=10, decimal_places=2, default=0)
@@ -1240,10 +1344,35 @@ class CompteBancaire(models.Model):
         max_digits=10, decimal_places=2, default=0, verbose_name="Frais de tenue de compte")
 
     def __str__(self):
+        """
+        Renvoie une représentation en chaîne de caractères de l'objet CompteBancaire.
+        """
         return "Solde actuel : " + str(self.solde_bancaire)
 
 
 class Salaire(models.Model):
+    """
+    Modèle représentant les détails du salaire d'un personnel.
+
+    Attributes:
+        date_debut (date): La date de début de la période de paie.
+        date_fin (date): La date de fin de la période de paie.
+        personnel (Personnel): La référence au personnel concerné par le salaire.
+        tcs (decimal): Le montant de la taxe sur les salaires.
+        prime_forfaitaire (decimal): Le montant de la prime forfaitaire.
+        acomptes (decimal): Le montant des acomptes versés au personnel.
+        frais_prestations_familiale_salsalaire (decimal): Les frais de prestations familiales sur le salaire.
+        
+    Methods:
+        calculer_salaire_brut_annuel() -> decimal: Calcule le salaire brut annuel du personnel.
+        calculer_salaire_brut_mensuel() -> decimal: Calcule le salaire brut mensuel du personnel.
+        calculer_total_A() -> decimal: Calcule le total A.
+        calculer_net_imposable_arrondi() -> int: Calcule le net imposable arrondi.
+        calculer_irpp_annuel() -> decimal: Calcule l'impôt sur le revenu des personnes physiques (IRPP) annuel.
+        calculer_irpp_mensuel() -> decimal: Calcule l'IRPP mensuel.
+        calculer_deductions_cnss() -> decimal: Calcule les déductions CNSS.
+        save(*args, **kwargs): Enregistre les détails du salaire dans la base de données.
+    """
     TYPE_CHOICES = [
         ('Enseignant', 'Enseignant'),
         ("Comptable", "Comptable"),
@@ -1415,10 +1544,28 @@ class Salaire(models.Model):
         super(Salaire, self).save(*args, **kwargs)
 
     def __str__(self):
-        return str(self.personnel.nom)
-
+        return str(self.personnel.nom) 
+    
 
 class Fournisseur(models.Model):
+    """
+    Modèle représentant les paiements effectués aux fournisseurs de service.
+
+    Attributes:
+        TYPE (list): Liste des types de fournisseurs.
+        TYPE_MOIS (list): Liste des mois.
+        type (str): Le type de fournisseur.
+        montant (decimal): Le montant versé au fournisseur.
+        dateversement (date): La date de versement du paiement.
+        le_mois (str): Le mois auquel le paiement est associé.
+        compte_bancaire (CompteBancaire): La référence au compte bancaire utilisé pour le paiement.
+        annee_universitaire (AnneeUniversitaire): L'année universitaire associée au paiement.
+
+    Methods:
+        save(*args, **kwargs): Enregistre les détails du paiement dans la base de données.
+
+    """
+
     TYPE = [
         ('TDE', 'TDE'),
         ("CEET", "CEET"),
@@ -1458,6 +1605,25 @@ class Fournisseur(models.Model):
 
 
 class Information(models.Model):
+    """
+    Modèle pour enregistrer les informations relatives aux attestations de service des enseignants.
+
+    Attributes:
+        TYPE_CHOISE (list): Liste des choix de niveaux.
+        enseignant (Enseignant): Référence à l'enseignant associé à l'attestation.
+        directeur (DirecteurDesEtudes): Référence au directeur des études associé à l'attestation.
+        numeroSecurite (int): Numéro de sécurité sociale de l'enseignant.
+        discipline (Matiere): La discipline associée enseigné par l'enseignant.
+        niveau (str): Le niveau enseigné par l'enseignant.
+        dateDebut (date): Date de début du contrat.
+        dateFin (date): Date de fin du contrat.
+        duree (str): Durée du contrat en jours.
+
+    Methods:
+        save(*args, **kwargs): Enregistre les détails de l'attestation dans la base de données.
+        __str__(): Renvoie une représentation en chaîne de caractères de l'attestation.
+
+    """
     TYPE_CHOISE = [
         ('Premier', 'Niveau 1'),
         ('Deuxième', 'Niveau 2'),
@@ -1487,6 +1653,34 @@ class Information(models.Model):
 
 
 class FicheDePaie(models.Model):
+    """
+    Modèle représentant les fiches de paie des enseignants.
+
+    Attributes:
+        dateDebut (date): Date de début de la période de paie.
+        dateFin (date): Date de fin de la période de paie.
+        matiere (Matiere): Référence à la matière enseignée.
+        enseignant (Enseignant): Référence à l'enseignant concerné par la fiche de paie.
+        nombreHeureL1 (int): Nombre d'heures enseignées pour le niveau 1.
+        nombreHeureL2 (int): Nombre d'heures enseignées pour le niveau 2.
+        nombreHeureL3 (int): Nombre d'heures enseignées pour le niveau 3.
+        nombreHeure (int): Nombre total d'heures enseignées.
+        prixUnitaire (int): Prix unitaire par heure.
+        montantL1 (int): Montant total pour le niveau 1.
+        montantL2 (int): Montant total pour le niveau 2.
+        montantL3 (int): Montant total pour le niveau 3.
+        montant (int): Montant total.
+        difference (int): Différence entre le montant total et les acomptes.
+        acomptes (int): Montant des acomptes déjà versés.
+        montantEnLettre (str): Montant total en lettres.
+        compte_bancaire (CompteBancaire): Référence au compte bancaire utilisé pour le paiement.
+        annee_universitaire (AnneeUniversitaire): Année universitaire associée à la fiche de paie.
+
+    Methods:
+        save(*args, **kwargs): Enregistre les détails de la fiche de paie dans la base de données.
+        __str__(): Renvoie une représentation en chaîne de caractères de la fiche de paie.
+
+    """
     dateDebut = models.DateField(verbose_name="Date de début", null=True)
     dateFin = models.DateField(verbose_name="Date de fin", null=True)
     matiere = models.ForeignKey(
@@ -1532,6 +1726,25 @@ class FicheDePaie(models.Model):
 
 
 class Charge(models.Model):
+    """
+    Modèle représentant les fiches de prise en charge des frais pour le personnel.
+
+    Attributes:
+        dateDebut (date): Date de début de la période de paie.
+        dateFin (date): Date de fin de la période de paie.
+        personnel (Personnel): Référence au personnel concerné par la prise en charge.
+        frais_de_vie (int): Montant des frais de vie pris en charge.
+        frais_nourriture (int): Montant des frais de nourriture pris en charge.
+        montant (int): Montant total pris en charge.
+        montantEnLettre (str): Montant total en lettres.
+        annee_universitaire (AnneeUniversitaire): Année universitaire associée à la prise en charge.
+        compte_bancaire (CompteBancaire): Référence au compte bancaire utilisé pour le remboursement.
+
+    Methods:
+        save(*args, **kwargs): Enregistre les détails de la prise en charge dans la base de données.
+        __str__(): Renvoie une représentation en chaîne de caractères de la prise en charge.
+
+    """
     dateDebut = models.DateField(verbose_name="Date de début", null=True)
     dateFin = models.DateField(verbose_name="Date de fin", null=True)
     personnel = models.ForeignKey(
@@ -1561,6 +1774,28 @@ class Charge(models.Model):
 
 
 class Conge(models.Model):
+    """
+    Modèle représentant les demandes de congé du personnel.
+
+    Attributes:
+        NATURE_CHOICES (list): Liste des choix de nature de congé.
+        VALIDATION_CHOICES (list): Liste des choix d'état de validation.
+
+        nature (str): Nature des congés.
+        autre_nature (str): Autre nature de congé à préciser (optionnel).
+        date_et_heure_debut (date): Date de début du congé.
+        date_et_heure_fin (date): Date de fin du congé.
+        personnel (Personnel): Référence au personnel demandant le congé.
+        motif_refus (str): Motif de refus du congé.
+        valider (str): État de validation du congé.
+        nombre_de_jours_de_conge (int): Nombre de jours de congé demandés.
+        annee_universitaire (AnneeUniversitaire): Année universitaire associée à la demande de congé.
+
+    Methods:
+        save(*args, **kwargs): Enregistre les détails de la demande de congé dans la base de données.
+        __str__(): Renvoie une représentation en chaîne de caractères de la demande de congé.
+
+    """
     NATURE_CHOICES = [
         ('Congé annuel', 'Congé annuel'),
         ('Congé de maternité', 'Congé de maternité'),
@@ -1600,4 +1835,4 @@ class Conge(models.Model):
         self.personnel.update_conge_counts()
 
     def __str__(self):
-        return str(self.personnel.nom) + "  " + str(self.personnel.prenom) + "  " + str(self.nombre_de_jours_de_conge)
+        return str(self.personnel.nom) + "  " +  str(self.personnel.prenom) + "  " + str(self.nombre_de_jours_de_conge) 

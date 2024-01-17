@@ -11,6 +11,7 @@ BIENVENU DANS LA DOCUMENTATION DE L'APPLICATION DE GESTION IFNTI !
    :caption: Table des matières:
 
    main/index
+   paiement/index
 
 Indices et tables
 ==================
