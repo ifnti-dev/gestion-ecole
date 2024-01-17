@@ -29,7 +29,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
-#LOGIN_URL = "/maquette/number/1/" #"/main/connexion"
+
 LOGIN_URL = "/main/connexion"
 
 DATE_INPUT_FORMATS = ['%d-%m-%Y']
