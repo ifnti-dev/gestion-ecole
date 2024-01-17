@@ -845,16 +845,12 @@ class Matiere(models.Model):
     codematiere = models.CharField(
         max_length=50, verbose_name="Code de la matière")
     libelle = models.CharField(max_length=100)
-    coefficient = models.IntegerField(
-        null=True,  verbose_name="Coefficient", default="1")
-    minValue = models.FloatField(
-        null=True,  verbose_name="Valeur minimale",  default="7")
-    heures = models.DecimalField(blank=True, max_digits=4, decimal_places=1, validators=[
-                                 MinValueValidator(1)], null=True)
-    abbreviation = models.CharField(max_length=10, default="Short")
-    enseignant = models.ForeignKey(Enseignant, blank=True, null=True,
-                                   verbose_name="Enseignants responsable", on_delete=models.CASCADE)
-    # enseignants = models.ManyToManyField(Enseignant, related_name="EnseignantsMatiere", blank=True, null=True, verbose_name="Enseignants")
+    coefficient = models.IntegerField(null=True,  verbose_name="Coefficient", default="1")
+    minValue = models.FloatField(null=True,  verbose_name="Valeur minimale",  default="7")
+    heures = models.DecimalField(blank=True, max_digits=4, decimal_places=1, validators=[MinValueValidator(1)], null=True) 
+    abbreviation = models.CharField(max_length=10,default ="Short", unique=True)
+    enseignant = models.ForeignKey(Enseignant, blank=True, null=True, verbose_name="Enseignants responsable", on_delete=models.CASCADE)
+    #enseignants = models.ManyToManyField(Enseignant, related_name="EnseignantsMatiere", blank=True, null=True, verbose_name="Enseignants")
     ue = models.ForeignKey('Ue', on_delete=models.CASCADE)
     is_active = models.BooleanField(default=True, verbose_name="Actif")
 
