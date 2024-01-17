@@ -78,6 +78,8 @@ class Etudiant(Utilisateur):
                           max_length=12, editable=False)
     CHOIX_SERIE = [('A', 'A'), ('C', 'C'), ('D', 'D'), ('E', 'E'), ('F1', 'F1'), ('F2', 'F2'), ('F3', 'F3'),
                    ('F4', 'F4'), ('G2', 'G2')]
+    
+    #: Séries faite au BAC 1
     seriebac1 = models.CharField(
         blank=True, max_length=2, choices=CHOIX_SERIE, verbose_name="Série bac 1", null=True)
     seriebac2 = models.CharField(
