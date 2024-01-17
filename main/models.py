@@ -54,27 +54,117 @@ class Utilisateur(models.Model):
         ('M', 'Masculin')
     ]
     nom = models.CharField(max_length=50)
+
+    """
+        Nom de l'utilisateur
+
+        **Type**:    string
+    """
+
     prenom = models.CharField(max_length=50, verbose_name="Prénom")
+
+    """
+        Prénom de l'utilisateur
+
+        **Type**:    string
+    """
+
     sexe = models.CharField(max_length=1, choices=SEXE_CHOISE)
+
+    """
+        Sexe de l'utilisateur
+
+        **Type**:    string
+    """
+
     datenaissance = models.DateField(blank=True, verbose_name="date de naissance", null=True, validators=[
                                      MaxValueValidator(limit_value=date(2006, 1, 1), message="L'année de naissance doit être inférieure à 2006")])
+
+    """
+        Date de naissance de l'utilisateur
+
+        **Type**:    string
+    """
+
     lieunaissance = models.CharField(
         blank=True, max_length=20, verbose_name="lieu de naissance", null=True)
+
+    """
+        Lieu de naissance de l'utilisateur
+
+        **Type**:    string
+    """
+
     contact = models.CharField(max_length=25, null=True)
+
+    """
+        Numéro de téléphone de l'utilisateur
+
+        **Type**:    string
+    """
+
     email = models.CharField(max_length=50, null=True)
+
+    """
+        Email de ml'utilisateur
+
+        **Type**:    string
+    """
+
     adresse = models.CharField(max_length=50, null=True)
+
+    """
+        Adresse de l'utilisateur
+
+        **Type**:    string
+    """
+
     prefecture = models.CharField(
         max_length=50, null=True, verbose_name="Préfecture", default='tchaoudjo', blank=True)
+
+    """
+        Préfecture de provenance de l'utilisateur
+
+        **Type**:    string
+    """
+
     is_active = models.BooleanField(
         default=True, verbose_name="Actif", null=True)
+
+    """
+        Statut de l'utilisateur (actif ou inactif)
+
+        **Type**:    string
+    """
+
     carte_identity = models.CharField(
         max_length=50, null=True,  verbose_name="Carte d'identité")
+
+    """
+        Carte d'identitée de l'utilisateur    
+    
+        **Type**:    string
+    """
+
     nationalite = models.CharField(
         max_length=30, default='Togolaise', verbose_name='Nationalté', blank=True)
+
+    """
+        Attestation de nationalité de l'utilisateur
+
+        **Type**:    string
+    """
+
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, editable=False)
     photo_passport = models.ImageField(
         null=True, blank=True, verbose_name="Photo passport")
+
+    """
+        Photo passeport de l'utilisateur
+
+        **Type**:    string
+    """
 
     class Meta:
         abstract = True
@@ -83,69 +173,259 @@ class Utilisateur(models.Model):
         return str(self.nom) + ' ' + str(self.prenom)
 
     def full_name(self):
+        """
+
+            Donne le nom et prénom de l'utilisateur    
+
+            :return: Le nom et prénom de l'utilisateur
+            :retype: string
+        """
         return self.nom.upper() + ' ' + self.prenom
 
     def getrole(self):
+        """
+            Donne le nom du rôle de l'utilisateur
+
+            :return: Le role de l'utilisateur.
+            :retype:  string
+        """
         return self.user.groups.all()[0].name
 
     def suspendre(self):
+        """
+            Désactive un utilisateur
+
+        """
+
         self.is_active = False
         self.save()
 
     def reactiver(self):
+        """
+            Active un utilisateur inactif
+
+        """
+
         self.is_active = True
         self.save()
 
 
 class Etudiant(Utilisateur):
-    id = models.CharField(primary_key=True, blank=True, max_length=12, editable=False)
+
+    """
+        Classe Etudiant
+    """
+    id = models.CharField(primary_key=True, blank=True,
+                          max_length=12, editable=False)
     CHOIX_SERIE = [('A', 'A'), ('C', 'C'), ('D', 'D'), ('E', 'E'), ('F1', 'F1'), ('F2', 'F2'), ('F3', 'F3'),
                    ('F4', 'F4'), ('G2', 'G2')]
+
     seriebac1 = models.CharField(
         blank=True, max_length=2, choices=CHOIX_SERIE, verbose_name="Série bac 1", null=True)
+
+    """
+        Série de l'étudiant en 1ere
+
+        **Type**:    string
+    """
+
     seriebac2 = models.CharField(
         blank=True, max_length=2, choices=CHOIX_SERIE, verbose_name="Série bac 2", null=True)
+
+    """
+        Série de l'étudiant en Terminale
+
+        **Type**:    string
+    """
+
     anneeentree = models.IntegerField(default=datetime.date.today(
     ).year, blank=True, verbose_name="Promotion", null=True)
+
+    """
+        Série de l'étudiant en Terminale
+
+        **Type**:    string
+    """
+
     anneebac1 = models.IntegerField(
         blank=True, verbose_name="Année d’obtention du BAC 1", null=True)
+
+    """
+        Année d'obtention du BAC 1
+
+        **Type**:    integer
+    """
+
     anneebac2 = models.IntegerField(
         blank=True, verbose_name="Année d’obtention du BAC 2", null=True, default=datetime.date.today().year)
+
+    """
+        Année d'obtention du BAC 2
+
+        **Type**:    integer
+    """
+
     etablissementSeconde = models.CharField(
         max_length=300, verbose_name="Nom d'établissement seconde", null=True, blank=True)
+
+    """
+        Établissement de 2nde de l'étudiant
+
+        **Type**:    string
+    """
+
     francaisSeconde = models.DecimalField(
         max_digits=4, decimal_places=2, verbose_name="Note de français Seconde", default="0")
+
+    """
+        Note en français en classe de 2nde de l'étudiant
+
+        **Type**:    integer
+    """
+
     anglaisSeconde = models.DecimalField(
         max_digits=4, decimal_places=2, verbose_name="Note d'anglais Seconde", default="0")
+
+    """
+        Note en anglais en classe de 2nde de l'étudiant
+
+        **Type**:    integer
+    """
+
     mathematiqueSeconde = models.DecimalField(
         max_digits=4, decimal_places=2, verbose_name="Note de mathématique Seconde", default="0")
+
+    """
+        Note en mathematique en classe de 2nde de l'étudiant
+
+        **Type**:    integer
+    """
+
     etablissementPremiere = models.CharField(
         max_length=300, verbose_name="Nom d'établissement Première", null=True, blank=True)
+
+    """
+        Établissement de 1ere de l'étudiant
+
+
+        **Type**:    string
+    """
+
     francaisPremiere = models.DecimalField(
         max_digits=4, decimal_places=2, verbose_name="Note de français Première", default="0")
+
+    """
+        Note en français en classe de 1ere de l'étudiant
+
+        **Type**:    integer
+    """
+
     anglaisPremiere = models.DecimalField(
         max_digits=4, decimal_places=2, verbose_name="Note d'anglais Première", default="0")
+
+    """
+        Note en anglais en classe de 1ere de l'étudiant
+
+        **Type**:    integer
+    """
+
     mathematiquePremiere = models.DecimalField(
         max_digits=4, decimal_places=2, verbose_name="Note de mathématique Première", default="0")
+
+    """
+        Note en mathématiques en classe de 1ere de l'étudiant
+
+        **Type**:    integer
+    """
+
     etablissementTerminale = models.CharField(
         max_length=300, verbose_name="Nom d'établissement Terminale", null=True, blank=True)
+
+    """
+        Établissement de Terminale de l'étudiant
+
+        **Type**:    string
+    """
+
     francaisTerminale = models.DecimalField(
         max_digits=4, decimal_places=2, verbose_name="Note de français Terminale", default="0")
+
+    """
+        Note en français en classe de Terminale de l'étudiant
+
+        **Type**:    integer
+    """
+
     anglaisTerminale = models.DecimalField(
         max_digits=4, decimal_places=2, verbose_name="Note d'anglais Terminale", default="0")
+
+    """
+        Note en anglais en classe de Terminale de l'étudiant
+
+        **Type**:    integer
+    """
+
     mathematiqueTerminale = models.DecimalField(
         max_digits=4, decimal_places=2, verbose_name="Note de mathématique Terminale", default="0")
+
+    """
+        Note en mathématiques en classe de Terminale de l'étudiant
+
+        **Type**:    integer
+    """
+
     delegue = models.BooleanField(
         default=False, verbose_name="delegué", null=True)
+
+    """
+        Attribut permettant de savoir si l'étudiant est le délégué de sa classe 
+
+        **Type**:    boolean
+    """
+
     passer_semestre_suivant = models.BooleanField(
         default=False, verbose_name="Passer au semestre suivant")
+
+    """
+        Permet de savoir si l'étudiant passe au semestre suivant
+
+        **Type**:    boolean
+    """
+
     decision_conseil = models.TextField(
         verbose_name="Décision du conseil", null=True, default="Décision du conseil")
+
+    """
+        Décision du conseil sur lors du passage au niveau supérieur
+
+        **Type**:    string
+    """
+
     profil = models.ImageField(
         null=True, blank=True, verbose_name="Photo de profil")
+
+    """
+        Photo de profil
+
+        **Type**:    string
+    """
+
     semestres = models.ManyToManyField('Semestre', null=True)
+
+    """
+        Liste des semestres de l'étudiant
+
+        **Type**:    list[Semestre]
+    """
+
     tuteurs = models.ManyToManyField(
         'Tuteur', related_name="Tuteurs", blank=True, null=True)
+
+    """
+        Tuteurs de l'étudiant
+
+        **Type**:    list[Tuteur]
+    """
 
     class Meta:
         verbose_name = "Etudiant"
@@ -388,6 +668,7 @@ class Etudiant(Utilisateur):
 
 # Calcule le nombre de crédits obtenus par l'étudiant dans un semestre donné.
 
+
     def credits_obtenus_semestre(self, semestre):
         """
             Cette fonction permet de calculer le nombre de crédits obtenus dans le semestre donné.
@@ -562,10 +843,25 @@ class Etudiant(Utilisateur):
         return semestre
 
     def __str__(self):
+        """
+
+            Méthode toString de la classe Etudiant
+
+
+            :return: Retourne le nom d'utilisateur de l'étudiant
+            :retype: str
+
+
+
+        """
         str_sem = "|".join([sem.id for sem in self.semestres.all()])
         return self.user.username
 
     def create_compte_etudiant(self):
+        """
+            Crée le compte écolage de l'étudiant.
+        """
+
         # Récupérez l'année universitaire courante
         annee_universitaire_courante = AnneeUniversitaire.objects.get(
             annee_courante=True)
