@@ -247,7 +247,7 @@ class Etudiant(Utilisateur):
 
     """
         Permet de savoir si l'étudiant passe au semestre suivant
-        
+
         **Type**:    boolean
     """
 
@@ -701,10 +701,25 @@ class Etudiant(Utilisateur):
         return semestre
 
     def __str__(self):
+        """
+
+            Méthode toString de la classe Etudiant
+
+
+            :return: Retourne le nom d'utilisateur de l'étudiant
+            :retype: str
+
+
+
+        """
         str_sem = "|".join([sem.id for sem in self.semestres.all()])
         return self.user.username
 
     def create_compte_etudiant(self):
+        """
+            Crée le compte écolage de l'étudiant.
+        """
+
         # Récupérez l'année universitaire courante
         annee_universitaire_courante = AnneeUniversitaire.objects.get(
             annee_courante=True)
