@@ -411,8 +411,24 @@ class built by <code class="docutils literal notranslate"><span class="pre">crea
 
 <dl class="py class">
 <dt class="sig sig-object py" id="main.models.Charge">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">main.models.</span></span><span class="sig-name descname"><span class="pre">Charge</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dateDebut</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dateFin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">personnel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frais_de_vie</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frais_nourriture</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">montant</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">montantEnLettre</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annee_universitaire</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compte_bancaire</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#main.models.Charge" title="Link to this definition">#</a></dt>
-<dd><dl class="py exception">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">main.models.</span></span><span class="sig-name descname"><span class="pre">Charge</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#main.models.Charge" title="Link to this definition">#</a></dt>
+<dd><p>Modèle représentant les fiches de prise en charge des frais pour le personnel.</p>
+<dl class="simple">
+<dt>Attributes:</dt><dd><p>dateDebut (date): Date de début de la période de paie.
+dateFin (date): Date de fin de la période de paie.
+personnel (Personnel): Référence au personnel concerné par la prise en charge.
+frais_de_vie (int): Montant des frais de vie pris en charge.
+frais_nourriture (int): Montant des frais de nourriture pris en charge.
+montant (int): Montant total pris en charge.
+montantEnLettre (str): Montant total en lettres.
+annee_universitaire (AnneeUniversitaire): Année universitaire associée à la prise en charge.
+compte_bancaire (CompteBancaire): Référence au compte bancaire utilisé pour le remboursement.</p>
+</dd>
+<dt>Methods:</dt><dd><p>save(<a href="#id1"><span class="problematic" id="id2">*</span></a>args, <a href="#id3"><span class="problematic" id="id4">**</span></a>kwargs): Enregistre les détails de la prise en charge dans la base de données.
+__str__(): Renvoie une représentation en chaîne de caractères de la prise en charge.</p>
+</dd>
+</dl>
+<dl class="py exception">
 <dt class="sig sig-object py" id="main.models.Charge.DoesNotExist">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#main.models.Charge.DoesNotExist" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
@@ -621,7 +637,7 @@ one-to-one (via ForwardOneToOneDescriptor subclass) relation.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="main.models.Comptable">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">main.models.</span></span><span class="sig-name descname"><span class="pre">Comptable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prenom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sexe</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datenaissance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lieunaissance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contact</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">email</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adresse</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefecture</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_active</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">carte_identity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nationalite</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">photo_passport</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">salaireBrut</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dernierdiplome</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nbreJrsCongesRestant</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nbreJrsConsomme</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">personnel_ptr</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#main.models.Comptable" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">main.models.</span></span><span class="sig-name descname"><span class="pre">Comptable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prenom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sexe</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datenaissance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lieunaissance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contact</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">email</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adresse</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefecture</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_active</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">carte_identity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nationalite</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">photo_passport</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">salaireBrut</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dernierdiplome</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nbreJrsCongesRestant</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nbreJrsConsomme</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nombre_de_personnes_en_charge</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">personnel_ptr</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#main.models.Comptable" title="Link to this definition">#</a></dt>
 <dd><dl class="py exception">
 <dt class="sig sig-object py" id="main.models.Comptable.DoesNotExist">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#main.models.Comptable.DoesNotExist" title="Link to this definition">#</a></dt>
@@ -678,8 +694,17 @@ non-SQL backends), respectively. Normally, they should not be set.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="main.models.CompteBancaire">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">main.models.</span></span><span class="sig-name descname"><span class="pre">CompteBancaire</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">numero</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solde_bancaire</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frais_tenue_de_compte</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#main.models.CompteBancaire" title="Link to this definition">#</a></dt>
-<dd><dl class="py exception">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">main.models.</span></span><span class="sig-name descname"><span class="pre">CompteBancaire</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#main.models.CompteBancaire" title="Link to this definition">#</a></dt>
+<dd><p>Modèle représentant un compte bancaire.</p>
+<dl class="simple">
+<dt>Attributes:</dt><dd><p>numero (str): Le numéro du compte bancaire.
+solde_bancaire (decimal): Le solde du compte bancaire.
+frais_tenue_de_compte (decimal): Les frais de tenue de compte.</p>
+</dd>
+<dt>Methods:</dt><dd><p>__str__() -&gt; str: Renvoie une représentation en chaîne de caractères de l’objet CompteBancaire.</p>
+</dd>
+</dl>
+<dl class="py exception">
 <dt class="sig sig-object py" id="main.models.CompteBancaire.DoesNotExist">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#main.models.CompteBancaire.DoesNotExist" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
@@ -801,8 +826,17 @@ object the first time, the query is executed.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="main.models.CompteEtudiant">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">main.models.</span></span><span class="sig-name descname"><span class="pre">CompteEtudiant</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">etudiant</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annee_universitaire</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solde</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#main.models.CompteEtudiant" title="Link to this definition">#</a></dt>
-<dd><dl class="py exception">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">main.models.</span></span><span class="sig-name descname"><span class="pre">CompteEtudiant</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#main.models.CompteEtudiant" title="Link to this definition">#</a></dt>
+<dd><p>Modèle représentant le compte associé à un étudiant pour une année universitaire donnée.</p>
+<dl class="simple">
+<dt>Attributes:</dt><dd><p>etudiant (Etudiant): Référence à l’étudiant associé au compte.
+annee_universitaire (AnneeUniversitaire): Année universitaire associée au compte.
+solde (Decimal): Solde du compte.</p>
+</dd>
+<dt>Methods:</dt><dd><p>__str__(): Renvoie une représentation en chaîne de caractères du compte étudiant.</p>
+</dd>
+</dl>
+<dl class="py exception">
 <dt class="sig sig-object py" id="main.models.CompteEtudiant.DoesNotExist">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#main.models.CompteEtudiant.DoesNotExist" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
@@ -871,8 +905,26 @@ object the first time, the query is executed.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="main.models.Conge">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">main.models.</span></span><span class="sig-name descname"><span class="pre">Conge</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nature</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">autre_nature</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">date_et_heure_debut</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">date_et_heure_fin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">personnel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">motif_refus</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">valider</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nombre_de_jours_de_conge</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annee_universitaire</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#main.models.Conge" title="Link to this definition">#</a></dt>
-<dd><dl class="py exception">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">main.models.</span></span><span class="sig-name descname"><span class="pre">Conge</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#main.models.Conge" title="Link to this definition">#</a></dt>
+<dd><p>Modèle représentant les demandes de congé du personnel.</p>
+<dl>
+<dt>Attributes:</dt><dd><p>NATURE_CHOICES (list): Liste des choix de nature de congé.
+VALIDATION_CHOICES (list): Liste des choix d’état de validation.</p>
+<p>nature (str): Nature des congés.
+autre_nature (str): Autre nature de congé à préciser (optionnel).
+date_et_heure_debut (date): Date de début du congé.
+date_et_heure_fin (date): Date de fin du congé.
+personnel (Personnel): Référence au personnel demandant le congé.
+motif_refus (str): Motif de refus du congé.
+valider (str): État de validation du congé.
+nombre_de_jours_de_conge (int): Nombre de jours de congé demandés.
+annee_universitaire (AnneeUniversitaire): Année universitaire associée à la demande de congé.</p>
+</dd>
+<dt>Methods:</dt><dd><p>save(<a href="#id5"><span class="problematic" id="id6">*</span></a>args, <a href="#id7"><span class="problematic" id="id8">**</span></a>kwargs): Enregistre les détails de la demande de congé dans la base de données.
+__str__(): Renvoie une représentation en chaîne de caractères de la demande de congé.</p>
+</dd>
+</dl>
+<dl class="py exception">
 <dt class="sig sig-object py" id="main.models.Conge.DoesNotExist">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#main.models.Conge.DoesNotExist" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
@@ -1046,9 +1098,8 @@ object the first time, the query is executed.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="main.models.CorrespondanceMaquette.Nature">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Nature</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#main.models.CorrespondanceMaquette.Nature" title="Link to this definition">#</a></dt>
-<dd><p>An enumeration.</p>
-<dl class="py attribute">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Nature</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qualname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">boundary</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#main.models.CorrespondanceMaquette.Nature" title="Link to this definition">#</a></dt>
+<dd><dl class="py attribute">
 <dt class="sig sig-object py" id="main.models.CorrespondanceMaquette.Nature.MATIERE">
 <span class="sig-name descname"><span class="pre">MATIERE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'M'</span></em><a class="headerlink" href="#main.models.CorrespondanceMaquette.Nature.MATIERE" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
@@ -1127,8 +1178,24 @@ non-SQL backends), respectively. Normally, they should not be set.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="main.models.DirecteurDesEtudes">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">main.models.</span></span><span class="sig-name descname"><span class="pre">DirecteurDesEtudes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prenom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sexe</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datenaissance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lieunaissance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contact</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">email</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adresse</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefecture</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_active</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">carte_identity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nationalite</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">photo_passport</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">salaireBrut</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dernierdiplome</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nbreJrsCongesRestant</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nbreJrsConsomme</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">personnel_ptr</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#main.models.DirecteurDesEtudes" title="Link to this definition">#</a></dt>
-<dd><dl class="py exception">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">main.models.</span></span><span class="sig-name descname"><span class="pre">DirecteurDesEtudes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#main.models.DirecteurDesEtudes" title="Link to this definition">#</a></dt>
+<dd><p>Modèle représentant le directeur des études de l’organisation.</p>
+<dl class="simple">
+<dt>Attributes:</dt><dd><p>id (str): Identifiant unique du directeur des études.
+nom (str): Nom du directeur des études.
+prenom (str): Prénom du directeur des études.
+email (str): Adresse e-mail du directeur des études.
+is_active (bool): Indique si le directeur des études est actif ou non.</p>
+</dd>
+<dt>Methods:</dt><dd><p>save(<a href="#id9"><span class="problematic" id="id10">*</span></a>args, <a href="#id11"><span class="problematic" id="id12">**</span></a>kwargs): Enregistre le directeur des études dans la base de données.
+delete(<a href="#id13"><span class="problematic" id="id14">*</span></a>args, <a href="#id15"><span class="problematic" id="id16">**</span></a>kwargs): Supprime le directeur des études de la base de données.
+__str__(): Renvoie une représentation en chaîne du directeur des études.</p>
+</dd>
+<dt>Meta:</dt><dd><p>verbose_name = « Directeur des études »
+verbose_name_plural = « Directeurs des études »</p>
+</dd>
+</dl>
+<dl class="py exception">
 <dt class="sig sig-object py" id="main.models.DirecteurDesEtudes.DoesNotExist">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#main.models.DirecteurDesEtudes.DoesNotExist" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
@@ -1250,8 +1317,22 @@ class built by <code class="docutils literal notranslate"><span class="pre">crea
 
 <dl class="py class">
 <dt class="sig sig-object py" id="main.models.Enseignant">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">main.models.</span></span><span class="sig-name descname"><span class="pre">Enseignant</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prenom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sexe</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datenaissance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lieunaissance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contact</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">email</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adresse</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefecture</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_active</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">carte_identity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nationalite</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">photo_passport</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">salaireBrut</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dernierdiplome</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nbreJrsCongesRestant</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nbreJrsConsomme</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">personnel_ptr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">specialite</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#main.models.Enseignant" title="Link to this definition">#</a></dt>
-<dd><dl class="py attribute">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">main.models.</span></span><span class="sig-name descname"><span class="pre">Enseignant</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#main.models.Enseignant" title="Link to this definition">#</a></dt>
+<dd><p>Modèle représentant un enseignant dans l’organisation.</p>
+<dl class="simple">
+<dt>Attributes:</dt><dd><p>id (str): Identifiant unique de l’enseignant.
+nom (str): Nom de l’enseignant.
+prenom (str): Prénom de l’enseignant.
+email (str): Adresse e-mail de l’enseignant.
+type (str): Type d’enseignant (vacataire ou permanent).
+specialite (str): Spécialité de l’enseignant.</p>
+</dd>
+<dt>Methods:</dt><dd><p>save(force_insert=False, force_update=False, using=None): Enregistre l’enseignant dans la base de données.
+niveaux(): Renvoie les niveaux d’enseignement de l’enseignant.
+__str__(): Renvoie une représentation en chaîne de l’enseignant.</p>
+</dd>
+</dl>
+<dl class="py attribute">
 <dt class="sig sig-object py" id="main.models.Enseignant.CHOIX_TYPE">
 <span class="sig-name descname"><span class="pre">CHOIX_TYPE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(('Vacataire',</span> <span class="pre">'Vacataire'),</span> <span class="pre">('Permanent',</span> <span class="pre">'Permanent'))</span></em><a class="headerlink" href="#main.models.Enseignant.CHOIX_TYPE" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
@@ -1411,8 +1492,39 @@ class built by <code class="docutils literal notranslate"><span class="pre">crea
 
 <dl class="py class">
 <dt class="sig sig-object py" id="main.models.Etudiant">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">main.models.</span></span><span class="sig-name descname"><span class="pre">Etudiant</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prenom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sexe</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datenaissance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lieunaissance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contact</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">email</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adresse</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefecture</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_active</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">carte_identity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nationalite</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">photo_passport</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seriebac1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seriebac2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anneeentree</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anneebac1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anneebac2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">etablissementSeconde</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">francaisSeconde</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anglaisSeconde</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mathematiqueSeconde</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">etablissementPremiere</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">francaisPremiere</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anglaisPremiere</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mathematiquePremiere</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">etablissementTerminale</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">francaisTerminale</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anglaisTerminale</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mathematiqueTerminale</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delegue</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">passer_semestre_suivant</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decision_conseil</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">profil</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#main.models.Etudiant" title="Link to this definition">#</a></dt>
-<dd><dl class="py attribute">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">main.models.</span></span><span class="sig-name descname"><span class="pre">Etudiant</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#main.models.Etudiant" title="Link to this definition">#</a></dt>
+<dd><p>Modèle représentant un étudiant inscrit dans le système.</p>
+<dl class="simple">
+<dt>Attributes:</dt><dd><p>id (str): Identifiant de l’étudiant.
+seriebac1 (str): Série du premier baccalauréat de l’étudiant.
+seriebac2 (str): Série du deuxième baccalauréat de l’étudiant.
+anneeentree (int): Année d’entrée de l’étudiant.
+anneebac1 (int): Année d’obtention du premier baccalauréat.
+anneebac2 (int): Année d’obtention du deuxième baccalauréat.
+etablissementSeconde (str): Nom de l’établissement de la classe de seconde.
+francaisSeconde (float): Note de français en classe de seconde.
+anglaisSeconde (float): Note d’anglais en classe de seconde.
+mathematiqueSeconde (float): Note de mathématiques en classe de seconde.
+etablissementPremiere (str): Nom de l’établissement de la classe de première.
+francaisPremiere (float): Note de français en classe de première.
+anglaisPremiere (float): Note d’anglais en classe de première.
+mathematiquePremiere (float): Note de mathématiques en classe de première.
+etablissementTerminale (str): Nom de l’établissement de la classe de terminale.
+francaisTerminale (float): Note de français en classe de terminale.
+anglaisTerminale (float): Note d’anglais en classe de terminale.
+mathematiqueTerminale (float): Note de mathématiques en classe de terminale.
+delegue (bool): Indique si l’étudiant est délégué.
+passer_semestre_suivant (bool): Indique si l’étudiant peut passer au semestre suivant.
+decision_conseil (str): Décision du conseil pour l’étudiant.
+profil (ImageField): Photo de profil de l’étudiant.
+semestres (ManyToManyField): Semestres suivis par l’étudiant.
+tuteurs (ManyToManyField): Tuteurs associés à l’étudiant.</p>
+</dd>
+<dt>Methods:</dt><dd><p>generate_email(): Génère l’adresse e-mail de l’étudiant.
+save(force_insert=False, force_update=False, using=None): Enregistre l’étudiant dans la base de données.</p>
+</dd>
+</dl>
+<dl class="py attribute">
 <dt class="sig sig-object py" id="main.models.Etudiant.CHOIX_SERIE">
 <span class="sig-name descname"><span class="pre">CHOIX_SERIE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[('A',</span> <span class="pre">'A'),</span> <span class="pre">('C',</span> <span class="pre">'C'),</span> <span class="pre">('D',</span> <span class="pre">'D'),</span> <span class="pre">('E',</span> <span class="pre">'E'),</span> <span class="pre">('F1',</span> <span class="pre">'F1'),</span> <span class="pre">('F2',</span> <span class="pre">'F2'),</span> <span class="pre">('F3',</span> <span class="pre">'F3'),</span> <span class="pre">('F4',</span> <span class="pre">'F4'),</span> <span class="pre">('G2',</span> <span class="pre">'G2')]</span></em><a class="headerlink" href="#main.models.Etudiant.CHOIX_SERIE" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
@@ -2083,8 +2195,33 @@ one-to-one (via ForwardOneToOneDescriptor subclass) relation.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="main.models.FicheDePaie">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">main.models.</span></span><span class="sig-name descname"><span class="pre">FicheDePaie</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dateDebut</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dateFin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">matiere</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enseignant</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nombreHeureL1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nombreHeureL2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nombreHeureL3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nombreHeure</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prixUnitaire</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">montantL1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">montantL2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">montantL3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">montant</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">difference</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">acomptes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">montantEnLettre</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compte_bancaire</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annee_universitaire</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#main.models.FicheDePaie" title="Link to this definition">#</a></dt>
-<dd><dl class="py exception">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">main.models.</span></span><span class="sig-name descname"><span class="pre">FicheDePaie</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#main.models.FicheDePaie" title="Link to this definition">#</a></dt>
+<dd><p>Modèle représentant les fiches de paie des enseignants.</p>
+<dl class="simple">
+<dt>Attributes:</dt><dd><p>dateDebut (date): Date de début de la période de paie.
+dateFin (date): Date de fin de la période de paie.
+matiere (Matiere): Référence à la matière enseignée.
+enseignant (Enseignant): Référence à l’enseignant concerné par la fiche de paie.
+nombreHeureL1 (int): Nombre d’heures enseignées pour le niveau 1.
+nombreHeureL2 (int): Nombre d’heures enseignées pour le niveau 2.
+nombreHeureL3 (int): Nombre d’heures enseignées pour le niveau 3.
+nombreHeure (int): Nombre total d’heures enseignées.
+prixUnitaire (int): Prix unitaire par heure.
+montantL1 (int): Montant total pour le niveau 1.
+montantL2 (int): Montant total pour le niveau 2.
+montantL3 (int): Montant total pour le niveau 3.
+montant (int): Montant total.
+difference (int): Différence entre le montant total et les acomptes.
+acomptes (int): Montant des acomptes déjà versés.
+montantEnLettre (str): Montant total en lettres.
+compte_bancaire (CompteBancaire): Référence au compte bancaire utilisé pour le paiement.
+annee_universitaire (AnneeUniversitaire): Année universitaire associée à la fiche de paie.</p>
+</dd>
+<dt>Methods:</dt><dd><p>save(<a href="#id17"><span class="problematic" id="id18">*</span></a>args, <a href="#id19"><span class="problematic" id="id20">**</span></a>kwargs): Enregistre les détails de la fiche de paie dans la base de données.
+__str__(): Renvoie une représentation en chaîne de caractères de la fiche de paie.</p>
+</dd>
+</dl>
+<dl class="py exception">
 <dt class="sig sig-object py" id="main.models.FicheDePaie.DoesNotExist">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#main.models.FicheDePaie.DoesNotExist" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
@@ -2290,8 +2427,22 @@ non-SQL backends), respectively. Normally, they should not be set.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="main.models.Fournisseur">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">main.models.</span></span><span class="sig-name descname"><span class="pre">Fournisseur</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">montant</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dateversement</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">le_mois</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compte_bancaire</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annee_universitaire</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#main.models.Fournisseur" title="Link to this definition">#</a></dt>
-<dd><dl class="py exception">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">main.models.</span></span><span class="sig-name descname"><span class="pre">Fournisseur</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#main.models.Fournisseur" title="Link to this definition">#</a></dt>
+<dd><p>Modèle représentant les paiements effectués aux fournisseurs de service.</p>
+<dl class="simple">
+<dt>Attributes:</dt><dd><p>TYPE (list): Liste des types de fournisseurs.
+TYPE_MOIS (list): Liste des mois.
+type (str): Le type de fournisseur.
+montant (decimal): Le montant versé au fournisseur.
+dateversement (date): La date de versement du paiement.
+le_mois (str): Le mois auquel le paiement est associé.
+compte_bancaire (CompteBancaire): La référence au compte bancaire utilisé pour le paiement.
+annee_universitaire (AnneeUniversitaire): L’année universitaire associée au paiement.</p>
+</dd>
+<dt>Methods:</dt><dd><p>save(<a href="#id21"><span class="problematic" id="id22">*</span></a>args, <a href="#id23"><span class="problematic" id="id24">**</span></a>kwargs): Enregistre les détails du paiement dans la base de données.</p>
+</dd>
+</dl>
+<dl class="py exception">
 <dt class="sig sig-object py" id="main.models.Fournisseur.DoesNotExist">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#main.models.Fournisseur.DoesNotExist" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
@@ -2421,8 +2572,17 @@ object the first time, the query is executed.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="main.models.Frais">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">main.models.</span></span><span class="sig-name descname"><span class="pre">Frais</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annee_universitaire</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">montant_inscription</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">montant_scolarite</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#main.models.Frais" title="Link to this definition">#</a></dt>
-<dd><dl class="py exception">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">main.models.</span></span><span class="sig-name descname"><span class="pre">Frais</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#main.models.Frais" title="Link to this definition">#</a></dt>
+<dd><p>Modèle représentant les frais d’inscription et de scolarité pour une année universitaire donnée.</p>
+<dl class="simple">
+<dt>Attributes:</dt><dd><p>annee_universitaire (AnneeUniversitaire): Année universitaire associée aux frais.
+montant_inscription (Decimal): Montant des frais d’inscription.
+montant_scolarite (Decimal): Montant des frais de scolarité.</p>
+</dd>
+<dt>Methods:</dt><dd><p>__str__(): Renvoie une représentation en chaîne de caractères des frais pour l’année universitaire.</p>
+</dd>
+</dl>
+<dl class="py exception">
 <dt class="sig sig-object py" id="main.models.Frais.DoesNotExist">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#main.models.Frais.DoesNotExist" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
@@ -2480,8 +2640,24 @@ object the first time, the query is executed.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="main.models.Information">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">main.models.</span></span><span class="sig-name descname"><span class="pre">Information</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enseignant</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">directeur</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">numeroSecurite</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">discipline</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">niveau</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dateDebut</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dateFin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">duree</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#main.models.Information" title="Link to this definition">#</a></dt>
-<dd><dl class="py exception">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">main.models.</span></span><span class="sig-name descname"><span class="pre">Information</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#main.models.Information" title="Link to this definition">#</a></dt>
+<dd><p>Modèle pour enregistrer les informations relatives aux attestations de service des enseignants.</p>
+<dl class="simple">
+<dt>Attributes:</dt><dd><p>TYPE_CHOISE (list): Liste des choix de niveaux.
+enseignant (Enseignant): Référence à l’enseignant associé à l’attestation.
+directeur (DirecteurDesEtudes): Référence au directeur des études associé à l’attestation.
+numeroSecurite (int): Numéro de sécurité sociale de l’enseignant.
+discipline (Matiere): La discipline associée enseigné par l’enseignant.
+niveau (str): Le niveau enseigné par l’enseignant.
+dateDebut (date): Date de début du contrat.
+dateFin (date): Date de fin du contrat.
+duree (str): Durée du contrat en jours.</p>
+</dd>
+<dt>Methods:</dt><dd><p>save(<a href="#id25"><span class="problematic" id="id26">*</span></a>args, <a href="#id27"><span class="problematic" id="id28">**</span></a>kwargs): Enregistre les détails de l’attestation dans la base de données.
+__str__(): Renvoie une représentation en chaîne de caractères de l’attestation.</p>
+</dd>
+</dl>
+<dl class="py exception">
 <dt class="sig sig-object py" id="main.models.Information.DoesNotExist">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#main.models.Information.DoesNotExist" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
@@ -2976,8 +3152,23 @@ object the first time, the query is executed.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="main.models.Paiement">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">main.models.</span></span><span class="sig-name descname"><span class="pre">Paiement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">montant</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dateversement</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">etudiant</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comptable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compte_bancaire</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">numerobordereau</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annee_universitaire</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#main.models.Paiement" title="Link to this definition">#</a></dt>
-<dd><dl class="py exception">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">main.models.</span></span><span class="sig-name descname"><span class="pre">Paiement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#main.models.Paiement" title="Link to this definition">#</a></dt>
+<dd><p>Modèle représentant les versements effectués par les étudiants.</p>
+<dl>
+<dt>Attributes:</dt><dd><p>TYPE_CHOICES (list): Liste des choix de type de versement.</p>
+<p>type (str): Type de versement (frais de scolarité, frais d’inscription, etc.).
+montant (Decimal): Montant versé.
+dateversement (date): Date du versement.
+etudiant (Etudiant): Référence à l’étudiant effectuant le versement.
+comptable (Comptable): Référence au comptable en charge du versement.
+compte_bancaire (CompteBancaire): Référence au compte bancaire utilisé pour le versement (optionnel).
+numerobordereau (str): Numéro de bordereau du versement.
+annee_universitaire (AnneeUniversitaire): Année universitaire associée au versement.</p>
+</dd>
+<dt>Methods:</dt><dd><p>__str__(): Renvoie une représentation en chaîne de caractères du versement.</p>
+</dd>
+</dl>
+<dl class="py exception">
 <dt class="sig sig-object py" id="main.models.Paiement.DoesNotExist">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#main.models.Paiement.DoesNotExist" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
@@ -3197,8 +3388,24 @@ class built by <code class="docutils literal notranslate"><span class="pre">crea
 
 <dl class="py class">
 <dt class="sig sig-object py" id="main.models.Personnel">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">main.models.</span></span><span class="sig-name descname"><span class="pre">Personnel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prenom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sexe</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datenaissance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lieunaissance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contact</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">email</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adresse</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefecture</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_active</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">carte_identity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nationalite</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">photo_passport</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">salaireBrut</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dernierdiplome</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nbreJrsCongesRestant</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nbreJrsConsomme</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#main.models.Personnel" title="Link to this definition">#</a></dt>
-<dd><dl class="py exception">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">main.models.</span></span><span class="sig-name descname"><span class="pre">Personnel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#main.models.Personnel" title="Link to this definition">#</a></dt>
+<dd><p>Modèle représentant un membre du personnel de l’organisation.</p>
+<dl class="simple">
+<dt>Attributes:</dt><dd><p>id (str): Identifiant du membre du personnel.
+salaireBrut (Decimal): Salaire de base du personnel.
+dernierdiplome (ImageField): Dernier diplôme du personnel.
+nbreJrsCongesRestant (int): Nombre de jours de congé restant pour le personnel.
+nbreJrsConsomme (int): Nombre de jours de congé consommés par le personnel.
+nombre_de_personnes_en_charge (int): Nombre de personnes prises en charge par le personnel.</p>
+</dd>
+<dt>Methods:</dt><dd><p>save(): Enregistre le personnel dans la base de données.
+update_conge_counts(): Met à jour les compteurs de congé pour le personnel.
+calculer_salaire_brut_annuel(): Calcule le salaire brut annuel du personnel.
+calculer_irpp_tcs_annuel(): Calcule l’impôt sur le revenu et les cotisations sociales annuelles du personnel.
+calcule_deductions_cnss_annuel(): Calcule les déductions de la CNSS annuelles pour le personnel.</p>
+</dd>
+</dl>
+<dl class="py exception">
 <dt class="sig sig-object py" id="main.models.Personnel.DoesNotExist">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#main.models.Personnel.DoesNotExist" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
@@ -3214,6 +3421,21 @@ class built by <code class="docutils literal notranslate"><span class="pre">crea
 <dd><p>A wrapper for a deferred-loading field. When the value is read from this
 object the first time, the query is executed.</p>
 </dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="main.models.Personnel.calcule_deductions_cnss_annuel">
+<span class="sig-name descname"><span class="pre">calcule_deductions_cnss_annuel</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#main.models.Personnel.calcule_deductions_cnss_annuel" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="main.models.Personnel.calculer_irpp_tcs_annuel">
+<span class="sig-name descname"><span class="pre">calculer_irpp_tcs_annuel</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#main.models.Personnel.calculer_irpp_tcs_annuel" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="main.models.Personnel.calculer_salaire_brut_annuel">
+<span class="sig-name descname"><span class="pre">calculer_salaire_brut_annuel</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#main.models.Personnel.calculer_salaire_brut_annuel" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="main.models.Personnel.carte_identity">
@@ -3369,6 +3591,13 @@ object the first time, the query is executed.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="main.models.Personnel.nom">
 <span class="sig-name descname"><span class="pre">nom</span></span><a class="headerlink" href="#main.models.Personnel.nom" title="Link to this definition">#</a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="main.models.Personnel.nombre_de_personnes_en_charge">
+<span class="sig-name descname"><span class="pre">nombre_de_personnes_en_charge</span></span><a class="headerlink" href="#main.models.Personnel.nombre_de_personnes_en_charge" title="Link to this definition">#</a></dt>
 <dd><p>A wrapper for a deferred-loading field. When the value is read from this
 object the first time, the query is executed.</p>
 </dd></dl>
@@ -3558,8 +3787,28 @@ class built by <code class="docutils literal notranslate"><span class="pre">crea
 
 <dl class="py class">
 <dt class="sig sig-object py" id="main.models.Salaire">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">main.models.</span></span><span class="sig-name descname"><span class="pre">Salaire</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">date_debut</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">date_fin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">personnel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">numero_cnss</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qualification_professionnel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prime_efficacite</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prime_qualite</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frais_travaux_complementaires</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prime_anciennete</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frais_prestations_familiales</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frais_risques_professionnel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frais_pension_vieillesse_emsalaire</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frais_prestations_familiale_salsalaire</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tcs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">irpp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_tcs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_irpp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prime_forfaitaire</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">acomptes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">salaire_net_a_payer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compte_bancaire</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annee_universitaire</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#main.models.Salaire" title="Link to this definition">#</a></dt>
-<dd><dl class="py exception">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">main.models.</span></span><span class="sig-name descname"><span class="pre">Salaire</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#main.models.Salaire" title="Link to this definition">#</a></dt>
+<dd><p>Modèle représentant les détails du salaire d’un personnel.</p>
+<dl class="simple">
+<dt>Attributes:</dt><dd><p>date_debut (date): La date de début de la période de paie.
+date_fin (date): La date de fin de la période de paie.
+personnel (Personnel): La référence au personnel concerné par le salaire.
+tcs (decimal): Le montant de la taxe sur les salaires.
+prime_forfaitaire (decimal): Le montant de la prime forfaitaire.
+acomptes (decimal): Le montant des acomptes versés au personnel.
+frais_prestations_familiale_salsalaire (decimal): Les frais de prestations familiales sur le salaire.</p>
+</dd>
+<dt>Methods:</dt><dd><p>calculer_salaire_brut_annuel() -&gt; decimal: Calcule le salaire brut annuel du personnel.
+calculer_salaire_brut_mensuel() -&gt; decimal: Calcule le salaire brut mensuel du personnel.
+calculer_total_A() -&gt; decimal: Calcule le total A.
+calculer_net_imposable_arrondi() -&gt; int: Calcule le net imposable arrondi.
+calculer_irpp_annuel() -&gt; decimal: Calcule l’impôt sur le revenu des personnes physiques (IRPP) annuel.
+calculer_irpp_mensuel() -&gt; decimal: Calcule l’IRPP mensuel.
+calculer_deductions_cnss() -&gt; decimal: Calcule les déductions CNSS.
+save(<a href="#id29"><span class="problematic" id="id30">*</span></a>args, <a href="#id31"><span class="problematic" id="id32">**</span></a>kwargs): Enregistre les détails du salaire dans la base de données.</p>
+</dd>
+</dl>
+<dl class="py exception">
 <dt class="sig sig-object py" id="main.models.Salaire.DoesNotExist">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#main.models.Salaire.DoesNotExist" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
@@ -3597,6 +3846,76 @@ one-to-one (via ForwardOneToOneDescriptor subclass) relation.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="main.models.Salaire.annee_universitaire_id">
 <span class="sig-name descname"><span class="pre">annee_universitaire_id</span></span><a class="headerlink" href="#main.models.Salaire.annee_universitaire_id" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="main.models.Salaire.calculer_charges_de_familles">
+<span class="sig-name descname"><span class="pre">calculer_charges_de_familles</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#main.models.Salaire.calculer_charges_de_familles" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="main.models.Salaire.calculer_deductions_cnss">
+<span class="sig-name descname"><span class="pre">calculer_deductions_cnss</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#main.models.Salaire.calculer_deductions_cnss" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="main.models.Salaire.calculer_irpp_annuel">
+<span class="sig-name descname"><span class="pre">calculer_irpp_annuel</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#main.models.Salaire.calculer_irpp_annuel" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="main.models.Salaire.calculer_irpp_mensuel">
+<span class="sig-name descname"><span class="pre">calculer_irpp_mensuel</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#main.models.Salaire.calculer_irpp_mensuel" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="main.models.Salaire.calculer_net_imposable">
+<span class="sig-name descname"><span class="pre">calculer_net_imposable</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#main.models.Salaire.calculer_net_imposable" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="main.models.Salaire.calculer_net_imposable_arrondi">
+<span class="sig-name descname"><span class="pre">calculer_net_imposable_arrondi</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#main.models.Salaire.calculer_net_imposable_arrondi" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="main.models.Salaire.calculer_net_taxable">
+<span class="sig-name descname"><span class="pre">calculer_net_taxable</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#main.models.Salaire.calculer_net_taxable" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="main.models.Salaire.calculer_salaire_brut_annuel">
+<span class="sig-name descname"><span class="pre">calculer_salaire_brut_annuel</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#main.models.Salaire.calculer_salaire_brut_annuel" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="main.models.Salaire.calculer_salaire_brut_mensuel">
+<span class="sig-name descname"><span class="pre">calculer_salaire_brut_mensuel</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#main.models.Salaire.calculer_salaire_brut_mensuel" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="main.models.Salaire.calculer_semi_net">
+<span class="sig-name descname"><span class="pre">calculer_semi_net</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#main.models.Salaire.calculer_semi_net" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="main.models.Salaire.calculer_total_A">
+<span class="sig-name descname"><span class="pre">calculer_total_A</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#main.models.Salaire.calculer_total_A" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="main.models.Salaire.calculer_total_B">
+<span class="sig-name descname"><span class="pre">calculer_total_B</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#main.models.Salaire.calculer_total_B" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="main.models.Salaire.calculer_total_C">
+<span class="sig-name descname"><span class="pre">calculer_total_C</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#main.models.Salaire.calculer_total_C" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="main.models.Salaire.calculer_total_D">
+<span class="sig-name descname"><span class="pre">calculer_total_D</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#main.models.Salaire.calculer_total_D" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -3681,20 +4000,6 @@ object the first time, the query is executed.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="main.models.Salaire.irpp">
 <span class="sig-name descname"><span class="pre">irpp</span></span><a class="headerlink" href="#main.models.Salaire.irpp" title="Link to this definition">#</a></dt>
-<dd><p>A wrapper for a deferred-loading field. When the value is read from this
-object the first time, the query is executed.</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="main.models.Salaire.is_irpp">
-<span class="sig-name descname"><span class="pre">is_irpp</span></span><a class="headerlink" href="#main.models.Salaire.is_irpp" title="Link to this definition">#</a></dt>
-<dd><p>A wrapper for a deferred-loading field. When the value is read from this
-object the first time, the query is executed.</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="main.models.Salaire.is_tcs">
-<span class="sig-name descname"><span class="pre">is_tcs</span></span><a class="headerlink" href="#main.models.Salaire.is_tcs" title="Link to this definition">#</a></dt>
 <dd><p>A wrapper for a deferred-loading field. When the value is read from this
 object the first time, the query is executed.</p>
 </dd></dl>
@@ -3969,8 +4274,24 @@ class built by <code class="docutils literal notranslate"><span class="pre">crea
 
 <dl class="py class">
 <dt class="sig sig-object py" id="main.models.Tuteur">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">main.models.</span></span><span class="sig-name descname"><span class="pre">Tuteur</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prenom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sexe</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adresse</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contact</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">profession</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#main.models.Tuteur" title="Link to this definition">#</a></dt>
-<dd><dl class="py attribute">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">main.models.</span></span><span class="sig-name descname"><span class="pre">Tuteur</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#main.models.Tuteur" title="Link to this definition">#</a></dt>
+<dd><p>Modèle représentant un tuteur ou un parent d’un étudiant.</p>
+<dl>
+<dt>Attributes:</dt><dd><p>CHOIX_SEX (list): Liste des choix de sexe pour le tuteur.
+CHOIX_TYPE (list): Liste des choix de type de tuteur (père, mère, tuteur).</p>
+<p>nom (str): Nom du tuteur.
+prenom (str): Prénom du tuteur.
+sexe (str): Sexe du tuteur (F pour féminin, M pour masculin).
+adresse (str): Adresse du tuteur.
+contact (str): Numéro de contact du tuteur.
+profession (str): Profession du tuteur.
+type (str): Type de tuteur (père, mère, tuteur).</p>
+</dd>
+<dt>Methods:</dt><dd><p>save(): Enregistre le tuteur dans la base de données et crée un utilisateur associé.
+__str__(): Renvoie une représentation en chaîne de caractères du tuteur.</p>
+</dd>
+</dl>
+<dl class="py attribute">
 <dt class="sig sig-object py" id="main.models.Tuteur.CHOIX_SEX">
 <span class="sig-name descname"><span class="pre">CHOIX_SEX</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[('F',</span> <span class="pre">'Féminin'),</span> <span class="pre">('M',</span> <span class="pre">'Masculin')]</span></em><a class="headerlink" href="#main.models.Tuteur.CHOIX_SEX" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
@@ -4250,7 +4571,32 @@ object the first time, the query is executed.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="main.models.Utilisateur">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">main.models.</span></span><span class="sig-name descname"><span class="pre">Utilisateur</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#main.models.Utilisateur" title="Link to this definition">#</a></dt>
-<dd><dl class="py class">
+<dd><p>Modèle représentant un utilisateur du système.</p>
+<dl class="simple">
+<dt>Attributes:</dt><dd><p>SEXE_CHOISE (list): Liste des choix de sexe pour l utilisateur.
+nom (str): Nom de l’utilisateur.
+prenom (str): Prénom de l’utilisateur.
+sexe (str): Sexe de l’utilisateur (F pour féminin, M pour masculin).
+datenaissance (date): Date de naissance de l’utilisateur.
+lieunaissance (str): Lieu de naissance de l’utilisateur.
+contact (str): Numéro de contact de l’utilisateur.
+email (str): Adresse e-mail de l’utilisateur.
+adresse (str): Adresse de l’utilisateur.
+prefecture (str): Préfecture de l’utilisateur.
+is_active (bool): Statut d’activation de l’utilisateur.
+carte_identity (str): Numéro de carte d’identité de l’utilisateur.
+nationalite (str): Nationalité de l’utilisateur.
+user (User): Référence à l’utilisateur authentifié associé.
+photo_passport (ImageField): Photo de passeport de l’utilisateur.</p>
+</dd>
+<dt>Methods:</dt><dd><p>__str__(): Renvoie une représentation en chaîne de caractères de l’utilisateur.
+full_name(): Renvoie le nom complet de l’utilisateur en majuscules.
+getrole(): Renvoie le rôle de l’utilisateur.
+suspendre(): Suspend l’utilisateur.
+reactiver(): Réactive l’utilisateur.</p>
+</dd>
+</dl>
+<dl class="py class">
 <dt class="sig sig-object py" id="main.models.Utilisateur.Meta">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Meta</span></span><a class="headerlink" href="#main.models.Utilisateur.Meta" title="Link to this definition">#</a></dt>
 <dd><dl class="py attribute">
@@ -4913,6 +5259,9 @@ object the first time, the query is executed.</p>
 <li><a class="reference internal" href="#main.models.Personnel.DoesNotExist"><code class="docutils literal notranslate"><span class="pre">Personnel.DoesNotExist</span></code></a></li>
 <li><a class="reference internal" href="#main.models.Personnel.MultipleObjectsReturned"><code class="docutils literal notranslate"><span class="pre">Personnel.MultipleObjectsReturned</span></code></a></li>
 <li><a class="reference internal" href="#main.models.Personnel.adresse"><code class="docutils literal notranslate"><span class="pre">Personnel.adresse</span></code></a></li>
+<li><a class="reference internal" href="#main.models.Personnel.calcule_deductions_cnss_annuel"><code class="docutils literal notranslate"><span class="pre">Personnel.calcule_deductions_cnss_annuel()</span></code></a></li>
+<li><a class="reference internal" href="#main.models.Personnel.calculer_irpp_tcs_annuel"><code class="docutils literal notranslate"><span class="pre">Personnel.calculer_irpp_tcs_annuel()</span></code></a></li>
+<li><a class="reference internal" href="#main.models.Personnel.calculer_salaire_brut_annuel"><code class="docutils literal notranslate"><span class="pre">Personnel.calculer_salaire_brut_annuel()</span></code></a></li>
 <li><a class="reference internal" href="#main.models.Personnel.carte_identity"><code class="docutils literal notranslate"><span class="pre">Personnel.carte_identity</span></code></a></li>
 <li><a class="reference internal" href="#main.models.Personnel.charge_set"><code class="docutils literal notranslate"><span class="pre">Personnel.charge_set</span></code></a></li>
 <li><a class="reference internal" href="#main.models.Personnel.comptable"><code class="docutils literal notranslate"><span class="pre">Personnel.comptable</span></code></a></li>
@@ -4931,6 +5280,7 @@ object the first time, the query is executed.</p>
 <li><a class="reference internal" href="#main.models.Personnel.nbreJrsCongesRestant"><code class="docutils literal notranslate"><span class="pre">Personnel.nbreJrsCongesRestant</span></code></a></li>
 <li><a class="reference internal" href="#main.models.Personnel.nbreJrsConsomme"><code class="docutils literal notranslate"><span class="pre">Personnel.nbreJrsConsomme</span></code></a></li>
 <li><a class="reference internal" href="#main.models.Personnel.nom"><code class="docutils literal notranslate"><span class="pre">Personnel.nom</span></code></a></li>
+<li><a class="reference internal" href="#main.models.Personnel.nombre_de_personnes_en_charge"><code class="docutils literal notranslate"><span class="pre">Personnel.nombre_de_personnes_en_charge</span></code></a></li>
 <li><a class="reference internal" href="#main.models.Personnel.objects"><code class="docutils literal notranslate"><span class="pre">Personnel.objects</span></code></a></li>
 <li><a class="reference internal" href="#main.models.Personnel.photo_passport"><code class="docutils literal notranslate"><span class="pre">Personnel.photo_passport</span></code></a></li>
 <li><a class="reference internal" href="#main.models.Personnel.prefecture"><code class="docutils literal notranslate"><span class="pre">Personnel.prefecture</span></code></a></li>
@@ -4965,6 +5315,20 @@ object the first time, the query is executed.</p>
 <li><a class="reference internal" href="#main.models.Salaire.acomptes"><code class="docutils literal notranslate"><span class="pre">Salaire.acomptes</span></code></a></li>
 <li><a class="reference internal" href="#main.models.Salaire.annee_universitaire"><code class="docutils literal notranslate"><span class="pre">Salaire.annee_universitaire</span></code></a></li>
 <li><a class="reference internal" href="#main.models.Salaire.annee_universitaire_id"><code class="docutils literal notranslate"><span class="pre">Salaire.annee_universitaire_id</span></code></a></li>
+<li><a class="reference internal" href="#main.models.Salaire.calculer_charges_de_familles"><code class="docutils literal notranslate"><span class="pre">Salaire.calculer_charges_de_familles()</span></code></a></li>
+<li><a class="reference internal" href="#main.models.Salaire.calculer_deductions_cnss"><code class="docutils literal notranslate"><span class="pre">Salaire.calculer_deductions_cnss()</span></code></a></li>
+<li><a class="reference internal" href="#main.models.Salaire.calculer_irpp_annuel"><code class="docutils literal notranslate"><span class="pre">Salaire.calculer_irpp_annuel()</span></code></a></li>
+<li><a class="reference internal" href="#main.models.Salaire.calculer_irpp_mensuel"><code class="docutils literal notranslate"><span class="pre">Salaire.calculer_irpp_mensuel()</span></code></a></li>
+<li><a class="reference internal" href="#main.models.Salaire.calculer_net_imposable"><code class="docutils literal notranslate"><span class="pre">Salaire.calculer_net_imposable()</span></code></a></li>
+<li><a class="reference internal" href="#main.models.Salaire.calculer_net_imposable_arrondi"><code class="docutils literal notranslate"><span class="pre">Salaire.calculer_net_imposable_arrondi()</span></code></a></li>
+<li><a class="reference internal" href="#main.models.Salaire.calculer_net_taxable"><code class="docutils literal notranslate"><span class="pre">Salaire.calculer_net_taxable()</span></code></a></li>
+<li><a class="reference internal" href="#main.models.Salaire.calculer_salaire_brut_annuel"><code class="docutils literal notranslate"><span class="pre">Salaire.calculer_salaire_brut_annuel()</span></code></a></li>
+<li><a class="reference internal" href="#main.models.Salaire.calculer_salaire_brut_mensuel"><code class="docutils literal notranslate"><span class="pre">Salaire.calculer_salaire_brut_mensuel()</span></code></a></li>
+<li><a class="reference internal" href="#main.models.Salaire.calculer_semi_net"><code class="docutils literal notranslate"><span class="pre">Salaire.calculer_semi_net()</span></code></a></li>
+<li><a class="reference internal" href="#main.models.Salaire.calculer_total_A"><code class="docutils literal notranslate"><span class="pre">Salaire.calculer_total_A()</span></code></a></li>
+<li><a class="reference internal" href="#main.models.Salaire.calculer_total_B"><code class="docutils literal notranslate"><span class="pre">Salaire.calculer_total_B()</span></code></a></li>
+<li><a class="reference internal" href="#main.models.Salaire.calculer_total_C"><code class="docutils literal notranslate"><span class="pre">Salaire.calculer_total_C()</span></code></a></li>
+<li><a class="reference internal" href="#main.models.Salaire.calculer_total_D"><code class="docutils literal notranslate"><span class="pre">Salaire.calculer_total_D()</span></code></a></li>
 <li><a class="reference internal" href="#main.models.Salaire.compte_bancaire"><code class="docutils literal notranslate"><span class="pre">Salaire.compte_bancaire</span></code></a></li>
 <li><a class="reference internal" href="#main.models.Salaire.compte_bancaire_id"><code class="docutils literal notranslate"><span class="pre">Salaire.compte_bancaire_id</span></code></a></li>
 <li><a class="reference internal" href="#main.models.Salaire.date_debut"><code class="docutils literal notranslate"><span class="pre">Salaire.date_debut</span></code></a></li>
@@ -4977,8 +5341,6 @@ object the first time, the query is executed.</p>
 <li><a class="reference internal" href="#main.models.Salaire.get_qualification_professionnel_display"><code class="docutils literal notranslate"><span class="pre">Salaire.get_qualification_professionnel_display()</span></code></a></li>
 <li><a class="reference internal" href="#main.models.Salaire.id"><code class="docutils literal notranslate"><span class="pre">Salaire.id</span></code></a></li>
 <li><a class="reference internal" href="#main.models.Salaire.irpp"><code class="docutils literal notranslate"><span class="pre">Salaire.irpp</span></code></a></li>
-<li><a class="reference internal" href="#main.models.Salaire.is_irpp"><code class="docutils literal notranslate"><span class="pre">Salaire.is_irpp</span></code></a></li>
-<li><a class="reference internal" href="#main.models.Salaire.is_tcs"><code class="docutils literal notranslate"><span class="pre">Salaire.is_tcs</span></code></a></li>
 <li><a class="reference internal" href="#main.models.Salaire.numero_cnss"><code class="docutils literal notranslate"><span class="pre">Salaire.numero_cnss</span></code></a></li>
 <li><a class="reference internal" href="#main.models.Salaire.objects"><code class="docutils literal notranslate"><span class="pre">Salaire.objects</span></code></a></li>
 <li><a class="reference internal" href="#main.models.Salaire.personnel"><code class="docutils literal notranslate"><span class="pre">Salaire.personnel</span></code></a></li>
