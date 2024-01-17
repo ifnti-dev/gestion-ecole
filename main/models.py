@@ -26,27 +26,117 @@ class Utilisateur(models.Model):
         ('M', 'Masculin')
     ]
     nom = models.CharField(max_length=50)
+
+    """
+        Nom de l'utilisateur
+
+        **Type**:    string
+    """
+
     prenom = models.CharField(max_length=50, verbose_name="Prénom")
+
+    """
+        Prénom de l'utilisateur
+
+        **Type**:    string
+    """
+
     sexe = models.CharField(max_length=1, choices=SEXE_CHOISE)
+
+    """
+        Sexe de l'utilisateur
+
+        **Type**:    string
+    """
+
     datenaissance = models.DateField(blank=True, verbose_name="date de naissance", null=True, validators=[
                                      MaxValueValidator(limit_value=date(2006, 1, 1), message="L'année de naissance doit être inférieure à 2006")])
+
+    """
+        Date de naissance de l'utilisateur
+
+        **Type**:    string
+    """
+
     lieunaissance = models.CharField(
         blank=True, max_length=20, verbose_name="lieu de naissance", null=True)
+
+    """
+        Lieu de naissance de l'utilisateur
+
+        **Type**:    string
+    """
+
     contact = models.CharField(max_length=25, null=True)
+
+    """
+        Numéro de téléphone de l'utilisateur
+
+        **Type**:    string
+    """
+
     email = models.CharField(max_length=50, null=True)
+
+    """
+        Email de ml'utilisateur
+
+        **Type**:    string
+    """
+
     adresse = models.CharField(max_length=50, null=True)
+
+    """
+        Adresse de l'utilisateur
+
+        **Type**:    string
+    """
+
     prefecture = models.CharField(
         max_length=50, null=True, verbose_name="Préfecture", default='tchaoudjo', blank=True)
+
+    """
+        Préfecture de provenance de l'utilisateur
+
+        **Type**:    string
+    """
+
     is_active = models.BooleanField(
         default=True, verbose_name="Actif", null=True)
+
+    """
+        Statut de l'utilisateur (actif ou inactif)
+
+        **Type**:    string
+    """
+
     carte_identity = models.CharField(
         max_length=50, null=True,  verbose_name="Carte d'identité")
+
+    """
+        Carte d'identitée de l'utilisateur    
+    
+        **Type**:    string
+    """
+
     nationalite = models.CharField(
         max_length=30, default='Togolaise', verbose_name='Nationalté', blank=True)
+
+    """
+        Attestation de nationalité de l'utilisateur
+
+        **Type**:    string
+    """
+
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, editable=False)
     photo_passport = models.ImageField(
         null=True, blank=True, verbose_name="Photo passport")
+
+    """
+        Photo passeport de l'utilisateur
+
+        **Type**:    string
+    """
 
     class Meta:
         abstract = True
@@ -55,16 +145,39 @@ class Utilisateur(models.Model):
         return str(self.nom) + ' ' + str(self.prenom)
 
     def full_name(self):
+        """
+
+            Donne le nom et prénom de l'utilisateur    
+
+            :return: Le nom et prénom de l'utilisateur
+            :retype: string
+        """
         return self.nom.upper() + ' ' + self.prenom
 
     def getrole(self):
+        """
+            Donne le nom du rôle de l'utilisateur
+
+            :return: Le role de l'utilisateur.
+            :retype:  string
+        """
         return self.user.groups.all()[0].name
 
     def suspendre(self):
+        """
+            Désactive un utilisateur
+
+        """
+
         self.is_active = False
         self.save()
 
     def reactiver(self):
+        """
+            Active un utilisateur inactif
+
+        """
+
         self.is_active = True
         self.save()
 
@@ -526,6 +639,7 @@ class Etudiant(Utilisateur):
 
 
 # Calcule le nombre de crédits obtenus par l'étudiant dans un semestre donné.
+
 
     def credits_obtenus_semestre(self, semestre):
         """
