@@ -72,59 +72,219 @@ class Utilisateur(models.Model):
 class Etudiant(Utilisateur):
 
     """
-        Classe étudiant
+        Classe Etudiant
     """
     id = models.CharField(primary_key=True, blank=True,
                           max_length=12, editable=False)
     CHOIX_SERIE = [('A', 'A'), ('C', 'C'), ('D', 'D'), ('E', 'E'), ('F1', 'F1'), ('F2', 'F2'), ('F3', 'F3'),
                    ('F4', 'F4'), ('G2', 'G2')]
-    
-    #: Séries faite au BAC 1
+
     seriebac1 = models.CharField(
         blank=True, max_length=2, choices=CHOIX_SERIE, verbose_name="Série bac 1", null=True)
+
+    """
+        Série de l'étudiant en 1ere
+
+        **Type**:    string
+    """
+
     seriebac2 = models.CharField(
         blank=True, max_length=2, choices=CHOIX_SERIE, verbose_name="Série bac 2", null=True)
+
+    """
+        Série de l'étudiant en Terminale
+
+        **Type**:    string
+    """
+
     anneeentree = models.IntegerField(default=datetime.date.today(
     ).year, blank=True, verbose_name="Promotion", null=True)
+
+    """
+        Série de l'étudiant en Terminale
+
+        **Type**:    string
+    """
+
     anneebac1 = models.IntegerField(
         blank=True, verbose_name="Année d’obtention du BAC 1", null=True)
+
+    """
+        Année d'obtention du BAC 1
+
+        **Type**:    integer
+    """
+
     anneebac2 = models.IntegerField(
         blank=True, verbose_name="Année d’obtention du BAC 2", null=True, default=datetime.date.today().year)
+
+    """
+        Année d'obtention du BAC 2
+
+        **Type**:    integer
+    """
+
     etablissementSeconde = models.CharField(
         max_length=300, verbose_name="Nom d'établissement seconde", null=True, blank=True)
+
+    """
+        Établissement de 2nde de l'étudiant
+
+        **Type**:    string
+    """
+
     francaisSeconde = models.DecimalField(
         max_digits=4, decimal_places=2, verbose_name="Note de français Seconde", default="0")
+
+    """
+        Note en français en classe de 2nde de l'étudiant
+
+        **Type**:    integer
+    """
+
     anglaisSeconde = models.DecimalField(
         max_digits=4, decimal_places=2, verbose_name="Note d'anglais Seconde", default="0")
+
+    """
+        Note en anglais en classe de 2nde de l'étudiant
+
+        **Type**:    integer
+    """
+
     mathematiqueSeconde = models.DecimalField(
         max_digits=4, decimal_places=2, verbose_name="Note de mathématique Seconde", default="0")
+
+    """
+        Note en mathematique en classe de 2nde de l'étudiant
+
+        **Type**:    integer
+    """
+
     etablissementPremiere = models.CharField(
         max_length=300, verbose_name="Nom d'établissement Première", null=True, blank=True)
+
+    """
+        Établissement de 1ere de l'étudiant
+
+
+        **Type**:    string
+    """
+
     francaisPremiere = models.DecimalField(
         max_digits=4, decimal_places=2, verbose_name="Note de français Première", default="0")
+
+    """
+        Note en français en classe de 1ere de l'étudiant
+
+        **Type**:    integer
+    """
+
     anglaisPremiere = models.DecimalField(
         max_digits=4, decimal_places=2, verbose_name="Note d'anglais Première", default="0")
+
+    """
+        Note en anglais en classe de 1ere de l'étudiant
+
+        **Type**:    integer
+    """
+
     mathematiquePremiere = models.DecimalField(
         max_digits=4, decimal_places=2, verbose_name="Note de mathématique Première", default="0")
+
+    """
+        Note en mathématiques en classe de 1ere de l'étudiant
+
+        **Type**:    integer
+    """
+
     etablissementTerminale = models.CharField(
         max_length=300, verbose_name="Nom d'établissement Terminale", null=True, blank=True)
+
+    """
+        Établissement de Terminale de l'étudiant
+
+        **Type**:    string
+    """
+
     francaisTerminale = models.DecimalField(
         max_digits=4, decimal_places=2, verbose_name="Note de français Terminale", default="0")
+
+    """
+        Note en français en classe de Terminale de l'étudiant
+
+        **Type**:    integer
+    """
+
     anglaisTerminale = models.DecimalField(
         max_digits=4, decimal_places=2, verbose_name="Note d'anglais Terminale", default="0")
+
+    """
+        Note en anglais en classe de Terminale de l'étudiant
+
+        **Type**:    integer
+    """
+
     mathematiqueTerminale = models.DecimalField(
         max_digits=4, decimal_places=2, verbose_name="Note de mathématique Terminale", default="0")
+
+    """
+        Note en mathématiques en classe de Terminale de l'étudiant
+
+        **Type**:    integer
+    """
+
     delegue = models.BooleanField(
         default=False, verbose_name="delegué", null=True)
+
+    """
+        Attribut permettant de savoir si l'étudiant est le délégué de sa classe 
+
+        **Type**:    boolean
+    """
+
     passer_semestre_suivant = models.BooleanField(
         default=False, verbose_name="Passer au semestre suivant")
+
+    """
+        Permet de savoir si l'étudiant passe au semestre suivant
+        
+        **Type**:    boolean
+    """
+
     decision_conseil = models.TextField(
         verbose_name="Décision du conseil", null=True, default="Décision du conseil")
+
+    """
+        Décision du conseil sur lors du passage au niveau supérieur
+
+        **Type**:    string
+    """
+
     profil = models.ImageField(
         null=True, blank=True, verbose_name="Photo de profil")
+
+    """
+        Photo de profil
+
+        **Type**:    string
+    """
+
     semestres = models.ManyToManyField('Semestre', null=True)
+
+    """
+        Liste des semestres de l'étudiant
+
+        **Type**:    list[Semestre]
+    """
+
     tuteurs = models.ManyToManyField(
         'Tuteur', related_name="Tuteurs", blank=True, null=True)
+
+    """
+        Tuteurs de l'étudiant
+
+        **Type**:    list[Tuteur]
+    """
 
     class Meta:
         verbose_name = "Etudiant"
