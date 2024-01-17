@@ -7,6 +7,8 @@ class Planning(models.Model):
     semestre = models.ForeignKey(Semestre, on_delete=models.CASCADE)
     datedebut = models.DateField()
     datefin = models.DateField()
+    intervalle=models.CharField(null=True,max_length=50)
+
        
     def __str__(self):
         return f"Semaine {self.semaine} - {self.semestre}"

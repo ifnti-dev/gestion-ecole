@@ -10,11 +10,15 @@
 }
 </style>
 <div class="block block-rounded">
-  
+
+    <div class="block-header p-4">
+        <h3 class="block-title">Liste des planning par semaine</h3>
+        <a data-toggle="modal" data-target="#newPlanningModal" class="btn btn-outline-primary">
+            <i class="fas fa-plus"></i> Nouveau planning
+        </a> 
+       </div>
     <div class="block-content block-content-full">
-        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#newPlanningModal">
-            Nouveau planning
-        </button>
+
         
         <table class="table table-bordered table-striped table-vcenter js-dataTable-full-pagination">
             <thead>
@@ -31,14 +35,18 @@
                     <td class="text-center font-size-sm">{{ planning.id }}</td>
                     <td class="text-center font-w600 font-size-sm"> <a href="details/{{planning.id}}" target="_blank">{{ planning.semaine }}</a></td>
                     <td class="text-center font-w600 font-size-sm">{{ planning.semestre }}</td>
-                    <td class="text-center font-w600 font-size-sm">{{ planning.datedebut }} au {{ planning.datefin }} </td>
+
+                    <td class="text-center font-w600 font-size-sm">{% if not planning.intervalle %} {{ planning.datedebut }} au {{ planning.datefin }} {% else %} {{ planning.intervalle }} {% endif %}</td>
+
                     <td class="text-center">
                         <button type="button" class="btn btn-secondary dropdown-toggle" id="dropdown-default-secondary" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <i class="fa fa-bars" aria-hidden="true"></i>
                         </button>
                         <div class="dropdown-menu font-size-sm" aria-labelledby="dropdown-default-secondary">
                             <li class="nav-main-item">
-                                <a class="nav-main-link nav-main-link-name" data-toggle="" aria-haspopup="true" aria-expanded="false" href="print/{{planning.id}}">
+
+                                <a class="nav-main-link nav-main-link-name" data-toggle="" aria-haspopup="true" aria-expanded="false" href="imprimer/{{planning.id}}">
+
                                     <i class="fa fa-print mr-1" aria-hidden="true"></i>
                                     <span class="nav-main-link-name">Imprimer</span>
                                 </a>
@@ -46,7 +54,9 @@
                             <li class="nav-main-item">
                                 <a class="nav-main-link nav-main-link-name" data-toggle="" aria-haspopup="true" aria-expanded="false" href="edit/{{planning.id}}">
                                     <i class="fa fa-edit mr-1" aria-hidden="true"></i>
-                                    <span class="nav-main-link-name">Modifier</span>
+
+                                    <span class="nav-main-link-name">Ajouter cours</span>
+
                                 </a>
                             </li>
                             <li class="nav-main-item">
@@ -163,7 +173,9 @@
                         // Soumettre le formulaire initial
                         $("#newPlanningForm").submit();
                     } else {
-                        One.helpers('notify', {type: 'danger', icon: 'fa fa-info-circle mr-1', message: response.plan});
+
+                        alert("Un planning de la semaine " +response.semaine +" du semestre "+ response.semestre +" a deja été enregistrer entre le "+ response.datedebut +" et le "+ response.datefin);
+
                     }
                 },
                 error: function (error) {
