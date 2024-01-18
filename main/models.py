@@ -23,31 +23,6 @@ import math
 class Utilisateur(models.Model):
     """
     Modèle représentant un utilisateur du système.
-
-    Attributes:
-        SEXE_CHOISE (list): Liste des choix de sexe pour l utilisateur.
-        nom (str): Nom de l'utilisateur.
-        prenom (str): Prénom de l'utilisateur.
-        sexe (str): Sexe de l'utilisateur (F pour féminin, M pour masculin).
-        datenaissance (date): Date de naissance de l'utilisateur.
-        lieunaissance (str): Lieu de naissance de l'utilisateur.
-        contact (str): Numéro de contact de l'utilisateur.
-        email (str): Adresse e-mail de l'utilisateur.
-        adresse (str): Adresse de l'utilisateur.
-        prefecture (str): Préfecture de l'utilisateur.
-        is_active (bool): Statut d'activation de l'utilisateur.
-        carte_identity (str): Numéro de carte d'identité de l'utilisateur.
-        nationalite (str): Nationalité de l'utilisateur.
-        user (User): Référence à l'utilisateur authentifié associé.
-        photo_passport (ImageField): Photo de passeport de l'utilisateur.
-
-    Methods:
-        __str__(): Renvoie une représentation en chaîne de caractères de l'utilisateur.
-        full_name(): Renvoie le nom complet de l'utilisateur en majuscules.
-        getrole(): Renvoie le rôle de l'utilisateur.
-        suspendre(): Suspend l'utilisateur.
-        reactiver(): Réactive l'utilisateur.
-
     """
     SEXE_CHOISE = [
         ('F', 'Feminin'),
@@ -84,6 +59,8 @@ class Utilisateur(models.Model):
         Date de naissance de l'utilisateur
 
         **Type**:    string
+
+        **Nullable:** true
     """
 
     lieunaissance = models.CharField(
@@ -101,14 +78,18 @@ class Utilisateur(models.Model):
         Numéro de téléphone de l'utilisateur
 
         **Type**:    string
+
+        **Nullable:** true
     """
 
     email = models.CharField(max_length=50, null=True)
 
     """
-        Email de ml'utilisateur
+        Email de l'utilisateur
 
         **Type**:    string
+
+        **Nullable:** true
     """
 
     adresse = models.CharField(max_length=50, null=True)
@@ -117,6 +98,8 @@ class Utilisateur(models.Model):
         Adresse de l'utilisateur
 
         **Type**:    string
+
+        **Nullable:** true
     """
 
     prefecture = models.CharField(
@@ -126,6 +109,8 @@ class Utilisateur(models.Model):
         Préfecture de provenance de l'utilisateur
 
         **Type**:    string
+
+        **Valeur par defaut:** Tchaoudjo
     """
 
     is_active = models.BooleanField(
@@ -135,6 +120,8 @@ class Utilisateur(models.Model):
         Statut de l'utilisateur (actif ou inactif)
 
         **Type**:    string
+
+        **Valeur par défaut:** true
     """
 
     carte_identity = models.CharField(
@@ -144,6 +131,8 @@ class Utilisateur(models.Model):
         Carte d'identitée de l'utilisateur    
     
         **Type**:    string
+
+        **Nullable:** true
     """
 
     nationalite = models.CharField(
@@ -153,6 +142,8 @@ class Utilisateur(models.Model):
         Attestation de nationalité de l'utilisateur
 
         **Type**:    string
+
+        **Valeur par défaut:** Togolaise
     """
 
     user = models.OneToOneField(
@@ -164,6 +155,8 @@ class Utilisateur(models.Model):
         Photo passeport de l'utilisateur
 
         **Type**:    string
+
+        **Nullable:** true
     """
 
     class Meta:
@@ -227,6 +220,8 @@ class Etudiant(Utilisateur):
         Série de l'étudiant en 1ere
 
         **Type**:    string
+
+        **Nullable:** true
     """
 
     seriebac2 = models.CharField(
@@ -236,6 +231,8 @@ class Etudiant(Utilisateur):
         Série de l'étudiant en Terminale
 
         **Type**:    string
+
+        **Nullable:** true
     """
 
     anneeentree = models.IntegerField(default=datetime.date.today(
@@ -245,6 +242,8 @@ class Etudiant(Utilisateur):
         Série de l'étudiant en Terminale
 
         **Type**:    string
+
+        **Nullable:** true
     """
 
     anneebac1 = models.IntegerField(
@@ -254,6 +253,8 @@ class Etudiant(Utilisateur):
         Année d'obtention du BAC 1
 
         **Type**:    integer
+
+        **Nullable:** true
     """
 
     anneebac2 = models.IntegerField(
@@ -263,6 +264,8 @@ class Etudiant(Utilisateur):
         Année d'obtention du BAC 2
 
         **Type**:    integer
+
+        **Valeur par defaut:** Date actuelle
     """
 
     etablissementSeconde = models.CharField(
@@ -272,6 +275,8 @@ class Etudiant(Utilisateur):
         Établissement de 2nde de l'étudiant
 
         **Type**:    string
+
+        **Nullable:** true
     """
 
     francaisSeconde = models.DecimalField(
@@ -281,6 +286,8 @@ class Etudiant(Utilisateur):
         Note en français en classe de 2nde de l'étudiant
 
         **Type**:    integer
+
+        **Valeur par defaut:** 0
     """
 
     anglaisSeconde = models.DecimalField(
@@ -290,6 +297,8 @@ class Etudiant(Utilisateur):
         Note en anglais en classe de 2nde de l'étudiant
 
         **Type**:    integer
+
+        **Valeur par defaut:** 0
     """
 
     mathematiqueSeconde = models.DecimalField(
@@ -299,6 +308,8 @@ class Etudiant(Utilisateur):
         Note en mathematique en classe de 2nde de l'étudiant
 
         **Type**:    integer
+
+        **Valeur par defaut:** 0
     """
 
     etablissementPremiere = models.CharField(
@@ -307,8 +318,9 @@ class Etudiant(Utilisateur):
     """
         Établissement de 1ere de l'étudiant
 
-
         **Type**:    string
+
+        **Nullable:** true
     """
 
     francaisPremiere = models.DecimalField(
@@ -318,6 +330,8 @@ class Etudiant(Utilisateur):
         Note en français en classe de 1ere de l'étudiant
 
         **Type**:    integer
+
+        **Valeur par defaut:** 0
     """
 
     anglaisPremiere = models.DecimalField(
@@ -327,6 +341,8 @@ class Etudiant(Utilisateur):
         Note en anglais en classe de 1ere de l'étudiant
 
         **Type**:    integer
+
+        **Valeur par defaut:** 0
     """
 
     mathematiquePremiere = models.DecimalField(
@@ -336,6 +352,8 @@ class Etudiant(Utilisateur):
         Note en mathématiques en classe de 1ere de l'étudiant
 
         **Type**:    integer
+
+        **Valeur par defaut:** 0
     """
 
     etablissementTerminale = models.CharField(
@@ -345,6 +363,8 @@ class Etudiant(Utilisateur):
         Établissement de Terminale de l'étudiant
 
         **Type**:    string
+
+        **Nullable:** true
     """
 
     francaisTerminale = models.DecimalField(
@@ -354,6 +374,8 @@ class Etudiant(Utilisateur):
         Note en français en classe de Terminale de l'étudiant
 
         **Type**:    integer
+
+        **Valeur par defaut:** 0
     """
 
     anglaisTerminale = models.DecimalField(
@@ -363,6 +385,8 @@ class Etudiant(Utilisateur):
         Note en anglais en classe de Terminale de l'étudiant
 
         **Type**:    integer
+
+        **Valeur par defaut:** 0
     """
 
     mathematiqueTerminale = models.DecimalField(
@@ -372,6 +396,8 @@ class Etudiant(Utilisateur):
         Note en mathématiques en classe de Terminale de l'étudiant
 
         **Type**:    integer
+
+        **Valeur par defaut:** 0
     """
 
     delegue = models.BooleanField(
@@ -381,6 +407,8 @@ class Etudiant(Utilisateur):
         Attribut permettant de savoir si l'étudiant est le délégué de sa classe 
 
         **Type**:    boolean
+
+        **Valeur par défaut:** false
     """
 
     passer_semestre_suivant = models.BooleanField(
@@ -390,6 +418,8 @@ class Etudiant(Utilisateur):
         Permet de savoir si l'étudiant passe au semestre suivant
 
         **Type**:    boolean
+
+        **Valeur par défaut:** false
     """
 
     decision_conseil = models.TextField(
@@ -399,6 +429,8 @@ class Etudiant(Utilisateur):
         Décision du conseil sur lors du passage au niveau supérieur
 
         **Type**:    string
+
+        **Valeur par défaut:** Décision du conseil
     """
 
     profil = models.ImageField(
@@ -408,6 +440,8 @@ class Etudiant(Utilisateur):
         Photo de profil
 
         **Type**:    string
+
+        **Nullable:** true
     """
 
     semestres = models.ManyToManyField('Semestre', null=True)
@@ -416,6 +450,8 @@ class Etudiant(Utilisateur):
         Liste des semestres de l'étudiant
 
         **Type**:    list[Semestre]
+
+        **Nullable:** true
     """
 
     tuteurs = models.ManyToManyField(
@@ -425,6 +461,8 @@ class Etudiant(Utilisateur):
         Tuteurs de l'étudiant
 
         **Type**:    list[Tuteur]
+
+        **Nullable:** true
     """
 
     class Meta:
@@ -668,7 +706,6 @@ class Etudiant(Utilisateur):
 
 # Calcule le nombre de crédits obtenus par l'étudiant dans un semestre donné.
 
-
     def credits_obtenus_semestre(self, semestre):
         """
             Cette fonction permet de calculer le nombre de crédits obtenus dans le semestre donné.
@@ -878,14 +915,69 @@ def create_compte_etudiant(sender, instance, created, **kwargs):
 
 
 class Personnel(Utilisateur):
-    id = models.CharField(primary_key=True, blank=True, max_length=12, editable=False)
-    salaireBrut = models.DecimalField(max_digits=15, decimal_places=2,  verbose_name="Salaire Brut", default=0)
-    dernierdiplome = models.ImageField(null=True, blank=True, verbose_name="Dernier diplome")
-    nbreJrsCongesRestant = models.IntegerField(verbose_name="Nbre jours de congé restant", default=0)
-    nbreJrsConsomme = models.IntegerField(verbose_name="Nombre de jours consommé", default=0)
-    nombre_de_personnes_en_charge = models.IntegerField(verbose_name="Nbre de pers pris en charge", default=0)
-    
+
+    """
+        Classe Personnel, représentant les membres du personnel. Elle hérite de la classe Utilisateur
+    """
+
+    id = models.CharField(primary_key=True, blank=True,
+                          max_length=12, editable=False)
+    """
+        Identifiant de l'employé
+
+        **Type**:    string
+    """
+    salaireBrut = models.DecimalField(
+        max_digits=15, decimal_places=2,  verbose_name="Salaire Brut", default=0)
+    """
+        Salaire brut du membre du employé
+
+        **Type**:   Decimal
+
+        **Valeur par défaut:** 0
+    """
+    dernierdiplome = models.ImageField(
+        null=True, blank=True, verbose_name="Dernier diplome")
+    """
+        Dernier diplome obtenu par le membre du employé
+
+        **Type**:    string
+
+        **Nullable:** true
+    """
+    nbreJrsCongesRestant = models.IntegerField(
+        verbose_name="Nbre jours de congé restant", default=0)
+    """
+        Nombre de congés restants prennables par le membre du employé
+
+        **Type**:    integer
+
+        **Valeur par défaut:** 0
+    """
+    nbreJrsConsomme = models.IntegerField(
+        verbose_name="Nombre de jours consommé", default=0)
+    """
+        Nombre de jours de congés déjà consommés par l'employé
+
+        **Type**:    integer
+
+        **Valeur par défaut:** 0
+    """
+    nombre_de_personnes_en_charge = models.IntegerField(
+        verbose_name="Nbre de pers pris en charge", default=0)
+    """
+        Nombre de personnes prises en charge par l'employé
+
+        **Type**:    integer
+
+        **Valeur par défaut:** 0
+    """
+
     def save(self):
+        """
+        Fonction rattachant l'employé à un utilisateur lors de sa sauvegarde.
+
+        """
         print(f'----{self.id}----')
         if self.id == "" or self.id == None:
             username = (self.prenom + self.nom).lower()
@@ -898,6 +990,9 @@ class Personnel(Utilisateur):
         super().save()
 
     def update_conge_counts(self):
+        """
+        Fonction mettant à jour le nombre de congés disponibles pour l'employé
+        """
         # Ajoutez la condition de validation ici
         conges_pris = Conge.objects.filter(personnel=self, valider='Actif')
         total_jours_pris = conges_pris.aggregate(
@@ -908,12 +1003,28 @@ class Personnel(Utilisateur):
         self.save()
 
     def calculer_salaire_brut_annuel(self):
+        """
+        Fonction calculant le salaire brut annuel de l'employé
+
+        :return: Salaire brut annuel de l'employé
+
+        :retype: Decimal
+
+        """
         salaires = Salaire.objects.filter(personnel=self)
         total_salaire_brut_annuel = sum(
             salaire.calculer_salaire_brut_mensuel() for salaire in salaires)
         return total_salaire_brut_annuel
 
     def calculer_irpp_tcs_annuel(self):
+        """
+        Fonction calculant la cumulation annuelle de l'IRPP (Import sur le Revenu des Personnes Physiques) et de la TCS (Taxe Complémentaire sur le Salaire).
+
+        :return: Somme entre le IRPP annuel et le TCS annuel del'employé
+
+        :retype: Decimal
+        """
+
         salaires = Salaire.objects.filter(personnel=self)
         total_irpp_annuel = sum(salaire.calculer_irpp_mensuel()
                                 for salaire in salaires)
@@ -925,35 +1036,28 @@ class Personnel(Utilisateur):
         return total_irpp_tcs_annuel
 
     def calcule_deductions_cnss_annuel(self):
+        """
+        Fonction calculant la déduction annuelle de la CNSS sur le salaire de l'employé
+
+        :return: Total déduit par la cnss sur le salaire de l'employé au cours de l'année.
+
+        :retype: Decimal
+        """
+
         salaires = Salaire.objects.filter(personnel=self)
 
-        total_deductions_cnss = sum(salaire.calculer_deductions_cnss() for salaire in salaires)
-        #total_deductions_cnss = total_deductions_cnss.quantize(Decimal('0.00'), rounding=ROUND_DOWN) 
+        total_deductions_cnss = sum(
+            salaire.calculer_deductions_cnss() for salaire in salaires)
+        # total_deductions_cnss = total_deductions_cnss.quantize(Decimal('0.00'), rounding=ROUND_DOWN)
 
         return Decimal(total_deductions_cnss)
 
 
 class DirecteurDesEtudes(Personnel):
     """
-    Modèle représentant le directeur des études de l'organisation.
-
-    Attributes:
-        id (str): Identifiant unique du directeur des études.
-        nom (str): Nom du directeur des études.
-        prenom (str): Prénom du directeur des études.
-        email (str): Adresse e-mail du directeur des études.
-        is_active (bool): Indique si le directeur des études est actif ou non.
-
-    Methods:
-        save(*args, **kwargs): Enregistre le directeur des études dans la base de données.
-        delete(*args, **kwargs): Supprime le directeur des études de la base de données.
-        __str__(): Renvoie une représentation en chaîne du directeur des études.
-
-    Meta:
-        verbose_name = "Directeur des études"
-        verbose_name_plural = "Directeurs des études"
-
+        Cette classe hérite de la classe Personnel, elle correspont au Directeur des Études.
     """
+
     def save(self, *args, **kwargs):
         if not self.id:
             directeurs = DirecteurDesEtudes.objects.all()
@@ -991,29 +1095,32 @@ class DirecteurDesEtudes(Personnel):
         verbose_name = "Directeur des études"
         verbose_name_plural = "Directeurs des études"
 
+
 class Enseignant(Personnel):
     """
-    Modèle représentant un enseignant dans l'organisation.
-
-    Attributes:
-        id (str): Identifiant unique de l'enseignant.
-        nom (str): Nom de l'enseignant.
-        prenom (str): Prénom de l'enseignant.
-        email (str): Adresse e-mail de l'enseignant.
-        type (str): Type d'enseignant (vacataire ou permanent).
-        specialite (str): Spécialité de l'enseignant.
-
-    Methods:
-        save(force_insert=False, force_update=False, using=None): Enregistre l'enseignant dans la base de données.
-        niveaux(): Renvoie les niveaux d'enseignement de l'enseignant.
-        __str__(): Renvoie une représentation en chaîne de l'enseignant.
-
+    Cette classe hérite de la classe Personnel, elle représente les enseignants.
     """
     CHOIX_TYPE = (('Vacataire', 'Vacataire'), ('Permanent', 'Permanent'))
+
     type = models.CharField(null=True, blank=True,
                             max_length=9, choices=CHOIX_TYPE)
+    """
+        Définit le type d'enseignant qu'est l'employé: Vacataire ou Permanent
+
+        **Type:** string
+
+        **Nullable:** true
+    """
     specialite = models.CharField(
         max_length=300, verbose_name="Spécialité", blank=True, null=True)
+
+    """
+        Définit la spécialitée de l'enseignant
+
+        **Type:** string
+
+        **Nullable:** true
+    """
 
     def save(self, force_insert=False, force_update=False, using=None):
         if not self.id:
@@ -1045,6 +1152,13 @@ class Enseignant(Personnel):
         super().save()
 
     def niveaux(self):
+        """
+        Cette fonction donne l'ensemble des semestre au cours desquels l'enseignant intervient
+
+        :return: Liste de chaine de caractères contenant les libellé des semestres dans lesquels il intervient
+        :retype: list[string]
+
+        """
         matieres = self.matiere_set.all()
         niveaux = set()
         for matiere in matieres:
@@ -1061,6 +1175,9 @@ class Enseignant(Personnel):
 
 
 class Comptable(Personnel):
+    """
+    Cette classe hérite de la classe Personnel, elle représente les comptables.
+    """
     pass
 
     def save(self, force_insert=False, force_update=False, using=None):
@@ -1097,22 +1214,6 @@ class Tuteur(models.Model):
     """
     Modèle représentant un tuteur ou un parent d'un étudiant.
 
-    Attributes:
-        CHOIX_SEX (list): Liste des choix de sexe pour le tuteur.
-        CHOIX_TYPE (list): Liste des choix de type de tuteur (père, mère, tuteur).
-
-        nom (str): Nom du tuteur.
-        prenom (str): Prénom du tuteur.
-        sexe (str): Sexe du tuteur (F pour féminin, M pour masculin).
-        adresse (str): Adresse du tuteur.
-        contact (str): Numéro de contact du tuteur.
-        profession (str): Profession du tuteur.
-        type (str): Type de tuteur (père, mère, tuteur).
-
-    Methods:
-        save(): Enregistre le tuteur dans la base de données et crée un utilisateur associé.
-        __str__(): Renvoie une représentation en chaîne de caractères du tuteur.
-
     """
     CHOIX_SEX = [
         ("F", "Féminin"),
@@ -1124,14 +1225,49 @@ class Tuteur(models.Model):
         ("tuteur", "Tuteur"),
     ]
     nom = models.CharField(max_length=20)
+    """
+        Nom du responsable
+
+        **Type:** string
+    """
     prenom = models.CharField(max_length=20)
+    """
+        Prenom du responsable
+
+        **Type:** string
+    """
     sexe = models.CharField(blank=True, max_length=1, choices=CHOIX_SEX)
+    """
+        Sexe du responsable
+
+        **Type:** string
+    """
     adresse = models.CharField(
         blank=True, max_length=20, verbose_name="Adresse")
+    """
+        Adresse du responsable
+
+        **Type:** string
+    """
     contact = models.CharField(max_length=25)
+    """
+        Numéro de téléphone du responsable
+
+        **Type:** string
+    """
     profession = models.CharField(
         blank=True, max_length=20, verbose_name="Profession")
+    """
+        Profession du responsable
+
+        **Type:** string
+    """
     type = models.CharField(blank=True, max_length=20, choices=CHOIX_TYPE)
+    """
+        Type de tuteur: Père, Mère ou Tuteur
+
+        **Type:** string
+    """
 
     def save(self):
         # print(self.id)
@@ -1151,7 +1287,17 @@ class Tuteur(models.Model):
 
 class Ue(models.Model):
     codeUE = models.CharField(max_length=50, verbose_name="Code de l'UE")
+    """
+        Code de l'UE
+
+        **Type:** string
+    """
     libelle = models.CharField(max_length=100)
+    """
+        Nom du responsable
+
+        **Type:** string
+    """
     TYPES = [
         ("Technologie", "Technologie"),
         ("Communication", "Communication"),
@@ -1164,17 +1310,53 @@ class Ue(models.Model):
         ("3", "Doctorat")
     ]
     niveau = models.CharField(max_length=50, choices=TYPES_NIVEAU)
+    """
+        Niveau d'enseignement de l'UE
+
+        **Type:** string
+    """
     type = models.CharField(max_length=50, choices=TYPES)
+    """
+        Type de l'UE
+
+        **Type:** string
+    """
     nbreCredits = models.IntegerField(verbose_name="Nombre de crédit")
+    """
+        Nombre de crédits de l'UE
+
+        **Type:** integer
+    """
     heures = models.DecimalField(
         blank=True, max_digits=4, decimal_places=1, validators=[MinValueValidator(1)])
+    """
+        Total d'heures d'enseignement de l'UE
+
+        **Type:** Decimal
+    """
     enseignant = models.ForeignKey(
         'Enseignant', on_delete=models.CASCADE, verbose_name="Enseignant responsable", null=True, blank=True)
+    """
+        Identifiant de l'enseignant responsable de l'UE
+
+        **Type:** string
+
+        **Nullable:** true
+    """
 
     class Meta:
         verbose_name_plural = 'UE'
 
     def matiere_principacle(self):
+        """
+        Cette fonction donne la matière principale de l'UE
+
+        :return: Un objet Matière si l'UE à une matière principale au cas contraire None.
+
+        :retype: Matiere or None
+
+
+        """
         max_coef = self.matiere_set.all().aggregate(
             Max('coefficient'))['coefficient__max']
         matiere = self.matiere_set.filter(coefficient=max_coef)
@@ -1211,15 +1393,75 @@ def generate_ue_code(sender, instance, created, **kwargs):
 class Matiere(models.Model):
     codematiere = models.CharField(
         max_length=50, verbose_name="Code de la matière")
+    """
+        Code de la matière
+
+        **Type:** string
+    """
     libelle = models.CharField(max_length=100)
-    coefficient = models.IntegerField(null=True,  verbose_name="Coefficient", default="1")
-    minValue = models.FloatField(null=True,  verbose_name="Valeur minimale",  default="7")
-    heures = models.DecimalField(blank=True, max_digits=4, decimal_places=1, validators=[MinValueValidator(1)], null=True) 
-    abbreviation = models.CharField(max_length=10,default ="Short", unique=True)
-    enseignant = models.ForeignKey(Enseignant, blank=True, null=True, verbose_name="Enseignants responsable", on_delete=models.CASCADE)
-    #enseignants = models.ManyToManyField(Enseignant, related_name="EnseignantsMatiere", blank=True, null=True, verbose_name="Enseignants")
+    """
+        Libellé de la matière
+
+        **Type:** string
+    """
+    coefficient = models.IntegerField(
+        null=True,  verbose_name="Coefficient", default="1")
+    """
+        Coefficient de la matière
+
+        **Type:** integer
+
+        **Valeur par défaut:** 1
+    """
+    minValue = models.FloatField(
+        null=True,  verbose_name="Valeur minimale",  default="7")
+    """
+        Moyenne minimale pour valider la matière.
+
+        **Type:** float
+
+        **Valeur par défaut:** 7.0
+    """
+    heures = models.DecimalField(blank=True, max_digits=4, decimal_places=1, validators=[
+                                 MinValueValidator(1)], null=True)
+    """
+        Total d'heures d'enseignement de la matière
+
+        **Type:** Decimal
+    """
+    abbreviation = models.CharField(
+        max_length=10, default="Short", unique=True)
+    """
+        Nom de la matière abbrégé
+
+        **Type:** string
+
+        **Unique:** true
+    """
+    enseignant = models.ForeignKey(Enseignant, blank=True, null=True,
+                                   verbose_name="Enseignants responsable", on_delete=models.CASCADE)
+    """
+        Identifiant de l'enseignant responsable de la matière
+
+        **Type:** string
+
+        **Nullable:** true
+    """
+    # enseignants = models.ManyToManyField(Enseignant, related_name="EnseignantsMatiere", blank=True, null=True, verbose_name="Enseignants")
     ue = models.ForeignKey('Ue', on_delete=models.CASCADE)
+    """
+        Identifiant de l'UE de la matière
+
+        **Type:** string
+    """
     is_active = models.BooleanField(default=True, verbose_name="Actif")
+    """
+        Défini si la matière est enseignée ou non
+
+        **Type:** booelan
+
+        **Valeur par défaut:** true
+    """
 
     def save(self, *args, **kwargs):
         if not self.codematiere:
@@ -1232,6 +1474,21 @@ class Matiere(models.Model):
         super(Matiere, self).save(*args, **kwargs)
 
     def count_evaluations(self, annee, semestres):
+        """
+        Cette fonction donne le nombre d'évaluations faites au cours du semestre dans la matière
+
+        :param annee: AnneeUniversitaire
+        :type annee: AnneeUniversitaire
+
+        :param semestres: Liste de semestres
+        :type semestres: list[Semestre]
+
+        :return: Retourne le nombre d'évalution faites dans la matière.
+
+        :retype: integer
+
+
+        """
         return len(Evaluation.objects.filter(matiere=self, semestre__in=semestres))
 
     def __str__(self):
@@ -1241,14 +1498,34 @@ class Matiere(models.Model):
         verbose_name_plural = "Matières"
 
     def suspendre(self):
+        """
+        Cette fonction permet de suspendre la matiere.
+        """
+
         self.is_active = False
         self.save()
 
     def reactiver(self):
+        """
+        Cette fonction permet de ractiver la matière
+        """
+
         self.is_active = True
         self.save()
 
     def ponderation_restante(self, semestre):
+        """
+        Calcule la pondération disponible pour les évaluations dans la matière
+
+        :param semestre: Semestre d'enseignement de la matière
+        :type semestre: Semestre
+
+        :return: Retourne la pondération restante.
+
+        :retype: integer
+
+        """
+
         try:
             evaluations = Evaluation.objects.filter(
                 matiere=self, rattrapage=False, semestre=semestre)
@@ -1259,18 +1536,53 @@ class Matiere(models.Model):
             return -1
 
     def is_available_to_add_evaluation(self, semestre):
+        """
+        Verifie s'il est possible d'ajouter une évaluation en fonction de la pondération restante
+
+        :param semestre: Semestre d'enseignement de la matière
+        :type semestre: Semestre
+
+
+        :return: Retourne un booléen.
+
+        :retype: boolean
+
+
+        """
         return self.ponderation_restante(semestre=semestre) > 0
 
     def dans_semestre(self, semestre):
+        """
+        Verifie si la matière est enseignée dans le semestre donné
+
+        :param semestre: Semestre d'enseignement de la matière
+        :type semestre: Semestre
+
+
+        :return: Retourne un booléen.
+
+        :retype: boolean
+
+
+        """
         return semestre in self.get_semestres(semestre.annee_universitaire, type="__all__")
 
     def get_semestres(self, annee_selectionnee, type):
         """
-        Cette méthode retourne les semestres d'une matiere
-        type : __current__| __all__
-        annee_selectionnee : annee_selectionnee | __all__
-        # Passer plus tard le parcours
+        Cette méthode retourne tous les semestres dans lesquels sont enseignés la matière au cours d'une année universitaire donnée.
+
+        :param annee_selectionnee: Année universitaire de recherche
+        :type annee_selectionnee: AnneeUniversitaire ou __all__
+
+        :param type: Type de semestre
+        :type type: __current__ ou __all__
+
+        :return: Liste des semestres dans lesquels la matière est enseignée
+        :retype: list[Semestre]
+
         """
+
+        # Passer plus tard le parcours
         type_semestres = []
         if type == "__current__":
             type_semestres = [True]
@@ -1291,6 +1603,16 @@ class Matiere(models.Model):
         return semestres
 
     def get_etudiants_en_rattrapage(self):
+        """
+        Cette méthode donne les étudiants en rattrapage dans la matière.
+
+        :return: Liste des étudiants en rattrapage.
+        :retype: list[Etudiant]
+
+        """
+
+        # Passer plus tard le parcours
+
         etudiants = set()
         semestres = self.get_semestres('__all__', '__all__')
         for semestre in semestres:
@@ -1302,6 +1624,16 @@ class Matiere(models.Model):
         return list(etudiants)
 
     def get_etudiant_semestre(self, semestre):
+        """
+        Cette méthode donne les étudiants suivant la matière au cours du semestre donné
+        :param semestre: Semestre d'enseignement
+        :type semestre: Semestre
+
+
+        :return: Liste des semestres dans lesquels la matière est enseignée
+        :retype: list[Etudiant]
+
+        """
         return semestre.etudiant_set.all()
 
 # class EnseignantsMatiere(models.Model):
@@ -1312,12 +1644,60 @@ class Matiere(models.Model):
 
 class Evaluation(models.Model):
     libelle = models.CharField(max_length=258, verbose_name="Nom")
-    ponderation = models.IntegerField(default=1, verbose_name="Pondération (1-100)", validators=[MinValueValidator(1), MaxValueValidator(100)])
+    """
+        Nom de l'évaluation
+
+        **Type:** string
+
+    """
+    ponderation = models.IntegerField(
+        default=1, verbose_name="Pondération (1-100)", validators=[MinValueValidator(1), MaxValueValidator(100)])
+    """
+        Pondération de l'évaluation
+
+        **Type:** integer
+
+        **Valeur par défaut:** 1
+    """
     date = models.DateField(verbose_name="Date évaluation")
-    matiere = models.ForeignKey(Matiere, on_delete=models.CASCADE, verbose_name='Matiere')
-    etudiants = models.ManyToManyField(Etudiant, through='Note', verbose_name="Étudiants")
-    semestre = models.ForeignKey('Semestre', on_delete=models.CASCADE, null=True)
+    """
+        Date de l'évaluation
+
+        **Type:** string
+
+    """
+    matiere = models.ForeignKey(
+        Matiere, on_delete=models.CASCADE, verbose_name='Matiere')
+    """
+        Identifiant de la matière rattachée à l'évaluation
+
+        **Type:** string
+
+    """
+    etudiants = models.ManyToManyField(
+        Etudiant, through='Note', verbose_name="Étudiants")
+    """
+        Ensemble des étudiants ayant participés à l'evaluation
+
+        **Type:** list[Etudiant]
+
+    """
+    semestre = models.ForeignKey(
+        'Semestre', on_delete=models.CASCADE, null=True)
+    """
+        Semestre dans lequel l'évaluation à été réalisée
+
+        **Type:** Semestre
+
+    """
     rattrapage = models.BooleanField(verbose_name="Rattrapage", default=False)
+    """
+        Défini si l'évaluation est un rattrapage ou non
+
+        **Type:** boolean
+
+        **Valeur par défaut:** false
+    """
 
     def save(self, *args, **kwargs):
         if self.rattrapage:
@@ -1332,17 +1712,68 @@ class Evaluation(models.Model):
 
 
 class Competence(models.Model):
+    """
+        Classe compétence
+    """
     id = models.CharField(primary_key=True, blank=True, max_length=30)
+    """
+        Identifiant de la compétence
+
+        **Type:** string
+
+    """
     code = models.CharField(max_length=100)
+    """
+        Code de la compétence
+
+        **Type:** string
+
+    """
     libelle = models.CharField(max_length=100)
+    """
+        Nom de la compétence
+
+        **Type:** string
+
+    """
     ue = models.ForeignKey('Ue', on_delete=models.CASCADE, verbose_name="UE")
+    """
+        Identifiant de l'UE de la compétence
+
+        **Type:** string
+
+    """
     matiere = models.ForeignKey(
         'Matiere', on_delete=models.CASCADE, verbose_name="Matiere")
+    """
+        Identifiant de la matière de la compétence
+
+        **Type:** string
+
+    """
 
 
 class AnneeUniversitaire(models.Model):
-    annee = models.DecimalField(max_digits=4, decimal_places=0, verbose_name="Année universitaire")
-    annee_courante = models.BooleanField(default=False, verbose_name="Année universitaire acutuelle", null=True)
+    """
+        Cette classe représente l'année universitaire.
+    """
+    annee = models.DecimalField(
+        max_digits=4, decimal_places=0, verbose_name="Année universitaire")
+    """
+        Libellé de l'année universitaire
+
+        **Type:** string
+
+    """
+    annee_courante = models.BooleanField(
+        default=False, verbose_name="Année universitaire acutuelle", null=True)
+    """
+        Définit s'il s'agit de l'année en cours d'utilisation dans l'application
+
+        **Type:** string
+
+        **Valeur par défaut:** false
+    """
 
     def save(self, *args, **kwargs):
         annee = AnneeUniversitaire.objects.filter(annee=self.annee)
@@ -1352,13 +1783,26 @@ class AnneeUniversitaire(models.Model):
         self.generateSemeste()
 
     def disable(self):
+        """
+            Désactive une année universitaire et la définie plus comme année "courante"
+        """
         self.annee_courante = False
         self.save()
 
     def get_semestres(self):
+        """
+        Retourne les semestre de l'année universitaire
+
+        :retype: Une liste de semestres
+
+        :retype: list[Semestre]
+        """
         return self.semestre_set.all()
 
     def generateSemeste(self):
+        """
+            Génère tous les semestres de l'année universitaire
+        """
         courant = False
         for i in range(1, 7):
             courant = i in [1, 3, 5] and self.annee > 2022
@@ -1374,6 +1818,12 @@ class AnneeUniversitaire(models.Model):
 
     @staticmethod
     def static_get_current_annee_universitaire():
+        """
+            Méthode statique donnant l'année universitaire courante.
+
+            :return: Un objet AnneUniversitaire correspondant à l'année universitaire en cours
+            :retype: AnneeUniversitaire
+        """
         current_date = datetime.datetime.now()
         try:
             # Rechercher l'année accadémique courrante
@@ -1389,6 +1839,12 @@ class AnneeUniversitaire(models.Model):
 
     @staticmethod
     def getNiveau(semestre_libelle):
+        """
+            Méthode statique donnant le niveau correspondant à un semestre.
+
+            :return: Le nom correspondant au niveau du semestre.
+            :retype: string
+        """
         data = {'L1': ['S1', 'S2'], 'L2': ['S3', 'S4'], 'L3': ['S5', 'S6']}
         for key in data:
             if semestre_libelle in data[key]:
@@ -1547,9 +2003,12 @@ class Note(models.Model):
 
 
 class Frais(models.Model):
-    annee_universitaire = models.ForeignKey(AnneeUniversitaire, on_delete=models.CASCADE)
-    montant_inscription = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Frais d'inscription")
-    montant_scolarite = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Frais de scolarité")
+    annee_universitaire = models.ForeignKey(
+        AnneeUniversitaire, on_delete=models.CASCADE)
+    montant_inscription = models.DecimalField(
+        max_digits=10, decimal_places=2, verbose_name="Frais d'inscription")
+    montant_scolarite = models.DecimalField(
+        max_digits=10, decimal_places=2, verbose_name="Frais de scolarité")
 
     def __str__(self):
         return "Année universitaire: " + str(self.annee_universitaire) + "  Frais d'inscription : " + str(self.montant_inscription) + "     " + " Frais de scolarité : " + str(self.montant_scolarite)
@@ -1658,7 +2117,7 @@ class Salaire(models.Model):
         prime_forfaitaire (decimal): Le montant de la prime forfaitaire.
         acomptes (decimal): Le montant des acomptes versés au personnel.
         frais_prestations_familiale_salsalaire (decimal): Les frais de prestations familiales sur le salaire.
-        
+
     Methods:
         calculer_salaire_brut_annuel() -> decimal: Calcule le salaire brut annuel du personnel.
         calculer_salaire_brut_mensuel() -> decimal: Calcule le salaire brut mensuel du personnel.
@@ -1829,10 +2288,8 @@ class Salaire(models.Model):
         prime_forfaitaire = self.prime_forfaitaire
         acomptes = self.acomptes
 
-
-
-        salaire_brut =  self.calculer_salaire_brut_mensuel()
-        deductions = self.calculer_deductions_cnss() +Decimal(irpp) + tcs
+        salaire_brut = self.calculer_salaire_brut_mensuel()
+        deductions = self.calculer_deductions_cnss() + Decimal(irpp) + tcs
 
         salaire_net = salaire_brut - deductions
         pret = salaire_net - acomptes
@@ -1840,8 +2297,8 @@ class Salaire(models.Model):
         super(Salaire, self).save(*args, **kwargs)
 
     def __str__(self):
-        return str(self.personnel.nom) 
-    
+        return str(self.personnel.nom)
+
 
 class Fournisseur(models.Model):
     """
@@ -2131,4 +2588,4 @@ class Conge(models.Model):
         self.personnel.update_conge_counts()
 
     def __str__(self):
-        return str(self.personnel.nom) + "  " +  str(self.personnel.prenom) + "  " + str(self.nombre_de_jours_de_conge) 
+        return str(self.personnel.nom) + "  " + str(self.personnel.prenom) + "  " + str(self.nombre_de_jours_de_conge)
