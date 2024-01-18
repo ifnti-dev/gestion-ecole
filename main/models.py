@@ -1163,22 +1163,6 @@ class Tuteur(models.Model):
     """
     Modèle représentant un tuteur ou un parent d'un étudiant.
 
-    Attributes:
-        CHOIX_SEX (list): Liste des choix de sexe pour le tuteur.
-        CHOIX_TYPE (list): Liste des choix de type de tuteur (père, mère, tuteur).
-
-        nom (str): Nom du tuteur.
-        prenom (str): Prénom du tuteur.
-        sexe (str): Sexe du tuteur (F pour féminin, M pour masculin).
-        adresse (str): Adresse du tuteur.
-        contact (str): Numéro de contact du tuteur.
-        profession (str): Profession du tuteur.
-        type (str): Type de tuteur (père, mère, tuteur).
-
-    Methods:
-        save(): Enregistre le tuteur dans la base de données et crée un utilisateur associé.
-        __str__(): Renvoie une représentation en chaîne de caractères du tuteur.
-
     """
     CHOIX_SEX = [
         ("F", "Féminin"),
@@ -1190,14 +1174,49 @@ class Tuteur(models.Model):
         ("tuteur", "Tuteur"),
     ]
     nom = models.CharField(max_length=20)
+    """
+        Nom du responsable
+
+        **Type:** string
+    """
     prenom = models.CharField(max_length=20)
+    """
+        Prenom du responsable
+
+        **Type:** string
+    """
     sexe = models.CharField(blank=True, max_length=1, choices=CHOIX_SEX)
+    """
+        Sexe du responsable
+
+        **Type:** string
+    """
     adresse = models.CharField(
         blank=True, max_length=20, verbose_name="Adresse")
+    """
+        Adresse du responsable
+
+        **Type:** string
+    """
     contact = models.CharField(max_length=25)
+    """
+        Numéro de téléphone du responsable
+
+        **Type:** string
+    """
     profession = models.CharField(
         blank=True, max_length=20, verbose_name="Profession")
+    """
+        Profession du responsable
+
+        **Type:** string
+    """
     type = models.CharField(blank=True, max_length=20, choices=CHOIX_TYPE)
+    """
+        Type de tuteur: Père, Mère ou Tuteur
+
+        **Type:** string
+    """
 
     def save(self):
         # print(self.id)
