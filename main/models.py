@@ -85,7 +85,7 @@ class Utilisateur(models.Model):
     email = models.CharField(max_length=50, null=True)
 
     """
-        Email de ml'utilisateur
+        Email de l'utilisateur
 
         **Type**:    string
 
@@ -1712,12 +1712,45 @@ class Evaluation(models.Model):
 
 
 class Competence(models.Model):
+    """
+        Classe compétence
+    """
     id = models.CharField(primary_key=True, blank=True, max_length=30)
+    """
+        Identifiant de la compétence
+
+        **Type:** string
+
+    """
     code = models.CharField(max_length=100)
+    """
+        Code de la compétence
+
+        **Type:** string
+
+    """
     libelle = models.CharField(max_length=100)
+    """
+        Nom de la compétence
+
+        **Type:** string
+
+    """
     ue = models.ForeignKey('Ue', on_delete=models.CASCADE, verbose_name="UE")
+    """
+        Identifiant de l'UE de la compétence
+
+        **Type:** string
+
+    """
     matiere = models.ForeignKey(
         'Matiere', on_delete=models.CASCADE, verbose_name="Matiere")
+    """
+        Identifiant de la matière de la compétence
+
+        **Type:** string
+
+    """
 
 
 class AnneeUniversitaire(models.Model):
