@@ -75,7 +75,7 @@
 
                 {% for semestre in semestres %}
                 <tr>
-                    <td class="text-center font-size-sm">{{semestre.id}}</td>
+                    <td class="text-center font-size-sm"> <a href="/planning/summary/{{semestre.id}}" target="_blank">{{semestre.id}}</a></td>
                     <td class="font-w600 text-center font-size-sm">{{semestre.libelle}}</td>
                     <td class="text-center d-none d-sm-table-cell font-size-sm">
                         {{semestre.credits}}

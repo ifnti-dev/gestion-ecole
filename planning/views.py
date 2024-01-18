@@ -176,6 +176,28 @@ def sauvegarder(request):
             seance.save()
         
         return JsonResponse({'status':"reussite"})
+    
+def resume(request,semestreId):
+    semestre=Semestre.objects.filter(id=semestreId).first()
+    liste_absence={}
+    planning=Planning.objects.filter(semestre=semestre)
+    plannings=set()
+    for plan in planning:
+        plannings.add(SeancePlannifier.objects.filter(planning=plan))
+
+    seances= Seance.objects.filter(semestre=semestre)
+    for seance in seances :
+        if len(seance.eleves_presents) > 0 :
+            for eleve in seance.eleves_presents :
+                liste_absence[eleve.nom +' '+eleve.prenom] = 'Matiere : '+seance.matiere.libelle +' Date et Heure : '+seance.date_et_heure_debut +' à '+seance.date_et_heure_fin
+
+    #faire une boucle sur la liste d'absence et recenser le nombre d'absence par eleves present dans la liste 
+    #recuperer le nombre de fois qu'une matiere a ete plannifier et le nombre de fois qu'elle a été enregistrer comme realiser
+    #recuperer les date et heure des seance plannifier mais non enregistrer (facultatif)
+    #recuperer le nombre d'heure prevues et effectuer par matieres
+    #recuperer le nombre d'heure effectuer par enseignant (suite logique de la partie plus haut)
+     
+    return HttpResponse('en devellopement')
         
 
 def modifier(request):
@@ -188,10 +210,7 @@ def modifier(request):
         
         for event in events:
             title = event.get('title')
-            cleaned_title = re.sub(r'\s*\([^)]*\)$', '', title)
-            print(cleaned_title)
-            print(title)
-            matiere = Matiere.objects.filter(libelle=cleaned_title).first()
+            matiere = Matiere.objects.filter(libelle=title).first()
             professeur = matiere.enseignant  # Remplacez cela par le champ approprié
             old_seance=SeancePlannifier.objects.filter(
                 intitule=title,
@@ -309,10 +328,69 @@ def imprimer(request,planningId):
         if timeshot not in timeslots:
             timeslots.append(timeshot)
 
+#
+    schedule = {}
 
 
-    print(days)
-    print(timeslots)
+    # Populate the schedule dictionary with empty sub-dictionaries for each time slot
+    for time in timeslots:
+        schedule[time] = {}
+
+    # Populate the schedule with planning information
+    for plan in plannings:
+        time_slot = plan.timeshot  # Replace with your actual attribute for timeslot
+        day = plan.day  # Replace with your actual attribute for day
+
+        # Check if the time slot exists in the schedule dictionary
+        if time_slot in schedule:
+            # Check if the day exists in the sub-dictionary for the given time slot
+            if day in schedule[time_slot]:
+                # Append the planning information to the existing list for the day
+                schedule[time_slot][day].append({
+                    "intitule": plan.intitule,
+                    "professeur": plan.professeur.nom if plan.professeur else "No Professor"
+                })
+            else:
+                # Create a new list for the day and append the planning information
+                schedule[time_slot][day] = [{
+                    "intitule": plan.intitule,
+                    "professeur": plan.professeur.nom if plan.professeur else "No Professor"
+                }]
+        else:
+            # Handle the case where the time slot is not in the schedule (if needed)
+            pass
+
+    # Print the resulting schedule
+    for time_slot, days_data in schedule.items():
+        print(f"Time Slot: {time_slot}")
+        
+        for day, planning_info_list in days_data.items():
+            print(f"  Day: {day}")
+            
+            for planning_info in planning_info_list:
+                print(f"    Intitule: {planning_info['intitule']}, Professeur: {planning_info['professeur']}")
+
+
+
+    context = {'planning': schedule}          
+                    
+    latex_input = 'planning_week'
+    latex_ouput = 'planning_week_'+str(plan.semaine)+str(plan.semestre)
+    pdf_file ='planning_week_'+str(plan.semaine)+str(plan.semestre)
+
+    # génération du pdf
+    generate_pdf(context, latex_input, latex_ouput, pdf_file)
+
+    # visualisation du pdf dans le navigateur
+    with open('media/pdf/' + str(pdf_file) + '.pdf', 'rb') as f:
+        pdf_preview = f.read()
+        response = HttpResponse(pdf_preview, content_type='application/pdf')
+        response['Content-Disposition'] = 'inline;filename=pdf_file.pdf'
+        return response
+
+
+
+
 
 
 
