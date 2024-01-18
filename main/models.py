@@ -1340,6 +1340,8 @@ class Ue(models.Model):
         Identifiant de l'enseignant responsable de l'UE
 
         **Type:** string
+
+        **Nullable:** true
     """
 
     class Meta:
@@ -1442,6 +1444,8 @@ class Matiere(models.Model):
         Identifiant de l'enseignant responsable de la matière
 
         **Type:** string
+
+        **Nullable:** true
     """
     # enseignants = models.ManyToManyField(Enseignant, related_name="EnseignantsMatiere", blank=True, null=True, verbose_name="Enseignants")
     ue = models.ForeignKey('Ue', on_delete=models.CASCADE)
@@ -1455,6 +1459,8 @@ class Matiere(models.Model):
         Défini si la matière est enseignée ou non
 
         **Type:** booelan
+
+        **Valeur par défaut:** true
     """
 
     def save(self, *args, **kwargs):
