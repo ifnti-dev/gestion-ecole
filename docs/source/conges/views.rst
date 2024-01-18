@@ -1,6 +1,6 @@
 Vues
 ====
 
-.. automodule:: paiement.views
+.. automodule:: conges.views
     :members:
     :undoc-members:

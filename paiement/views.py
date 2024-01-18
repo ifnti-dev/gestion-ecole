@@ -16,7 +16,17 @@ from decimal import Decimal, ROUND_DOWN
 
 @login_required(login_url=settings.LOGIN_URL)
 def liste_frais(request, id_annee_selectionnee):
+    """
+    Affiche la liste des frais pour une année universitaire donnée.
 
+    :param request: L'objet HttpRequest utilisé pour effectuer la requête.
+    :param id_annee_selectionnee: L'ID de l'année universitaire sélectionnée.
+    :return: Un objet HttpResponse contenant le rendu de la page 'frais/liste_frais.html'.
+    :raises: Http404 si l'année universitaire sélectionnée n'est pas trouvée.
+
+    Cette vue récupère les frais associés à l'année universitaire spécifiée,
+    puis les renvoie au template 'frais/liste_frais.html' pour affichage.
+    """
     annee_universitaire = get_object_or_404(AnneeUniversitaire, pk=id_annee_selectionnee)
     current_annee = AnneeUniversitaire.static_get_current_annee_universitaire()
     frais = Frais.objects.filter(annee_universitaire = annee_universitaire)
@@ -76,12 +86,33 @@ def create_comptable(request, id=0):
 
 @login_required(login_url=settings.LOGIN_URL)
 def comptable_detail(request, id):
+    """
+    Affiche les informations détaillées d'un comptable donnée.
+
+    :param request: L'objet HttpRequest utilisé pour effectuer la requête.
+    :param id : L'ID du comptable sélectionné.
+    :return: Un objet HttpResponse contenant le rendu de la page 'comptables/comptable_detail.html'.
+
+    Cette vue récupère les informations détaillées d'un comptable spécifique,
+    puis les renvoie au template 'comptables/comptable_detail.html' pour affichage.
+    """
     comptable = get_object_or_404(Comptable, id=id)
     return render(request, 'comptables/comptable_detail.html', {'comptable': comptable})
 
 
 @login_required(login_url=settings.LOGIN_URL)
 def comptable_list(request):
+    """
+    Affiche la liste des comptables actifs.
+
+    Args: request: L'objet HttpRequest pour la requête entrante.
+    Returns: Un objet HttpResponse contenant le rendu HTML de la liste des comptables actifs.
+    Raises: Aucune exception n'est levée.
+
+    Cette vue récupèrela liste des comptables actifs,
+    puis les renvoie au template 'comptables/comptable_list.html' pour affichage.
+
+    """
     current_annee = AnneeUniversitaire.static_get_current_annee_universitaire()
     comptables = Comptable.objects.filter(is_active=True)
     context = {
@@ -92,6 +123,17 @@ def comptable_list(request):
 
 @login_required(login_url=settings.LOGIN_URL)
 def comptables_suspendu(request):
+    """
+    Affiche la liste des comptables inactifs.
+
+    Args: request: L'objet HttpRequest pour la requête entrante.
+    Returns: Un objet HttpResponse contenant le rendu HTML de la liste des comptables inactifs.
+    Raises: Aucune exception n'est levée.
+
+    Cette vue récupèrela liste des comptables inactifs,
+    puis les renvoie au template 'comptables/comptable_list.html' pour affichage.
+
+    """
     annee_universitaire_courante = AnneeUniversitaire.static_get_current_annee_universitaire()
     comptables = Comptable.objects.filter(is_active=False)
     context = {
@@ -103,6 +145,17 @@ def comptables_suspendu(request):
 
 @login_required(login_url=settings.LOGIN_URL)
 def liste_paiements(request, id_annee_selectionnee):
+    """
+    Affiche la liste des versements de frais de scolarité pour une année universitaire donnée.
+
+    :param request: L'objet HttpRequest utilisé pour effectuer la requête.
+    :param id_annee_selectionnee: L'ID de l'année universitaire sélectionnée.
+    :return: Un objet HttpResponse contenant le rendu de la page 'paiements/liste_paiements.html'.
+    :raises: Http404 si l'année universitaire sélectionnée n'est pas trouvée.
+
+    Cette vue récupère les versements de frais de scolarité  associés à l'année universitaire spécifiée,
+    puis les renvoie au template 'paiements/liste_paiements.html' pour affichage.
+    """
     annee_universitaire = get_object_or_404(AnneeUniversitaire, pk=id_annee_selectionnee)
     paiements = Paiement.objects.filter(annee_universitaire=annee_universitaire)
     context = {
@@ -238,6 +291,17 @@ def create_compte(request, id=0):
 
 @login_required(login_url=settings.LOGIN_URL)
 def compte_bancaire(request, id_annee_selectionnee):
+    """
+    Affiche les informations du compte bancaire pour une année universitaire donnée.
+
+    :param request: L'objet HttpRequest utilisé pour effectuer la requête.
+    :param id_annee_selectionnee: L'ID de l'année universitaire sélectionnée.
+    :return: Un objet HttpResponse contenant le rendu de la page 'compte_bancaire/compte_bancaire.html'.
+    :raises: Http404 si l'année universitaire sélectionnée n'est pas trouvée.
+
+    Cette vue récupère les frais associés à l'année universitaire spécifiée,
+    puis les renvoie au template 'compte_bancaire/compte_bancaire.html' pour affichage.
+    """
     semestres_annee = Semestre.objects.filter(annee_universitaire=id_annee_selectionnee)
     etudiants_annee = Etudiant.objects.filter(semestres__in=semestres_annee)
     paiements_annee = Paiement.objects.filter(etudiant__in=etudiants_annee)
@@ -359,6 +423,17 @@ def liste_etudiants(request, id_annee_selectionnee):
 #Méthode affichant le bilan annuel des paiements des frais scolaires
 @login_required(login_url=settings.LOGIN_URL)
 def bilan_paiements_annuel(request, id_annee_selectionnee):
+    """
+    Affiche en version pdf le bilan annuel des paiements effectués par les étudiants pour une année universitaire donnée.
+
+    Args:
+        request (HttpRequest): L'objet de requête HTTP utilisé par Django.
+        id_annee_selectionnee (int): L'identifiant de l'année universitaire sélectionnée.
+
+    Returns:HttpResponse: Une réponse HTTP contenant le bilan des paiements en format HTML.
+    Raises:AnneeUniversitaire.DoesNotExist: Si l'année universitaire avec l'ID donné n'existe pas.
+
+    """
     etudiants_annee = Etudiant.objects.filter(semestres__annee_universitaire=id_annee_selectionnee).distinct()
     annee_selectionnee = AnneeUniversitaire.objects.get(pk=id_annee_selectionnee)
     paiements = Paiement.objects.filter(annee_universitaire=id_annee_selectionnee)
@@ -420,6 +495,17 @@ def bilan_paiements_annuel(request, id_annee_selectionnee):
 
 @login_required(login_url=settings.LOGIN_URL)
 def les_bulletins_de_paye(request, id_annee_selectionnee):
+    """
+    Affiche la liste des bulletins de paie pour une année universitaire donnée.
+
+    :param request: L'objet HttpRequest utilisé pour effectuer la requête.
+    :param id_annee_selectionnee: L'ID de l'année universitaire sélectionnée.
+    :return: Un objet HttpResponse contenant le rendu de la page 'salaires/bulletins_de_paye.html'.
+    :raises: Http404 si l'année universitaire sélectionnée n'est pas trouvée.
+
+    Cette vue récupère les bulletins de paie associés à l'année universitaire spécifiée,
+    puis les renvoie au template 'salaires/bulletins_de_paye.html' pour affichage.
+    """
     annee_universitaire = get_object_or_404(AnneeUniversitaire, pk=id_annee_selectionnee)
     bulletins = Salaire.objects.filter(annee_universitaire=annee_universitaire)
     context = {
@@ -487,6 +573,16 @@ def delete_bulletin(request):
 
 
 def detail_bulletin(request, id):
+    """
+    Affiche les informations détaillées d'un bulletin de paie d'un employé donnée à savoir le salaire brut, les retenus CNSS, les primes, le salaire net à payer, etc...
+
+    :param request: L'objet HttpRequest utilisé pour effectuer la requête.
+    :param id : L'ID du bulletin de paie sélectionné.
+    :return: Un objet HttpResponse contenant le rendu de la page 'salaires/detail_bulletin.html'.
+
+    Cette vue récupère les informations détaillées d'un bulletin de paie d'un employé donnée,
+    puis les renvoie au template 'salaires/detail_bulletin.html' pour affichage.
+    """
     bulletin = get_object_or_404(Salaire, id=id)
     total_primes = bulletin.prime_efficacite + bulletin.prime_qualite + bulletin.frais_travaux_complementaires
     frais_prestations_familiale_salsalaire = bulletin.frais_prestations_familiale_salsalaire * bulletin.personnel.salaireBrut
@@ -522,6 +618,17 @@ def detail_bulletin(request, id):
 
 @login_required(login_url=settings.LOGIN_URL)
 def bulletin_de_paye(request, id):
+    """
+    Affiche en version pdf le bulletin de paie d'un employé donnée.
+
+    Args:
+        request (HttpRequest): L'objet de requête HTTP utilisé par Django.
+        id_annee_selectionnee (int): L'identifiant de l'année universitaire sélectionnée.
+
+    Returns:HttpResponse: Une réponse HTTP contenant le bilan des paiements en format HTML.
+    Raises:AnneeUniversitaire.DoesNotExist: Si l'année universitaire avec l'ID donné n'existe pas.
+
+    """
     bulletin = get_object_or_404(Salaire, id=id)
     total_primes = bulletin.prime_efficacite + bulletin.prime_qualite + bulletin.frais_travaux_complementaires
     frais_prestations_familiale_salsalaire = bulletin.frais_prestations_familiale_salsalaire * bulletin.personnel.salaireBrut
@@ -577,9 +684,19 @@ def bulletin_de_paye(request, id):
 
 
 
-
 @login_required(login_url=settings.LOGIN_URL)
 def liste_paiements_fournisseurs(request, id_annee_selectionnee):
+    """
+    Affiche la liste des versements effectués aux fournisseurs de services pour une année universitaire donnée.
+
+    :param request: L'objet HttpRequest utilisé pour effectuer la requête.
+    :param id_annee_selectionnee: L'ID de l'année universitaire sélectionnée.
+    :return: Un objet HttpResponse contenant le rendu de la page 'fournisseurs/liste_paiements_fournisseurs.html'.
+    :raises: Http404 si l'année universitaire sélectionnée n'est pas trouvée.
+
+    Cette vue récupère les versements effectués aux fournisseurs de services associés à l'année universitaire spécifiée,
+    puis les renvoie au template 'fournisseurs/liste_paiements_fournisseurs.html' pour affichage.
+    """
     annee_universitaire = get_object_or_404(AnneeUniversitaire, pk=id_annee_selectionnee)
     paiements_fournisseurs = Fournisseur.objects.filter(annee_universitaire=annee_universitaire)
     context = {
@@ -626,6 +743,17 @@ def enregistrer_paiement_fournisseur(request, id=0):
 
 @login_required(login_url=settings.LOGIN_URL)
 def liste_fiches_de_paie(request, id_annee_selectionnee):
+    """
+    Affiche la liste des fiches de paie pour une année universitaire donnée.
+
+    :param request: L'objet HttpRequest utilisé pour effectuer la requête.
+    :param id_annee_selectionnee: L'ID de l'année universitaire sélectionnée.
+    :return: Un objet HttpResponse contenant le rendu de la page 'fichePaies/fiche_de_paie_list.html'.
+    :raises: Http404 si l'année universitaire sélectionnée n'est pas trouvée.
+
+    Cette vue récupère les fiches de paie associés à l'année universitaire spécifiée,
+    puis les renvoie au template 'fichePaies/fiche_de_paie_list.html' pour affichage.
+    """
     annee_universitaire = get_object_or_404(AnneeUniversitaire, pk=id_annee_selectionnee)
     fiches = FicheDePaie.objects.filter(annee_universitaire=annee_universitaire)
     context = {
@@ -692,8 +820,14 @@ def enregistrer_fiche_de_paie(request, id=0):
 
 @login_required(login_url=settings.LOGIN_URL)
 def fiche_paie(request, id):
+    """
+    Affiche en version pdf la fiche de paie d'un employé donnée à savoir les identifiants de l'employé en question, la période de paie, le nombre d'heure travaillé, le salaire net à payer etc...
+
+    :param request: L'objet HttpRequest utilisé pour effectuer la requête.
+    :param id : L'ID de la fiche de paie sélectionné.
+
+    """
     fiche_paie = get_object_or_404(FicheDePaie, id=id)
-    
     context = {
         'fiche_paie': fiche_paie,
     }
@@ -713,6 +847,17 @@ def fiche_paie(request, id):
 
 @login_required(login_url=settings.LOGIN_URL)
 def liste_fiches_de_prise_en_charge(request, id_annee_selectionnee):
+    """
+    Affiche la liste des fiches de prise en charge des volontaires pour une année universitaire donnée.
+
+    :param request: L'objet HttpRequest utilisé pour effectuer la requête.
+    :param id_annee_selectionnee: L'ID de l'année universitaire sélectionnée.
+    :return: Un objet HttpResponse contenant le rendu de la page 'charges/liste_fiches_de_prise_en_charge.html'.
+    :raises: Http404 si l'année universitaire sélectionnée n'est pas trouvée.
+
+    Cette vue récupère les fiches de prise en charge des volontaires associés à l'année universitaire spécifiée,
+    puis les renvoie au template 'charges/liste_fiches_de_prise_en_charge.html' pour affichage.
+    """
     annee_universitaire = get_object_or_404(AnneeUniversitaire, pk=id_annee_selectionnee)
     fiches = Charge.objects.filter(annee_universitaire=annee_universitaire)
     context = {
@@ -777,8 +922,14 @@ def enregistrer_fiche_de_prise_en_charge(request, id=0):
 
 @login_required(login_url=settings.LOGIN_URL)
 def fiche_de_charge(request, id):
+    """
+    Affiche en version pdf la fiche de prise en charge d'un employé donnée à savoir les identifiants de l'employé en question, les frais de vie, les frais de nourriture etc...
+
+    :param request: L'objet HttpRequest utilisé pour effectuer la requête.
+    :param id : L'ID de la fiche de paie sélectionné.
+
+    """
     fiche_de_charge = get_object_or_404(Charge, id=id)
-    
     context = {
         'fiche_de_charge': fiche_de_charge,
     }
