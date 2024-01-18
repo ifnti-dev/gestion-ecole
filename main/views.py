@@ -39,6 +39,7 @@ def dashboard(request):
         }
 
         return render(request, 'dashboard.html', context=data)
+    return render(request, 'dashboard.html')
     
     return render(request, 'dashboard.html')
     # elif request.user.groups.all().first().name =='etudiant' :
