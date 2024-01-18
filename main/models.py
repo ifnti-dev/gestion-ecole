@@ -1108,6 +1108,8 @@ class Enseignant(Personnel):
         Définit le type d'enseignant qu'est l'employé: Vacataire ou Permanent
 
         **Type:** string
+
+        **Nullable:** true
     """
     specialite = models.CharField(
         max_length=300, verbose_name="Spécialité", blank=True, null=True)
@@ -1116,6 +1118,8 @@ class Enseignant(Personnel):
         Définit la spécialitée de l'enseignant
 
         **Type:** string
+
+        **Nullable:** true
     """
 
     def save(self, force_insert=False, force_update=False, using=None):
