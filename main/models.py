@@ -878,14 +878,59 @@ def create_compte_etudiant(sender, instance, created, **kwargs):
 
 
 class Personnel(Utilisateur):
-    id = models.CharField(primary_key=True, blank=True, max_length=12, editable=False)
-    salaireBrut = models.DecimalField(max_digits=15, decimal_places=2,  verbose_name="Salaire Brut", default=0)
-    dernierdiplome = models.ImageField(null=True, blank=True, verbose_name="Dernier diplome")
-    nbreJrsCongesRestant = models.IntegerField(verbose_name="Nbre jours de congé restant", default=0)
-    nbreJrsConsomme = models.IntegerField(verbose_name="Nombre de jours consommé", default=0)
-    nombre_de_personnes_en_charge = models.IntegerField(verbose_name="Nbre de pers pris en charge", default=0)
-    
+
+    """
+        Classe Personnel, représentant les membres du personnel. Elle hérite de la classe Utilisateur
+    """
+
+    id = models.CharField(primary_key=True, blank=True,
+                          max_length=12, editable=False)
+    """
+        Identifiant de l'employé
+
+        **Type**:    string
+    """
+    salaireBrut = models.DecimalField(
+        max_digits=15, decimal_places=2,  verbose_name="Salaire Brut", default=0)
+    """
+        Salaire brut du membre du employé
+
+        **Type**:   Decimal
+    """
+    dernierdiplome = models.ImageField(
+        null=True, blank=True, verbose_name="Dernier diplome")
+    """
+        Dernier diplome obtenu par le membre du employé
+
+        **Type**:    string
+    """
+    nbreJrsCongesRestant = models.IntegerField(
+        verbose_name="Nbre jours de congé restant", default=0)
+    """
+        Nombre de congés restants prennables par le membre du employé
+
+        **Type**:    integer
+    """
+    nbreJrsConsomme = models.IntegerField(
+        verbose_name="Nombre de jours consommé", default=0)
+    """
+        Nombre de jours de congés déjà consommés par l'employé
+
+        **Type**:    integer
+    """
+    nombre_de_personnes_en_charge = models.IntegerField(
+        verbose_name="Nbre de pers pris en charge", default=0)
+    """
+        Nombre de personnes prises en charge par l'employé
+
+        **Type**:    integer
+    """
+
     def save(self):
+        """
+        Fonction rattachant l'employé à un utilisateur lors de sa sauvegarde.
+
+        """
         print(f'----{self.id}----')
         if self.id == "" or self.id == None:
             username = (self.prenom + self.nom).lower()
@@ -898,6 +943,9 @@ class Personnel(Utilisateur):
         super().save()
 
     def update_conge_counts(self):
+        """
+        Fonction mettant à jour le nombre de congés disponibles pour l'employé
+        """
         # Ajoutez la condition de validation ici
         conges_pris = Conge.objects.filter(personnel=self, valider='Actif')
         total_jours_pris = conges_pris.aggregate(
@@ -908,12 +956,28 @@ class Personnel(Utilisateur):
         self.save()
 
     def calculer_salaire_brut_annuel(self):
+        """
+        Fonction calculant le salaire brut annuel de l'employé
+
+        :return: Salaire brut annuel de l'employé
+
+        :retype: Decimal
+
+        """
         salaires = Salaire.objects.filter(personnel=self)
         total_salaire_brut_annuel = sum(
             salaire.calculer_salaire_brut_mensuel() for salaire in salaires)
         return total_salaire_brut_annuel
 
     def calculer_irpp_tcs_annuel(self):
+        """
+        Fonction calculant la cumulation annuelle de l'IRPP (Import sur le Revenu des Personnes Physiques) et de la TCS (Taxe Complémentaire sur le Salaire).
+
+        :return: Somme entre le IRPP annuel et le TCS annuel del'employé
+
+        :retype: Decimal
+        """
+
         salaires = Salaire.objects.filter(personnel=self)
         total_irpp_annuel = sum(salaire.calculer_irpp_mensuel()
                                 for salaire in salaires)
@@ -925,35 +989,28 @@ class Personnel(Utilisateur):
         return total_irpp_tcs_annuel
 
     def calcule_deductions_cnss_annuel(self):
+        """
+        Fonction calculant la déduction annuelle de la CNSS sur le salaire de l'employé
+
+        :return: Total déduit par la cnss sur le salaire de l'employé au cours de l'année.
+
+        :retype: Decimal
+        """
+
         salaires = Salaire.objects.filter(personnel=self)
 
-        total_deductions_cnss = sum(salaire.calculer_deductions_cnss() for salaire in salaires)
-        #total_deductions_cnss = total_deductions_cnss.quantize(Decimal('0.00'), rounding=ROUND_DOWN) 
+        total_deductions_cnss = sum(
+            salaire.calculer_deductions_cnss() for salaire in salaires)
+        # total_deductions_cnss = total_deductions_cnss.quantize(Decimal('0.00'), rounding=ROUND_DOWN)
 
         return Decimal(total_deductions_cnss)
 
 
 class DirecteurDesEtudes(Personnel):
     """
-    Modèle représentant le directeur des études de l'organisation.
-
-    Attributes:
-        id (str): Identifiant unique du directeur des études.
-        nom (str): Nom du directeur des études.
-        prenom (str): Prénom du directeur des études.
-        email (str): Adresse e-mail du directeur des études.
-        is_active (bool): Indique si le directeur des études est actif ou non.
-
-    Methods:
-        save(*args, **kwargs): Enregistre le directeur des études dans la base de données.
-        delete(*args, **kwargs): Supprime le directeur des études de la base de données.
-        __str__(): Renvoie une représentation en chaîne du directeur des études.
-
-    Meta:
-        verbose_name = "Directeur des études"
-        verbose_name_plural = "Directeurs des études"
-
+        Cette classe hérite de la classe Personnel, elle correspont au Directeur des Études.
     """
+
     def save(self, *args, **kwargs):
         if not self.id:
             directeurs = DirecteurDesEtudes.objects.all()
@@ -991,29 +1048,28 @@ class DirecteurDesEtudes(Personnel):
         verbose_name = "Directeur des études"
         verbose_name_plural = "Directeurs des études"
 
+
 class Enseignant(Personnel):
     """
-    Modèle représentant un enseignant dans l'organisation.
-
-    Attributes:
-        id (str): Identifiant unique de l'enseignant.
-        nom (str): Nom de l'enseignant.
-        prenom (str): Prénom de l'enseignant.
-        email (str): Adresse e-mail de l'enseignant.
-        type (str): Type d'enseignant (vacataire ou permanent).
-        specialite (str): Spécialité de l'enseignant.
-
-    Methods:
-        save(force_insert=False, force_update=False, using=None): Enregistre l'enseignant dans la base de données.
-        niveaux(): Renvoie les niveaux d'enseignement de l'enseignant.
-        __str__(): Renvoie une représentation en chaîne de l'enseignant.
-
+    Cette classe hérite de la classe Personnel, elle représente les enseignants.
     """
     CHOIX_TYPE = (('Vacataire', 'Vacataire'), ('Permanent', 'Permanent'))
+
     type = models.CharField(null=True, blank=True,
                             max_length=9, choices=CHOIX_TYPE)
+    """
+        Définit le type d'enseignant qu'est l'employé: Vacataire ou Permanent
+
+        **Type:** string
+    """
     specialite = models.CharField(
         max_length=300, verbose_name="Spécialité", blank=True, null=True)
+
+    """
+        Définit la spécialitée de l'enseignant
+
+        **Type:** string
+    """
 
     def save(self, force_insert=False, force_update=False, using=None):
         if not self.id:
@@ -1045,6 +1101,13 @@ class Enseignant(Personnel):
         super().save()
 
     def niveaux(self):
+        """
+        Cette fonction donne l'ensemble des semestre au cours desquels l'enseignant intervient
+
+        :return: Liste de chaine de caractères contenant les libellé des semestres dans lesquels il intervient
+        :retype: list[string]
+
+        """
         matieres = self.matiere_set.all()
         niveaux = set()
         for matiere in matieres:
@@ -1061,6 +1124,9 @@ class Enseignant(Personnel):
 
 
 class Comptable(Personnel):
+    """
+    Cette classe hérite de la classe Personnel, elle représente les comptables.
+    """
     pass
 
     def save(self, force_insert=False, force_update=False, using=None):
@@ -1212,12 +1278,17 @@ class Matiere(models.Model):
     codematiere = models.CharField(
         max_length=50, verbose_name="Code de la matière")
     libelle = models.CharField(max_length=100)
-    coefficient = models.IntegerField(null=True,  verbose_name="Coefficient", default="1")
-    minValue = models.FloatField(null=True,  verbose_name="Valeur minimale",  default="7")
-    heures = models.DecimalField(blank=True, max_digits=4, decimal_places=1, validators=[MinValueValidator(1)], null=True) 
-    abbreviation = models.CharField(max_length=10,default ="Short", unique=True)
-    enseignant = models.ForeignKey(Enseignant, blank=True, null=True, verbose_name="Enseignants responsable", on_delete=models.CASCADE)
-    #enseignants = models.ManyToManyField(Enseignant, related_name="EnseignantsMatiere", blank=True, null=True, verbose_name="Enseignants")
+    coefficient = models.IntegerField(
+        null=True,  verbose_name="Coefficient", default="1")
+    minValue = models.FloatField(
+        null=True,  verbose_name="Valeur minimale",  default="7")
+    heures = models.DecimalField(blank=True, max_digits=4, decimal_places=1, validators=[
+                                 MinValueValidator(1)], null=True)
+    abbreviation = models.CharField(
+        max_length=10, default="Short", unique=True)
+    enseignant = models.ForeignKey(Enseignant, blank=True, null=True,
+                                   verbose_name="Enseignants responsable", on_delete=models.CASCADE)
+    # enseignants = models.ManyToManyField(Enseignant, related_name="EnseignantsMatiere", blank=True, null=True, verbose_name="Enseignants")
     ue = models.ForeignKey('Ue', on_delete=models.CASCADE)
     is_active = models.BooleanField(default=True, verbose_name="Actif")
 
@@ -1312,11 +1383,15 @@ class Matiere(models.Model):
 
 class Evaluation(models.Model):
     libelle = models.CharField(max_length=258, verbose_name="Nom")
-    ponderation = models.IntegerField(default=1, verbose_name="Pondération (1-100)", validators=[MinValueValidator(1), MaxValueValidator(100)])
+    ponderation = models.IntegerField(
+        default=1, verbose_name="Pondération (1-100)", validators=[MinValueValidator(1), MaxValueValidator(100)])
     date = models.DateField(verbose_name="Date évaluation")
-    matiere = models.ForeignKey(Matiere, on_delete=models.CASCADE, verbose_name='Matiere')
-    etudiants = models.ManyToManyField(Etudiant, through='Note', verbose_name="Étudiants")
-    semestre = models.ForeignKey('Semestre', on_delete=models.CASCADE, null=True)
+    matiere = models.ForeignKey(
+        Matiere, on_delete=models.CASCADE, verbose_name='Matiere')
+    etudiants = models.ManyToManyField(
+        Etudiant, through='Note', verbose_name="Étudiants")
+    semestre = models.ForeignKey(
+        'Semestre', on_delete=models.CASCADE, null=True)
     rattrapage = models.BooleanField(verbose_name="Rattrapage", default=False)
 
     def save(self, *args, **kwargs):
@@ -1341,8 +1416,10 @@ class Competence(models.Model):
 
 
 class AnneeUniversitaire(models.Model):
-    annee = models.DecimalField(max_digits=4, decimal_places=0, verbose_name="Année universitaire")
-    annee_courante = models.BooleanField(default=False, verbose_name="Année universitaire acutuelle", null=True)
+    annee = models.DecimalField(
+        max_digits=4, decimal_places=0, verbose_name="Année universitaire")
+    annee_courante = models.BooleanField(
+        default=False, verbose_name="Année universitaire acutuelle", null=True)
 
     def save(self, *args, **kwargs):
         annee = AnneeUniversitaire.objects.filter(annee=self.annee)
@@ -1547,9 +1624,12 @@ class Note(models.Model):
 
 
 class Frais(models.Model):
-    annee_universitaire = models.ForeignKey(AnneeUniversitaire, on_delete=models.CASCADE)
-    montant_inscription = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Frais d'inscription")
-    montant_scolarite = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Frais de scolarité")
+    annee_universitaire = models.ForeignKey(
+        AnneeUniversitaire, on_delete=models.CASCADE)
+    montant_inscription = models.DecimalField(
+        max_digits=10, decimal_places=2, verbose_name="Frais d'inscription")
+    montant_scolarite = models.DecimalField(
+        max_digits=10, decimal_places=2, verbose_name="Frais de scolarité")
 
     def __str__(self):
         return "Année universitaire: " + str(self.annee_universitaire) + "  Frais d'inscription : " + str(self.montant_inscription) + "     " + " Frais de scolarité : " + str(self.montant_scolarite)
@@ -1658,7 +1738,7 @@ class Salaire(models.Model):
         prime_forfaitaire (decimal): Le montant de la prime forfaitaire.
         acomptes (decimal): Le montant des acomptes versés au personnel.
         frais_prestations_familiale_salsalaire (decimal): Les frais de prestations familiales sur le salaire.
-        
+
     Methods:
         calculer_salaire_brut_annuel() -> decimal: Calcule le salaire brut annuel du personnel.
         calculer_salaire_brut_mensuel() -> decimal: Calcule le salaire brut mensuel du personnel.
@@ -1829,10 +1909,8 @@ class Salaire(models.Model):
         prime_forfaitaire = self.prime_forfaitaire
         acomptes = self.acomptes
 
-
-
-        salaire_brut =  self.calculer_salaire_brut_mensuel()
-        deductions = self.calculer_deductions_cnss() +Decimal(irpp) + tcs
+        salaire_brut = self.calculer_salaire_brut_mensuel()
+        deductions = self.calculer_deductions_cnss() + Decimal(irpp) + tcs
 
         salaire_net = salaire_brut - deductions
         pret = salaire_net - acomptes
@@ -1840,8 +1918,8 @@ class Salaire(models.Model):
         super(Salaire, self).save(*args, **kwargs)
 
     def __str__(self):
-        return str(self.personnel.nom) 
-    
+        return str(self.personnel.nom)
+
 
 class Fournisseur(models.Model):
     """
@@ -2131,4 +2209,4 @@ class Conge(models.Model):
         self.personnel.update_conge_counts()
 
     def __str__(self):
-        return str(self.personnel.nom) + "  " +  str(self.personnel.prenom) + "  " + str(self.nombre_de_jours_de_conge) 
+        return str(self.personnel.nom) + "  " + str(self.personnel.prenom) + "  " + str(self.nombre_de_jours_de_conge)
