@@ -220,6 +220,8 @@ class Etudiant(Utilisateur):
         Série de l'étudiant en 1ere
 
         **Type**:    string
+
+        **Nullable:** true
     """
 
     seriebac2 = models.CharField(
@@ -229,6 +231,8 @@ class Etudiant(Utilisateur):
         Série de l'étudiant en Terminale
 
         **Type**:    string
+
+        **Nullable:** true
     """
 
     anneeentree = models.IntegerField(default=datetime.date.today(
@@ -238,6 +242,8 @@ class Etudiant(Utilisateur):
         Série de l'étudiant en Terminale
 
         **Type**:    string
+
+        **Nullable:** true
     """
 
     anneebac1 = models.IntegerField(
@@ -247,6 +253,8 @@ class Etudiant(Utilisateur):
         Année d'obtention du BAC 1
 
         **Type**:    integer
+
+        **Nullable:** true
     """
 
     anneebac2 = models.IntegerField(
@@ -267,6 +275,8 @@ class Etudiant(Utilisateur):
         Établissement de 2nde de l'étudiant
 
         **Type**:    string
+
+        **Nullable:** true
     """
 
     francaisSeconde = models.DecimalField(
@@ -309,6 +319,8 @@ class Etudiant(Utilisateur):
         Établissement de 1ere de l'étudiant
 
         **Type**:    string
+
+        **Nullable:** true
     """
 
     francaisPremiere = models.DecimalField(
@@ -351,6 +363,8 @@ class Etudiant(Utilisateur):
         Établissement de Terminale de l'étudiant
 
         **Type**:    string
+
+        **Nullable:** true
     """
 
     francaisTerminale = models.DecimalField(
@@ -393,6 +407,8 @@ class Etudiant(Utilisateur):
         Attribut permettant de savoir si l'étudiant est le délégué de sa classe 
 
         **Type**:    boolean
+
+        **Valeur par défaut:** false
     """
 
     passer_semestre_suivant = models.BooleanField(
@@ -402,6 +418,8 @@ class Etudiant(Utilisateur):
         Permet de savoir si l'étudiant passe au semestre suivant
 
         **Type**:    boolean
+
+        **Valeur par défaut:** false
     """
 
     decision_conseil = models.TextField(
@@ -422,6 +440,8 @@ class Etudiant(Utilisateur):
         Photo de profil
 
         **Type**:    string
+
+        **Nullable:** true
     """
 
     semestres = models.ManyToManyField('Semestre', null=True)
@@ -430,6 +450,8 @@ class Etudiant(Utilisateur):
         Liste des semestres de l'étudiant
 
         **Type**:    list[Semestre]
+
+        **Nullable:** true
     """
 
     tuteurs = models.ManyToManyField(
@@ -439,6 +461,8 @@ class Etudiant(Utilisateur):
         Tuteurs de l'étudiant
 
         **Type**:    list[Tuteur]
+
+        **Nullable:** true
     """
 
     class Meta:
