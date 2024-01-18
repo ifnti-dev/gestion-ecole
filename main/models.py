@@ -942,6 +942,8 @@ class Personnel(Utilisateur):
         Dernier diplome obtenu par le membre du employé
 
         **Type**:    string
+
+        **Nullable:** true
     """
     nbreJrsCongesRestant = models.IntegerField(
         verbose_name="Nbre jours de congé restant", default=0)
