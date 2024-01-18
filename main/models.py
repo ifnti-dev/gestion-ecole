@@ -59,6 +59,8 @@ class Utilisateur(models.Model):
         Date de naissance de l'utilisateur
 
         **Type**:    string
+
+        **Nullable:** true
     """
 
     lieunaissance = models.CharField(
@@ -76,6 +78,8 @@ class Utilisateur(models.Model):
         Numéro de téléphone de l'utilisateur
 
         **Type**:    string
+
+        **Nullable:** true
     """
 
     email = models.CharField(max_length=50, null=True)
@@ -84,6 +88,8 @@ class Utilisateur(models.Model):
         Email de ml'utilisateur
 
         **Type**:    string
+
+        **Nullable:** true
     """
 
     adresse = models.CharField(max_length=50, null=True)
@@ -92,6 +98,8 @@ class Utilisateur(models.Model):
         Adresse de l'utilisateur
 
         **Type**:    string
+
+        **Nullable:** true
     """
 
     prefecture = models.CharField(
@@ -112,6 +120,8 @@ class Utilisateur(models.Model):
         Statut de l'utilisateur (actif ou inactif)
 
         **Type**:    string
+
+        **Valeur par défaut:** true
     """
 
     carte_identity = models.CharField(
@@ -121,6 +131,8 @@ class Utilisateur(models.Model):
         Carte d'identitée de l'utilisateur    
     
         **Type**:    string
+
+        **Nullable:** true
     """
 
     nationalite = models.CharField(
@@ -130,6 +142,8 @@ class Utilisateur(models.Model):
         Attestation de nationalité de l'utilisateur
 
         **Type**:    string
+
+        **Valeur par défaut:** Togolaise
     """
 
     user = models.OneToOneField(
@@ -665,7 +679,6 @@ class Etudiant(Utilisateur):
 
 
 # Calcule le nombre de crédits obtenus par l'étudiant dans un semestre donné.
-
 
     def credits_obtenus_semestre(self, semestre):
         """
@@ -1362,18 +1375,18 @@ class Matiere(models.Model):
     """
         Coefficient de la matière
 
-        **Valeur par défaut:** 1
-
         **Type:** integer
+
+        **Valeur par défaut:** 1
     """
     minValue = models.FloatField(
         null=True,  verbose_name="Valeur minimale",  default="7")
     """
         Moyenne minimale pour valider la matière.
 
-        **Valeur par défaut:** 7
-
         **Type:** float
+
+        **Valeur par défaut:** 7.0
     """
     heures = models.DecimalField(blank=True, max_digits=4, decimal_places=1, validators=[
                                  MinValueValidator(1)], null=True)
@@ -1385,29 +1398,31 @@ class Matiere(models.Model):
     abbreviation = models.CharField(
         max_length=10, default="Short", unique=True)
     """
-        
+        Nom de la matière abbrégé
 
-        **Type:** Decimal
+        **Type:** string
+
+        **Unique:** true
     """
     enseignant = models.ForeignKey(Enseignant, blank=True, null=True,
                                    verbose_name="Enseignants responsable", on_delete=models.CASCADE)
     """
-        Total d'heures d'enseignement de l'UE
+        Identifiant de l'enseignant responsable de la matière
 
-        **Type:** Decimal
+        **Type:** string
     """
     # enseignants = models.ManyToManyField(Enseignant, related_name="EnseignantsMatiere", blank=True, null=True, verbose_name="Enseignants")
     ue = models.ForeignKey('Ue', on_delete=models.CASCADE)
     """
-        Total d'heures d'enseignement de l'UE
+        Identifiant de l'UE de la matière
 
-        **Type:** Decimal
+        **Type:** string
     """
     is_active = models.BooleanField(default=True, verbose_name="Actif")
     """
-        Total d'heures d'enseignement de l'UE
+        Défini si la matière est enseignée ou non
 
-        **Type:** Decimal
+        **Type:** booelan
     """
 
     def save(self, *args, **kwargs):
@@ -1421,6 +1436,21 @@ class Matiere(models.Model):
         super(Matiere, self).save(*args, **kwargs)
 
     def count_evaluations(self, annee, semestres):
+        """
+        Cette fonction donne le nombre d'évaluations faites au cours du semestre dans la matière
+
+        :param annee: AnneeUniversitaire
+        :type annee: AnneeUniversitaire
+
+        :param semestres: Liste de semestres
+        :type semestres: list[Semestre]
+
+        :return: Retourne le nombre d'évalution faites dans la matière.
+
+        :retype: integer
+
+
+        """
         return len(Evaluation.objects.filter(matiere=self, semestre__in=semestres))
 
     def __str__(self):
@@ -1430,14 +1460,34 @@ class Matiere(models.Model):
         verbose_name_plural = "Matières"
 
     def suspendre(self):
+        """
+        Cette fonction permet de suspendre la matiere.
+        """
+
         self.is_active = False
         self.save()
 
     def reactiver(self):
+        """
+        Cette fonction permet de ractiver la matière
+        """
+
         self.is_active = True
         self.save()
 
     def ponderation_restante(self, semestre):
+        """
+        Calcule la pondération disponible pour les évaluations dans la matière
+
+        :param semestre: Semestre d'enseignement de la matière
+        :type semestre: Semestre
+
+        :return: Retourne la pondération restante.
+
+        :retype: integer
+
+        """
+
         try:
             evaluations = Evaluation.objects.filter(
                 matiere=self, rattrapage=False, semestre=semestre)
@@ -1448,18 +1498,53 @@ class Matiere(models.Model):
             return -1
 
     def is_available_to_add_evaluation(self, semestre):
+        """
+        Verifie s'il est possible d'ajouter une évaluation en fonction de la pondération restante
+
+        :param semestre: Semestre d'enseignement de la matière
+        :type semestre: Semestre
+
+
+        :return: Retourne un booléen.
+
+        :retype: boolean
+
+
+        """
         return self.ponderation_restante(semestre=semestre) > 0
 
     def dans_semestre(self, semestre):
+        """
+        Verifie si la matière est enseignée dans le semestre donné
+
+        :param semestre: Semestre d'enseignement de la matière
+        :type semestre: Semestre
+
+
+        :return: Retourne un booléen.
+
+        :retype: boolean
+
+
+        """
         return semestre in self.get_semestres(semestre.annee_universitaire, type="__all__")
 
     def get_semestres(self, annee_selectionnee, type):
         """
-        Cette méthode retourne les semestres d'une matiere
-        type : __current__| __all__
-        annee_selectionnee : annee_selectionnee | __all__
-        # Passer plus tard le parcours
+        Cette méthode retourne tous les semestres dans lesquels sont enseignés la matière au cours d'une année universitaire donnée.
+
+        :param annee_selectionnee: Année universitaire de recherche
+        :type annee_selectionnee: AnneeUniversitaire ou __all__
+
+        :param type: Type de semestre
+        :type type: __current__ ou __all__
+
+        :return: Liste des semestres dans lesquels la matière est enseignée
+        :retype: list[Semestre]
+
         """
+
+        # Passer plus tard le parcours
         type_semestres = []
         if type == "__current__":
             type_semestres = [True]
@@ -1480,6 +1565,16 @@ class Matiere(models.Model):
         return semestres
 
     def get_etudiants_en_rattrapage(self):
+        """
+        Cette méthode donne les étudiants en rattrapage dans la matière.
+
+        :return: Liste des étudiants en rattrapage.
+        :retype: list[Etudiant]
+
+        """
+
+        # Passer plus tard le parcours
+
         etudiants = set()
         semestres = self.get_semestres('__all__', '__all__')
         for semestre in semestres:
@@ -1491,6 +1586,16 @@ class Matiere(models.Model):
         return list(etudiants)
 
     def get_etudiant_semestre(self, semestre):
+        """
+        Cette méthode donne les étudiants suivant la matière au cours du semestre donné
+        :param semestre: Semestre d'enseignement
+        :type semestre: Semestre
+
+
+        :return: Liste des semestres dans lesquels la matière est enseignée
+        :retype: list[Etudiant]
+
+        """
         return semestre.etudiant_set.all()
 
 # class EnseignantsMatiere(models.Model):
