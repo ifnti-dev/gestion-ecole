@@ -15,6 +15,8 @@ import zipfile
 import zipfile
 import openpyxl
 
+BASE_PATH = "media/excel_templates"
+
 def trim_str(string):
     string = str(string).lower()
     string = re.sub(r'\s+', '', string.strip())
@@ -30,20 +32,33 @@ def convert_serial_temporel_number_to_date(numero_serie_temporelle):
     return date_resultat
 
 @transaction.atomic
-def pre_load_ue_matiere_template_data_by_year(annee):
-    result_path = 'media/excel_templates/ues_matieres.xlsx'
-    file_path = "media/excel_templates/ues_matieres_tmp.xlsx"
-    wb = openpyxl.load_workbook(filename=file_path)
-    template_sheet = wb.active
-    ues = Ue.objects.filter(programme__semestre__annee_universitaire__annee=annee)
-    new_sheets = []
-    for ue in ues:
-        new_sheet = wb.copy_worksheet(template_sheet)
-        new_sheet.title = ue.codeUE
-        new_sheet['A1'] = ue.libelle
-        new_sheets.append(new_sheets)
-    wb.save(result_path)   
-    wb.close()
+def pre_load_ue_matiere_template_data_by_year(annees):
+    folder_path = f"{BASE_PATH}/matieres_templates/"
+    os.mkdir(folder_path)
+    template_path = f"{BASE_PATH}/ues_matieres_tmp.xlsx"
+    
+    for annee in annees:
+        result_name = f"{folder_path}/ues_matieres_{annee}.xlsx"
+
+        wb = openpyxl.load_workbook(filename=template_path)
+        template_sheet = wb.active
+        ues = Ue.objects.filter(programme__semestre__annee_universitaire__annee=annee)
+        new_sheets = []
+        for ue in ues:
+            new_sheet = wb.copy_worksheet(template_sheet)
+            new_sheet.title = ue.codeUE
+            new_sheet['A1'] = ue.libelle
+            new_sheets.append(new_sheets)
+        wb.save(result_name)   
+        wb.close()
+        
+    shutil.make_archive(folder_path, 'zip', folder_path)
+    
+    for file_path in os.listdir(folder_path):
+        os.remove(folder_path+"/"+file_path)
+    os.rmdir(folder_path)
+    
+    return folder_path+".zip"
 
 @transaction.atomic
 def load_matieres_by_year(path, annee, batch_size=100):
@@ -278,8 +293,6 @@ def load_maquette(path, annee):
             if row[0] and row[0] != "libelle":
                 libelle = row[0].strip()
                 libelle = libelle.replace("  ", " ")
-                code  = "_".join([mot[0].lower() for mot in libelle.split(' ')])
-                code_ue[code] = libelle
                 ue = Ue.objects.create(libelle=libelle, type=row[1], niveau=row[2].split('=')[1], nbreCredits=row[3].split('=')[1], heures=row[4].split('=')[1])
                 semestre_ue[semestre].append(ue)
 
@@ -290,7 +303,6 @@ def load_maquette(path, annee):
         programme = Programme.objects.create(
             semestre=semestre, parcours=parcours)
         programme.ues.set(semestre_ue[semestre.libelle.lower()])
-    return code_ue
 
 def load_matieres(path):
     # Clean matières data

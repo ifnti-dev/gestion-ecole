@@ -30,7 +30,7 @@
                 <div class="d-flex justify-content-between">
                     {{ form.matieres_excel_file }}
                     <div class="mx-3 d-flex align-items-center">
-                        <a href="{{ MEDIA_URL }}/excel_templates/ues_matiere.xlsx" download="excel" class="ml-3">Template</a>
+                        <a href="{% url 'maquette:matiere_template' %}" download="excel" class="ml-3">Template</a>
                     </div>
                 </div>
                 {{ form.matieres_excel_file.errors }}
@@ -52,7 +52,7 @@
         <div class="d-flex flex-column mt-3">
             {{ form.maquette_excel_file.label_tag }}
             <div class="d-flex justify-content-between">
-                {{ form.maquette_excel_file }}
+                <input type="file" name="maquette_excel_file" id="" multiple>
                 <div class="mx-3 d-flex align-items-center">
                     <a href="{% url 'maquette:maquette_template' %}">
                         <button type="submit" class="btn btn-primary">Template</button>

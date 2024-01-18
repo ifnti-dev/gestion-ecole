@@ -22,4 +22,5 @@ urlpatterns = [
     path('delete_parcours/<int:id>/', views.delete_parcours, name='delete_parcours'),
     path('notes/ues/template/', views.generate_note_template, name='note_template'),
     path('template/', views.generate_maquette_template, name='maquette_template'),
+    path('matiere/ues/template/', views.generate_matiere_template, name='matiere_template'),
 ]

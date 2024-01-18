@@ -42,8 +42,6 @@ CODE_UE = {
 
 CODE_UE_inverse = {v: k for k, v in CODE_UE.items()}
 
-
-
 def get_user_role(request):
     return request.user.groups.all().first()
 

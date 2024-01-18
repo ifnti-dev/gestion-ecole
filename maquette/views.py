@@ -280,13 +280,15 @@ def data(request):
                         year_part = name_part[2].split('-')
                         if len(year_part) == 2:
                             annee_selectionnee = int(year_part[0])
-                            annee_selectionnee = AnneeUniversitaire.objects.get(annee=2022)
+                            annee_selectionnee = AnneeUniversitaire.objects.get(annee=annee_selectionnee)
                             print(annee_selectionnee)
                             load_maquette(file_cache_tmp, annee_selectionnee)
-            if matieres_excel_file:
-                load_matieres(matieres_excel_file)
-            if notes_excel_file:
-                load_notes_from_matiere(notes_excel_file)
+                            
+        return HttpResponse("Hello")
+        if matieres_excel_file:
+            load_matieres(matieres_excel_file)
+        if notes_excel_file:
+            load_notes_from_matiere(notes_excel_file)
         return redirect('maquette:data')
     data = {
         'form' : DataForm()
@@ -309,3 +311,10 @@ def generate_maquette_template(request):
         response['Content-Disposition'] = 'attachment; filename="{}"'.format(os.path.basename(file_name))
         return response
 
+def generate_matiere_template(request):
+    file_name = 'ues_matieres_tmp.xlsx'
+    file_path = 'media/excel_templates/'+file_name
+    with open(file_path, 'rb') as file:
+        response = HttpResponse(file.read(), content_type="application/force-download")
+        response['Content-Disposition'] = 'attachment; filename="{}"'.format(os.path.basename(file_name))
+        return response
