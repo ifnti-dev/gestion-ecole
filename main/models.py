@@ -155,6 +155,8 @@ class Utilisateur(models.Model):
         Photo passeport de l'utilisateur
 
         **Type**:    string
+
+        **Nullable:** true
     """
 
     class Meta:
