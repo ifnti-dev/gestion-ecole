@@ -1236,7 +1236,17 @@ class Tuteur(models.Model):
 
 class Ue(models.Model):
     codeUE = models.CharField(max_length=50, verbose_name="Code de l'UE")
+    """
+        Code de l'UE
+
+        **Type:** string
+    """
     libelle = models.CharField(max_length=100)
+    """
+        Nom du responsable
+
+        **Type:** string
+    """
     TYPES = [
         ("Technologie", "Technologie"),
         ("Communication", "Communication"),
@@ -1249,17 +1259,51 @@ class Ue(models.Model):
         ("3", "Doctorat")
     ]
     niveau = models.CharField(max_length=50, choices=TYPES_NIVEAU)
+    """
+        Niveau d'enseignement de l'UE
+
+        **Type:** string
+    """
     type = models.CharField(max_length=50, choices=TYPES)
+    """
+        Type de l'UE
+
+        **Type:** string
+    """
     nbreCredits = models.IntegerField(verbose_name="Nombre de crédit")
+    """
+        Nombre de crédits de l'UE
+
+        **Type:** integer
+    """
     heures = models.DecimalField(
         blank=True, max_digits=4, decimal_places=1, validators=[MinValueValidator(1)])
+    """
+        Total d'heures d'enseignement de l'UE
+
+        **Type:** Decimal
+    """
     enseignant = models.ForeignKey(
         'Enseignant', on_delete=models.CASCADE, verbose_name="Enseignant responsable", null=True, blank=True)
+    """
+        Identifiant de l'enseignant responsable de l'UE
+
+        **Type:** string
+    """
 
     class Meta:
         verbose_name_plural = 'UE'
 
     def matiere_principacle(self):
+        """
+        Cette fonction donne la matière principale de l'UE
+
+        :return: Un objet Matière si l'UE à une matière principale au cas contraire None.
+
+        :retype: Matiere or None
+
+
+        """
         max_coef = self.matiere_set.all().aggregate(
             Max('coefficient'))['coefficient__max']
         matiere = self.matiere_set.filter(coefficient=max_coef)
