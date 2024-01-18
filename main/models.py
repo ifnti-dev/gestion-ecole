@@ -1772,9 +1772,7 @@ class AnneeUniversitaire(models.Model):
 
         **Type:** string
 
-        **Nullable:** true
-
-        **Valeur par défaut: false
+        **Valeur par défaut:** false
     """
 
     def save(self, *args, **kwargs):
