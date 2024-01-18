@@ -1644,16 +1644,60 @@ class Matiere(models.Model):
 
 class Evaluation(models.Model):
     libelle = models.CharField(max_length=258, verbose_name="Nom")
+    """
+        Nom de l'évaluation
+
+        **Type:** string
+
+    """
     ponderation = models.IntegerField(
         default=1, verbose_name="Pondération (1-100)", validators=[MinValueValidator(1), MaxValueValidator(100)])
+    """
+        Pondération de l'évaluation
+
+        **Type:** integer
+
+        **Valeur par défaut:** 1
+    """
     date = models.DateField(verbose_name="Date évaluation")
+    """
+        Date de l'évaluation
+
+        **Type:** string
+
+    """
     matiere = models.ForeignKey(
         Matiere, on_delete=models.CASCADE, verbose_name='Matiere')
+    """
+        Identifiant de la matière rattachée à l'évaluation
+
+        **Type:** string
+
+    """
     etudiants = models.ManyToManyField(
         Etudiant, through='Note', verbose_name="Étudiants")
+    """
+        Ensemble des étudiants ayant participés à l'evaluation
+
+        **Type:** list[Etudiant]
+
+    """
     semestre = models.ForeignKey(
         'Semestre', on_delete=models.CASCADE, null=True)
+    """
+        Semestre dans lequel l'évaluation à été réalisée
+
+        **Type:** Semestre
+
+    """
     rattrapage = models.BooleanField(verbose_name="Rattrapage", default=False)
+    """
+        Défini si l'évaluation est un rattrapage ou non
+
+        **Type:** boolean
+
+        **Valeur par défaut:** false
+    """
 
     def save(self, *args, **kwargs):
         if self.rattrapage:
