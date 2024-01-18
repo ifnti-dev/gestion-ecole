@@ -23,31 +23,6 @@ import math
 class Utilisateur(models.Model):
     """
     Modèle représentant un utilisateur du système.
-
-    Attributes:
-        SEXE_CHOISE (list): Liste des choix de sexe pour l utilisateur.
-        nom (str): Nom de l'utilisateur.
-        prenom (str): Prénom de l'utilisateur.
-        sexe (str): Sexe de l'utilisateur (F pour féminin, M pour masculin).
-        datenaissance (date): Date de naissance de l'utilisateur.
-        lieunaissance (str): Lieu de naissance de l'utilisateur.
-        contact (str): Numéro de contact de l'utilisateur.
-        email (str): Adresse e-mail de l'utilisateur.
-        adresse (str): Adresse de l'utilisateur.
-        prefecture (str): Préfecture de l'utilisateur.
-        is_active (bool): Statut d'activation de l'utilisateur.
-        carte_identity (str): Numéro de carte d'identité de l'utilisateur.
-        nationalite (str): Nationalité de l'utilisateur.
-        user (User): Référence à l'utilisateur authentifié associé.
-        photo_passport (ImageField): Photo de passeport de l'utilisateur.
-
-    Methods:
-        __str__(): Renvoie une représentation en chaîne de caractères de l'utilisateur.
-        full_name(): Renvoie le nom complet de l'utilisateur en majuscules.
-        getrole(): Renvoie le rôle de l'utilisateur.
-        suspendre(): Suspend l'utilisateur.
-        reactiver(): Réactive l'utilisateur.
-
     """
     SEXE_CHOISE = [
         ('F', 'Feminin'),
@@ -126,6 +101,8 @@ class Utilisateur(models.Model):
         Préfecture de provenance de l'utilisateur
 
         **Type**:    string
+
+        **Valeur par defaut:** Tchaoudjo
     """
 
     is_active = models.BooleanField(
@@ -263,6 +240,8 @@ class Etudiant(Utilisateur):
         Année d'obtention du BAC 2
 
         **Type**:    integer
+
+        **Valeur par defaut:** Date actuelle
     """
 
     etablissementSeconde = models.CharField(
@@ -281,6 +260,8 @@ class Etudiant(Utilisateur):
         Note en français en classe de 2nde de l'étudiant
 
         **Type**:    integer
+
+        **Valeur par defaut:** 0
     """
 
     anglaisSeconde = models.DecimalField(
@@ -290,6 +271,8 @@ class Etudiant(Utilisateur):
         Note en anglais en classe de 2nde de l'étudiant
 
         **Type**:    integer
+
+        **Valeur par defaut:** 0
     """
 
     mathematiqueSeconde = models.DecimalField(
@@ -299,6 +282,8 @@ class Etudiant(Utilisateur):
         Note en mathematique en classe de 2nde de l'étudiant
 
         **Type**:    integer
+
+        **Valeur par defaut:** 0
     """
 
     etablissementPremiere = models.CharField(
@@ -306,7 +291,6 @@ class Etudiant(Utilisateur):
 
     """
         Établissement de 1ere de l'étudiant
-
 
         **Type**:    string
     """
@@ -318,6 +302,8 @@ class Etudiant(Utilisateur):
         Note en français en classe de 1ere de l'étudiant
 
         **Type**:    integer
+
+        **Valeur par defaut:** 0
     """
 
     anglaisPremiere = models.DecimalField(
@@ -327,6 +313,8 @@ class Etudiant(Utilisateur):
         Note en anglais en classe de 1ere de l'étudiant
 
         **Type**:    integer
+
+        **Valeur par defaut:** 0
     """
 
     mathematiquePremiere = models.DecimalField(
@@ -336,6 +324,8 @@ class Etudiant(Utilisateur):
         Note en mathématiques en classe de 1ere de l'étudiant
 
         **Type**:    integer
+
+        **Valeur par defaut:** 0
     """
 
     etablissementTerminale = models.CharField(
@@ -354,6 +344,8 @@ class Etudiant(Utilisateur):
         Note en français en classe de Terminale de l'étudiant
 
         **Type**:    integer
+
+        **Valeur par defaut:** 0
     """
 
     anglaisTerminale = models.DecimalField(
@@ -363,6 +355,8 @@ class Etudiant(Utilisateur):
         Note en anglais en classe de Terminale de l'étudiant
 
         **Type**:    integer
+
+        **Valeur par defaut:** 0
     """
 
     mathematiqueTerminale = models.DecimalField(
@@ -372,6 +366,8 @@ class Etudiant(Utilisateur):
         Note en mathématiques en classe de Terminale de l'étudiant
 
         **Type**:    integer
+
+        **Valeur par defaut:** 0
     """
 
     delegue = models.BooleanField(
@@ -399,6 +395,8 @@ class Etudiant(Utilisateur):
         Décision du conseil sur lors du passage au niveau supérieur
 
         **Type**:    string
+
+        **Valeur par défaut:** Décision du conseil
     """
 
     profil = models.ImageField(
@@ -896,6 +894,8 @@ class Personnel(Utilisateur):
         Salaire brut du membre du employé
 
         **Type**:   Decimal
+
+        **Valeur par défaut:** 0
     """
     dernierdiplome = models.ImageField(
         null=True, blank=True, verbose_name="Dernier diplome")
@@ -910,6 +910,8 @@ class Personnel(Utilisateur):
         Nombre de congés restants prennables par le membre du employé
 
         **Type**:    integer
+
+        **Valeur par défaut:** 0
     """
     nbreJrsConsomme = models.IntegerField(
         verbose_name="Nombre de jours consommé", default=0)
@@ -917,6 +919,8 @@ class Personnel(Utilisateur):
         Nombre de jours de congés déjà consommés par l'employé
 
         **Type**:    integer
+
+        **Valeur par défaut:** 0
     """
     nombre_de_personnes_en_charge = models.IntegerField(
         verbose_name="Nbre de pers pris en charge", default=0)
@@ -924,6 +928,8 @@ class Personnel(Utilisateur):
         Nombre de personnes prises en charge par l'employé
 
         **Type**:    integer
+
+        **Valeur par défaut:** 0
     """
 
     def save(self):
@@ -1340,20 +1346,69 @@ def generate_ue_code(sender, instance, created, **kwargs):
 class Matiere(models.Model):
     codematiere = models.CharField(
         max_length=50, verbose_name="Code de la matière")
+    """
+        Code de la matière
+
+        **Type:** string
+    """
     libelle = models.CharField(max_length=100)
+    """
+        Libellé de la matière
+
+        **Type:** string
+    """
     coefficient = models.IntegerField(
         null=True,  verbose_name="Coefficient", default="1")
+    """
+        Coefficient de la matière
+
+        **Valeur par défaut:** 1
+
+        **Type:** integer
+    """
     minValue = models.FloatField(
         null=True,  verbose_name="Valeur minimale",  default="7")
+    """
+        Moyenne minimale pour valider la matière.
+
+        **Valeur par défaut:** 7
+
+        **Type:** float
+    """
     heures = models.DecimalField(blank=True, max_digits=4, decimal_places=1, validators=[
                                  MinValueValidator(1)], null=True)
+    """
+        Total d'heures d'enseignement de la matière
+
+        **Type:** Decimal
+    """
     abbreviation = models.CharField(
         max_length=10, default="Short", unique=True)
+    """
+        
+
+        **Type:** Decimal
+    """
     enseignant = models.ForeignKey(Enseignant, blank=True, null=True,
                                    verbose_name="Enseignants responsable", on_delete=models.CASCADE)
+    """
+        Total d'heures d'enseignement de l'UE
+
+        **Type:** Decimal
+    """
     # enseignants = models.ManyToManyField(Enseignant, related_name="EnseignantsMatiere", blank=True, null=True, verbose_name="Enseignants")
     ue = models.ForeignKey('Ue', on_delete=models.CASCADE)
+    """
+        Total d'heures d'enseignement de l'UE
+
+        **Type:** Decimal
+    """
     is_active = models.BooleanField(default=True, verbose_name="Actif")
+    """
+        Total d'heures d'enseignement de l'UE
+
+        **Type:** Decimal
+    """
 
     def save(self, *args, **kwargs):
         if not self.codematiere:
