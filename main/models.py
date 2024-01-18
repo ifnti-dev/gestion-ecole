@@ -1754,10 +1754,28 @@ class Competence(models.Model):
 
 
 class AnneeUniversitaire(models.Model):
+    """
+        Cette classe représente l'année universitaire.
+    """
     annee = models.DecimalField(
         max_digits=4, decimal_places=0, verbose_name="Année universitaire")
+    """
+        Libellé de l'année universitaire
+
+        **Type:** string
+
+    """
     annee_courante = models.BooleanField(
         default=False, verbose_name="Année universitaire acutuelle", null=True)
+    """
+        Définit s'il s'agit de l'année en cours d'utilisation dans l'application
+
+        **Type:** string
+
+        **Nullable:** true
+
+        **Valeur par défaut: false
+    """
 
     def save(self, *args, **kwargs):
         annee = AnneeUniversitaire.objects.filter(annee=self.annee)
@@ -1767,13 +1785,26 @@ class AnneeUniversitaire(models.Model):
         self.generateSemeste()
 
     def disable(self):
+        """
+            Désactive une année universitaire et la définie plus comme année "courante"
+        """
         self.annee_courante = False
         self.save()
 
     def get_semestres(self):
+        """
+        Retourne les semestre de l'année universitaire
+
+        :retype: Une liste de semestres
+
+        :retype: list[Semestre]
+        """
         return self.semestre_set.all()
 
     def generateSemeste(self):
+        """
+            Génère tous les semestres de l'année universitaire
+        """
         courant = False
         for i in range(1, 7):
             courant = i in [1, 3, 5] and self.annee > 2022
@@ -1789,6 +1820,12 @@ class AnneeUniversitaire(models.Model):
 
     @staticmethod
     def static_get_current_annee_universitaire():
+        """
+            Méthode statique donnant l'année universitaire courante.
+
+            :return: Un objet AnneUniversitaire correspondant à l'année universitaire en cours
+            :retype: AnneeUniversitaire
+        """
         current_date = datetime.datetime.now()
         try:
             # Rechercher l'année accadémique courrante
@@ -1804,6 +1841,12 @@ class AnneeUniversitaire(models.Model):
 
     @staticmethod
     def getNiveau(semestre_libelle):
+        """
+            Méthode statique donnant le niveau correspondant à un semestre.
+
+            :return: Le nom correspondant au niveau du semestre.
+            :retype: string
+        """
         data = {'L1': ['S1', 'S2'], 'L2': ['S3', 'S4'], 'L3': ['S5', 'S6']}
         for key in data:
             if semestre_libelle in data[key]:
