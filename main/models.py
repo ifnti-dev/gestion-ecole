@@ -3227,21 +3227,85 @@ class Conge(models.Model):
 
     nature = models.CharField(
         max_length=30, choices=NATURE_CHOICES, verbose_name="Nature des congés")
+    """
+        Nature de la demande de congés 
+
+        **Type:** string
+
+    """
     autre_nature = models.CharField(
         max_length=100, blank=True, null=True, verbose_name="Autre nature à préciser")
+    """
+        Nature secondaire de la demande de congés
+
+        **Type:** string
+
+        **Nullable:** true
+
+    """
     date_et_heure_debut = models.DateField(
         default=timezone.now, verbose_name="Date de début")
+    """
+        Date de début des congés
+
+        **Type:** string
+
+    """
     date_et_heure_fin = models.DateField(
         default=timezone.now, verbose_name="Date de fin")
+    """
+        Date de fin des congés
+
+        **Type:** string
+
+    """
     personnel = models.ForeignKey(
         'Personnel', on_delete=models.CASCADE, verbose_name="Personnel")
+    """
+        Identifiant de l'employé partant en congés
+
+        **Type:** string
+
+    """
     motif_refus = models.TextField(
         null=True, blank=True, verbose_name="Motif de refus")
+    """
+        Motif de refus des congés 
+
+        **Type:** string
+
+        **Nullable:** true
+
+    """
     valider = models.CharField(
         max_length=30, choices=VALIDATION_CHOICES, verbose_name="État", default="Inconnu")
+    """
+        Validation des congés
+
+        **Type:** string
+
+        **Valeur par défaut:** "Inconnu"
+
+    """
     nombre_de_jours_de_conge = models.IntegerField(default=0)
+    """
+        Nombre de jours de congés demandés
+
+        **Type:** integer
+
+        **Valeur par défaut:** 0
+
+    """
     annee_universitaire = models.ForeignKey(
         'AnneeUniversitaire', on_delete=models.CASCADE, verbose_name="Année Universitaire", null=True, blank=True)
+    """
+        Année Universitaire des congés
+
+        **Type:** integer
+
+        **Nullable:** true
+
+    """
 
     def save(self, *args, **kwargs):
         if not self.annee_universitaire:
