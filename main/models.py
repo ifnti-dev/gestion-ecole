@@ -1627,6 +1627,7 @@ class Matiere(models.Model):
     def get_etudiant_semestre(self, semestre):
         """
         Cette méthode donne les étudiants suivant la matière au cours du semestre donné
+
         :param semestre: Semestre d'enseignement
         :type semestre: Semestre
 
@@ -2749,20 +2750,6 @@ class Salaire(models.Model):
 class Fournisseur(models.Model):
     """
     Modèle représentant les paiements effectués aux fournisseurs de service.
-
-    Attributes:
-        TYPE (list): Liste des types de fournisseurs.
-        TYPE_MOIS (list): Liste des mois.
-        type (str): Le type de fournisseur.
-        montant (decimal): Le montant versé au fournisseur.
-        dateversement (date): La date de versement du paiement.
-        le_mois (str): Le mois auquel le paiement est associé.
-        compte_bancaire (CompteBancaire): La référence au compte bancaire utilisé pour le paiement.
-        annee_universitaire (AnneeUniversitaire): L'année universitaire associée au paiement.
-
-    Methods:
-        save(*args, **kwargs): Enregistre les détails du paiement dans la base de données.
-
     """
 
     TYPE = [
@@ -2786,16 +2773,58 @@ class Fournisseur(models.Model):
         ("Décembre", "Décembre")
     ]
     type = models.CharField(max_length=30, choices=TYPE)
+    """
+        Fournisseur de service 
+
+        **Type:** string
+
+    """
     montant = models.DecimalField(
         max_digits=10, decimal_places=2, default=0, verbose_name="Montant versé")
+    """
+        Montant versé au fourniseur
+
+        **Type:** Decimal
+
+        **Valeur par défaut:** 0.0
+
+    """
     dateversement = models.DateField(
         default=timezone.now, verbose_name="Date de versement")
+    """
+        Date du versement
+
+        **Type:** string
+
+    """
     le_mois = models.CharField(
         max_length=30, choices=TYPE_MOIS, verbose_name="Mois")
+    """
+        Mois du versement
+
+        **Type:** string
+
+    """
     compte_bancaire = models.ForeignKey(
         'CompteBancaire', on_delete=models.CASCADE, null=True, blank=True)
+    """
+        Compte bancaire du fournisseur
+
+        **Type:** string
+
+        **Nullable:** true
+
+    """
     annee_universitaire = models.ForeignKey(
         'AnneeUniversitaire', on_delete=models.CASCADE, verbose_name="Année Universitaire", null=True, blank=True)
+    """
+        Année du versement
+
+        **Type:** string
+
+        **Nullable:** true
+
+    """
 
     def save(self, *args, **kwargs):
         if not self.annee_universitaire:
