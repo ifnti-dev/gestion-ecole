@@ -2180,30 +2180,40 @@ class Note(models.Model):
 
 
 class Frais(models.Model):
+    """
+        Classe correpsondant aux Frais de scolarité chaque année
+    """
     annee_universitaire = models.ForeignKey(
         AnneeUniversitaire, on_delete=models.CASCADE)
+    """
+        Année universitaire du montant des frais
+
+        **Type:** string
+
+    """
     montant_inscription = models.DecimalField(
         max_digits=10, decimal_places=2, verbose_name="Frais d'inscription")
+    """
+        Montant de l'inscription
+
+        **Type:** Decimal
+
+    """
     montant_scolarite = models.DecimalField(
         max_digits=10, decimal_places=2, verbose_name="Frais de scolarité")
+    """
+        Montant de la scolaritée
+
+        **Type:** Decimal
+
+    """
 
     def __str__(self):
         return "Année universitaire: " + str(self.annee_universitaire) + "  Frais d'inscription : " + str(self.montant_inscription) + "     " + " Frais de scolarité : " + str(self.montant_scolarite)
 
 
 class CompteEtudiant(models.Model):
-    """
-    Modèle représentant le compte associé à un étudiant pour une année universitaire donnée.
-
-    Attributes:
-        etudiant (Etudiant): Référence à l'étudiant associé au compte.
-        annee_universitaire (AnneeUniversitaire): Année universitaire associée au compte.
-        solde (Decimal): Solde du compte.
-
-    Methods:
-        __str__(): Renvoie une représentation en chaîne de caractères du compte étudiant.
-
-    """
+    
     etudiant = models.ForeignKey(Etudiant, on_delete=models.CASCADE)
     annee_universitaire = models.ForeignKey(
         AnneeUniversitaire, on_delete=models.CASCADE)
