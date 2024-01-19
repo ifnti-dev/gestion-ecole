@@ -2835,22 +2835,6 @@ class Fournisseur(models.Model):
 class Information(models.Model):
     """
     Modèle pour enregistrer les informations relatives aux attestations de service des enseignants.
-
-    Attributes:
-        TYPE_CHOISE (list): Liste des choix de niveaux.
-        enseignant (Enseignant): Référence à l'enseignant associé à l'attestation.
-        directeur (DirecteurDesEtudes): Référence au directeur des études associé à l'attestation.
-        numeroSecurite (int): Numéro de sécurité sociale de l'enseignant.
-        discipline (Matiere): La discipline associée enseigné par l'enseignant.
-        niveau (str): Le niveau enseigné par l'enseignant.
-        dateDebut (date): Date de début du contrat.
-        dateFin (date): Date de fin du contrat.
-        duree (str): Durée du contrat en jours.
-
-    Methods:
-        save(*args, **kwargs): Enregistre les détails de l'attestation dans la base de données.
-        __str__(): Renvoie une représentation en chaîne de caractères de l'attestation.
-
     """
     TYPE_CHOISE = [
         ('Premier', 'Niveau 1'),
@@ -2859,17 +2843,72 @@ class Information(models.Model):
     ]
     enseignant = models.ForeignKey(
         'Enseignant', on_delete=models.CASCADE, verbose_name="Enseigant", null=True)
+    """
+        Enseignant associé à l'information
+
+        **Type:** string
+
+        **Nullable:** true
+
+    """
     directeur = models.ForeignKey(
         'DirecteurDesEtudes', on_delete=models.CASCADE, verbose_name="Directeur des études", null=True)
+    """
+        Directeur des études asscocié à l'information
+
+        **Type:** string
+
+        **Nullable:** true
+
+    """
     numeroSecurite = models.IntegerField(
         verbose_name="Numéro de sécurité sociale")
+    """
+        Numéro de sécurité sociale de l'employé
+
+        **Type:** integer
+
+    """
     discipline = models.ForeignKey(
         'Matiere', on_delete=models.CASCADE, verbose_name="Discipline")
+    """
+        Matiere enseignée par l'employé
+
+        **Type:** string
+
+    """
     niveau = models.CharField(
         max_length=100, choices=TYPE_CHOISE, verbose_name="Niveau")
+    """
+        Niveau de l'enseignant
+
+        **Type:** string
+
+    """
     dateDebut = models.DateField(verbose_name="Date de début")
+    """
+        Date à laquelle à commencé par travailler
+
+        **Type:** string
+
+
+    """
     dateFin = models.DateField(verbose_name="Date de fin")
+    """
+        Date à laquelle l'employé s'est arrêté de travailler
+
+        **Type:** string
+
+    """
     duree = models.CharField(max_length=100, verbose_name="Durée", default='0')
+    """
+        Durée du contrat de l'employé
+
+        **Type:** string
+
+        **Valeur par défaut:** "0"
+
+    """
 
     def save(self, *args, **kwargs):
         duree = self.dateFin - self.dateDebut
