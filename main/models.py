@@ -2887,7 +2887,7 @@ class Information(models.Model):
     """
     dateDebut = models.DateField(verbose_name="Date de début")
     """
-        Date à laquelle à commencé par travailler
+        Date à laquelle l'employé à commencé par travailler
 
         **Type:** string
 
@@ -2922,58 +2922,172 @@ class Information(models.Model):
 class FicheDePaie(models.Model):
     """
     Modèle représentant les fiches de paie des enseignants.
-
-    Attributes:
-        dateDebut (date): Date de début de la période de paie.
-        dateFin (date): Date de fin de la période de paie.
-        matiere (Matiere): Référence à la matière enseignée.
-        enseignant (Enseignant): Référence à l'enseignant concerné par la fiche de paie.
-        nombreHeureL1 (int): Nombre d'heures enseignées pour le niveau 1.
-        nombreHeureL2 (int): Nombre d'heures enseignées pour le niveau 2.
-        nombreHeureL3 (int): Nombre d'heures enseignées pour le niveau 3.
-        nombreHeure (int): Nombre total d'heures enseignées.
-        prixUnitaire (int): Prix unitaire par heure.
-        montantL1 (int): Montant total pour le niveau 1.
-        montantL2 (int): Montant total pour le niveau 2.
-        montantL3 (int): Montant total pour le niveau 3.
-        montant (int): Montant total.
-        difference (int): Différence entre le montant total et les acomptes.
-        acomptes (int): Montant des acomptes déjà versés.
-        montantEnLettre (str): Montant total en lettres.
-        compte_bancaire (CompteBancaire): Référence au compte bancaire utilisé pour le paiement.
-        annee_universitaire (AnneeUniversitaire): Année universitaire associée à la fiche de paie.
-
-    Methods:
-        save(*args, **kwargs): Enregistre les détails de la fiche de paie dans la base de données.
-        __str__(): Renvoie une représentation en chaîne de caractères de la fiche de paie.
-
     """
     dateDebut = models.DateField(verbose_name="Date de début", null=True)
+    """
+        Date à laquelle l'employé à commencé
+
+        **Type:** string
+
+        **Nullable:** true
+
+    """
     dateFin = models.DateField(verbose_name="Date de fin", null=True)
+    """
+        Date à laquelle l'employé s'est arrêté
+
+        **Type:** string
+
+        **Nullable:** true
+
+    """
     matiere = models.ForeignKey(
         'Matiere', on_delete=models.CASCADE, verbose_name="Matière")
+    """
+        Matière enseignée par le reçeveur de la fiche de paie
+
+        **Type:** string
+
+    """
     enseignant = models.ForeignKey(
         'Enseignant', on_delete=models.CASCADE, verbose_name="Enseignant")
+    """
+        Identifiant de l'enseignant reçevant la fiche de paie
+
+        **Type:** string
+
+    """
     nombreHeureL1 = models.IntegerField(
         verbose_name="Nombre d'heure L1", default=0)
+    """
+        Nombre d'heure réalisées en L1
+
+        **Type:** integer
+
+        **Valeur par défaut:** 0
+
+    """
     nombreHeureL2 = models.IntegerField(
         verbose_name="Nombre d'heure L2", default=0)
+    """
+        Nombre d'heures réalisées en L2
+
+        **Type:** integer
+
+        **Valeur par défaut:** 0
+
+    """
     nombreHeureL3 = models.IntegerField(
         verbose_name="Nombre d'heure L3", default=0)
+    """
+        Nombre d'heures réalisées en L3
+
+        **Type:** integer
+
+        **Valeur par défaut:** 0
+
+    """
     nombreHeure = models.IntegerField(verbose_name="Nombre d'heure", default=0)
+    """
+        Nombre d'heures au total
+
+        **Type:** integer
+
+        **Valeur par défaut:** 0
+
+    """
     prixUnitaire = models.IntegerField(verbose_name="Prix unitaire", default=0)
+    """
+        Prix unitaire de l'heure
+
+        **Type:** integer
+
+        **Valeur par défaut:** 0
+
+    """
     montantL1 = models.IntegerField(verbose_name="montant L1", default=0)
+    """
+        Montant total en L1
+
+        **Type:** integer
+
+        **Valeur par défaut:** 0
+
+    """
     montantL2 = models.IntegerField(verbose_name="montant L2", default=0)
+    """
+        Montant total en L2
+
+        **Type:** integer
+
+        **Valeur par défaut:** 0
+    """
     montantL3 = models.IntegerField(verbose_name="montant L3", default=0)
+    """
+        Montant total en L3
+
+        **Type:** integer
+
+        **Valeur par défaut:** 0
+
+    """
     montant = models.IntegerField(verbose_name="montant", default=0)
+    """
+        Montant total
+
+        **Type:** integer
+
+        **Valeur par défaut:** 0
+
+    """
     difference = models.IntegerField(verbose_name="Différence", default=0)
+    """
+        
+
+        **Type:** integer
+
+        **Valeur par défaut:** 0
+
+    """
     acomptes = models.IntegerField(verbose_name="Acomptes", default=0)
+    """
+        
+
+        **Type:** integer
+
+        **Valeur par défaut:** 0
+
+    """
     montantEnLettre = models.CharField(
         max_length=100, verbose_name="Montant en lettre", default="lettres")
+    """
+        Montant en lettres du paiement
+    
+        **Type:** string
+
+        **Valeur par défaut:** "lettres"
+
+    """
     compte_bancaire = models.ForeignKey(
         'CompteBancaire', on_delete=models.CASCADE, null=True, blank=True)
+    """
+        Compte bancaire du bénéficiare
+
+        **Type:** string
+
+        **Nullable:** true
+
+    """
     annee_universitaire = models.ForeignKey(
         'AnneeUniversitaire', on_delete=models.CASCADE, verbose_name="Année Universitaire", null=True, blank=True)
+    """
+        Année Universitaire au correspondant au paiement
+
+        **Type:** string
+
+        **Nullable:** true
+
+    """
 
     def __str__(self):
         return str(self.enseignant.nom) + "  " + str(self.enseignant.prenom) + "  " + str(self.dateDebut) + "-" + str(self.dateFin)
