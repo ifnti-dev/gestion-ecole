@@ -2213,11 +2213,33 @@ class Frais(models.Model):
 
 
 class CompteEtudiant(models.Model):
-    
+    """
+        Classe représentant le compte de paiement de l'étudiant
+    """
     etudiant = models.ForeignKey(Etudiant, on_delete=models.CASCADE)
+    """
+        Montant de la scolaritée
+
+        **Type:** Decimal
+
+    """
     annee_universitaire = models.ForeignKey(
         AnneeUniversitaire, on_delete=models.CASCADE)
+    """
+        Montant de la scolaritée
+
+        **Type:** Decimal
+
+    """
     solde = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    """
+        Total soldé par l'étudiant au cours de l'année scolaire
+
+        **Type:** Decimal
+
+        **Valeur par défaut:** 0
+
+    """
 
     def __str__(self):
         return str(self.etudiant.nom) + str(self.etudiant.prenom) + "  Solde - " + str(self.annee_universitaire) + " : " + str(self.solde)
