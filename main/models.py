@@ -1982,10 +1982,33 @@ class Domaine(models.Model):
 
 
 class Parcours(models.Model):
+    """
+        Classe correspondant à un parcours
+    """
     nom = models.CharField(max_length=255, verbose_name="Nom")
+    """
+        Nom du parcours
+
+        **Type:** string
+
+    """
     domaine = models.ForeignKey(
         Domaine, on_delete=models.CASCADE, verbose_name="Domaine", null=True)
+    """
+        Identifiant du domaine auquel est rattaché le parcours
+
+        **Type:** string
+
+        **Nullable:** true  
+
+    """
     description = models.TextField(max_length=500, verbose_name="description")
+    """
+        Description du parcours
+
+        **Type:** string
+
+    """
 
     def __str__(self):
         return self.nom
@@ -1994,6 +2017,7 @@ class Parcours(models.Model):
 class Programme(models.Model):
     parcours = models.ForeignKey(
         Parcours, on_delete=models.CASCADE, verbose_name="Parcours", null=True, blank=True)
+    
     semestre = models.ForeignKey(
         Semestre, on_delete=models.CASCADE, verbose_name="Semestre")
     ues = models.ManyToManyField(Ue, verbose_name="UE")
