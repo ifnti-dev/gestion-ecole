@@ -706,6 +706,7 @@ class Etudiant(Utilisateur):
 
 # Calcule le nombre de crédits obtenus par l'étudiant dans un semestre donné.
 
+
     def credits_obtenus_semestre(self, semestre):
         """
             Cette fonction permet de calculer le nombre de crédits obtenus dans le semestre donné.
@@ -1912,7 +1913,7 @@ class Semestre(models.Model):
         return super().save()
 
     def static_get_current_semestre():
-        
+
         try:
             annee = AnneeUniversitaire.static_get_current_annee_universitaire()
             # Revoir cette partie retourner S1,S3,S5 ou S2,S4,S6
@@ -1920,7 +1921,6 @@ class Semestre(models.Model):
                 return annee.semestre_set.all()
         except:
             return Semestre.objects.all()
-
 
     def get_all_ues(self):
         """
@@ -2015,12 +2015,34 @@ class Parcours(models.Model):
 
 
 class Programme(models.Model):
+    """
+        Classe correspondant à un programme
+    """
     parcours = models.ForeignKey(
         Parcours, on_delete=models.CASCADE, verbose_name="Parcours", null=True, blank=True)
-    
+    """
+        Identifiant du parcours auquel est rattaché le programme
+
+        **Type:** string
+
+        **Nullable:** true
+
+    """
     semestre = models.ForeignKey(
         Semestre, on_delete=models.CASCADE, verbose_name="Semestre")
+    """
+        Identifiant du semestre auquel est rattaché le programme
+
+        **Type:** string
+
+    """
     ues = models.ManyToManyField(Ue, verbose_name="UE")
+    """
+        UEs contenues dans le parcours
+
+        **Type:** string
+
+    """
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
@@ -2037,6 +2059,12 @@ class Programme(models.Model):
             ue.save()
 
     def generate_code(self):
+        """
+            Donne le code du parcours.
+
+            :return: Une chaine de caractère correspondant au code du parcours.
+            :retype: string
+        """
         return f'{self.parcours}-{self.ues}-{self.semestre}'
 
     def __str__(self):
