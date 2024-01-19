@@ -3042,7 +3042,7 @@ class FicheDePaie(models.Model):
     """
     difference = models.IntegerField(verbose_name="Différence", default=0)
     """
-        
+        Différence
 
         **Type:** integer
 
@@ -3051,7 +3051,7 @@ class FicheDePaie(models.Model):
     """
     acomptes = models.IntegerField(verbose_name="Acomptes", default=0)
     """
-        
+        Acompte
 
         **Type:** integer
 
@@ -3109,37 +3109,91 @@ class FicheDePaie(models.Model):
 class Charge(models.Model):
     """
     Modèle représentant les fiches de prise en charge des frais pour le personnel.
-
-    Attributes:
-        dateDebut (date): Date de début de la période de paie.
-        dateFin (date): Date de fin de la période de paie.
-        personnel (Personnel): Référence au personnel concerné par la prise en charge.
-        frais_de_vie (int): Montant des frais de vie pris en charge.
-        frais_nourriture (int): Montant des frais de nourriture pris en charge.
-        montant (int): Montant total pris en charge.
-        montantEnLettre (str): Montant total en lettres.
-        annee_universitaire (AnneeUniversitaire): Année universitaire associée à la prise en charge.
-        compte_bancaire (CompteBancaire): Référence au compte bancaire utilisé pour le remboursement.
-
-    Methods:
-        save(*args, **kwargs): Enregistre les détails de la prise en charge dans la base de données.
-        __str__(): Renvoie une représentation en chaîne de caractères de la prise en charge.
-
     """
     dateDebut = models.DateField(verbose_name="Date de début", null=True)
+    """
+        Date de debut de la prise en charge
+
+        **Type:** string
+
+        **Nullable:** true
+
+    """
     dateFin = models.DateField(verbose_name="Date de fin", null=True)
+    """
+        Date de fin de la prise en charge
+
+        **Type:** string
+
+        **Nullable:** true
+
+    """
     personnel = models.ForeignKey(
         'Personnel', on_delete=models.CASCADE, verbose_name="Personnel")
+    """
+        Employé pris en charge
+
+        **Type:** string
+
+    """
     frais_de_vie = models.IntegerField(verbose_name="Frais de vie", default=0)
+    """
+        Frais de vie de l'employé
+
+        **Type:** integer
+
+        **Valeur par défaut:** 0
+
+    """
     frais_nourriture = models.IntegerField(
         verbose_name="Frais de nourriture", default=0)
+    """
+        Frais de nourriture de l'employé
+
+        **Type:** integer
+
+        **Valeur par défaut:** 0
+
+    """
     montant = models.IntegerField(verbose_name="Montant", default=0)
+    """
+        Montant de la facture
+
+        **Type:** integer
+
+        **Valeur par défaut:** 0
+
+    """
     montantEnLettre = models.CharField(
         max_length=100, verbose_name="Montant en lettre", default="lettres")
+    """
+        Montant en lettre de la facture
+
+        **Type:** string
+
+        **Valeur par défaut:** "lettres"
+
+    """
     annee_universitaire = models.ForeignKey(
         'AnneeUniversitaire', on_delete=models.CASCADE, verbose_name="Année Universitaire", null=True, blank=True)
+    """
+        Année Universitaire au correspondant à la facture
+
+        **Type:** string
+
+        **Nullable:** true
+
+    """
     compte_bancaire = models.ForeignKey(
         'CompteBancaire', on_delete=models.CASCADE, null=True, blank=True)
+    """
+        Compte bancaire de versement
+
+        **Type:** string
+
+        **Nullable:** true
+
+    """
 
     def __str__(self):
         return str(self.personnel.nom) + "  " + str(self.personnel.prenom) + "  " + str(self.dateDebut) + "-" + str(self.dateFin)
@@ -3157,24 +3211,6 @@ class Charge(models.Model):
 class Conge(models.Model):
     """
     Modèle représentant les demandes de congé du personnel.
-
-    Attributes:
-        NATURE_CHOICES (list): Liste des choix de nature de congé.
-        VALIDATION_CHOICES (list): Liste des choix d'état de validation.
-
-        nature (str): Nature des congés.
-        autre_nature (str): Autre nature de congé à préciser (optionnel).
-        date_et_heure_debut (date): Date de début du congé.
-        date_et_heure_fin (date): Date de fin du congé.
-        personnel (Personnel): Référence au personnel demandant le congé.
-        motif_refus (str): Motif de refus du congé.
-        valider (str): État de validation du congé.
-        nombre_de_jours_de_conge (int): Nombre de jours de congé demandés.
-        annee_universitaire (AnneeUniversitaire): Année universitaire associée à la demande de congé.
-
-    Methods:
-        save(*args, **kwargs): Enregistre les détails de la demande de congé dans la base de données.
-        __str__(): Renvoie une représentation en chaîne de caractères de la demande de congé.
 
     """
     NATURE_CHOICES = [
