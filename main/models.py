@@ -1842,6 +1842,10 @@ class AnneeUniversitaire(models.Model):
         """
             Méthode statique donnant le niveau correspondant à un semestre.
 
+            :param semestre_libelle: Nom du semestre
+
+            :type semestre_libelle: string
+
             :return: Le nom correspondant au niveau du semestre.
             :retype: string
         """
@@ -1857,14 +1861,46 @@ class AnneeUniversitaire(models.Model):
 
 class Semestre(models.Model):
     id = models.CharField(primary_key=True, blank=True, max_length=14)
+    """
+        Identifiant du semestre
+
+        **Type:** string
+    """
     CHOIX_SEMESTRE = [('S1', 'Semestre1'), ('S2', 'Semestre2'), ('S3', 'Semestre3'),
                       ('S4', 'Semestre4'), ('S5', 'Semestre5'), ('S6', 'Semestre6')]
     libelle = models.CharField(max_length=30, choices=CHOIX_SEMESTRE)
+    """
+        Intitulé du semestre
+
+        **Type:** string
+
+    """
     credits = models.IntegerField(default=30)
+    """
+        Nombre de crédits du semestre    
+    
+        **Type:** integer
+
+        **Valeur par défaut:** 30
+    """
     courant = models.BooleanField(
         default=False, verbose_name="Semestre actuel", null=True)
+    """
+        Définit s'il s'agit d'un semestre en cours
+
+        **Type:** string
+
+        **Valeur par défaut:** false
+    """
     annee_universitaire = models.ForeignKey(
         AnneeUniversitaire, on_delete=models.SET_NULL, null=True)
+    """
+    identifiant de l'année universitaire à laquelle le semestre est rattaché    
+    
+        **Type:** string
+
+        **Nullable:** true
+    """
 
     def save(self):
         if not self.id:
@@ -1873,6 +1909,7 @@ class Semestre(models.Model):
         return super().save()
 
     def static_get_current_semestre():
+        
         try:
             annee = AnneeUniversitaire.static_get_current_annee_universitaire()
             # Revoir cette partie retourner S1,S3,S5 ou S2,S4,S6
@@ -1881,13 +1918,14 @@ class Semestre(models.Model):
         except:
             return Semestre.objects.all()
 
-    # méthode permettant de retourner toutes les ues d'un semestre
-    """
-        paramètre : aucun 
-        retour: tableau d'ues
-    """
 
     def get_all_ues(self):
+        """
+            Méthode donnant l'ensemble des UEs contenues dans un semestre.
+
+            :return: Liste d'UE.
+            :retype: list[UE]
+        """
         try:
             programme = Programme.objects.get(semestre__id=self.id)
             return programme.ues.all()
@@ -1895,6 +1933,12 @@ class Semestre(models.Model):
             return []
 
     def code_semestre(self):
+        """
+            Donne le code du semestre.
+
+            :return: Une chaine de caractère correspondant au code du semestre.
+            :retype: string
+        """
         return f'{self.libelle}-{self.annee_universitaire}'
 
     def __str__(self):
