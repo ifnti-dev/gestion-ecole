@@ -2233,11 +2233,11 @@ class CompteEtudiant(models.Model):
     """
     solde = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     """
-        Total soldé par l'étudiant au cours de l'année scolaire
+        Total à solder par l'étudiant au cours de l'année scolaire
 
         **Type:** Decimal
 
-        **Valeur par défaut:** 0
+        **Valeur par défaut:** 0.0
 
     """
 
@@ -2247,43 +2247,83 @@ class CompteEtudiant(models.Model):
 
 class Paiement(models.Model):
     """
-    Modèle représentant les versements effectués par les étudiants.
-
-    Attributes:
-        TYPE_CHOICES (list): Liste des choix de type de versement.
-
-        type (str): Type de versement (frais de scolarité, frais d'inscription, etc.).
-        montant (Decimal): Montant versé.
-        dateversement (date): Date du versement.
-        etudiant (Etudiant): Référence à l'étudiant effectuant le versement.
-        comptable (Comptable): Référence au comptable en charge du versement.
-        compte_bancaire (CompteBancaire): Référence au compte bancaire utilisé pour le versement (optionnel).
-        numerobordereau (str): Numéro de bordereau du versement.
-        annee_universitaire (AnneeUniversitaire): Année universitaire associée au versement.
-
-    Methods:
-        __str__(): Renvoie une représentation en chaîne de caractères du versement.
-
+        Classe correspondant au versement des frais de scolarité par l'étudiant
     """
     TYPE_CHOICES = [
         ('Frais de scolarité', 'Frais de scolarité'),
         ("Frais d'inscription", "Frais d'inscription"),
     ]
     type = models.CharField(max_length=30, choices=TYPE_CHOICES)
+    """
+        Type de paiement
+
+        **Type:** string
+
+
+    """
     montant = models.DecimalField(
         max_digits=10, decimal_places=2, default=0, verbose_name="Montant versé")
+    """
+
+        Montant versé par l'étudiant
+
+        **Type:** Decimal
+
+        **Valeur par défaut:** 0.0
+
+    """
     dateversement = models.DateField(
         default=timezone.now, verbose_name="Date de versement")
+    """
+        Date du versement
+
+        **Type:** string
+
+    """
     etudiant = models.ForeignKey(
         'Etudiant', on_delete=models.CASCADE, verbose_name="Etudiant")
+    """
+        Étudiant ayant éffectué le versement
+    
+        **Type:** string
+
+    """
     comptable = models.ForeignKey(
         'Comptable', on_delete=models.CASCADE, verbose_name="Comptable")
+    """
+        Total à solder par l'étudiant au cours de l'année scolaire
+
+        **Type:** Decimal
+
+    """
     compte_bancaire = models.ForeignKey(
         'CompteBancaire', on_delete=models.CASCADE, null=True, blank=True)
+    """
+        Compte bancaire sur lequel le versement à été effectué.
+
+        **Type:** integer
+
+        **Nullable:** true
+
+    """
     numerobordereau = models.CharField(
         max_length=30, verbose_name="Numéro de bordereau", default=0)
+    """
+        Numéro du bordereau de versement
+
+        **Type:** string
+
+        **Valeur par défaut:** "0"
+
+    """
     annee_universitaire = models.ForeignKey(
         AnneeUniversitaire, on_delete=models.CASCADE)
+    """
+        Année universitaire correspondant au versement
+
+        **Type:** string
+
+    """
 
     def __str__(self):
         return str(self.dateversement) + " : " + str(self.etudiant.nom) + "  " + str(self.etudiant.prenom) + "  " + str(self.montant)
@@ -2293,13 +2333,6 @@ class CompteBancaire(models.Model):
     """
     Modèle représentant un compte bancaire.
 
-    Attributes:
-        numero (str): Le numéro du compte bancaire.
-        solde_bancaire (decimal): Le solde du compte bancaire.
-        frais_tenue_de_compte (decimal): Les frais de tenue de compte.
-
-    Methods:
-        __str__() -> str: Renvoie une représentation en chaîne de caractères de l'objet CompteBancaire.
     """
     numero = models.CharField(max_length=100, verbose_name="Numéro du compte")
     solde_bancaire = models.DecimalField(
