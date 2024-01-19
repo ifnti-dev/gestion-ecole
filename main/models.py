@@ -2075,24 +2075,69 @@ class Programme(models.Model):
 
 
 class CorrespondanceMaquette(models.Model):
+    """
+        Classe permettant de faire les correspondances entre différentes maquettes. Cette classe à étét mise en place pour fair e la correpondance entre les UEs et Matières de l'IFNTI d'avant 2023 et celles post-2023.
+    """
     class Nature(models.TextChoices):
         UE = "U", "UE"
         MATIERE = "M", "Matière"
 
     nature = models.CharField(max_length=1, choices=Nature.choices)
+    """
+        Nature des éléments à correspondre (UE ou Matière)
+
+        **Type:** string
+
+    """
     ancienne = models.CharField(max_length=225, blank=True, null=True)
+    """
+        Ancienne UE ou Matiere
+
+        **Type:** string
+
+        **Nullable:** true
+
+    """
     nouvelle = models.CharField(max_length=225, blank=True, null=True)
+    """
+        Nouvelle UE ou Matiere
+
+        **Type:** string
+
+        **Nullable:** true
+
+    """
 
     def save(self):
         super().save()
 
     def afficher_nature(self):
+        """
+            Affiche la nature de la correspondance
+
+            :return: Une chaine de caractère correspondant à la nature de la correpondance.
+            :retype: string
+        """
         return "UE" if self.nature.lower() == 'u' else "Matière"
 
     def get_ancienne(self):
+        """
+            Donne l'ancienne UE ou Matiere.
+
+            :return: Un objet UE ou Matiere en fonction de la nature de la correspondance.
+
+            :retype: UE ou Matiere.
+        """
         return Ue.objects.get(id=self.ancienne) if self.nature.lower() == 'u' else Matiere.objects.get(id=self.ancienne)
 
     def get_nouvelle(self):
+        """
+            Donne la nouvelle UE ou Matiere.
+
+            :return: Un objet UE ou Matiere en fonction de la nature de la correspondance.
+
+            :retype: UE ou Matiere
+        """
         return Ue.objects.get(id=self.nouvelle) if self.nature.lower() == 'u' else Matiere.objects.get(id=self.nouvelle)
 
 
