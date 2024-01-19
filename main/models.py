@@ -2144,21 +2144,33 @@ class CorrespondanceMaquette(models.Model):
 class Note(models.Model):
     """
     Ce modèle représente la note d'un étudiant dans un semestre et une matière donnée.
-
-    Attributes:
-        valeurNote (decimal): La valeur de la note.
-        etudiant (Etudiant): L'étudiant à qui cette note appartient.
-        matiere (Matiere): La matière dans laquelle l'étudiant a eu cette note. 
-
-    Methods:
-        __str__() -> str: Renvoie une représentation en chaîne de caractères de l'objet Note.
     """
     valeurNote = models.DecimalField(default=0.0, blank=False, max_digits=5, decimal_places=2,
                                      verbose_name="note", validators=[MaxValueValidator(20), MinValueValidator(0.0)])
+    """
+        Valeur de la note
+
+        **Type:** Decimal
+
+        **Valeur par défaut:** 0.0
+
+    """
     etudiant = models.ForeignKey(
         Etudiant, on_delete=models.CASCADE, verbose_name="Étudiant")
+    """
+        Identifiant de l'étudiant à qui appartient la note
+
+        **Type:** string
+
+    """
     evaluation = models.ForeignKey(
         Evaluation, on_delete=models.CASCADE, verbose_name="Evaluation")
+    """
+        Evaluation dans laquelle l'étudiant a obtenu la note
+
+        **Type:** string
+
+    """
 
     def __str__(self):
         """
