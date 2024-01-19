@@ -2335,10 +2335,33 @@ class CompteBancaire(models.Model):
 
     """
     numero = models.CharField(max_length=100, verbose_name="Numéro du compte")
+    """
+       Numéro du compte bancaire
+
+        **Type:** string
+
+
+    """
     solde_bancaire = models.DecimalField(
         max_digits=10, decimal_places=2, default=0)
+    """
+        Solde dans le compte
+
+        **Type:** Decimal
+
+        **Valeur par défaut:** 0.0
+
+    """
     frais_tenue_de_compte = models.DecimalField(
         max_digits=10, decimal_places=2, default=0, verbose_name="Frais de tenue de compte")
+    """
+        Frais de tenue de compte
+    
+        **Type:** Decimal
+
+        **Valeur par défaut:** 0
+
+    """
 
     def __str__(self):
         """
