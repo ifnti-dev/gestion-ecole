@@ -2373,25 +2373,6 @@ class CompteBancaire(models.Model):
 class Salaire(models.Model):
     """
     Modèle représentant les détails du salaire d'un personnel.
-
-    Attributes:
-        date_debut (date): La date de début de la période de paie.
-        date_fin (date): La date de fin de la période de paie.
-        personnel (Personnel): La référence au personnel concerné par le salaire.
-        tcs (decimal): Le montant de la taxe sur les salaires.
-        prime_forfaitaire (decimal): Le montant de la prime forfaitaire.
-        acomptes (decimal): Le montant des acomptes versés au personnel.
-        frais_prestations_familiale_salsalaire (decimal): Les frais de prestations familiales sur le salaire.
-
-    Methods:
-        calculer_salaire_brut_annuel() -> decimal: Calcule le salaire brut annuel du personnel.
-        calculer_salaire_brut_mensuel() -> decimal: Calcule le salaire brut mensuel du personnel.
-        calculer_total_A() -> decimal: Calcule le total A.
-        calculer_net_imposable_arrondi() -> int: Calcule le net imposable arrondi.
-        calculer_irpp_annuel() -> decimal: Calcule l'impôt sur le revenu des personnes physiques (IRPP) annuel.
-        calculer_irpp_mensuel() -> decimal: Calcule l'IRPP mensuel.
-        calculer_deductions_cnss() -> decimal: Calcule les déductions CNSS.
-        save(*args, **kwargs): Enregistre les détails du salaire dans la base de données.
     """
     TYPE_CHOICES = [
         ('Enseignant', 'Enseignant'),
@@ -2401,45 +2382,210 @@ class Salaire(models.Model):
         ("Agent d'entretien", "Agent d'entretien"),
     ]
     date_debut = models.DateField(verbose_name="Date de début", null=True)
+    """
+        Date à laquelle l'employé à commencé par travailler
+
+        **Type:** string
+
+        **Nullable:** true
+
+    """
     date_fin = models.DateField(verbose_name="Date de fin", null=True)
+    """
+        Date à laquelle l'employé s'est arrêté de travailler    
+    
+        **Type:** string
+
+        **Nullable:** true
+
+    """
     personnel = models.ForeignKey(
         Personnel, on_delete=models.CASCADE, null=False)
+    """
+        Employé à qui est rattaché le salaire
+    
+        **Type:** string
+
+        **Nullable:** true
+
+    """
     numero_cnss = models.CharField(
         max_length=30, verbose_name="Numéro CNSS", default=0)
+    """
+        Numéro CNSS (Caisse Nationale de Sécurité Sociale)
+
+        **Type:** string
+
+        **Valeur par défaut:** "0"
+
+    """
     qualification_professionnel = models.CharField(
         max_length=30, choices=TYPE_CHOICES, verbose_name="Qualification professionnelle")
+    """
+        Qualification professionelle de l'employé
+
+        **Type:** string
+
+    """
     prime_efficacite = models.DecimalField(
         max_digits=10, decimal_places=2, default=0, verbose_name="Prime d'éfficacité")
+    """
+        Prime d'efficacité de l'employé
+
+        **Type:** Decimal
+
+        **Valeur par défaut:** 0.0
+
+    """
     prime_qualite = models.DecimalField(
         max_digits=10, decimal_places=2, default=0, verbose_name="Prime de qualité")
+    """
+        Prime de qualitée de l'employé
+
+        **Type:** Decimal
+
+        **Valeur par défaut:** 0.0
+
+    """
     frais_travaux_complementaires = models.DecimalField(
         max_digits=10, decimal_places=2, default=0, verbose_name="Travaux complémentaires")
+    """
+        Frais des travaux complémentaires réalisés par l'employé
+
+        **Type:** Decimal
+
+        **Valeur par défaut:** 0.0
+
+    """
     prime_anciennete = models.DecimalField(
         max_digits=10, decimal_places=2, default=0, verbose_name="Prime d'ancienneté")
+    """
+        Prime d'anciennetée de l'employé
+
+        **Type:** Decimal
+
+        **Valeur par défaut:** 0.0
+
+    """
     frais_prestations_familiales = models.DecimalField(
         max_digits=10, decimal_places=3, default=0.03)
+    """
+        Frais des prestations familiales de l'employé
+
+        **Type:** Decimal
+
+        **Valeur par défaut:** 0.03
+
+    """
     frais_risques_professionnel = models.DecimalField(
         max_digits=10, decimal_places=3, default=0.02)
+    """
+        Frais des risques professionnels
+
+        **Type:** Decimal
+
+        **Valeur par défaut:** 0.02
+
+    """
     frais_pension_vieillesse_emsalaire = models.DecimalField(
         max_digits=10, decimal_places=3, default=0.125)
+    """
+        Frais de la pension de vieillesse de l'employé
+
+        **Type:** Decimal
+
+        **Valeur par défaut:** 0.125
+
+    """
     frais_prestations_familiale_salsalaire = models.DecimalField(
         max_digits=10, decimal_places=3, default=0.04)
+    """
+        Frais prestations familiale salariales
+
+        **Type:** Decimal
+
+        **Valeur par défaut:** 0.04
+
+    """
     tcs = models.DecimalField(
         max_digits=10, decimal_places=2, default=0, verbose_name="TCS")
+    """
+        Taxe complémentaire sur le salaire
+
+        **Type:** Decimal
+
+        **Valeur par défaut:** 0.0
+
+    """
     irpp = models.DecimalField(
         max_digits=10, decimal_places=2, default=0, verbose_name="IRPP")
+    """
+        Impôt sur le revenu des personnes physiques
+
+        **Type:** Decimal
+
+        **Valeur par défaut:** 0.0
+
+    """
     prime_forfaitaire = models.DecimalField(
         max_digits=10, decimal_places=2, default=0, verbose_name="Prime forfaitaires")
+    """
+        Prime forfaitaire de l'employé
+
+        **Type:** Decimal
+
+        **Valeur par défaut:** 0.0
+
+    """
     acomptes = models.DecimalField(
         max_digits=10, decimal_places=2, default=0, verbose_name="Acomptes")
+    """
+        Acomptes de l'employé
+
+        **Type:** Decimal
+
+        **Valeur par défaut:** 0.0
+
+    """
     salaire_net_a_payer = models.DecimalField(
         max_digits=15, decimal_places=2, default=0, verbose_name="Salaire Net à payer")
+    """
+        Salaire net de l'employé
+
+        **Type:** Decimal
+
+        **Valeur par défaut:** 0.0
+
+    """
     compte_bancaire = models.ForeignKey(
         'CompteBancaire', on_delete=models.CASCADE, null=True, blank=True)
+    """
+        Compte bancaire de l'employé
+    
+        **Type:** string
+
+        **Nullable:** true
+
+    """
     annee_universitaire = models.ForeignKey(
         'AnneeUniversitaire', on_delete=models.CASCADE, verbose_name="Année Universitaire", null=True, blank=True)
+    """
+        Année universitaire au cours duquel l'employé à reçu le paiement
+    
+        **Type:** string
+
+        **Nullable:** true
+
+    """
 
     def calculer_salaire_brut_annuel(self):
+        """
+            Donne le salaire brut annuel de l'employé
+
+            :return: Le salaire brut annuel de l'employé
+
+            :retype: Decimal
+        """
         salaire_de_base = self.personnel.salaireBrut
         prime_efficacite = self.prime_efficacite
         prime_qualite = self.prime_qualite
@@ -2456,6 +2602,13 @@ class Salaire(models.Model):
         return salaire_brut_annuel
 
     def calculer_salaire_brut_mensuel(self):
+        """
+            Donne le salaire brut mensuel de l'employé
+
+            :return: Le salaire brut mensuel de l'employé
+
+            :retype: Decimal
+        """
         salaire_brut_mensuel = self.calculer_salaire_brut_annuel() / 12
         return salaire_brut_mensuel
 
@@ -2488,6 +2641,13 @@ class Salaire(models.Model):
         return semi_net
 
     def calculer_charges_de_familles(self):
+        """
+            Calcule les charges familliales de l'employé
+
+            :return: Frais des charges familliales de l'employé
+
+            :retype: Decimal
+        """
         F44 = self.personnel.nombre_de_personnes_en_charge
         if F44 <= 6:
             resultat = 120000 * F44
@@ -2512,6 +2672,13 @@ class Salaire(models.Model):
         return int(net_imposable_arrondi_str)
 
     def calculer_irpp_annuel(self):
+        """
+            Calcul du IRPP annuel de l'employé
+
+            :return: IRPP annuel de l'employé
+
+            :retype: Decimal
+        """
         G51 = self.calculer_net_imposable_arrondi()
         if G51 < 900000 or G51 == 900000:
             irpp = G51 * 0
@@ -2532,10 +2699,24 @@ class Salaire(models.Model):
         return irpp
 
     def calculer_irpp_mensuel(self):
+        """
+            Calcul du IRPP mensuel de l'employé
+
+            :return: IRPP mensuel de l'employé
+
+            :retype: Decimal
+        """
         irpp_mensuel = self.calculer_irpp_annuel() / 12
         return irpp_mensuel
 
     def calculer_deductions_cnss(self):
+        """
+            Calcul des déductions de la CNSS sur le salaire de l'employé
+
+            :return: Déductions de la CNSS
+
+            :retype: Decimal
+        """
         frais_prestations_familiale_salsalaire = Decimal(
             self.frais_prestations_familiale_salsalaire) * Decimal(self.calculer_salaire_brut_mensuel())
         deductions = (
