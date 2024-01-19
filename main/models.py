@@ -1860,6 +1860,9 @@ class AnneeUniversitaire(models.Model):
 
 
 class Semestre(models.Model):
+    """
+        Classe correspondant aux semestres
+    """
     id = models.CharField(primary_key=True, blank=True, max_length=14)
     """
         Identifiant du semestre
@@ -1946,10 +1949,31 @@ class Semestre(models.Model):
 
 
 class Domaine(models.Model):
+    """
+        Classe correspondant aux domaines
+    """
     nom = models.CharField(max_length=255, verbose_name="Nom")
+    """
+        Nom du domaine
+
+        **Type:** string
+
+    """
     description = models.TextField(max_length=500, verbose_name="description")
+    """
+        Description du domaine
+
+        **Type:** string
+
+    """
 
     def generate_code(self):
+        """
+            Donne le code du domaine.
+
+            :return: Une chaine de caractère correspondant au code du domaine.
+            :retype: string
+        """
         tab_nom = self.nom.strip().split(" ")
         return f'{tab_nom[0][0]}{tab_nom[0][1]}'.upper()
 
