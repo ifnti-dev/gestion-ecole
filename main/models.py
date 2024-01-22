@@ -706,6 +706,7 @@ class Etudiant(Utilisateur):
 
 # Calcule le nombre de crédits obtenus par l'étudiant dans un semestre donné.
 
+
     def credits_obtenus_semestre(self, semestre):
         """
             Cette fonction permet de calculer le nombre de crédits obtenus dans le semestre donné.
@@ -1626,6 +1627,7 @@ class Matiere(models.Model):
     def get_etudiant_semestre(self, semestre):
         """
         Cette méthode donne les étudiants suivant la matière au cours du semestre donné
+
         :param semestre: Semestre d'enseignement
         :type semestre: Semestre
 
@@ -1842,6 +1844,10 @@ class AnneeUniversitaire(models.Model):
         """
             Méthode statique donnant le niveau correspondant à un semestre.
 
+            :param semestre_libelle: Nom du semestre
+
+            :type semestre_libelle: string
+
             :return: Le nom correspondant au niveau du semestre.
             :retype: string
         """
@@ -1856,15 +1862,50 @@ class AnneeUniversitaire(models.Model):
 
 
 class Semestre(models.Model):
+    """
+        Classe correspondant aux semestres
+    """
     id = models.CharField(primary_key=True, blank=True, max_length=14)
+    """
+        Identifiant du semestre
+
+        **Type:** string
+    """
     CHOIX_SEMESTRE = [('S1', 'Semestre1'), ('S2', 'Semestre2'), ('S3', 'Semestre3'),
                       ('S4', 'Semestre4'), ('S5', 'Semestre5'), ('S6', 'Semestre6')]
     libelle = models.CharField(max_length=30, choices=CHOIX_SEMESTRE)
+    """
+        Intitulé du semestre
+
+        **Type:** string
+
+    """
     credits = models.IntegerField(default=30)
+    """
+        Nombre de crédits du semestre    
+    
+        **Type:** integer
+
+        **Valeur par défaut:** 30
+    """
     courant = models.BooleanField(
         default=False, verbose_name="Semestre actuel", null=True)
+    """
+        Définit s'il s'agit d'un semestre en cours
+
+        **Type:** string
+
+        **Valeur par défaut:** false
+    """
     annee_universitaire = models.ForeignKey(
         AnneeUniversitaire, on_delete=models.SET_NULL, null=True)
+    """
+    identifiant de l'année universitaire à laquelle le semestre est rattaché    
+    
+        **Type:** string
+
+        **Nullable:** true
+    """
 
     def save(self):
         if not self.id:
@@ -1873,6 +1914,7 @@ class Semestre(models.Model):
         return super().save()
 
     def static_get_current_semestre():
+
         try:
             annee = AnneeUniversitaire.static_get_current_annee_universitaire()
             # Revoir cette partie retourner S1,S3,S5 ou S2,S4,S6
@@ -1881,13 +1923,13 @@ class Semestre(models.Model):
         except:
             return Semestre.objects.all()
 
-    # méthode permettant de retourner toutes les ues d'un semestre
-    """
-        paramètre : aucun 
-        retour: tableau d'ues
-    """
-
     def get_all_ues(self):
+        """
+            Méthode donnant l'ensemble des UEs contenues dans un semestre.
+
+            :return: Liste d'UE.
+            :retype: list[UE]
+        """
         try:
             programme = Programme.objects.get(semestre__id=self.id)
             return programme.ues.all()
@@ -1895,6 +1937,12 @@ class Semestre(models.Model):
             return []
 
     def code_semestre(self):
+        """
+            Donne le code du semestre.
+
+            :return: Une chaine de caractère correspondant au code du semestre.
+            :retype: string
+        """
         return f'{self.libelle}-{self.annee_universitaire}'
 
     def __str__(self):
@@ -1902,10 +1950,31 @@ class Semestre(models.Model):
 
 
 class Domaine(models.Model):
+    """
+        Classe correspondant aux domaines
+    """
     nom = models.CharField(max_length=255, verbose_name="Nom")
+    """
+        Nom du domaine
+
+        **Type:** string
+
+    """
     description = models.TextField(max_length=500, verbose_name="description")
+    """
+        Description du domaine
+
+        **Type:** string
+
+    """
 
     def generate_code(self):
+        """
+            Donne le code du domaine.
+
+            :return: Une chaine de caractère correspondant au code du domaine.
+            :retype: string
+        """
         tab_nom = self.nom.strip().split(" ")
         return f'{tab_nom[0][0]}{tab_nom[0][1]}'.upper()
 
@@ -1914,21 +1983,67 @@ class Domaine(models.Model):
 
 
 class Parcours(models.Model):
+    """
+        Classe correspondant à un parcours
+    """
     nom = models.CharField(max_length=255, verbose_name="Nom")
+    """
+        Nom du parcours
+
+        **Type:** string
+
+    """
     domaine = models.ForeignKey(
         Domaine, on_delete=models.CASCADE, verbose_name="Domaine", null=True)
+    """
+        Identifiant du domaine auquel est rattaché le parcours
+
+        **Type:** string
+
+        **Nullable:** true  
+
+    """
     description = models.TextField(max_length=500, verbose_name="description")
+    """
+        Description du parcours
+
+        **Type:** string
+
+    """
 
     def __str__(self):
         return self.nom
 
 
 class Programme(models.Model):
+    """
+        Classe correspondant à un programme
+    """
     parcours = models.ForeignKey(
         Parcours, on_delete=models.CASCADE, verbose_name="Parcours", null=True, blank=True)
+    """
+        Identifiant du parcours auquel est rattaché le programme
+
+        **Type:** string
+
+        **Nullable:** true
+
+    """
     semestre = models.ForeignKey(
         Semestre, on_delete=models.CASCADE, verbose_name="Semestre")
+    """
+        Identifiant du semestre auquel est rattaché le programme
+
+        **Type:** string
+
+    """
     ues = models.ManyToManyField(Ue, verbose_name="UE")
+    """
+        UEs contenues dans le parcours
+
+        **Type:** string
+
+    """
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
@@ -1945,6 +2060,12 @@ class Programme(models.Model):
             ue.save()
 
     def generate_code(self):
+        """
+            Donne le code du parcours.
+
+            :return: Une chaine de caractère correspondant au code du parcours.
+            :retype: string
+        """
         return f'{self.parcours}-{self.ues}-{self.semestre}'
 
     def __str__(self):
@@ -1955,45 +2076,102 @@ class Programme(models.Model):
 
 
 class CorrespondanceMaquette(models.Model):
+    """
+        Classe permettant de faire les correspondances entre différentes maquettes. Cette classe à étét mise en place pour fair e la correpondance entre les UEs et Matières de l'IFNTI d'avant 2023 et celles post-2023.
+    """
     class Nature(models.TextChoices):
         UE = "U", "UE"
         MATIERE = "M", "Matière"
 
     nature = models.CharField(max_length=1, choices=Nature.choices)
+    """
+        Nature des éléments à correspondre (UE ou Matière)
+
+        **Type:** string
+
+    """
     ancienne = models.CharField(max_length=225, blank=True, null=True)
+    """
+        Ancienne UE ou Matiere
+
+        **Type:** string
+
+        **Nullable:** true
+
+    """
     nouvelle = models.CharField(max_length=225, blank=True, null=True)
+    """
+        Nouvelle UE ou Matiere
+
+        **Type:** string
+
+        **Nullable:** true
+
+    """
 
     def save(self):
         super().save()
 
     def afficher_nature(self):
+        """
+            Affiche la nature de la correspondance
+
+            :return: Une chaine de caractère correspondant à la nature de la correpondance.
+            :retype: string
+        """
         return "UE" if self.nature.lower() == 'u' else "Matière"
 
     def get_ancienne(self):
+        """
+            Donne l'ancienne UE ou Matiere.
+
+            :return: Un objet UE ou Matiere en fonction de la nature de la correspondance.
+
+            :retype: UE ou Matiere.
+        """
         return Ue.objects.get(id=self.ancienne) if self.nature.lower() == 'u' else Matiere.objects.get(id=self.ancienne)
 
     def get_nouvelle(self):
+        """
+            Donne la nouvelle UE ou Matiere.
+
+            :return: Un objet UE ou Matiere en fonction de la nature de la correspondance.
+
+            :retype: UE ou Matiere
+        """
         return Ue.objects.get(id=self.nouvelle) if self.nature.lower() == 'u' else Matiere.objects.get(id=self.nouvelle)
 
 
 class Note(models.Model):
     """
     Ce modèle représente la note d'un étudiant dans un semestre et une matière donnée.
-
-    Attributes:
-        valeurNote (decimal): La valeur de la note.
-        etudiant (Etudiant): L'étudiant à qui cette note appartient.
-        matiere (Matiere): La matière dans laquelle l'étudiant a eu cette note. 
-
-    Methods:
-        __str__() -> str: Renvoie une représentation en chaîne de caractères de l'objet Note.
     """
     valeurNote = models.DecimalField(default=0.0, blank=False, max_digits=5, decimal_places=2,
                                      verbose_name="note", validators=[MaxValueValidator(20), MinValueValidator(0.0)])
+    """
+        Valeur de la note
+
+        **Type:** Decimal
+
+        **Valeur par défaut:** 0.0
+
+    """
     etudiant = models.ForeignKey(
         Etudiant, on_delete=models.CASCADE, verbose_name="Étudiant")
+    """
+        Identifiant de l'étudiant à qui appartient la note
+
+        **Type:** string
+
+    """
     evaluation = models.ForeignKey(
         Evaluation, on_delete=models.CASCADE, verbose_name="Evaluation")
+    """
+        Evaluation dans laquelle l'étudiant a obtenu la note
+
+        **Type:** string
+
+    """
 
     def __str__(self):
         """
@@ -2003,12 +2181,33 @@ class Note(models.Model):
 
 
 class Frais(models.Model):
+    """
+        Classe correpsondant aux Frais de scolarité chaque année
+    """
     annee_universitaire = models.ForeignKey(
         AnneeUniversitaire, on_delete=models.CASCADE)
+    """
+        Année universitaire du montant des frais
+
+        **Type:** string
+
+    """
     montant_inscription = models.DecimalField(
         max_digits=10, decimal_places=2, verbose_name="Frais d'inscription")
+    """
+        Montant de l'inscription
+
+        **Type:** Decimal
+
+    """
     montant_scolarite = models.DecimalField(
         max_digits=10, decimal_places=2, verbose_name="Frais de scolarité")
+    """
+        Montant de la scolaritée
+
+        **Type:** Decimal
+
+    """
 
     def __str__(self):
         return "Année universitaire: " + str(self.annee_universitaire) + "  Frais d'inscription : " + str(self.montant_inscription) + "     " + " Frais de scolarité : " + str(self.montant_scolarite)
@@ -2016,21 +2215,32 @@ class Frais(models.Model):
 
 class CompteEtudiant(models.Model):
     """
-    Modèle représentant le compte associé à un étudiant pour une année universitaire donnée.
-
-    Attributes:
-        etudiant (Etudiant): Référence à l'étudiant associé au compte.
-        annee_universitaire (AnneeUniversitaire): Année universitaire associée au compte.
-        solde (Decimal): Solde du compte.
-
-    Methods:
-        __str__(): Renvoie une représentation en chaîne de caractères du compte étudiant.
-
+        Classe représentant le compte de paiement de l'étudiant
     """
     etudiant = models.ForeignKey(Etudiant, on_delete=models.CASCADE)
+    """
+        Montant de la scolaritée
+
+        **Type:** Decimal
+
+    """
     annee_universitaire = models.ForeignKey(
         AnneeUniversitaire, on_delete=models.CASCADE)
+    """
+        Montant de la scolaritée
+
+        **Type:** Decimal
+
+    """
     solde = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    """
+        Total à solder par l'étudiant au cours de l'année scolaire
+
+        **Type:** Decimal
+
+        **Valeur par défaut:** 0.0
+
+    """
 
     def __str__(self):
         return str(self.etudiant.nom) + str(self.etudiant.prenom) + "  Solde - " + str(self.annee_universitaire) + " : " + str(self.solde)
@@ -2038,43 +2248,83 @@ class CompteEtudiant(models.Model):
 
 class Paiement(models.Model):
     """
-    Modèle représentant les versements effectués par les étudiants.
-
-    Attributes:
-        TYPE_CHOICES (list): Liste des choix de type de versement.
-
-        type (str): Type de versement (frais de scolarité, frais d'inscription, etc.).
-        montant (Decimal): Montant versé.
-        dateversement (date): Date du versement.
-        etudiant (Etudiant): Référence à l'étudiant effectuant le versement.
-        comptable (Comptable): Référence au comptable en charge du versement.
-        compte_bancaire (CompteBancaire): Référence au compte bancaire utilisé pour le versement (optionnel).
-        numerobordereau (str): Numéro de bordereau du versement.
-        annee_universitaire (AnneeUniversitaire): Année universitaire associée au versement.
-
-    Methods:
-        __str__(): Renvoie une représentation en chaîne de caractères du versement.
-
+        Classe correspondant au versement des frais de scolarité par l'étudiant
     """
     TYPE_CHOICES = [
         ('Frais de scolarité', 'Frais de scolarité'),
         ("Frais d'inscription", "Frais d'inscription"),
     ]
     type = models.CharField(max_length=30, choices=TYPE_CHOICES)
+    """
+        Type de paiement
+
+        **Type:** string
+
+
+    """
     montant = models.DecimalField(
         max_digits=10, decimal_places=2, default=0, verbose_name="Montant versé")
+    """
+
+        Montant versé par l'étudiant
+
+        **Type:** Decimal
+
+        **Valeur par défaut:** 0.0
+
+    """
     dateversement = models.DateField(
         default=timezone.now, verbose_name="Date de versement")
+    """
+        Date du versement
+
+        **Type:** string
+
+    """
     etudiant = models.ForeignKey(
         'Etudiant', on_delete=models.CASCADE, verbose_name="Etudiant")
+    """
+        Étudiant ayant éffectué le versement
+    
+        **Type:** string
+
+    """
     comptable = models.ForeignKey(
         'Comptable', on_delete=models.CASCADE, verbose_name="Comptable")
+    """
+        Total à solder par l'étudiant au cours de l'année scolaire
+
+        **Type:** Decimal
+
+    """
     compte_bancaire = models.ForeignKey(
         'CompteBancaire', on_delete=models.CASCADE, null=True, blank=True)
+    """
+        Compte bancaire sur lequel le versement à été effectué.
+
+        **Type:** integer
+
+        **Nullable:** true
+
+    """
     numerobordereau = models.CharField(
         max_length=30, verbose_name="Numéro de bordereau", default=0)
+    """
+        Numéro du bordereau de versement
+
+        **Type:** string
+
+        **Valeur par défaut:** "0"
+
+    """
     annee_universitaire = models.ForeignKey(
         AnneeUniversitaire, on_delete=models.CASCADE)
+    """
+        Année universitaire correspondant au versement
+
+        **Type:** string
+
+    """
 
     def __str__(self):
         return str(self.dateversement) + " : " + str(self.etudiant.nom) + "  " + str(self.etudiant.prenom) + "  " + str(self.montant)
@@ -2084,19 +2334,35 @@ class CompteBancaire(models.Model):
     """
     Modèle représentant un compte bancaire.
 
-    Attributes:
-        numero (str): Le numéro du compte bancaire.
-        solde_bancaire (decimal): Le solde du compte bancaire.
-        frais_tenue_de_compte (decimal): Les frais de tenue de compte.
-
-    Methods:
-        __str__() -> str: Renvoie une représentation en chaîne de caractères de l'objet CompteBancaire.
     """
     numero = models.CharField(max_length=100, verbose_name="Numéro du compte")
+    """
+       Numéro du compte bancaire
+
+        **Type:** string
+
+
+    """
     solde_bancaire = models.DecimalField(
         max_digits=10, decimal_places=2, default=0)
+    """
+        Solde dans le compte
+
+        **Type:** Decimal
+
+        **Valeur par défaut:** 0.0
+
+    """
     frais_tenue_de_compte = models.DecimalField(
         max_digits=10, decimal_places=2, default=0, verbose_name="Frais de tenue de compte")
+    """
+        Frais de tenue de compte
+    
+        **Type:** Decimal
+
+        **Valeur par défaut:** 0
+
+    """
 
     def __str__(self):
         """
@@ -2108,25 +2374,6 @@ class CompteBancaire(models.Model):
 class Salaire(models.Model):
     """
     Modèle représentant les détails du salaire d'un personnel.
-
-    Attributes:
-        date_debut (date): La date de début de la période de paie.
-        date_fin (date): La date de fin de la période de paie.
-        personnel (Personnel): La référence au personnel concerné par le salaire.
-        tcs (decimal): Le montant de la taxe sur les salaires.
-        prime_forfaitaire (decimal): Le montant de la prime forfaitaire.
-        acomptes (decimal): Le montant des acomptes versés au personnel.
-        frais_prestations_familiale_salsalaire (decimal): Les frais de prestations familiales sur le salaire.
-
-    Methods:
-        calculer_salaire_brut_annuel() -> decimal: Calcule le salaire brut annuel du personnel.
-        calculer_salaire_brut_mensuel() -> decimal: Calcule le salaire brut mensuel du personnel.
-        calculer_total_A() -> decimal: Calcule le total A.
-        calculer_net_imposable_arrondi() -> int: Calcule le net imposable arrondi.
-        calculer_irpp_annuel() -> decimal: Calcule l'impôt sur le revenu des personnes physiques (IRPP) annuel.
-        calculer_irpp_mensuel() -> decimal: Calcule l'IRPP mensuel.
-        calculer_deductions_cnss() -> decimal: Calcule les déductions CNSS.
-        save(*args, **kwargs): Enregistre les détails du salaire dans la base de données.
     """
     TYPE_CHOICES = [
         ('Enseignant', 'Enseignant'),
@@ -2136,45 +2383,210 @@ class Salaire(models.Model):
         ("Agent d'entretien", "Agent d'entretien"),
     ]
     date_debut = models.DateField(verbose_name="Date de début", null=True)
+    """
+        Date à laquelle l'employé à commencé par travailler
+
+        **Type:** string
+
+        **Nullable:** true
+
+    """
     date_fin = models.DateField(verbose_name="Date de fin", null=True)
+    """
+        Date à laquelle l'employé s'est arrêté de travailler    
+    
+        **Type:** string
+
+        **Nullable:** true
+
+    """
     personnel = models.ForeignKey(
         Personnel, on_delete=models.CASCADE, null=False)
+    """
+        Employé à qui est rattaché le salaire
+    
+        **Type:** string
+
+        **Nullable:** true
+
+    """
     numero_cnss = models.CharField(
         max_length=30, verbose_name="Numéro CNSS", default=0)
+    """
+        Numéro CNSS (Caisse Nationale de Sécurité Sociale)
+
+        **Type:** string
+
+        **Valeur par défaut:** "0"
+
+    """
     qualification_professionnel = models.CharField(
         max_length=30, choices=TYPE_CHOICES, verbose_name="Qualification professionnelle")
+    """
+        Qualification professionelle de l'employé
+
+        **Type:** string
+
+    """
     prime_efficacite = models.DecimalField(
         max_digits=10, decimal_places=2, default=0, verbose_name="Prime d'éfficacité")
+    """
+        Prime d'efficacité de l'employé
+
+        **Type:** Decimal
+
+        **Valeur par défaut:** 0.0
+
+    """
     prime_qualite = models.DecimalField(
         max_digits=10, decimal_places=2, default=0, verbose_name="Prime de qualité")
+    """
+        Prime de qualitée de l'employé
+
+        **Type:** Decimal
+
+        **Valeur par défaut:** 0.0
+
+    """
     frais_travaux_complementaires = models.DecimalField(
         max_digits=10, decimal_places=2, default=0, verbose_name="Travaux complémentaires")
+    """
+        Frais des travaux complémentaires réalisés par l'employé
+
+        **Type:** Decimal
+
+        **Valeur par défaut:** 0.0
+
+    """
     prime_anciennete = models.DecimalField(
         max_digits=10, decimal_places=2, default=0, verbose_name="Prime d'ancienneté")
+    """
+        Prime d'anciennetée de l'employé
+
+        **Type:** Decimal
+
+        **Valeur par défaut:** 0.0
+
+    """
     frais_prestations_familiales = models.DecimalField(
         max_digits=10, decimal_places=3, default=0.03)
+    """
+        Frais des prestations familiales de l'employé
+
+        **Type:** Decimal
+
+        **Valeur par défaut:** 0.03
+
+    """
     frais_risques_professionnel = models.DecimalField(
         max_digits=10, decimal_places=3, default=0.02)
+    """
+        Frais des risques professionnels
+
+        **Type:** Decimal
+
+        **Valeur par défaut:** 0.02
+
+    """
     frais_pension_vieillesse_emsalaire = models.DecimalField(
         max_digits=10, decimal_places=3, default=0.125)
+    """
+        Frais de la pension de vieillesse de l'employé
+
+        **Type:** Decimal
+
+        **Valeur par défaut:** 0.125
+
+    """
     frais_prestations_familiale_salsalaire = models.DecimalField(
         max_digits=10, decimal_places=3, default=0.04)
+    """
+        Frais prestations familiale salariales
+
+        **Type:** Decimal
+
+        **Valeur par défaut:** 0.04
+
+    """
     tcs = models.DecimalField(
         max_digits=10, decimal_places=2, default=0, verbose_name="TCS")
+    """
+        Taxe complémentaire sur le salaire
+
+        **Type:** Decimal
+
+        **Valeur par défaut:** 0.0
+
+    """
     irpp = models.DecimalField(
         max_digits=10, decimal_places=2, default=0, verbose_name="IRPP")
+    """
+        Impôt sur le revenu des personnes physiques
+
+        **Type:** Decimal
+
+        **Valeur par défaut:** 0.0
+
+    """
     prime_forfaitaire = models.DecimalField(
         max_digits=10, decimal_places=2, default=0, verbose_name="Prime forfaitaires")
+    """
+        Prime forfaitaire de l'employé
+
+        **Type:** Decimal
+
+        **Valeur par défaut:** 0.0
+
+    """
     acomptes = models.DecimalField(
         max_digits=10, decimal_places=2, default=0, verbose_name="Acomptes")
+    """
+        Acomptes de l'employé
+
+        **Type:** Decimal
+
+        **Valeur par défaut:** 0.0
+
+    """
     salaire_net_a_payer = models.DecimalField(
         max_digits=15, decimal_places=2, default=0, verbose_name="Salaire Net à payer")
+    """
+        Salaire net de l'employé
+
+        **Type:** Decimal
+
+        **Valeur par défaut:** 0.0
+
+    """
     compte_bancaire = models.ForeignKey(
         'CompteBancaire', on_delete=models.CASCADE, null=True, blank=True)
+    """
+        Compte bancaire de l'employé
+    
+        **Type:** string
+
+        **Nullable:** true
+
+    """
     annee_universitaire = models.ForeignKey(
         'AnneeUniversitaire', on_delete=models.CASCADE, verbose_name="Année Universitaire", null=True, blank=True)
+    """
+        Année universitaire au cours duquel l'employé à reçu le paiement
+    
+        **Type:** string
+
+        **Nullable:** true
+
+    """
 
     def calculer_salaire_brut_annuel(self):
+        """
+            Donne le salaire brut annuel de l'employé
+
+            :return: Le salaire brut annuel de l'employé
+
+            :retype: Decimal
+        """
         salaire_de_base = self.personnel.salaireBrut
         prime_efficacite = self.prime_efficacite
         prime_qualite = self.prime_qualite
@@ -2191,6 +2603,13 @@ class Salaire(models.Model):
         return salaire_brut_annuel
 
     def calculer_salaire_brut_mensuel(self):
+        """
+            Donne le salaire brut mensuel de l'employé
+
+            :return: Le salaire brut mensuel de l'employé
+
+            :retype: Decimal
+        """
         salaire_brut_mensuel = self.calculer_salaire_brut_annuel() / 12
         return salaire_brut_mensuel
 
@@ -2223,6 +2642,13 @@ class Salaire(models.Model):
         return semi_net
 
     def calculer_charges_de_familles(self):
+        """
+            Calcule les charges familliales de l'employé
+
+            :return: Frais des charges familliales de l'employé
+
+            :retype: Decimal
+        """
         F44 = self.personnel.nombre_de_personnes_en_charge
         if F44 <= 6:
             resultat = 120000 * F44
@@ -2247,6 +2673,13 @@ class Salaire(models.Model):
         return int(net_imposable_arrondi_str)
 
     def calculer_irpp_annuel(self):
+        """
+            Calcul du IRPP annuel de l'employé
+
+            :return: IRPP annuel de l'employé
+
+            :retype: Decimal
+        """
         G51 = self.calculer_net_imposable_arrondi()
         if G51 < 900000 or G51 == 900000:
             irpp = G51 * 0
@@ -2267,10 +2700,24 @@ class Salaire(models.Model):
         return irpp
 
     def calculer_irpp_mensuel(self):
+        """
+            Calcul du IRPP mensuel de l'employé
+
+            :return: IRPP mensuel de l'employé
+
+            :retype: Decimal
+        """
         irpp_mensuel = self.calculer_irpp_annuel() / 12
         return irpp_mensuel
 
     def calculer_deductions_cnss(self):
+        """
+            Calcul des déductions de la CNSS sur le salaire de l'employé
+
+            :return: Déductions de la CNSS
+
+            :retype: Decimal
+        """
         frais_prestations_familiale_salsalaire = Decimal(
             self.frais_prestations_familiale_salsalaire) * Decimal(self.calculer_salaire_brut_mensuel())
         deductions = (
@@ -2303,20 +2750,6 @@ class Salaire(models.Model):
 class Fournisseur(models.Model):
     """
     Modèle représentant les paiements effectués aux fournisseurs de service.
-
-    Attributes:
-        TYPE (list): Liste des types de fournisseurs.
-        TYPE_MOIS (list): Liste des mois.
-        type (str): Le type de fournisseur.
-        montant (decimal): Le montant versé au fournisseur.
-        dateversement (date): La date de versement du paiement.
-        le_mois (str): Le mois auquel le paiement est associé.
-        compte_bancaire (CompteBancaire): La référence au compte bancaire utilisé pour le paiement.
-        annee_universitaire (AnneeUniversitaire): L'année universitaire associée au paiement.
-
-    Methods:
-        save(*args, **kwargs): Enregistre les détails du paiement dans la base de données.
-
     """
 
     TYPE = [
@@ -2340,16 +2773,58 @@ class Fournisseur(models.Model):
         ("Décembre", "Décembre")
     ]
     type = models.CharField(max_length=30, choices=TYPE)
+    """
+        Fournisseur de service 
+
+        **Type:** string
+
+    """
     montant = models.DecimalField(
         max_digits=10, decimal_places=2, default=0, verbose_name="Montant versé")
+    """
+        Montant versé au fourniseur
+
+        **Type:** Decimal
+
+        **Valeur par défaut:** 0.0
+
+    """
     dateversement = models.DateField(
         default=timezone.now, verbose_name="Date de versement")
+    """
+        Date du versement
+
+        **Type:** string
+
+    """
     le_mois = models.CharField(
         max_length=30, choices=TYPE_MOIS, verbose_name="Mois")
+    """
+        Mois du versement
+
+        **Type:** string
+
+    """
     compte_bancaire = models.ForeignKey(
         'CompteBancaire', on_delete=models.CASCADE, null=True, blank=True)
+    """
+        Compte bancaire du fournisseur
+
+        **Type:** string
+
+        **Nullable:** true
+
+    """
     annee_universitaire = models.ForeignKey(
         'AnneeUniversitaire', on_delete=models.CASCADE, verbose_name="Année Universitaire", null=True, blank=True)
+    """
+        Année du versement
+
+        **Type:** string
+
+        **Nullable:** true
+
+    """
 
     def save(self, *args, **kwargs):
         if not self.annee_universitaire:
@@ -2360,22 +2835,6 @@ class Fournisseur(models.Model):
 class Information(models.Model):
     """
     Modèle pour enregistrer les informations relatives aux attestations de service des enseignants.
-
-    Attributes:
-        TYPE_CHOISE (list): Liste des choix de niveaux.
-        enseignant (Enseignant): Référence à l'enseignant associé à l'attestation.
-        directeur (DirecteurDesEtudes): Référence au directeur des études associé à l'attestation.
-        numeroSecurite (int): Numéro de sécurité sociale de l'enseignant.
-        discipline (Matiere): La discipline associée enseigné par l'enseignant.
-        niveau (str): Le niveau enseigné par l'enseignant.
-        dateDebut (date): Date de début du contrat.
-        dateFin (date): Date de fin du contrat.
-        duree (str): Durée du contrat en jours.
-
-    Methods:
-        save(*args, **kwargs): Enregistre les détails de l'attestation dans la base de données.
-        __str__(): Renvoie une représentation en chaîne de caractères de l'attestation.
-
     """
     TYPE_CHOISE = [
         ('Premier', 'Niveau 1'),
@@ -2384,17 +2843,72 @@ class Information(models.Model):
     ]
     enseignant = models.ForeignKey(
         'Enseignant', on_delete=models.CASCADE, verbose_name="Enseigant", null=True)
+    """
+        Enseignant associé à l'information
+
+        **Type:** string
+
+        **Nullable:** true
+
+    """
     directeur = models.ForeignKey(
         'DirecteurDesEtudes', on_delete=models.CASCADE, verbose_name="Directeur des études", null=True)
+    """
+        Directeur des études asscocié à l'information
+
+        **Type:** string
+
+        **Nullable:** true
+
+    """
     numeroSecurite = models.IntegerField(
         verbose_name="Numéro de sécurité sociale")
+    """
+        Numéro de sécurité sociale de l'employé
+
+        **Type:** integer
+
+    """
     discipline = models.ForeignKey(
         'Matiere', on_delete=models.CASCADE, verbose_name="Discipline")
+    """
+        Matiere enseignée par l'employé
+
+        **Type:** string
+
+    """
     niveau = models.CharField(
         max_length=100, choices=TYPE_CHOISE, verbose_name="Niveau")
+    """
+        Niveau de l'enseignant
+
+        **Type:** string
+
+    """
     dateDebut = models.DateField(verbose_name="Date de début")
+    """
+        Date à laquelle l'employé à commencé par travailler
+
+        **Type:** string
+
+
+    """
     dateFin = models.DateField(verbose_name="Date de fin")
+    """
+        Date à laquelle l'employé s'est arrêté de travailler
+
+        **Type:** string
+
+    """
     duree = models.CharField(max_length=100, verbose_name="Durée", default='0')
+    """
+        Durée du contrat de l'employé
+
+        **Type:** string
+
+        **Valeur par défaut:** "0"
+
+    """
 
     def save(self, *args, **kwargs):
         duree = self.dateFin - self.dateDebut
@@ -2408,58 +2922,172 @@ class Information(models.Model):
 class FicheDePaie(models.Model):
     """
     Modèle représentant les fiches de paie des enseignants.
-
-    Attributes:
-        dateDebut (date): Date de début de la période de paie.
-        dateFin (date): Date de fin de la période de paie.
-        matiere (Matiere): Référence à la matière enseignée.
-        enseignant (Enseignant): Référence à l'enseignant concerné par la fiche de paie.
-        nombreHeureL1 (int): Nombre d'heures enseignées pour le niveau 1.
-        nombreHeureL2 (int): Nombre d'heures enseignées pour le niveau 2.
-        nombreHeureL3 (int): Nombre d'heures enseignées pour le niveau 3.
-        nombreHeure (int): Nombre total d'heures enseignées.
-        prixUnitaire (int): Prix unitaire par heure.
-        montantL1 (int): Montant total pour le niveau 1.
-        montantL2 (int): Montant total pour le niveau 2.
-        montantL3 (int): Montant total pour le niveau 3.
-        montant (int): Montant total.
-        difference (int): Différence entre le montant total et les acomptes.
-        acomptes (int): Montant des acomptes déjà versés.
-        montantEnLettre (str): Montant total en lettres.
-        compte_bancaire (CompteBancaire): Référence au compte bancaire utilisé pour le paiement.
-        annee_universitaire (AnneeUniversitaire): Année universitaire associée à la fiche de paie.
-
-    Methods:
-        save(*args, **kwargs): Enregistre les détails de la fiche de paie dans la base de données.
-        __str__(): Renvoie une représentation en chaîne de caractères de la fiche de paie.
-
     """
     dateDebut = models.DateField(verbose_name="Date de début", null=True)
+    """
+        Date à laquelle l'employé à commencé
+
+        **Type:** string
+
+        **Nullable:** true
+
+    """
     dateFin = models.DateField(verbose_name="Date de fin", null=True)
+    """
+        Date à laquelle l'employé s'est arrêté
+
+        **Type:** string
+
+        **Nullable:** true
+
+    """
     matiere = models.ForeignKey(
         'Matiere', on_delete=models.CASCADE, verbose_name="Matière")
+    """
+        Matière enseignée par le reçeveur de la fiche de paie
+
+        **Type:** string
+
+    """
     enseignant = models.ForeignKey(
         'Enseignant', on_delete=models.CASCADE, verbose_name="Enseignant")
+    """
+        Identifiant de l'enseignant reçevant la fiche de paie
+
+        **Type:** string
+
+    """
     nombreHeureL1 = models.IntegerField(
         verbose_name="Nombre d'heure L1", default=0)
+    """
+        Nombre d'heure réalisées en L1
+
+        **Type:** integer
+
+        **Valeur par défaut:** 0
+
+    """
     nombreHeureL2 = models.IntegerField(
         verbose_name="Nombre d'heure L2", default=0)
+    """
+        Nombre d'heures réalisées en L2
+
+        **Type:** integer
+
+        **Valeur par défaut:** 0
+
+    """
     nombreHeureL3 = models.IntegerField(
         verbose_name="Nombre d'heure L3", default=0)
+    """
+        Nombre d'heures réalisées en L3
+
+        **Type:** integer
+
+        **Valeur par défaut:** 0
+
+    """
     nombreHeure = models.IntegerField(verbose_name="Nombre d'heure", default=0)
+    """
+        Nombre d'heures au total
+
+        **Type:** integer
+
+        **Valeur par défaut:** 0
+
+    """
     prixUnitaire = models.IntegerField(verbose_name="Prix unitaire", default=0)
+    """
+        Prix unitaire de l'heure
+
+        **Type:** integer
+
+        **Valeur par défaut:** 0
+
+    """
     montantL1 = models.IntegerField(verbose_name="montant L1", default=0)
+    """
+        Montant total en L1
+
+        **Type:** integer
+
+        **Valeur par défaut:** 0
+
+    """
     montantL2 = models.IntegerField(verbose_name="montant L2", default=0)
+    """
+        Montant total en L2
+
+        **Type:** integer
+
+        **Valeur par défaut:** 0
+    """
     montantL3 = models.IntegerField(verbose_name="montant L3", default=0)
+    """
+        Montant total en L3
+
+        **Type:** integer
+
+        **Valeur par défaut:** 0
+
+    """
     montant = models.IntegerField(verbose_name="montant", default=0)
+    """
+        Montant total
+
+        **Type:** integer
+
+        **Valeur par défaut:** 0
+
+    """
     difference = models.IntegerField(verbose_name="Différence", default=0)
+    """
+        Différence
+
+        **Type:** integer
+
+        **Valeur par défaut:** 0
+
+    """
     acomptes = models.IntegerField(verbose_name="Acomptes", default=0)
+    """
+        Acompte
+
+        **Type:** integer
+
+        **Valeur par défaut:** 0
+
+    """
     montantEnLettre = models.CharField(
         max_length=100, verbose_name="Montant en lettre", default="lettres")
+    """
+        Montant en lettres du paiement
+    
+        **Type:** string
+
+        **Valeur par défaut:** "lettres"
+
+    """
     compte_bancaire = models.ForeignKey(
         'CompteBancaire', on_delete=models.CASCADE, null=True, blank=True)
+    """
+        Compte bancaire du bénéficiare
+
+        **Type:** string
+
+        **Nullable:** true
+
+    """
     annee_universitaire = models.ForeignKey(
         'AnneeUniversitaire', on_delete=models.CASCADE, verbose_name="Année Universitaire", null=True, blank=True)
+    """
+        Année Universitaire au correspondant au paiement
+
+        **Type:** string
+
+        **Nullable:** true
+
+    """
 
     def __str__(self):
         return str(self.enseignant.nom) + "  " + str(self.enseignant.prenom) + "  " + str(self.dateDebut) + "-" + str(self.dateFin)
@@ -2481,6 +3109,7 @@ class FicheDePaie(models.Model):
 class Charge(models.Model):
     """
     Modèle représentant les fiches de prise en charge des frais pour le personnel.
+<<<<<<< HEAD
 
     Attributes:
         dateDebut (date): Date de début de la période de paie.
@@ -2493,21 +3122,93 @@ class Charge(models.Model):
         annee_universitaire (AnneeUniversitaire): Année universitaire associée à la prise en charge.
         compte_bancaire (CompteBancaire): Référence au compte bancaire utilisé pour le remboursement.
 
+=======
+>>>>>>> main
     """
     dateDebut = models.DateField(verbose_name="Date de début", null=True)
+    """
+        Date de debut de la prise en charge
+
+        **Type:** string
+
+        **Nullable:** true
+
+    """
     dateFin = models.DateField(verbose_name="Date de fin", null=True)
+    """
+        Date de fin de la prise en charge
+
+        **Type:** string
+
+        **Nullable:** true
+
+    """
     personnel = models.ForeignKey(
         'Personnel', on_delete=models.CASCADE, verbose_name="Personnel")
+    """
+        Employé pris en charge
+
+        **Type:** string
+
+    """
     frais_de_vie = models.IntegerField(verbose_name="Frais de vie", default=0)
+    """
+        Frais de vie de l'employé
+
+        **Type:** integer
+
+        **Valeur par défaut:** 0
+
+    """
     frais_nourriture = models.IntegerField(
         verbose_name="Frais de nourriture", default=0)
+    """
+        Frais de nourriture de l'employé
+
+        **Type:** integer
+
+        **Valeur par défaut:** 0
+
+    """
     montant = models.IntegerField(verbose_name="Montant", default=0)
+    """
+        Montant de la facture
+
+        **Type:** integer
+
+        **Valeur par défaut:** 0
+
+    """
     montantEnLettre = models.CharField(
         max_length=100, verbose_name="Montant en lettre", default="lettres")
+    """
+        Montant en lettre de la facture
+
+        **Type:** string
+
+        **Valeur par défaut:** "lettres"
+
+    """
     annee_universitaire = models.ForeignKey(
         'AnneeUniversitaire', on_delete=models.CASCADE, verbose_name="Année Universitaire", null=True, blank=True)
+    """
+        Année Universitaire au correspondant à la facture
+
+        **Type:** string
+
+        **Nullable:** true
+
+    """
     compte_bancaire = models.ForeignKey(
         'CompteBancaire', on_delete=models.CASCADE, null=True, blank=True)
+    """
+        Compte bancaire de versement
+
+        **Type:** string
+
+        **Nullable:** true
+
+    """
 
     def __str__(self):
         """
@@ -2532,24 +3233,6 @@ class Conge(models.Model):
     """
     Modèle représentant les demandes de congé du personnel.
 
-    Attributes:
-        NATURE_CHOICES (list): Liste des choix de nature de congé.
-        VALIDATION_CHOICES (list): Liste des choix d'état de validation.
-
-        nature (str): Nature des congés.
-        autre_nature (str): Autre nature de congé à préciser (optionnel).
-        date_et_heure_debut (date): Date de début du congé.
-        date_et_heure_fin (date): Date de fin du congé.
-        personnel (Personnel): Référence au personnel demandant le congé.
-        motif_refus (str): Motif de refus du congé.
-        valider (str): État de validation du congé.
-        nombre_de_jours_de_conge (int): Nombre de jours de congé demandés.
-        annee_universitaire (AnneeUniversitaire): Année universitaire associée à la demande de congé.
-
-    Methods:
-        save(*args, **kwargs): Enregistre les détails de la demande de congé dans la base de données.
-        __str__(): Renvoie une représentation en chaîne de caractères de la demande de congé.
-
     """
     NATURE_CHOICES = [
         ('Congé annuel', 'Congé annuel'),
@@ -2565,21 +3248,85 @@ class Conge(models.Model):
 
     nature = models.CharField(
         max_length=30, choices=NATURE_CHOICES, verbose_name="Nature des congés")
+    """
+        Nature de la demande de congés 
+
+        **Type:** string
+
+    """
     autre_nature = models.CharField(
         max_length=100, blank=True, null=True, verbose_name="Autre nature à préciser")
+    """
+        Nature secondaire de la demande de congés
+
+        **Type:** string
+
+        **Nullable:** true
+
+    """
     date_et_heure_debut = models.DateField(
         default=timezone.now, verbose_name="Date de début")
+    """
+        Date de début des congés
+
+        **Type:** string
+
+    """
     date_et_heure_fin = models.DateField(
         default=timezone.now, verbose_name="Date de fin")
+    """
+        Date de fin des congés
+
+        **Type:** string
+
+    """
     personnel = models.ForeignKey(
         'Personnel', on_delete=models.CASCADE, verbose_name="Personnel")
+    """
+        Identifiant de l'employé partant en congés
+
+        **Type:** string
+
+    """
     motif_refus = models.TextField(
         null=True, blank=True, verbose_name="Motif de refus")
+    """
+        Motif de refus des congés 
+
+        **Type:** string
+
+        **Nullable:** true
+
+    """
     valider = models.CharField(
         max_length=30, choices=VALIDATION_CHOICES, verbose_name="État", default="Inconnu")
+    """
+        Validation des congés
+
+        **Type:** string
+
+        **Valeur par défaut:** "Inconnu"
+
+    """
     nombre_de_jours_de_conge = models.IntegerField(default=0)
+    """
+        Nombre de jours de congés demandés
+
+        **Type:** integer
+
+        **Valeur par défaut:** 0
+
+    """
     annee_universitaire = models.ForeignKey(
         'AnneeUniversitaire', on_delete=models.CASCADE, verbose_name="Année Universitaire", null=True, blank=True)
+    """
+        Année Universitaire des congés
+
+        **Type:** integer
+
+        **Nullable:** true
+
+    """
 
     def save(self, *args, **kwargs):
         if not self.annee_universitaire:
