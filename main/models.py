@@ -3117,7 +3117,6 @@ class Charge(models.Model):
         **Type:** string
 
         **Nullable:** true
-
     """
     dateFin = models.DateField(verbose_name="Date de fin", null=True)
     """
@@ -3196,9 +3195,15 @@ class Charge(models.Model):
     """
 
     def __str__(self):
+        """
+             __str__(): Renvoie une représentation en chaîne de caractères de la prise en charge.
+        """
         return str(self.personnel.nom) + "  " + str(self.personnel.prenom) + "  " + str(self.dateDebut) + "-" + str(self.dateFin)
 
     def save(self, *args, **kwargs):
+        """
+            save(*args, **kwargs): Enregistre les détails de la prise en charge dans la base de données.
+        """
         if not self.annee_universitaire:
             self.annee_universitaire = AnneeUniversitaire.static_get_current_annee_universitaire()
 
