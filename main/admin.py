@@ -1,6 +1,7 @@
 from django.contrib import admin
 from .models import Enseignant, Evaluation, CompteBancaire, Fournisseur, Domaine,Information, Parcours,Programme, Matiere, Etudiant, Competence, Note, Comptable, Semestre, Ue, AnneeUniversitaire, Personnel, Tuteur, Paiement, FicheDePaie, DirecteurDesEtudes, Frais, CompteEtudiant, Salaire, Conge
 from cahier_de_texte.models import Seance
+from planning.models import Planning,SeancePlannifier
 from main.forms import EnseignantForm
 from import_export.admin import ImportExportModelAdmin
 
@@ -74,6 +75,8 @@ admin.site.register(CompteBancaire)
 admin.site.register(CompteEtudiant)
 admin.site.register(Salaire)
 admin.site.register(Fournisseur)
+admin.site.register(Planning)
+admin.site.register(SeancePlannifier)
 admin.site.register(Conge)
 from django import forms
 
