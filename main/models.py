@@ -3109,21 +3109,7 @@ class FicheDePaie(models.Model):
 class Charge(models.Model):
     """
     Modèle représentant les fiches de prise en charge des frais pour le personnel.
-<<<<<<< HEAD
 
-    Attributes:
-        dateDebut (date): Date de début de la période de paie.
-        dateFin (date): Date de fin de la période de paie.
-        personnel (Personnel): Référence au personnel concerné par la prise en charge.
-        frais_de_vie (int): Montant des frais de vie pris en charge.
-        frais_nourriture (int): Montant des frais de nourriture pris en charge.
-        montant (int): Montant total pris en charge.
-        montantEnLettre (str): Montant total en lettres.
-        annee_universitaire (AnneeUniversitaire): Année universitaire associée à la prise en charge.
-        compte_bancaire (CompteBancaire): Référence au compte bancaire utilisé pour le remboursement.
-
-=======
->>>>>>> main
     """
     dateDebut = models.DateField(verbose_name="Date de début", null=True)
     """
