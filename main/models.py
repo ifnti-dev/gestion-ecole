@@ -3109,7 +3109,6 @@ class FicheDePaie(models.Model):
 class Charge(models.Model):
     """
     Modèle représentant les fiches de prise en charge des frais pour le personnel.
-
     """
     dateDebut = models.DateField(verbose_name="Date de début", null=True)
     """
@@ -3118,7 +3117,6 @@ class Charge(models.Model):
         **Type:** string
 
         **Nullable:** true
-
     """
     dateFin = models.DateField(verbose_name="Date de fin", null=True)
     """
