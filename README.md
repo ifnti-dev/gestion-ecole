@@ -1,7 +1,14 @@
 # Projet Gestion université ifnti
 Application de gestion de l'ifnti
 
+# Preambule
+Creation d'une base de donnée avec postgresql:
 
+```bash
+$ sudo -i -u postgres
+$ psql
+# CREATE DATABASE <DB_NAME>;
+```
 
 
 # Installation et lancement de l'application
