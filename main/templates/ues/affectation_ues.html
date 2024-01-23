@@ -31,7 +31,7 @@
                         <div class="col-sm-6">
                             <div class="custom-control custom-checkbox">
                                 <input class="custom-control-input matiere" type="checkbox" name="ues[]" value="{{ ue.libelle }}" id="{{ ue.libelle }}">
-                                <label class="custom-control-label" for="{{ ue.libelle }}">{{ ue.libelle }}</label>
+                                <label class="custom-control-label" for="{{ ue.libelle }}">{{ ue.codeUE }} || {{ ue.libelle }} </label>
                             </div>
                         </div>
                     {% endfor %}
