@@ -15,22 +15,16 @@
 \thispagestyle{empty}
 \vfill
 \begin{center}
-{\Huge L3 S5 2023-2024}
+{\Huge \VAR{niveau}}
 \end{center}
 \vfill
-\begin{tabular}{r|C{3.75cm}|C{3.75cm}|C{3.75cm}|C{3.75cm}|C{3.75cm}|C{3.75cm}|}
-\multicolumn{1}{c}{} 
-& \multicolumn{1}{c}{\large Lundi 18/12 - J35}
-& \multicolumn{1}{c}{\large Mardi 19/12 - J36}
-& \multicolumn{1}{c}{\large Mercredi 20/12 - J37}
-& \multicolumn{1}{c}{\large Jeudi 21/12 - J38}
-& \multicolumn{1}{c}{\large Vendredi 22/12 - J39}
-& \multicolumn{1}{c}{\large Samedi 23/12 - J40}\\
-\multicolumn{1}{c}{}&\multicolumn{1}{c}{}&\multicolumn{1}{c}{}&\multicolumn{1}{c}{}&\multicolumn{1}{c}{}&\multicolumn{1}{c}{}&\multicolumn{1}{c}{}\\
+\begin{tabular}{r|\BLOCK{for i in range(0, days|length)}C{\VAR{taille}cm}|\BLOCK{endfor}}
+\multicolumn{1}{c}{} \BLOCK{for day in days}&\multicolumn{1}{c}{\large \VAR{day}}\BLOCK{endfor}\\
+\multicolumn{1}{c}{}\BLOCK{for day in days}&\multicolumn{1}{c}{}\BLOCK{endfor}\\
 \hhline{~------}
-Tenues & Veste & Tricot & Veste & Tricot & Bigarré & Bigarré \\ 
+Tenues \BLOCK{for i in range(0, days|length)} & \VAR{tenues[i]}\BLOCK{endfor}\\
 \hhline{~------}
-\multicolumn{1}{c}{}&\multicolumn{1}{c}{}&\multicolumn{1}{c}{}&\multicolumn{1}{c}{}&\multicolumn{1}{c}{}&\multicolumn{1}{c}{}&\multicolumn{1}{c}{}\\
+\multicolumn{1}{c}{}\BLOCK{for day in days}&\multicolumn{1}{c}{}\BLOCK{endfor}\\
 \hhline{~------}
 7h
 & \multirow{2}{*}{Étude}
