@@ -12,6 +12,7 @@ docs/build/*
 
 # Backup files # 
 *.bak 
+backup/*
 
 # If you are using PyCharm # 
 # User-specific stuff
