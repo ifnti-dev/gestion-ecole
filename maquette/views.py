@@ -3,7 +3,7 @@ from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from main.pdfMaker import generate_pdf
 from main.models import AnneeUniversitaire, CorrespondanceMaquette, Matiere, Programme, Semestre, Ue, Domaine, Parcours
-from scripts.utils import load_maquette,load_notes_from_ue_file, pre_load_note_ues_template_data
+from scripts.utils import load_maquette, load_matieres_by_year, load_notes_from_ue_file, pre_load_note_ues_template_data, pre_load_ue_matiere_template_data_by_year
 from .forms import CorrespondanceMaquetteForm, DataForm, GenerateMaquetteForm, ProgrammeForm, DomaineForm, ParcoursForm
 import os
 from django.core import serializers
@@ -130,36 +130,44 @@ def generateDictFromProgrammeData(semestre, parcours, annee_accademique):
     else:
         semestres = annee_accademique.semestre_set.all()
         titre = ""
-    programmes = Programme.objects.filter(parcours=parcours, semestre__in=semestres, semestre__annee_universitaire=annee_accademique)
-    ues_list = []
+    programmes = Programme.objects.filter(parcours=parcours, semestre__in=semestres, semestre__annee_universitaire=annee_accademique).prefetch_related('ues')
+    semestres_data = []
     for programme in programmes:
-        for ue in programme.ues.all():
-            matires = [matiere.libelle for matiere in ue.matiere_set.all()]
-            horaires = [matiere.heures if matiere.heures else 0  for matiere in ue.matiere_set.all()]
-            enseignants = []
-            for matiere in ue.matiere_set.all():
-                if matiere.enseignant:
-                    enseignants.append(matiere.enseignant)
-                else:
-                    enseignants.append("pas de prof")
-            enseignant_principale = ue.enseignant
-            ue_dict = {
-                    "semestre" : programme.semestre.libelle,
-                    "intitule" : ue.libelle,
-                    "type_ue" : ue.type,
-                    "matieres" : matires,
-                    "credit" : ue.nbreCredits,
-                    "volumes_horaires" : horaires,
-                    "enseignants" : enseignants,
-                    "enseignants_principaux" : enseignant_principale,
-                }
-            
-            ues_list.append(ue_dict)
+        ues = programme.ues.all().prefetch_related('matiere_set')
+        semestre_data = {
+            "semsetre" : programme.semestre,
+            "ues" : ues,
+            "ues_length" : ues.count(),
+        }
+
+        semestres_data.append(semestre_data)
+        
+        # for ue in programme.ues.all():
+        #     matires = [matiere.libelle for matiere in ue.matiere_set.all()]
+        #     horaires = [matiere.heures if matiere.heures else 0  for matiere in ue.matiere_set.all()]
+        #     enseignants = []
+        #     for matiere in ue.matiere_set.all():
+        #         if matiere.enseignant:
+        #             enseignants.append(matiere.enseignant)
+        #         else:
+        #             enseignants.append("pas de prof")
+        #     enseignant_principale = ue.enseignant
+        #     ue_dict = {
+        #             "semestre" : programme.semestre.libelle,
+        #             "intitule" : ue.libelle,
+        #             "type_ue" : ue.type,
+        #             "matieres" : matires,
+        #             "credit" : ue.nbreCredits,
+        #             "volumes_horaires" : horaires,
+        #             "enseignants" : enseignants,
+        #             "enseignants_principaux" : enseignant_principale,
+        #         }
+        #     ues_list.append(ue_dict)
     data={
         "titre" : titre,
-        "tatale_credit" : sum([ue["credit"] for ue in ues_list]),
-        "totale_volume_horaire" : [sum(sum(ue["volumes_horaires"]) for ue in ues_list)],
-        "ues" : ues_list
+        # "tatale_credit" : sum([ue["credit"] for ue in ues_list]),
+        # "totale_volume_horaire" : [sum(sum(ue["volumes_horaires"]) for ue in ues_list)],
+        "semestres_data" : semestres_data
     }
     return data
 
@@ -283,12 +291,22 @@ def data(request):
                             annee_selectionnee = AnneeUniversitaire.objects.get(annee=annee_selectionnee)
                             print(annee_selectionnee)
                             load_maquette(file_cache_tmp, annee_selectionnee)
-                            
-        return HttpResponse("Hello")
+
         if matieres_excel_file:
-            load_matieres(matieres_excel_file)
+            load_matieres_by_year(matieres_excel_file, annee_selectionnee)
+            return HttpResponse("Vrai")
         if notes_excel_file:
-            load_notes_from_matiere(notes_excel_file)
+            full_data = str(notes_excel_file).split('_')
+            code_ue = full_data[1]
+            semestre = full_data[2]
+            annee_selectionnee = int(full_data[3].split('-')[0])
+            
+            annee_selectionnee = AnneeUniversitaire.objects.get(annee=annee_selectionnee)
+            ue = Ue.objects.get(codeUE=code_ue)
+            semestre = annee_selectionnee.semestre_set.get(libelle=semestre)
+            load_notes_from_ue_file(notes_excel_file, ue, semestre)
+            return HttpResponse("Vrai")
+            
         return redirect('maquette:data')
     data = {
         'form' : DataForm()
@@ -296,7 +314,10 @@ def data(request):
     return render(request, 'data/index.html', context=data)
 
 def generate_note_template(request):
-    zip_path = pre_load_note_ues_template_data(request.session.get('id_annee_selectionnee'))
+    id_annee_selectionnee = request.session.get('id_annee_selectionnee')
+    annee_selectionnee = get_object_or_404(AnneeUniversitaire, pk=id_annee_selectionnee)
+    semestre = annee_selectionnee.get_semestres().first()
+    zip_path = pre_load_note_ues_template_data(semestre)
     zip_file = open(zip_path, 'r')
     with open(zip_path, 'rb') as zip_file:
         response = HttpResponse(zip_file.read(), content_type='application/force-download')
@@ -312,9 +333,11 @@ def generate_maquette_template(request):
         return response
 
 def generate_matiere_template(request):
-    file_name = 'ues_matieres_tmp.xlsx'
+    annees = AnneeUniversitaire.objects.all()
+    file_name = pre_load_ue_matiere_template_data_by_year(annees)
     file_path = 'media/excel_templates/'+file_name
-    with open(file_path, 'rb') as file:
+    with open(file_name, 'rb') as file:
         response = HttpResponse(file.read(), content_type="application/force-download")
         response['Content-Disposition'] = 'attachment; filename="{}"'.format(os.path.basename(file_name))
         return response
+

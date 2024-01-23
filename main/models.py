@@ -1210,19 +1210,20 @@ def generate_ue_code(sender, instance, created, **kwargs):
 
 class Matiere(models.Model):
     codematiere = models.CharField(
-        max_length=50, verbose_name="Code de la matière")
+        max_length=50, verbose_name="Code de la matière", blank=True)
     libelle = models.CharField(max_length=100)
     coefficient = models.IntegerField(null=True,  verbose_name="Coefficient", default="1")
     minValue = models.FloatField(null=True,  verbose_name="Valeur minimale",  default="7")
     heures = models.DecimalField(blank=True, max_digits=4, decimal_places=1, validators=[MinValueValidator(1)], null=True) 
-    abbreviation = models.CharField(max_length=10,default ="Short", unique=True)
+    abbreviation = models.CharField(max_length=20,default ="Short", unique=True)
     enseignant = models.ForeignKey(Enseignant, blank=True, null=True, verbose_name="Enseignants responsable", on_delete=models.CASCADE)
     #enseignants = models.ManyToManyField(Enseignant, related_name="EnseignantsMatiere", blank=True, null=True, verbose_name="Enseignants")
     ue = models.ForeignKey('Ue', on_delete=models.CASCADE)
     is_active = models.BooleanField(default=True, verbose_name="Actif")
 
     def save(self, *args, **kwargs):
-        if not self.codematiere:
+        print("Save Matière")
+        if not self.codematiere and len(self.codematiere) == 0:
             # Calculer le préfixe numérique en fonction de l'ordre des matières dans l'UE
             ordre_matiere = Matiere.objects.filter(ue=self.ue).count() + 1
 
@@ -1341,13 +1342,10 @@ class Competence(models.Model):
 
 
 class AnneeUniversitaire(models.Model):
-    annee = models.DecimalField(max_digits=4, decimal_places=0, verbose_name="Année universitaire")
+    annee = models.DecimalField(max_digits=4, decimal_places=0, verbose_name="Année universitaire", unique=True)
     annee_courante = models.BooleanField(default=False, verbose_name="Année universitaire acutuelle", null=True)
 
     def save(self, *args, **kwargs):
-        annee = AnneeUniversitaire.objects.filter(annee=self.annee)
-        if not self.pk and annee:
-            return
         super().save(*args, **kwargs)
         self.generateSemeste()
 
@@ -1377,15 +1375,17 @@ class AnneeUniversitaire(models.Model):
         current_date = datetime.datetime.now()
         try:
             # Rechercher l'année accadémique courrante
-            virtual_current_university_date = AnneeUniversitaire.objects.get(
-                annee_courante=True)
-            # Rechercher l'année courante
-            if current_date.month >= 8 and virtual_current_university_date.annee < current_date.year:
+            virtual_current_university_date = AnneeUniversitaire.objects.get(annee_courante=True)
+            
+            # Rechercher l'année  réel courante
+            print("::: IN TRY ::::")
+            if virtual_current_university_date.annee == current_date.year and current_date.month >= 8 :
                 virtual_current_university_date.disable()
                 return AnneeUniversitaire.objects.create(annee=current_date.year, annee_courante=True)
             return virtual_current_university_date
         except Exception as e:
-            return AnneeUniversitaire.objects.create(annee=current_date.year, annee_courante=True)
+            print("::: IN except ::::")
+            return -1
 
     @staticmethod
     def getNiveau(semestre_libelle):
@@ -1401,14 +1401,11 @@ class AnneeUniversitaire(models.Model):
 
 class Semestre(models.Model):
     id = models.CharField(primary_key=True, blank=True, max_length=14)
-    CHOIX_SEMESTRE = [('S1', 'Semestre1'), ('S2', 'Semestre2'), ('S3', 'Semestre3'),
-                      ('S4', 'Semestre4'), ('S5', 'Semestre5'), ('S6', 'Semestre6')]
+    CHOIX_SEMESTRE = [('S1', 'Semestre1'), ('S2', 'Semestre2'), ('S3', 'Semestre3'),('S4', 'Semestre4'), ('S5', 'Semestre5'), ('S6', 'Semestre6')]
     libelle = models.CharField(max_length=30, choices=CHOIX_SEMESTRE)
     credits = models.IntegerField(default=30)
-    courant = models.BooleanField(
-        default=False, verbose_name="Semestre actuel", null=True)
-    annee_universitaire = models.ForeignKey(
-        AnneeUniversitaire, on_delete=models.SET_NULL, null=True)
+    courant = models.BooleanField(default=False, verbose_name="Semestre actuel", null=True)
+    annee_universitaire = models.ForeignKey(AnneeUniversitaire, on_delete=models.SET_NULL, null=True)
 
     def save(self):
         if not self.id:
@@ -1497,6 +1494,8 @@ class Programme(models.Model):
     class Meta:
         unique_together = ["parcours", "semestre"]
 
+class Settings(models.Model):
+    pass
 
 class CorrespondanceMaquette(models.Model):
     class Nature(models.TextChoices):

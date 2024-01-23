@@ -68,6 +68,7 @@
                         <span class="nav-main-link-name text-capitalize">Frais scolaires</span>
                     </a>
                 </li>
+
                 <li class="nav-main-item">
                     <a class="nav-main-link" href="{% url 'paiement:bulletins_de_paye' id_annee_selectionnee %}">
                         <i class="nav-main-link-icon si si-energy"></i>
@@ -119,9 +120,6 @@
 
                 {% endif %}
 
-
-
-
                 {% if is_secretaire %}
                 <li class="nav-main-heading text-white">Etudiants</li>
 
@@ -138,17 +136,34 @@
                         <span class="nav-main-link-name text-capitalize">Tuteurs</span>
                     </a>
                 </li>
+
                 <li class="nav-main-item">
                     <a class="nav-main-link" href="{% url 'main:liste_des_etudiants_suspendu' %}">
                         <i class="nav-main-link-icon si si-energy"></i>
                         <span class="nav-main-link-name text-capitalize">Etudiants suspendus</span>
                     </a>
                 </li>
+
                 {% endif %}
 
                 {% if is_directeur_des_etudes %}
 
                 <li class="nav-main-heading text-white">Etudiants</li>
+
+                <li class="nav-main-item">
+                    <a class="nav-main-link nav-main-link-submenu" data-toggle="submenu" aria-haspopup="true" aria-expanded="false" href="#">
+                        <i class="nav-main-link-icon si si-layers"></i>
+                        <span class="nav-main-link-name">Page Packs</span>
+                    </a>
+                    <ul class="nav-main-submenu">
+                        <li class="nav-main-item">
+                            <a class="nav-main-link nav-main-link-submenu" data-toggle="submenu" aria-haspopup="true" aria-expanded="false" href="#">
+                                <i class="nav-main-link-icon si si-bag"></i>
+                                <span class="nav-main-link-name">e-Commerce</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
 
                 <li class="nav-main-item">
                     <a class="nav-main-link" href="{% url 'main:etudiants' %}">
@@ -164,20 +179,20 @@
                     </a>
                 </li>
 
-
-
                 <li class="nav-main-item">
                     <a class="nav-main-link" href="{% url 'main:liste_des_tuteurs' %}">
                         <i class="nav-main-link-icon si si-energy"></i>
                         <span class="nav-main-link-name text-capitalize">Tuteurs</span>
                     </a>
                 </li>
+
                 <li class="nav-main-item">
                     <a class="nav-main-link" href="{% url 'main:liste_des_etudiants_suspendu' %}">
                         <i class="nav-main-link-icon si si-energy"></i>
                         <span class="nav-main-link-name text-capitalize">Etudiants suspendus</span>
                     </a>
                 </li>
+
                 {% endif %}
                 {% if is_etudiant or is_enseignant %}
                 <li class="nav-main-heading text-white">Classe</li>
@@ -214,10 +229,8 @@
                         <i class="nav-main-link-icon si si-energy"></i>
                         <span class="nav-main-link-name text-capitalize">Cahier de texte</span>
                     </a>
-                    <a
-                    class="nav-main-link"
-                    href="{% url 'planning:planning' %}"
-                >
+                    <a class="nav-main-link"
+                        href="{% url 'planning:planning' %}">
                     <i class="nav-main-link-icon si si-energy"></i>
                     <span class="nav-main-link-name text-capitalize"
                         >Planning</span
