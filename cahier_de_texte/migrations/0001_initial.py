@@ -1,0 +1,35 @@
+
+from django.db import migrations, models
+import django.db.models.deletion
+
+
+class Migration(migrations.Migration):
+
+    initial = True
+
+    dependencies = [
+        ('main', '0001_initial'),
+        ('planning', '0001_initial'),
+    ]
+
+    operations = [
+        migrations.CreateModel(
+            name='Seance',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('intitule', models.CharField(max_length=200)),
+                ('date_et_heure_debut', models.DateTimeField()),
+                ('date_et_heure_fin', models.DateTimeField()),
+                ('description', models.TextField()),
+                ('valider', models.BooleanField(default=False)),
+                ('commentaire', models.TextField(null=True)),
+                ('auteur', models.ForeignKey(default='Anonyme', on_delete=django.db.models.deletion.CASCADE, related_name='seance_auteur', to='main.etudiant')),
+                ('eleves_presents', models.ManyToManyField(related_name='seances_presents', to='main.etudiant')),
+                ('enseignant', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to='main.enseignant')),
+                ('matiere', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='main.matiere')),
+                ('seancePlannifier', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to='planning.seanceplannifier')),
+                ('semestre', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to='main.semestre')),
+            ],
+        ),
+    ]
+
