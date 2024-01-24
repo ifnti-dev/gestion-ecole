@@ -72,9 +72,11 @@ def nouveau_planning(request):
         annee = AnneeUniversitaire.static_get_current_annee_universitaire().annee
         semestre = Semestre.objects.filter(courant=True, pk__contains=annee,id=semestreId).first()
         planification = defaultdict(list)
+        
         ues = semestre.get_all_ues()
-
+        
         for ue in ues:
+            print('plan1')
             matieres_json = serialize('json', ue.matiere_set.all())
             matieres = json.loads(matieres_json)
             for matiere in matieres :
@@ -95,6 +97,7 @@ def nouveau_planning(request):
                     matiere['temps_plannifier']=temps_x                         
 
             planification[str(ue)].append({'matieres': matieres})
+            print('plan : ',planification)
             planification_json = json.dumps(planification)
         
 
@@ -319,7 +322,7 @@ def imprimer(request,planningId):
 
         day = jour +' '+valeur_jour+'/'+valeur_mois+' - J'+jour_n 
         
-        timeshot= str(planning.date_heure_debut.hour)+'h'+str(planning.date_heure_debut.minute) +' - '+str(planning.date_heure_fin.hour)+'h'+str(planning.date_heure_fin.minute)
+        timeshot= str(planning.date_heure_debut.hour)+'h'+str(planning.date_heure_debut.minute)
 
         planning.day = day
         planning.timeshot = timeshot
