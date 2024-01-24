@@ -1829,7 +1829,6 @@ class AnneeUniversitaire(models.Model):
         # try:
         #     # Rechercher l'année accadémique courrante
         #     virtual_current_university_date = AnneeUniversitaire.objects.get(annee_courante=True)
-            
         #     # Rechercher l'année  réel courante
         #     print("::: IN TRY ::::")
         #     if virtual_current_university_date.annee == current_date.year and current_date.month >= 8 :
@@ -1839,6 +1838,7 @@ class AnneeUniversitaire(models.Model):
         # except Exception as e:
         #     print("::: IN except ::::")
         #     return -1
+        
 
     @staticmethod
     def getNiveau(semestre_libelle):

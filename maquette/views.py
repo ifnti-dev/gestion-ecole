@@ -354,7 +354,7 @@ def upload_matieres(request):
             for file_cache_tmp in matieres_excel_file:
                 name = str(file_cache_tmp)
                 annee_str = name.split('_')[-1]
-                annee_str = 2023
+                annee_str = annee_str.split('-')[0]
                 annee = AnneeUniversitaire.objects.get(annee=annee_str)
                 load_matieres_by_year(file_cache_tmp, annee)
         return redirect('maquette:data')

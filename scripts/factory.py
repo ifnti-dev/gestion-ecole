@@ -1,6 +1,6 @@
 import random
 from faker import Faker
-from main.models import Etudiant, Personnel, Enseignant, Comptable, Programme,  Tuteur, Ue, Matiere, Evaluation, Competence, Semestre, Domaine, Parcours, AnneeUniversitaire, Note
+from main.models import Etudiant, Personnel, FicheDePaie, Enseignant, Comptable, Programme,  Tuteur, Ue, Matiere, Evaluation, Competence, Semestre, Domaine, Parcours, AnneeUniversitaire, Note
 from cahier_de_texte.models import Seance
 from django.contrib.auth.models import User 
 from django.contrib.auth.models import Group, Permission
@@ -30,7 +30,9 @@ def clean_data_base():
     print("Drop all object ..... 5")
     Tuteur.objects.all().delete()
     print("Drop all object ..... 6")
-    Ue.objects.all().delete()
+    #Ue.objects.all().delete()
+    #
+    return
     print("Drop all object ..... 7")
     Matiere.objects.all().delete()
     print("Drop all object ..... 8")
