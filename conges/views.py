@@ -21,6 +21,22 @@ from .forms import RefusCongeForm
 
 @login_required(login_url=settings.LOGIN_URL)
 def liste_mes_conges(request, id_annee_selectionnee):
+    """
+    Affiche la liste des demandes de congés (validées et rejettées) d'un employé donné pour une année universitaire sélectionnée.
+
+    Args: 
+
+    :param id_annee_selectionnee: L'ID de l'année universitaire sélectionnée.
+    request: L'objet HttpRequest pour la requête entrante.
+
+    Returns: Un objet HttpResponse contenant le rendu HTML de la liste des demandes de congés.
+
+    Raises: Aucune exception n'est levée.
+
+    Cette vue récupère la liste des demandes de congés (validées et rejettées) d'un employé donné pour une année universitaire sélectionnée,
+    puis les renvoie au template 'conges/liste_conges.html' pour l'affichage.
+
+    """
     annee_universitaire = get_object_or_404(AnneeUniversitaire, pk=id_annee_selectionnee)    
     conges = Conge.objects.filter(annee_universitaire=annee_universitaire, personnel__user=request.user)   
     personnel = Personnel.objects.get(user=request.user)  # Récupérer l'objet Personnel associé à l'utilisateur actuel
@@ -35,6 +51,16 @@ def liste_mes_conges(request, id_annee_selectionnee):
 
 @login_required(login_url=settings.LOGIN_URL)
 def formulaire_de_demande_de_conges(request, id):
+    """
+    Affiche en version pdf le formulaire de demande de congés de l'employé sélectionné.
+
+    Args:
+        request (HttpRequest): L'objet de requête HTTP utilisé par Django.
+        id (str): L'identifiant du formulaire de demande de l'employé sélectionné.
+
+    Returns:HttpResponse: Une réponse HTTP contenant le formulaire de demande de congés en format HTML.
+
+    """
     conge = get_object_or_404(Conge, pk=id) 
     role = conge.personnel.getrole().capitalize()
     if conge.valider == 'Actif':
@@ -66,6 +92,23 @@ def formulaire_de_demande_de_conges(request, id):
 
 @login_required(login_url=settings.LOGIN_URL)
 def liste_conges(request, id_annee_selectionnee):
+    """
+    Affiche la liste de toutes les demandes de congés (validées et rejettées) des employés pour une année universitaire sélectionnée.
+
+    Args: 
+
+    :param id_annee_selectionnee: L'ID de l'année universitaire sélectionnée.
+    request: L'objet HttpRequest pour la requête entrante.
+
+    Returns: Un objet HttpResponse contenant le rendu HTML de la liste de toutes les demandes de congés.
+
+    Raises: Aucune exception n'est levée.
+
+    Cette vue récupère la liste de toutes les demandes de congés (validées et rejettées) des employés pour une année universitaire sélectionnée,
+    puis les renvoie au template 'conges/liste_conges.html' pour l'affichage.
+
+    """
+
     annee_universitaire = get_object_or_404(AnneeUniversitaire, pk=id_annee_selectionnee)
     conges = Conge.objects.filter(annee_universitaire = annee_universitaire)
     context = {
@@ -77,6 +120,22 @@ def liste_conges(request, id_annee_selectionnee):
 
 @login_required(login_url=settings.LOGIN_URL)
 def demander_conges(request, id=0):
+    """
+    Enregistre ou met à jour le formulaire de demande de congés dans le système.
+    Si l’ID est fourni, elle met à jour les informations concernant la demande de congés existante avec les nouvelles données. Sinon, elle enregistre un nouveau formulaire de demande de congés.
+
+    Args:
+        request: L'objet HttpRequest qui représente la requête HTTP reçue.
+        id (int, optional): L'identifiant du formulaire de demande de congés à modifier (par défaut : 0).
+
+    Returns:
+        HttpResponse: La réponse HTTP renvoyée au client.
+    'conges/demander_conges.html' : correspond au template qui est renvoyer.
+
+    Raises:
+        None
+
+    """
     if request.method == "GET":
         if id == 0:
             form = CongeForm()
@@ -116,6 +175,22 @@ def demander_conges(request, id=0):
 
 @login_required(login_url=settings.LOGIN_URL)
 def demandes_validees(request, id_annee_selectionnee):
+    """
+    Affiche la liste des demandes de congés validées par le responsable de l'établissement (congés actifs) pour une année universitaire sélectionnée.
+
+    Args: 
+
+    :param id_annee_selectionnee: L'ID de l'année universitaire sélectionnée.
+    request: L'objet HttpRequest pour la requête entrante.
+
+    Returns: Un objet HttpResponse contenant le rendu HTML de la liste des demandes validées.
+
+    Raises: Aucune exception n'est levée.
+
+    Cette vue récupère la liste des demandes de congés validées pour une année universitaire sélectionnée,
+    puis les renvoie au template 'conges/demandes_validees.html' pour affichage.
+
+    """
     demandes_validees = Conge.objects.filter(valider="Actif")
     annee_universitaire = get_object_or_404(AnneeUniversitaire, pk=id_annee_selectionnee)
     context = {
@@ -128,6 +203,23 @@ def demandes_validees(request, id_annee_selectionnee):
 
 @login_required(login_url=settings.LOGIN_URL)
 def demandes_en_attentes(request, id_annee_selectionnee):
+    """
+    Affiche la liste des demandes de congés en attente pour une année universitaire sélectionnée.
+
+    Args: 
+
+    :param id_annee_selectionnee: L'ID de l'année universitaire sélectionnée.
+    request: L'objet HttpRequest pour la requête entrante.
+
+    Returns: Un objet HttpResponse contenant le rendu HTML de la liste des demandes en attente.
+
+    Raises: Aucune exception n'est levée.
+
+    Cette vue récupère la liste des demandes de congés en attente pour une année universitaire sélectionnée,
+    puis les renvoie au template 'conges/demandes_en_attentes.html' pour affichage.
+
+    """
+
     demandes_en_attentes = Conge.objects.filter(valider="Inconnu")
     annee_universitaire = get_object_or_404(AnneeUniversitaire, pk=id_annee_selectionnee)
     context = {
@@ -140,6 +232,22 @@ def demandes_en_attentes(request, id_annee_selectionnee):
 
 @login_required(login_url=settings.LOGIN_URL)
 def demandes_rejettees(request, id_annee_selectionnee):
+    """
+    Affiche la liste des demandes de congés rejettées par le responsable de l'établissement (congés inactifs) pour une année universitaire sélectionnée.
+
+    Args: 
+
+    :param id_annee_selectionnee: L'ID de l'année universitaire sélectionnée.
+    request: L'objet HttpRequest pour la requête entrante.
+
+    Returns: Un objet HttpResponse contenant le rendu HTML de la liste des demandes rejettées.
+
+    Raises: Aucune exception n'est levée.
+
+    Cette vue récupère la liste des demandes de congés rejettées pour une année universitaire sélectionnée,
+    puis les renvoie au template 'conges/demandes_rejettees.html' pour affichage.
+
+    """
     demandes_rejettees = Conge.objects.filter(valider="Inactif")
     annee_universitaire = get_object_or_404(AnneeUniversitaire, pk=id_annee_selectionnee)
     context = {
