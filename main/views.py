@@ -4,6 +4,7 @@ from django.http import HttpResponse
 from main.pdfMaker import generate_pdf
 from django.conf import settings
 from main.forms import EnseignantForm, EtudiantForm, EvaluationForm, InformationForm, ProgrammeForm, NoteForm, TuteurForm, UeForm, MatiereForm
+from scripts.utils import pre_load_evaluation_template_data
 from .models import Domaine, Enseignant, Evaluation, DirecteurDesEtudes, Personnel, Information, Matiere, Etudiant, Competence, Note, Comptable, Parcours, Programme, Semestre, Ue, AnneeUniversitaire, Tuteur
 from cahier_de_texte.models import Seance
 from planning.models import Planning ,SeancePlannifier
@@ -27,8 +28,7 @@ import datetime
 def dashboard(request):
     id_annee_selectionnee = request.session.get('id_annee_selectionnee')
     print(id_annee_selectionnee)
-    annee_selectionnee = get_object_or_404(
-        AnneeUniversitaire, pk=id_annee_selectionnee)
+    annee_selectionnee = get_object_or_404(AnneeUniversitaire, pk=id_annee_selectionnee)
     semestres = annee_selectionnee.get_semestres()
     if request.user.groups.all().first().name in ['directeur_des_etudes', 'secretaire']:
         data = {
@@ -142,6 +142,7 @@ def etudiants(request):
         semestres_selected = semestres_selected.get()
     except:
         semestres_selected = {'id': semestre_id}
+        
     etats_selected = {'id': etat_id}
 
     # Construire une liste temporaire d'étudiants avec des informations de niveau
@@ -1383,7 +1384,7 @@ def evaluations(request, id_matiere):
     evaluations = Evaluation.objects.filter(matiere=matiere, semestre__in=semestres, rattrapage__in=[True, False])
     semestres = matiere.get_semestres(annee_selectionnee=annee_universitaire, type='__all__')
     
-    preLoadEvaluationTemplateData(matiere, semestre)
+    pre_load_evaluation_template_data(matiere, semestre)
 
     data = {
         'matiere': matiere,
@@ -1703,8 +1704,8 @@ def changer_mdp(request):
 
 def login_view(request):
     if request.method == "POST":
-        username = request.POST.get('login-username')
-        password = request.POST.get('login-password')
+        username = request.POST.get('username')
+        password = request.POST.get('password')
         user = authenticate(request, username=username, password=password)
         if user:
             login(request, user)
