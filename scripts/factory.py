@@ -12,6 +12,7 @@ def run():
         user.delete()
     
     clean_data_base()
+    create_groups_if_exist()
 
 def clean_data_base():
     print("Drop all object ..... 7")
@@ -80,7 +81,7 @@ def clean_data_base():
     parcours.save()
     print(f"Parcours créé : {parcours}")
 
-def create_groups_if_exist(request):
+def create_groups_if_exist():
     permissions = [
         'view', 'add', 'change', 'delete', "diplome", "carte", "releve_details", "releve_synthetique",
     ]

@@ -1,0 +1,36 @@
+<div class="modal" id="{{ modal_id }}" tabindex="-1" role="dialog" aria-labelledby="{{ modal_id }}" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="block block-rounded block-themed block-transparent mb-0">
+                <div class="block-header bg-primary">
+                    <h3 class="block-title">{{ title }}</h3>
+                    <div class="block-options">
+                        <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
+                            <i class="fa fa-fw fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+                <form action="{{ url }}" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="block-content font-size-sm">
+                        <div class="d-flex align-items-center justify-content-center">
+                            <div class="mb-3">
+                                <label for="file" class="form-label">Sélectionner un fichier</label>
+                                <input class="form-control p-1" name="file" type="file" id="file" multiple>
+                            </div>
+                            <a href="{{ url }}">
+                                <button type="button" class="btn border mt-2 ml-3">
+                                    <i class="fa fa-fw fa-file-archive"></i>
+                                </button>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="block-content block-content-full text-right">
+                        <button type="button" class="btn btn-alt-primary mr-1" data-dismiss="modal">Annuler</button>
+                        <button type="submit" class="btn btn-primary">Soumettre</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

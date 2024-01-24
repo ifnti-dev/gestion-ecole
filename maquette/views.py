@@ -324,7 +324,22 @@ def generate_note_template(request):
         response['Content-Disposition'] = 'attachment; filename="{}"'.format(os.path.basename(zip_path))
         return response
 
-def generate_maquette_template(request):
+def upload_maquette(request):
+    if request.method == "POST":
+        if 'file' in request.FILES :
+            maquette_excel_file = request.FILES.getlist('file')
+            for file_cache_tmp in maquette_excel_file:
+                name = str(file_cache_tmp)
+                name_part = name.split('_')
+                if len(name_part) == 3:
+                    year_part = name_part[2].split('-')
+                    if len(year_part) == 2:
+                        annee_selectionnee = int(year_part[0])
+                        annee_selectionnee = AnneeUniversitaire.objects.get(annee=annee_selectionnee)
+                        print(annee_selectionnee)
+                        load_maquette(file_cache_tmp, annee_selectionnee)
+        return redirect('maquette:data')
+
     file_name = 'maquette_general_[annee].xlsx'
     file_path = 'media/excel_templates/'+file_name
     with open(file_path, 'rb') as file:
@@ -332,7 +347,18 @@ def generate_maquette_template(request):
         response['Content-Disposition'] = 'attachment; filename="{}"'.format(os.path.basename(file_name))
         return response
 
-def generate_matiere_template(request):
+def upload_matieres(request):
+    if request.method == "POST":
+        if 'file' in request.FILES :
+            matieres_excel_file = request.FILES.getlist('file')
+            for file_cache_tmp in matieres_excel_file:
+                name = str(file_cache_tmp)
+                annee_str = name.split('_')[-1]
+                annee_str = 2023
+                annee = AnneeUniversitaire.objects.get(annee=annee_str)
+                load_matieres_by_year(file_cache_tmp, annee)
+        return redirect('maquette:data')
+        
     annees = AnneeUniversitaire.objects.all()
     file_name = pre_load_ue_matiere_template_data_by_year(annees)
     file_path = 'media/excel_templates/'+file_name

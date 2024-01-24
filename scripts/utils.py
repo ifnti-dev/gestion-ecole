@@ -6,7 +6,7 @@ import re
 from main.models import Charge, Competence, Comptable, CompteBancaire, CompteEtudiant, Conge, DirecteurDesEtudes, Domaine, Enseignant, Etudiant, FicheDePaie, Fournisseur, Frais, Information, Note, Paiement, Personnel, Salaire, Semestre, Tuteur, Ue, Evaluation, Parcours, AnneeUniversitaire, Programme, Matiere
 from cahier_de_texte.models import Seance
 from scripts.factory import clean_data_base
-from django.db import transaction
+from django.db import DataError, transaction
 from datetime import datetime, timedelta
 
 BASE_PATH = "media/excel_templates"
@@ -32,7 +32,7 @@ def pre_load_ue_matiere_template_data_by_year(annees):
     template_path = f"{BASE_PATH}/ues_matieres_tmp.xlsx"
     
     for annee in annees:
-        result_name = f"{folder_path}/ues_matieres_{annee.annee}.xlsx"
+        result_name = f"{folder_path}/ues_matieres_{annee}.xlsx"
         wb = openpyxl.load_workbook(filename=template_path)
         template_sheet = wb.active
         ues = Ue.objects.filter(programme__semestre__annee_universitaire__annee=annee.annee)
@@ -75,17 +75,23 @@ def load_matieres_by_year(path, annee, batch_size=100):
                 coefficient=int(trim_str(row[1])),
                 minValue=int(trim_str(row[2])),
                 heures=int(trim_str(row[3])),
-                abbreviation=trim_str(row[4]),
+                abbreviation=f"{i+1}{ue.codeUE}",
                 ue=ue,
                 codematiere=f"{i+1}{ue.codeUE}",
             ))
             
             if len(matieres_to_create) == batch_size:   
-                Matiere.objects.bulk_create(matieres_to_create)
+                try:
+                    Matiere.objects.bulk_create(matieres_to_create)
+                except DataError as de:
+                    raise de
                 matieres_to_create = []
 
         if matieres_to_create:
-            Matiere.objects.bulk_create(matieres_to_create)
+            try:
+                Matiere.objects.bulk_create(matieres_to_create)
+            except DataError as de:
+                raise de
 
 @transaction.atomic
 def pre_load_note_ues_template_data(semestre):

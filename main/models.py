@@ -1825,19 +1825,20 @@ class AnneeUniversitaire(models.Model):
             :retype: AnneeUniversitaire
         """
         current_date = datetime.datetime.now()
-        try:
-            # Rechercher l'année accadémique courrante
-            virtual_current_university_date = AnneeUniversitaire.objects.get(annee_courante=True)
+        return AnneeUniversitaire.objects.get(annee=2023)
+        # try:
+        #     # Rechercher l'année accadémique courrante
+        #     virtual_current_university_date = AnneeUniversitaire.objects.get(annee_courante=True)
             
-            # Rechercher l'année  réel courante
-            print("::: IN TRY ::::")
-            if virtual_current_university_date.annee == current_date.year and current_date.month >= 8 :
-                virtual_current_university_date.disable()
-                return AnneeUniversitaire.objects.create(annee=current_date.year, annee_courante=True)
-            return virtual_current_university_date
-        except Exception as e:
-            print("::: IN except ::::")
-            return -1
+        #     # Rechercher l'année  réel courante
+        #     print("::: IN TRY ::::")
+        #     if virtual_current_university_date.annee == current_date.year and current_date.month >= 8 :
+        #         virtual_current_university_date.disable()
+        #         return AnneeUniversitaire.objects.create(annee=current_date.year, annee_courante=True)
+        #     return virtual_current_university_date
+        # except Exception as e:
+        #     print("::: IN except ::::")
+        #     return -1
 
     @staticmethod
     def getNiveau(semestre_libelle):

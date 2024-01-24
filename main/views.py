@@ -142,6 +142,7 @@ def etudiants(request):
         semestres_selected = semestres_selected.get()
     except:
         semestres_selected = {'id': semestre_id}
+        
     etats_selected = {'id': etat_id}
 
     # Construire une liste temporaire d'étudiants avec des informations de niveau
