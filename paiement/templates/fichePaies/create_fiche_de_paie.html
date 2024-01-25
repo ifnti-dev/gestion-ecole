@@ -43,36 +43,39 @@ Enregistrement d'une fiche de paie
             <span class="text-danger">{{ form.enseignant.errors }}</span>
           </div>
           <div class="col-md-6">
-            {{ form.matiere.label_tag }}
-            {{ form.matiere }}
-            <span class="text-danger">{{ form.matiere.errors }}</span>
-        </div> 
+            {{ form.prixUnitaire.label_tag }}
+            {{ form.prixUnitaire }}
+            <span class="text-danger">{{ form.prixUnitaire.errors }}</span>
+          </div>
         </div>
 
         <div class="form-row mb-3"> 
-           <div class="col-md-6">
+          <div class="col-md-6">
             {{ form.nombreHeureL1.label_tag }}
             {{ form.nombreHeureL1 }}
             <span class="text-danger">{{ form.nombreHeureL1.errors }}</span>
           </div>
+          <div class="col-md-6">
+            <label for="matiere">Matière L1</label>
+            {{ form.matiere }}
+            <span class="text-danger">{{ form.matiere.errors }}</span>
+          </div> 
+        </div>
+
+        <div class="form-row mb-3">
           <div class="col-md-6">
             {{ form.nombreHeureL2.label_tag }}
             {{ form.nombreHeureL2 }}
             <span class="text-danger">{{ form.nombreHeureL2.errors }}</span>
           </div>
         </div>
-
+          
         <div class="form-row mb-3"> 
-           <div class="col-md-6">
+          <div class="col-md-6">
             {{ form.nombreHeureL3.label_tag }}
             {{ form.nombreHeureL3 }}
             <span class="text-danger">{{ form.nombreHeureL3.errors }}</span>
-          </div>
-          <div class="col-md-6">
-            {{ form.prixUnitaire.label_tag }}
-            {{ form.prixUnitaire }}
-            <span class="text-danger">{{ form.prixUnitaire.errors }}</span>
-          </div>
+          </div>     
         </div>
 
         <div class="form-row mb-3">
