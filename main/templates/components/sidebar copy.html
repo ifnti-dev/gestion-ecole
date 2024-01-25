@@ -11,14 +11,16 @@
         </a>
     </div>
     <div class="js-sidebar-scroll primary-bg-glace">
+        <!-- Side Navigation -->
         <div class="content-side">
             <ul class="nav-main">
                 <li class="nav-main-item">
-                    <a class="nav-main-link" href="/">
+                    <a class="nav-main-link active" href="/">
                         <i class="nav-main-link-icon si si-speedometer"></i>
-                        <span class="nav-main-link-name text-capitalize">Tableau de bord</span>
+                        <span class="nav-main-link-name">Dashboard</span>
                     </a>
                 </li>
+
                 {% if is_comptable %}
                 <li class="nav-main-heading text-white">Etudiants</li>
 
@@ -147,7 +149,7 @@
 
                 <li class="nav-main-heading text-white">Etudiants</li>
 
-                {% comment %} <li class="nav-main-item">
+                <li class="nav-main-item">
                     <a class="nav-main-link nav-main-link-submenu" data-toggle="submenu" aria-haspopup="true" aria-expanded="false" href="#">
                         <i class="nav-main-link-icon si si-layers"></i>
                         <span class="nav-main-link-name">Page Packs</span>
@@ -160,7 +162,8 @@
                             </a>
                         </li>
                     </ul>
-                </li> {% endcomment %}
+                </li>
+
                 <li class="nav-main-item">
                     <a class="nav-main-link" href="{% url 'main:etudiants' %}">
                         <i class="nav-main-link-icon si si-energy"></i>

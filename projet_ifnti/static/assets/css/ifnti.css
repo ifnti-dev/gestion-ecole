@@ -1,6 +1,13 @@
 :root {
+    
     --primary-color: #045BEA;
     --primary-color-glace: #1c72d6;
+    /* --primary-color: #ea7b04;
+    --primary-color-glace: #d6571c; */
+    /* --primary-color: #045BEA;
+    --primary-color-glace: #1c72d6;
+    --chart-orange-color: #cc5034;
+    --chart-orange-color-hover: #ee3309; */
     --chart-orange-color: #cc5034;
     --chart-orange-color-hover: #ee3309;
 }

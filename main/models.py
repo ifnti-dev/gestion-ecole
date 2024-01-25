@@ -1465,7 +1465,8 @@ class Matiere(models.Model):
     """
 
     def save(self, *args, **kwargs):
-        if not self.codematiere:
+        print("Save Matière")
+        if not self.codematiere and len(self.codematiere) == 0:
             # Calculer le préfixe numérique en fonction de l'ordre des matières dans l'UE
             ordre_matiere = Matiere.objects.filter(ue=self.ue).count() + 1
 
@@ -1777,9 +1778,6 @@ class AnneeUniversitaire(models.Model):
     """
 
     def save(self, *args, **kwargs):
-        annee = AnneeUniversitaire.objects.filter(annee=self.annee)
-        if not self.pk and annee:
-            return
         super().save(*args, **kwargs)
         self.generateSemeste()
 
@@ -1826,17 +1824,20 @@ class AnneeUniversitaire(models.Model):
             :retype: AnneeUniversitaire
         """
         current_date = datetime.datetime.now()
-        try:
-            # Rechercher l'année accadémique courrante
-            virtual_current_university_date = AnneeUniversitaire.objects.get(
-                annee_courante=True)
-            # Rechercher l'année courante
-            if current_date.month >= 8 and virtual_current_university_date.annee < current_date.year:
-                virtual_current_university_date.disable()
-                return AnneeUniversitaire.objects.create(annee=current_date.year, annee_courante=True)
-            return virtual_current_university_date
-        except Exception as e:
-            return AnneeUniversitaire.objects.create(annee=current_date.year, annee_courante=True)
+        return AnneeUniversitaire.objects.get(annee=2023)
+        # try:
+        #     # Rechercher l'année accadémique courrante
+        #     virtual_current_university_date = AnneeUniversitaire.objects.get(annee_courante=True)
+        #     # Rechercher l'année  réel courante
+        #     print("::: IN TRY ::::")
+        #     if virtual_current_university_date.annee == current_date.year and current_date.month >= 8 :
+        #         virtual_current_university_date.disable()
+        #         return AnneeUniversitaire.objects.create(annee=current_date.year, annee_courante=True)
+        #     return virtual_current_university_date
+        # except Exception as e:
+        #     print("::: IN except ::::")
+        #     return -1
+        
 
     @staticmethod
     def getNiveau(semestre_libelle):
@@ -2073,6 +2074,8 @@ class Programme(models.Model):
     class Meta:
         unique_together = ["parcours", "semestre"]
 
+class Settings(models.Model):
+    pass
 
 class CorrespondanceMaquette(models.Model):
     """
