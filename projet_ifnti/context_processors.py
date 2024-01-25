@@ -4,7 +4,6 @@ from main.helpers import get_authenticate_profile_path, get_user_role, get_id_au
 
 
 def bootstrap(request):
-    create_groups_if_exist(request)
     current_annee_accademique = AnneeUniversitaire.static_get_current_annee_universitaire()
     auth_user_role = get_user_role(request)
     role_name = ""
@@ -21,7 +20,7 @@ def bootstrap(request):
         id_annee_selectionnee = int(request.session.get("id_annee_selectionnee"))
     except:
         id_annee_selectionnee = 0
-        
+
     return {
         'annee_universitaire': current_annee_accademique if current_annee_accademique else "-",
         'annees_universitaire': AnneeUniversitaire.objects.all().order_by('-annee'),

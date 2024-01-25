@@ -13,7 +13,7 @@
 <div class="block block-rounded">
     <div class="block-header">
         <h3 class="block-title"> Matiere : {{ matiere.libelle }} </h3>
-        <button type="button" class="mr-3 btn btn-outline-primary" data-toggle="modal" data-target="#modal-block-vcenter">
+        <button type="button" class="mr-3 btn btn-outline-primary" data-toggle="modal" data-target="#evaluation">
             <i class="fas fa-plus"></i> Importer
         </button>
         <a href="{% url 'main:add_evaluation' matiere.id 0 selected_semestre.id %}" class="mr-3 btn btn-outline-primary">
@@ -77,8 +77,10 @@
                                 </a>                   
                             </li>
                             <li class="nav-main-item">
-                                <a class="nav-main-link nav-main-link-name" data-toggle="" aria-haspopup="true" aria-expanded="false" href="{% url 'main:delete_evaluation' evaluation.id %}">
-                                    <i class="fa fa-trash mr-1 text-danger" aria-hidden="true"></i>
+                                <a class="nav-main-link nav-main-link-name"
+                                onclick="delete_object('/main/evaluations/delete/{{ evaluation.id }}/', 'une evaluation')"
+                                href="#">
+                                    <i class="fa fa-trash mr-1 text-danger"></i>
                                     <span class="nav-main-link-name">Supprimer</span>
                                 </a>                   
                             </li>
@@ -123,6 +125,9 @@
         </div>
     </div>
 </div>
+
+{% include 'components/modal_import_evaluation.html' with title="Importer des evaluations" modal_id="evaluation" url=url_path %}
+
 {% endblock content %}
 {% block scripts %}
     <script type="text/javascript">

@@ -12,45 +12,16 @@ def run():
         user.delete()
     
     clean_data_base()
+    #create_groups_if_exist(request)
     create_groups_if_exist()
 
 def clean_data_base():
-    print("Drop all object ..... 7")
-    Programme.objects.all().delete()
-    print("Drop all object ..... 7")
-    Seance.objects.all().delete()
-    print("Drop all object ..... 1")
-    Personnel.objects.all().delete()
-    print("Drop all object ..... 2")
-    Enseignant.objects.all().delete()
-    print("Drop all object ..... 3")
-    Etudiant.objects.all().delete()
-    print("Drop all object ..... 4")
-    Comptable.objects.all().delete()
-    print("Drop all object ..... 5")
-    Tuteur.objects.all().delete()
-    print("Drop all object ..... 6")
-    #Ue.objects.all().delete()
-    #
-    return
-    print("Drop all object ..... 7")
-    Matiere.objects.all().delete()
-    print("Drop all object ..... 8")
-    Evaluation.objects.all().delete()
-    print("Drop all object ..... 9")
-    Competence.objects.all().delete()
-    print("Drop all object ..... 10")
-    Semestre.objects.all().delete()
-    print("Drop all object ..... 11")
-    Domaine.objects.all().delete()
-    print("Drop all object ..... 12")
-    Parcours.objects.all().delete()
-    print("Drop all object ..... 13")
-    Note.objects.all().delete()
-    print("Drop all object .....")
-    AnneeUniversitaire.objects.all().delete()
-    print("Drop all object ..... end")
-
+    models = [AnneeUniversitaire, Programme, Seance, Personnel, Enseignant, Etudiant, Comptable, Tuteur, Ue, Matiere, Evaluation, Competence, Semestre, Domaine, Note]
+    for model in models:
+        print(f"::::::::::::::::::::::: Delete Model {model.__name__} :::::::::::::::::::::::")
+        model.objects.all().delete()
+        
+    print("::::::::::::::::::::::: Create Faker :::::::::::::::::::::::")
     # Génération des fausses instances pour le modèle AnneeUniversitaire
     current = False
     for i in range(1,11):
@@ -94,7 +65,7 @@ def create_groups_if_exist():
         "domaine", "enseignant", "Etudiant", "evaluation",
         "fiche de paie", "information", "matiere", "note",
         "paiement", "parcours", "personnel", "programme",
-        "salaire", "seance", "semestre", "tuteur", "ue"
+        "salaire", "seance", "semestre", "tuteur", "ue", "seance plannifier" , "plannig"
         ]
 
     permissions_directeur_des_etudes = {
@@ -110,7 +81,7 @@ def create_groups_if_exist():
         }
 
     permissions_etudiant = {
-        "view": ["etudiant", "matiere", "ue", "evaluation", "note", "seance"],
+        "view": ["etudiant", "matiere", "ue", "evaluation", "note", "seance", "seance plannifier", "plannig"],
         "add": ["seance"],
         "change": ["seance"],
         "delete": [],
@@ -119,7 +90,7 @@ def create_groups_if_exist():
     }
 
     permissions_enseignant = {
-        "view": ["etudiant", "matiere", "ue", "evaluation", "note", "enseignant", "seance",],
+        "view": ["etudiant", "matiere", "ue", "evaluation", "note", "enseignant", "seance", "seance plannifier", "plannig"],
         "add": ["evaluation", "note"],
         "change": ["evaluation", "note", "seance"],
         "delete": ["evaluation", "note"],
@@ -133,10 +104,10 @@ def create_groups_if_exist():
     }
 
     permissions_secretaire = {
-        "view": ["etudiant", "matiere", "ue", "evaluation", "note", "enseignant", "seance", "tuteur"],
-        "add": ["evaluation", "note", "seance", "ue", "matiere", "enseignant", "tuteur", "etudiant"],
-        "change": ["evaluation", "note", "seance", "ue", "matiere", "enseignant", "tuteur", "etudiant"],
-        "delete": ["evaluation", "note"],
+        "view": ["etudiant", "matiere", "ue", "evaluation", "note", "enseignant", "seance", "tuteur", "seance plannifier", "plannig"],
+        "add": ["evaluation", "note", "seance", "ue", "matiere", "enseignant", "tuteur", "etudiant", "seance plannifier", "plannig"],
+        "change": ["evaluation", "note", "seance", "ue", "matiere", "enseignant", "tuteur", "etudiant", "seance plannifier", "plannig"],
+        "delete": ["evaluation", "note", "seance plannifier", "plannig"],
         "releve_details": ["etudiant"],
         "releve_synthetique": ["etudiant"],
         "carte": ["etudiant"],
@@ -148,19 +119,18 @@ def create_groups_if_exist():
     if is_created:
         # Ajouter des permission
         add_permissions_to_groupe(groupe, permissions_directeur_des_etudes)
-
+    
     groupe, is_created = Group.objects.get_or_create(name="etudiant")
     if is_created:
         add_permissions_to_groupe(groupe, permissions_etudiant)
-
+    
     groupe, is_created = Group.objects.get_or_create(name="enseignant")
     if is_created:
         add_permissions_to_groupe(groupe, permissions_enseignant)
-
+    
     groupe, is_created = Group.objects.get_or_create(name="comptable")
     if is_created:
         add_permissions_to_groupe(groupe, permissions_comptable)
-
     groupe, is_created = Group.objects.get_or_create(name="secretaire")
     if is_created:
         add_permissions_to_groupe(groupe, permissions_secretaire)
@@ -172,11 +142,12 @@ def add_permissions_to_groupe(groupe, model_dictionnary):
         if permissions:
             for permission in permissions:
                 permissions_name.append(permission_key+" "+permission)
-
+    
     for name in permissions_name:
         try:
-            permission = Permission.objects.filter(name__contains=name).get()
+            permission = Permission.objects.filter(name__contains=name).first()
+            groupe.permissions.add(permission)
         except Exception as e:
+            #print(e, name)
             print(":::: Exception ::::")
-        groupe.permissions.add(permission)
 
