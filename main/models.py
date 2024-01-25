@@ -1594,8 +1594,7 @@ class Matiere(models.Model):
         else:
             annee_selectionnees = [annee_selectionnee]
 
-        programmes = self.ue.programme_set.filter(
-            semestre__annee_universitaire__in=annee_selectionnees, semestre__courant__in=type_semestres)
+        programmes = self.ue.programme_set.filter(semestre__annee_universitaire__in=annee_selectionnees, semestre__courant__in=type_semestres).order_by("-semestre")
         semestres = set()
 
         for programme in programmes:
@@ -1611,9 +1610,6 @@ class Matiere(models.Model):
         :retype: list[Etudiant]
 
         """
-
-        # Passer plus tard le parcours
-
         etudiants = set()
         semestres = self.get_semestres('__all__', '__all__')
         for semestre in semestres:
@@ -1622,6 +1618,7 @@ class Matiere(models.Model):
                     self, semestre)
                 if not a_valide:
                     etudiants.update([etudiant])
+                    
         return list(etudiants)
 
     def get_etudiant_semestre(self, semestre):
@@ -1653,7 +1650,7 @@ class Evaluation(models.Model):
 
     """
     ponderation = models.IntegerField(
-        default=1, verbose_name="Pondération (1-100)", validators=[MinValueValidator(1), MaxValueValidator(100)])
+        default=100, verbose_name="Pondération (1-100)", validators=[MinValueValidator(1), MaxValueValidator(100)])
     """
         Pondération de l'évaluation
 
@@ -2817,6 +2814,7 @@ class Fournisseur(models.Model):
         **Nullable:** true
 
     """
+    
     annee_universitaire = models.ForeignKey(
         'AnneeUniversitaire', on_delete=models.CASCADE, verbose_name="Année Universitaire", null=True, blank=True)
     """

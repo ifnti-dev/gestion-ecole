@@ -106,7 +106,7 @@
 <script src="{% static 'assets/js/plugins/flatpickr/flatpickr.min.js' %}"></script>
 
 <script src="{% static 'assets/js/plugins/bootstrap-notify/bootstrap-notify.min.js' %}"></script>
-<script src="{% static 'assets/js/pages/be_comp_dialogs.min.js' %}"></script>
+<script src="{% static 'assets/js/sweetalert2.js' %}"></script>
 <script>jQuery(function () { One.helpers('notify'); });</script>
 <!-- Page JS Helpers (Flatpickr + BS Datepicker + BS Colorpicker + BS Maxlength + Select2 + Masked Inputs + Ion Range Slider plugins) -->
 <script>jQuery(function () { One.helpers(['flatpickr', 'datepicker', 'colorpicker', 'maxlength', 'select2', 'masked-inputs', 'rangeslider']);  });</script>
@@ -116,6 +116,60 @@
         console.log(form_tag_annee);
         form_tag_annee.submit();
     });
+</script>
+{% if messages %}
+{% for message in messages  %}
+<li {% if message.tags %} class="{{ message.tags }}" {% endif %}>
+    
+    {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
+    <script type="text/javascript"> 
+        let icon = "error";
+        let title = "erreur";
+    </script>
+    {% elif message.level == DEFAULT_MESSAGE_LEVELS.INFO %}
+    <script type="text/javascript"> 
+        let icon = "info";
+        let title = "Info";
+    </script>
+    {% elif message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}
+    <script type="text/javascript"> 
+        let icon = "success";
+        let title = "success";
+    </script>
+    {% endif %}
+    <script type="text/javascript"> 
+        let message = {% autoescape off %} "{{ message }}" {% endautoescape %};
+        Swal.fire({
+            icon: icon,
+            title: title.toUpperCase(),
+            text: message,
+            confirmButtonColor: "#5179d6",
+        });
+    </script>
+</li>
+{% endfor %}
+{% endif %}
+<script type="text/javascript"> 
+    function delete_object(delete_url, object) {
+        let title = "Êtes vous sur !";
+        let message = "Vous voulez supprimer "+object;
+        Swal.fire({
+            icon: "warning",
+            title: title,
+            text: message,
+            showConfirmButton: true,
+            showCancelButton: true,
+            focusConfirm: false,
+            confirmButtonColor: "#e56767",
+        }).then((response) => {
+            if (response.isConfirmed) {
+                window.location.href = delete_url;
+            }
+        }).catch((error) => {
+            console.log(error);
+        });
+        
+    }
 </script>
 {% block scripts %}{% endblock scripts %}
 </html>

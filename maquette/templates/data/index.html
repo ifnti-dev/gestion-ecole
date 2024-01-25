@@ -80,9 +80,9 @@
     {% include 'components/application_card.html' with title="Notes" modal_id="note" icon_bg_color="bg-danger" icon_class_names="far fa-2x fa-file-excel" %}
     {% include 'components/application_card.html' with title="Parametre" modal_id="settings" icon_bg_color="bg-primary" icon_class_names="si fa-2x si-settings" %}
 </div>
-
 {% include 'components/modal_import_data.html' with title="Importer la maquette" modal_id="maquette" url="/maquette/upload/maquette/" %}
 {% include 'components/modal_import_data.html' with title="Importer les matières" modal_id="matiere" url="/maquette/upload/matieres/" %}
-{% include 'components/modal_import_data.html' with title="Importer les notes" modal_id="note" url="/maquette/template/notes/" %}
+{% include 'components/modal_import_data.html' with title="Importer les notes" modal_id="note" url="/maquette/upload/notes/" %}
 
 {% endblock content %}
+    

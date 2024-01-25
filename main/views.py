@@ -4,7 +4,7 @@ from django.http import HttpResponse
 from main.pdfMaker import generate_pdf
 from django.conf import settings
 from main.forms import EnseignantForm, EtudiantForm, EvaluationForm, InformationForm, ProgrammeForm, NoteForm, TuteurForm, UeForm, MatiereForm
-from scripts.utils import pre_load_evaluation_template_data
+from scripts.utils import load_notes_from_evaluation, pre_load_evaluation_template_data
 from .models import Domaine, Enseignant, Evaluation, DirecteurDesEtudes, Personnel, Information, Matiere, Etudiant, Competence, Note, Comptable, Parcours, Programme, Semestre, Ue, AnneeUniversitaire, Tuteur
 from cahier_de_texte.models import Seance
 from planning.models import Planning ,SeancePlannifier
@@ -163,7 +163,6 @@ def etudiants(request):
 
     # Rendre la page avec le contexte
     return render(request, 'etudiants/etudiants.html', context=data)
-
 
 
 
@@ -1383,14 +1382,14 @@ def evaluations(request, id_matiere):
 
     evaluations = Evaluation.objects.filter(matiere=matiere, semestre__in=semestres, rattrapage__in=[True, False])
     semestres = matiere.get_semestres(annee_selectionnee=annee_universitaire, type='__all__')
-    
-    pre_load_evaluation_template_data(matiere, semestre)
+    url_path = "/main/evaluations/upload/" + str(matiere.id) + "/" + str(semestre.id) + "/"
 
     data = {
         'matiere': matiere,
         'evaluations': evaluations,
         'semestres': semestres,
         'selected_semestre': semestre,
+        'url_path': url_path,
     }
     return render(request, 'evaluations/index.html', data)
 
@@ -1423,7 +1422,7 @@ def createNotesByEvaluation(request, id_matiere, rattrapage, id_semestre):
             validate_min=True,
         )
         
-        if request.method == 'POST':
+        if request.method == 'POST' :
             evaluation_form = EvaluationForm(request.POST)
             evaluation_form.set_max_ponderation(
                 matiere.ponderation_restante(semestre=semestre))
@@ -1538,11 +1537,18 @@ def deleteEvaluation(request, id):
 def uploadEvaluation(request, id_matiere, id_semestre):
     matiere = get_object_or_404(Matiere, pk=id_matiere)
     semestre = get_object_or_404(Semestre, pk=id_semestre)
-    if 'evaluation_data' in request.FILES:
-        file = request.FILES.get('evaluation_data')
-        load_notes_from_evaluation(file, matiere, semestre)
-        #return HttpResponse("Hello")
-    return redirect('main:evaluations', id_matiere=id_matiere)
+    if request.method == "POST":
+        if 'file' in request.FILES:
+            file = request.FILES.get('evaluation_data')
+            load_notes_from_evaluation(file, matiere, semestre)
+            #return HttpResponse("Hello")
+        return redirect('main:evaluations', id_matiere=id_matiere)
+        
+    file_name = pre_load_evaluation_template_data(matiere, semestre)
+    with open(file_name, 'rb') as file:
+        response = HttpResponse(file.read(), content_type="application/force-download")
+        response['Content-Disposition'] = 'attachment; filename="{}"'.format(os.path.basename(file_name))
+        return response
 
 @login_required(login_url=settings.LOGIN_URL)
 def affectation_matieres_professeur(request):
@@ -1571,7 +1577,6 @@ def affectation_matieres_professeur(request):
         context = {'enseignants': enseignants_filtrer,
                    'matieres': matieres_filtrer}
         return render(request, "matieres/affectation_professeur.html", context)
-
 
 @login_required(login_url=settings.LOGIN_URL)
 def liste_matieres_professeur(request):
