@@ -1576,12 +1576,11 @@ class Matiere(models.Model):
         :param annee_selectionnee: Année universitaire de recherche
         :type annee_selectionnee: AnneeUniversitaire ou __all__
 
-        :param type: Type de semestre
+        :param type: :;,  
         :type type: __current__ ou __all__
 
         :return: Liste des semestres dans lesquels la matière est enseignée
         :retype: list[Semestre]
-
         """
 
         # Passer plus tard le parcours
@@ -2942,9 +2941,9 @@ class FicheDePaie(models.Model):
         **Nullable:** true
 
     """
-    matiere = models.ForeignKey('Matiere', on_delete=models.CASCADE, verbose_name="Matière", null=True)
+    matiere = models.ManyToManyField('Matiere', related_name="Matières", blank=True, null=True)
     """
-        Matière enseignée par le reçeveur de la fiche de paie
+        Matières enseignées par le reçeveur de la fiche de paie
 
         **Type:** string
 

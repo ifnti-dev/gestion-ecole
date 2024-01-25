@@ -819,7 +819,7 @@ def bulletin_de_paye(request, id):
     retenues_cnss_personnel = Decimal(frais_prestations_familiale_salsalaire) + Decimal(tcs) + Decimal(irpp)
     salaire_net = (Decimal(Salaire_brut) - Decimal(retenues_cnss_personnel))
     salaire_net = salaire_net.quantize(Decimal('0.000'), rounding=ROUND_DOWN) 
-    bulletin.salaire_net_a_payer = salaire_net
+    bulletin.salaire_net_a_payer = salaire_net - bulletin.acomptes
 
     ## pour l'employeur
     frais_prestations_familiales = bulletin.frais_prestations_familiales * bulletin.personnel.salaireBrut
