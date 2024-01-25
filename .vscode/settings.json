@@ -11,5 +11,6 @@
     ],
     "python.testing.pytestEnabled": false,
     "python.testing.unittestEnabled": true,
-    "docwriter.style": "Doxygen"
+    "docwriter.style": "Doxygen",
+    "python.analysis.typeCheckingMode": "off"
 }
