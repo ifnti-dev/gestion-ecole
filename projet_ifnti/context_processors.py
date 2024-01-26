@@ -3,7 +3,6 @@ from django.contrib.auth.models import Group, Permission
 from main.helpers import get_authenticate_profile_path, get_user_role, get_id_authenticate_user_model
 
 
-
 def bootstrap(request):
     create_groups_if_exist(request)
     current_annee_accademique = AnneeUniversitaire.static_get_current_annee_universitaire()
@@ -18,7 +17,11 @@ def bootstrap(request):
         niveau = ''
         
     id_auth_model = get_id_authenticate_user_model(request)
-    
+    try:
+        id_annee_selectionnee = int(request.session.get("id_annee_selectionnee"))
+    except:
+        id_annee_selectionnee = 0
+        
     return {
         'annee_universitaire': current_annee_accademique if current_annee_accademique else "-",
         'annees_universitaire': AnneeUniversitaire.objects.all().order_by('-annee'),
@@ -29,7 +32,7 @@ def bootstrap(request):
         'is_secretaire': role_name == 'secretaire',
         'is_comptable': role_name == 'comptable',
         'id_authenticate_user_model': id_auth_model,
-        'id_annee_selectionnee': int(request.session.get("id_annee_selectionnee")),
+        'id_annee_selectionnee': id_annee_selectionnee,
         'page_is_not_profil' : True,
         'profile_path': get_authenticate_profile_path(request, id_auth_model),
         'niveau': niveau,
@@ -117,7 +120,6 @@ def create_groups_if_exist(request):
     groupe, is_created = Group.objects.get_or_create(name="secretaire")
     if is_created:
         add_permissions_to_groupe(groupe, permissions_secretaire)
-
 
 def add_permissions_to_groupe(groupe, model_dictionnary):
     permissions_name = []

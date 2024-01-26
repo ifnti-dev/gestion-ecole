@@ -35,17 +35,14 @@
     <link rel="stylesheet" id="css-main" href="{% static 'assets/css/oneui.css' %}">  
     <title>GESTION IFNTI</title>
 </head>
-<body onload="pageLoaded()" class="loading-overlay">
-    <div id="preloader">
-        <div id="loader"></div>
-    </div>  
-    <div id="page-container" class="d-none sidebar-o bg-sidebar-light enable-page-overlay side-scroll page-header-fixed main-content-narrow">
+<body>
+    <div id="page-container" class="sidebar-o bg-sidebar-light enable-page-overlay side-scroll page-header-fixed main-content-narrow">
         {% include 'components/sidebar.html' %}
 
         {% include 'components/header.html' %}
 
         <main id="main-container">
-             <!-- Bannier -->
+            <!-- Bannier -->
             {% if page_is_not_profil %}
                 <div class="bg-body-light">
                     <div class="content content-full">
@@ -76,8 +73,6 @@
                     <p class="mb-0">{{notification.message}}</p>
                 </div>
             {% endif %}
-                        
-            <!-- FIN Bannier -->
             {% block content %} {% endblock content %}
         </main>
 
@@ -90,7 +85,6 @@
 {% django_browser_reload_script %}
 
 <script src="{% static 'assets/js/jquery-3.7.1.min.js'%}"></script>
-
 <script src="{% static 'assets/js/oneui.core.min.js' %}"></script>
 <script src="{% static 'assets/js/oneui.app.min.js' %}"></script>
 <script src="{% static 'assets/js/plugins/datatables/jquery.dataTables.min.js' %}"></script>
@@ -112,7 +106,7 @@
 <script src="{% static 'assets/js/plugins/flatpickr/flatpickr.min.js' %}"></script>
 
 <script src="{% static 'assets/js/plugins/bootstrap-notify/bootstrap-notify.min.js' %}"></script>
-
+<script src="{% static 'assets/js/pages/be_comp_dialogs.min.js' %}"></script>
 <script>jQuery(function () { One.helpers('notify'); });</script>
 <!-- Page JS Helpers (Flatpickr + BS Datepicker + BS Colorpicker + BS Maxlength + Select2 + Masked Inputs + Ion Range Slider plugins) -->
 <script>jQuery(function () { One.helpers(['flatpickr', 'datepicker', 'colorpicker', 'maxlength', 'select2', 'masked-inputs', 'rangeslider']);  });</script>
@@ -122,24 +116,6 @@
         console.log(form_tag_annee);
         form_tag_annee.submit();
     });
-
-    function showLoadingOverlay() {
-        console.log('La page en cours de chargement.');
-        document.getElementById('preloader').style.display = 'block';
-        $('#page-container').addClass('d-none');
-    }
-    
-    function hideLoadingOverlay() {
-        document.getElementById('preloader').style.display = 'none';
-        $('#page-container').removeClass('d-none');
-    }
-    
-    function pageLoaded() {
-        console.log('La page est entièrement chargée.');
-        hideLoadingOverlay(); // Masquer l'élément de chargement une fois que la page est chargée
-    }
-    // Afficher l'élément de chargement au chargement initial de la page
-    showLoadingOverlay();
 </script>
 {% block scripts %}{% endblock scripts %}
 </html>

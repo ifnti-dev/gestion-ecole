@@ -26,6 +26,80 @@ Tenues \BLOCK{for i in range(0, days|length)} & \VAR{tenues[i]}\BLOCK{endfor}\\
 \hhline{~------}
 \multicolumn{1}{c}{}\BLOCK{for day in days}&\multicolumn{1}{c}{}\BLOCK{endfor}\\
 \hhline{~------}
+\BLOCK{for time in planning} 
+\VAR{time}
+\BLOCK{for i in range(0, days|length)}
+\BLOCK{for cour in planning[time][days[i]]}
+& \multirow{2}{*}{\VAR{cour}} 
+\BLOCK{endfor}
+\BLOCK{endfor}
+\\
+\BLOCK{for i in range(0, days|length)}
+\BLOCK{for cour, prof in planning[time][days[i]]}
+& \multirow{2}{*}{\VAR{prof[0]['professeur']}} 
+\BLOCK{endfor}
+\BLOCK{endfor}
+\BLOCK{endfor}
+
+
+
+\BLOCK{for time, days_data in planning.items()} 
+\BLOCK{if time =="7h0"} 
+        \VAR{time}\BLOCK{for day, activities in days_data.items()}\BLOCK{for activity, info_list in activities.items()}& \multirow{2}{*}{\VAR{activity}} \BLOCK{endfor} \BLOCK{endfor}
+        \\  \BLOCK{for day, activities in days_data.items()} \BLOCK{for activity, info_list in activities.items()} & \multirow{2}{*}{\VAR{info_list[0]['professeur'] if info_list }} \BLOCK{endfor} \BLOCK{endfor}
+\BLOCK{endif}
+\BLOCK{if time =="8h45"}
+        \\
+        \multirow{2}{*}{8h30} & & & & & & \\ 
+        \hhline{~------}
+        \multirow{2}{*}{8h45} & & & & & & \\
+        \hhline{~------}
+        \BLOCK{for day, activities in days_data.items()}\BLOCK{for activity, info_list in activities.items()}& \multirow{2}{*}{\VAR{activity}} \BLOCK{endfor} \BLOCK{endfor}
+        \\  \BLOCK{for day, activities in days_data.items()} \BLOCK{for activity, info_list in activities.items()} & \multirow{2}{*}{\VAR{info_list[0]['professeur'] if info_list }} \BLOCK{endfor} \BLOCK{endfor}
+\BLOCK{endif}
+\BLOCK{if time =="10h30"}
+        \\
+        \multirow{2}{*}{10h15} &  &  &  &  & & \\ 
+        \hhline{~------}
+        \multirow{2}{*}{10h30}&&&&&&\\
+        \hhline{~------}
+        \BLOCK{for day, activities in days_data.items()}\BLOCK{for activity, info_list in activities.items()}& \multirow{2}{*}{\VAR{activity}} \BLOCK{endfor} \BLOCK{endfor}
+        \\  \BLOCK{for day, activities in days_data.items()} \BLOCK{for activity, info_list in activities.items()} & \multirow{2}{*}{\VAR{info_list[0]['professeur'] if info_list }} \BLOCK{endfor} \BLOCK{endfor}
+
+\BLOCK{endif}
+\BLOCK{if time =="14h0"}
+        \\
+        \multirow{2}{*}{12h} &  &  &  & & & \\ 
+        \hhline{~------}
+        \hhline{~------}
+        & \multicolumn{6}{|c|}{\cellcolor[gray]{0.9}}\\ 
+        & \multicolumn{6}{|c|}{\cellcolor[gray]{0.9}}\\
+        & \multicolumn{6}{|c|}{\cellcolor[gray]{0.9}}\\
+        & \multicolumn{6}{|c|}{\cellcolor[gray]{0.9}}\\
+        \multirow{2}{*}{14h} & \multicolumn{6}{|c|}{\cellcolor[gray]{0.9}\multirow{-5}{*}{{\Large Semaine 8 du 18/12 au 23/12 (J35 à J40)}}}\\
+        \hhline{~------}
+        \BLOCK{for day, activities in days_data.items()}\BLOCK{for activity, info_list in activities.items()}& \multirow{2}{*}{\VAR{activity}} \BLOCK{endfor} \BLOCK{endfor}
+        \\  \BLOCK{for day, activities in days_data.items()} \BLOCK{for activity, info_list in activities.items()} & \multirow{2}{*}{\VAR{info_list[0]['professeur'] if info_list }} \BLOCK{endfor} \BLOCK{endfor}
+
+\BLOCK{endif}
+\BLOCK{if time =="15h45"}
+        \\
+        \multirow{2}{*}{15h30} &  & & & & & \\ 
+        \hhline{~------}
+        \multirow{2}{*}{15h45} &  &  &  &  & &\\ 
+        \hhline{~------}
+        \BLOCK{for day, activities in days_data.items()}\BLOCK{for activity, info_list in activities.items()}& \multirow{2}{*}{\VAR{activity}} \BLOCK{endfor} \BLOCK{endfor}
+        \\  \BLOCK{for day, activities in days_data.items()} \BLOCK{for activity, info_list in activities.items()} & \multirow{2}{*}{\VAR{info_list[0]['professeur'] if info_list }} \BLOCK{endfor} \BLOCK{endfor}
+        \\
+        \multirow{2}{*}{17h15} &  & & & & & 
+\BLOCK{endif}
+\BLOCK{endfor}
+
+
+
+
+
+
 7h & \multirow{2}{*}{Étude} & \multirow{2}{*}{UE Libre (Docker)} & \multirow{2}{*}{IRS} & \multirow{2}{*}{UE Libre} & \multirow{2}{*}{Django} & \multirow{2}{*}{Java Avancé} \\
 & \multirow{2}{*}{} & \multirow{2}{*}{(M.Téouri)} & \multirow{2}{*}{} & \multirow{2}{*}{(M.Téouri)} & \multirow{2}{*}{(M.Koumoi)} & \multirow{2}{*}{(M.Djimissa)}\\
 

@@ -8,6 +8,8 @@ __pycache__
 db.sqlite3
 
 main/migrations/*
+planning/migrations/*
+cahier_de_texte/migrations/*
 docs/build/*
 
 # Backup files # 
