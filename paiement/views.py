@@ -12,7 +12,11 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
 from decimal import Decimal, ROUND_DOWN
+from datetime import datetime
+import locale
 
+# Définir la locale en français
+locale.setlocale(locale.LC_TIME, 'fr_FR.UTF-8')
 
 @login_required(login_url=settings.LOGIN_URL)
 def liste_frais(request, id_annee_selectionnee):
@@ -801,7 +805,11 @@ def bulletin_de_paye(request, id):
     Raises:AnneeUniversitaire.DoesNotExist: Si l'année universitaire avec l'ID donné n'existe pas.
 
     """
+
     bulletin = get_object_or_404(Salaire, id=id)
+    date_debut_formatted = datetime.strptime(str(bulletin.date_debut), "%Y-%m-%d").strftime("%d %B %Y")
+    date_fin_formatted = datetime.strptime(str(bulletin.date_fin), "%Y-%m-%d").strftime("%d %B %Y")
+
     total_primes = bulletin.prime_efficacite + bulletin.prime_qualite + bulletin.frais_travaux_complementaires
     frais_prestations_familiale_salsalaire = bulletin.frais_prestations_familiale_salsalaire * bulletin.personnel.salaireBrut
     primes = (
@@ -839,6 +847,8 @@ def bulletin_de_paye(request, id):
         'frais_prestations_familiales' : frais_prestations_familiales,
         'frais_pension_vieillesse_emsalaire' : frais_pension_vieillesse_emsalaire,
         'frais_prestations_familiale_salsalaire' : frais_prestations_familiale_salsalaire,
+        "date_debut_formatted" : date_debut_formatted,
+        "date_fin_formatted" : date_fin_formatted,
     }
 
     latex_input = 'bulletin_de_paye'
@@ -1008,8 +1018,11 @@ def enregistrer_fiche_de_paie(request, id=0):
             form = FicheDePaieForm(request.POST,instance=fiche_de_paie)
         if form.is_valid():
             fiche_de_paie = form.save(commit=False)
-            dateDebut = fiche_de_paie.dateDebut
-            dateFin = fiche_de_paie.dateFin
+            dateDebut = form.cleaned_data['dateDebut']
+            dateFin = form.cleaned_data['dateFin']
+            matieres_L1 = form.cleaned_data['matieres_L1']
+            matieres_L2 = form.cleaned_data['matieres_L2']
+            matieres_L3 = form.cleaned_data['matieres_L3']
 
             # Vérification de la validité des dates
             if dateDebut and dateFin and dateDebut > dateFin:
@@ -1021,6 +1034,9 @@ def enregistrer_fiche_de_paie(request, id=0):
                 fiche_de_paie.compte_bancaire = compte_universite
                 fiche_de_paie.save()
 
+                # Ajouter les matières sélectionnées à la fiche de paie
+                fiche_de_paie.matiere.add(*matieres_L1, *matieres_L2, *matieres_L3)
+
                 compte_universite.solde_bancaire -= fiche_de_paie.montant 
                 compte_universite.save()
 
@@ -1030,8 +1046,7 @@ def enregistrer_fiche_de_paie(request, id=0):
                 return render(request, 'etudiants/message_erreur.html', {"message": "Le compte bancaire n'existe pas"})                               
         else:
             return render(request, 'fichePaies/create_fiche_de_paie.html', {'form': form})
-
-
+    
 
 
 @login_required(login_url=settings.LOGIN_URL)
@@ -1044,8 +1059,24 @@ def fiche_paie(request, id):
 
     """
     fiche_paie = get_object_or_404(FicheDePaie, id=id)
+
+    # Formatage des dates en "jour mois année"
+    
+    date_debut_formatted = datetime.strptime(str(fiche_paie.dateDebut), "%Y-%m-%d").strftime("%d %B %Y")
+    date_fin_formatted = datetime.strptime(str(fiche_paie.dateFin), "%Y-%m-%d").strftime("%d %B %Y")
+
+
+    matieres_L1 = ", ".join([matiere.libelle for matiere in fiche_paie.matiere.filter(ue__programme__semestre__libelle__in=['S1', 'S2'])])
+    matieres_L2 = ", ".join([matiere.libelle for matiere in fiche_paie.matiere.filter(ue__programme__semestre__libelle__in=['S3', 'S4'])])
+    matieres_L3 = ", ".join([matiere.libelle for matiere in fiche_paie.matiere.filter(ue__programme__semestre__libelle__in=['S5', 'S6'])])
+
     context = {
         'fiche_paie': fiche_paie,
+        'matieres_L1': matieres_L1,
+        'matieres_L2': matieres_L2,
+        'matieres_L3': matieres_L3,
+        'date_debut_formatted': date_debut_formatted,
+        'date_fin_formatted': date_fin_formatted,
     }
 
     latex_input = 'fiche_paie'
@@ -1059,7 +1090,8 @@ def fiche_paie(request, id):
         response = HttpResponse(pdf_preview, content_type='application/pdf')
         response['Content-Disposition'] = 'inline;filename=pdf_file.pdf'
         return response
-    
+
+
 
 @login_required(login_url=settings.LOGIN_URL)
 def liste_fiches_de_prise_en_charge(request, id_annee_selectionnee):
@@ -1082,25 +1114,6 @@ def liste_fiches_de_prise_en_charge(request, id_annee_selectionnee):
     }
     return render(request, 'charges/liste_fiches_de_prise_en_charge.html', context)
 
-
-def delete_fiches_de_paie(request):
-    """
-        Supprime une fiche de paie.
-
-    :param request: L'objet HttpRequest utilisé pour effectuer la requête.
-    :return: redirect : redirige l'utilisateur vers la page affichant la liste des fiches de paie de l'année universitaire courante.
-    
-        **Context**
-
-        ``fiche_paie``
-            une instance du : model:`main.FicheDePaie`.
-    """
-    if request.method == 'GET':
-        fiche_de_charge_id = request.GET.get('id')
-        fiche_de_charge = get_object_or_404(Charge, id=fiche_de_charge_id)
-        fiche_de_charge.delete()
-    id_annee_selectionnee = AnneeUniversitaire.static_get_current_annee_universitaire().id
-    return redirect('paiement:liste_fiches_de_prise_en_charge', id_annee_selectionnee=id_annee_selectionnee)
 
 
 @login_required(login_url=settings.LOGIN_URL)
@@ -1173,8 +1186,13 @@ def fiche_de_charge(request, id):
 
     """
     fiche_de_charge = get_object_or_404(Charge, id=id)
+    date_debut_formatted = datetime.strptime(str(fiche_de_charge.dateDebut), "%Y-%m-%d").strftime("%d %B %Y")
+    date_fin_formatted = datetime.strptime(str(fiche_de_charge.dateFin), "%Y-%m-%d").strftime("%d %B %Y")
+
     context = {
         'fiche_de_charge': fiche_de_charge,
+        'date_debut_formatted' :date_debut_formatted,
+        'date_fin_formatted' : date_fin_formatted,
     }
 
     latex_input = 'fiche_de_charge'
