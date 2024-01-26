@@ -1046,6 +1046,11 @@ def releve_notes(request, id, id_semestre):
     context['semestre'] = semestre
     context['annee'] = semestre.annee_universitaire
 
+    in_format = "%Y-%m-%d"
+    out_format = "%d-%m-%Y"
+    date_formatee = datetime.strptime(
+        str(etudiant.datenaissance), in_format).strftime(out_format)
+    context['date_naissance'] = date_formatee
     # if request.user.groups.all().first().name == 'directeur_des_etudes':
     #     context['directeur'] = request.user.utilisateur.nom + ' ' + request.user.prenom
 
@@ -1098,6 +1103,12 @@ def releve_notes_semestre(request, id_semestre):
             if validation:
                 credits_obtenus += ue.nbreCredits
 
+        in_format = "%Y-%m-%d"
+        out_format = "%d-%m-%Y"
+        date_formatee = datetime.strptime(str(etudiant.datenaissance), in_format).strftime(out_format)
+        
+        
+        releve_note['date_naissance'] = date_formatee
         releve_note['credits_obtenus'] = credits_obtenus
         releve_note['etudiant'] = etudiant
         releves_notes_tab.append(releve_note)
