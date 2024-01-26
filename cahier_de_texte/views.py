@@ -332,10 +332,11 @@ def imprimer(request):
         seances_total = Seance.objects.filter(semestre=semestre,valider=nuance(valider)).order_by('date_et_heure_debut')
         ues = semestre.get_all_ues()
         matieres_dict = {}
+        etudiants=semestre.etudiant_set.all()
 
         if par_matiere != 'parMatieres' :
-            context={'listeAbsence':nuance(listeAbsence),'commentaires':nuance(commentaires),'listeUe':nuance(listeUe),'listeEtudiant':nuance(listeEtudiant),'seances':seances_total}                           
-            latex_input = 'cahier_de_texte2'
+            context={'etudiants':etudiants,'semestre':semestre_id,'listeAbsence':nuance(listeAbsence),'ues':ues,'commentaires':nuance(commentaires),'listeUe':nuance(listeUe),'listeEtudiant':nuance(listeEtudiant),'seances':seances_total}                           
+            latex_input = 'cahier_de_texte'
             latex_ouput = 'CDT_'+str(semestre_id)+'_'+str(datetime.datetime.now())
             pdf_file = 'CDT_'+str(semestre_id)+'_'+str(datetime.datetime.now())
 
