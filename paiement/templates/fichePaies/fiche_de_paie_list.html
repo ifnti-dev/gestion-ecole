@@ -19,9 +19,8 @@
                     <tr>
                         <th class="text-center" style="width: 30%;">Période</th>
                         <th class="text-center" style="width: 30%;">Enseignant</th>
-                        <th class="text-center" style="width: 30%;">Matière</th>
-                        <th class="text-center" style="width: 30%;">Nombre d'heure</th>
-                        <th class="text-center" style="width: 30%;">Montant à payer</th>
+                        <th class="text-center" style="width: 18%;">Nombre d'heure</th>
+                        <th class="text-center" style="width: 18%;">Montant à payer</th>
                         <th class="text-center" style="width: 55%;">Actions</th>
                     </tr>
                 </thead>
@@ -30,7 +29,6 @@
                     <tr>
                         <td class="text-center font-size-sm">Du {{ fiche.dateDebut }} au {{ fiche.dateFin }}</td>
                         <td class="text-center font-size-sm">{{ fiche.enseignant.nom }} {{ fiche.enseignant.prenom }}</td>
-                        <td class="text-center font-size-sm">{{ fiche.matiere }}</td>
                         <td class="text-center font-size-sm">{{ fiche.nombreHeure }} H</td>
                         <td class="text-center font-size-sm">{{ fiche.difference }} FCFA</td>
                         <td style="text-align: center;">

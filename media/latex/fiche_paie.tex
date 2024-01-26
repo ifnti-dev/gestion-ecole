@@ -37,9 +37,9 @@
 
 \begin{center}
 \begin{tabular}{@{}ll}
-\textbf{Nom et Prénoms : }\hspace{4cm}\textbf{\VAR{fiche_paie.enseignant.nom} \VAR{fiche_paie.enseignant.prenom}}\\
+\textbf{Nom et Prénoms : }\hspace{0.8cm}\textbf{\VAR{fiche_paie.enseignant.nom} \VAR{fiche_paie.enseignant.prenom}}\\
 \vspace{1mm}
-\textbf{Période : }\hspace{2.5cm}\textbf{ Du \VAR{fiche_paie.dateDebut} au  \VAR{fiche_paie.dateFin}}\\
+\textbf{Période : }\hspace{2.6cm}\textbf{ Du \VAR{date_debut_formatted} au  \VAR{date_fin_formatted}}\\
 \end{tabular}
 \end{center}
 \vspace{5Mm}
@@ -49,11 +49,11 @@
 \hline 
 ÉLÉMENTS & MATIÈRES & NOMBRE D'HEURES & PU & MONTANTS \\ 
 \hline 
-L1 & none & \VAR{fiche_paie.nombreHeureL1} & \VAR{fiche_paie.prixUnitaire} & \VAR{fiche_paie.montantL1} \\ 
+L1 & \VAR{matieres_L1} & \VAR{fiche_paie.nombreHeureL1} & \VAR{fiche_paie.prixUnitaire} & \VAR{fiche_paie.montantL1} \\ 
 \hline 
-L2 & none & \VAR{fiche_paie.nombreHeureL2} & \VAR{fiche_paie.prixUnitaire} & \VAR{fiche_paie.montantL2} \\ 
+L2 & \VAR{matieres_L2} & \VAR{fiche_paie.nombreHeureL2} & \VAR{fiche_paie.prixUnitaire} & \VAR{fiche_paie.montantL2} \\ 
 \hline 
-L3 & none & \VAR{fiche_paie.nombreHeureL3} & \VAR{fiche_paie.prixUnitaire} & \VAR{fiche_paie.montantL3} \\ 
+L3 & \VAR{matieres_L3} & \VAR{fiche_paie.nombreHeureL3} & \VAR{fiche_paie.prixUnitaire} & \VAR{fiche_paie.montantL3} \\ 
 \hline 
 \multicolumn{2}{|c|}{TOTAL} & \VAR{fiche_paie.nombreHeure} & \VAR{fiche_paie.prixUnitaire} & \VAR{fiche_paie.montant} \\ 
 \hline 
@@ -65,6 +65,7 @@ L3 & none & \VAR{fiche_paie.nombreHeureL3} & \VAR{fiche_paie.prixUnitaire} & \VA
 \hline 
 \end{tabular} 
 \end{center}
+
 
 \vspace{1cm}
 

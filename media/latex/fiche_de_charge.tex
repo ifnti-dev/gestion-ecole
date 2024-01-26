@@ -37,11 +37,11 @@
 
 \begin{center}
 \begin{tabular}{@{}ll}
-\textbf{NOM : }\hspace{4cm}\textbf{\VAR{fiche_de_charge.personnel.nom}}\\
+\textbf{NOM : }\hspace{2cm}\textbf{\VAR{fiche_de_charge.personnel.nom}}\\
 \vspace{1mm}
-\textbf{PRÉNOMS : }\hspace{2.8cm}\textbf{\VAR{fiche_de_charge.personnel.prenom}}\\
+\textbf{PRÉNOMS : }\hspace{0.8cm}\textbf{\VAR{fiche_de_charge.personnel.prenom}}\\
 \vspace{1mm}
-\textbf{Période de : }\hspace{2.5cm}\textbf{\VAR{fiche_de_charge.dateDebut} à \VAR{fiche_de_charge.dateFin}}\\
+\textbf{Période : }\hspace{1.6cm}\textbf{Du \VAR{date_debut_formatted} au \VAR{date_fin_formatted}}\\
 \end{tabular}
 \end{center}
 \vspace{5Mm}
@@ -63,28 +63,22 @@ VALEUR EN LETTRE &\multicolumn{2}{|c|}{\VAR{fiche_de_charge.montantEnLettre} fra
 \end{center}
 \vspace{1cm}
 
-\textbf{MODE DE PAIEMENT : \hspace{4.5cm} \textbf{Numéro : \VAR{fiche_de_charge.numero}} 
+\textbf{MODE DE PAIEMENT} 
 \begin{itemize}
-  \item \textbf{Chèque : $\square$}
+  \item \textbf{Chèque : $\square$   \hspace{1cm} \textbf{Numéro : \VAR{fiche_de_charge.numero} } } 
   \item \textbf{Espèces : $\square$}
-\end{itemize}} 
+\end{itemize} 
+
 
 \begin{flushright}
 Sokodé le \today
 \end{flushright}\vspace{2mm}
 
-\begin{center}
-\textbf{SIGNATURES}
-\end{center}
 
+\begin{flushright}
+Le Responsable d'établissement
+\end{flushright}
 
-\begin{minipage}[t]{0.5\textwidth}
-  \raggedright Directeur
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.5\textwidth}
-  \raggedleft Volontaire
-\end{minipage}
 
 
 \end{document}
