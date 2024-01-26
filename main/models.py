@@ -1491,7 +1491,7 @@ class Matiere(models.Model):
 
 
         """
-        return len(Evaluation.objects.filter(matiere=self, semestre__in=semestres))
+        return Evaluation.objects.filter(matiere=self, semestre__in=semestres).count()
 
     def __str__(self):
         return self.codematiere + " " + self.libelle

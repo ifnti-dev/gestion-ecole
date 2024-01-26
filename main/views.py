@@ -16,6 +16,7 @@ from django.contrib.auth import authenticate, login, logout, get_user_model
 from .resources import EtudiantResource, EnseignantResource
 from tablib import Dataset
 from .custom_permission_required import evaluation_permission, show_recapitulatif_note_permission
+from django.contrib import messages
 
 
 def datetime_serializer(obj):
@@ -539,35 +540,56 @@ def create_tuteur(request, id=0):
 @permission_required("main.view_matiere")
 def matieres(request):
     id_annee_selectionnee = request.session.get("id_annee_selectionnee")
-    annee_universitaire = get_object_or_404(
-        AnneeUniversitaire, pk=id_annee_selectionnee)
+    annee_universitaire = get_object_or_404(AnneeUniversitaire, pk=id_annee_selectionnee)
     niveau = "IFNTI"
     semestres = annee_universitaire.semestre_set.all()
     semestres_selected = semestres
-
-    if 'semestre' in request.GET:
-        semestre_id = request.GET.get('semestre')
+    ue_id = "-1"
+    
+    if request.method == "POST":
+        semestre_id = request.POST.get('semestre')
+        ue_id = request.POST.get('ue')
         if semestre_id != "":
             semestres_selected = semestres.filter(pk=semestre_id)
-
-    matieres = Matiere.objects.filter(
-        ue__programme__semestre__in=semestres_selected).distinct()
-
-    for matiere in matieres:
-        matiere.nb_evaluations = matiere.count_evaluations(
-            annee_universitaire, semestres_selected)
-
+            
+    programme = semestres_selected[0].programme_set.first()
+    if programme:
+        ues = programme.ues.all().prefetch_related('matiere_set')
+    else:
+        ues = []
+    
+    matieres = set()
+    if ue_id == "-1":
+        for ue in ues:
+            _matieres = ue.matiere_set.all()
+            for matiere in _matieres:
+                matiere.nb_evaluations = matiere.count_evaluations(annee_universitaire, semestres_selected)
+            matieres.update(_matieres)
+    else:
+        ue = ues.filter(id=ue_id).first()
+        if ue:
+            matieres = ue.matiere_set.all()
+            for matiere in matieres:
+                matiere.nb_evaluations = matiere.count_evaluations(annee_universitaire, semestres_selected)        
     try:
         semestres_selected = semestres_selected.get()
     except:
         semestres_selected = semestres_selected[0]
+        
+    try:
+        selected_ue = ue
+    except:
+        selected_ue = ""
 
     data = {
         'matieres': matieres,
         'semestres': semestres,
+        'ues': ues,
         'niveau': niveau,
         'selected_semestre': semestres_selected,
+        'selected_ue': selected_ue,
     }
+    
     return render(request, 'matieres/matieres.html', context=data)
 
 
@@ -597,14 +619,22 @@ def create_matiere(request, id=0):
     else:
         if id == 0:
             form = MatiereForm(request.POST)
+            message = "a été ajouté"
         else:
             matiere = Matiere.objects.get(pk=id)
             form = MatiereForm(request.POST, instance=matiere)
+            message = "a été mis a jour"
+            
         if form.is_valid():
-            form.save()
-            #id_annee_selectionnee = AnneeUniversitaire.static_get_current_annee_universitaire().id
+            matiere = form.save()
+            messages.success(request, f"La matière {matiere.libelle} {message} !")
             return redirect('main:matieres_etudiant')
 
+def delete_matiere(request, id_matiere):
+    matiere = get_object_or_404(Matiere, pk=id_matiere)
+    messages.success(request, f"La matière {matiere.libelle} a été supprimer !")
+    matiere.delete()
+    return redirect('main:matieres_etudiant')
 
 @login_required(login_url=settings.LOGIN_URL)
 @permission_required("main.view_matiere")
@@ -630,7 +660,6 @@ def matiere_semestre(request, semestre):
         'matieres_semestre': matieres_semestre
     }
     return render(request, 'matieres/matiere_par_semestre.html', context)
-
 
 def ues_etudiants(request):
     role = get_user_role(request)
@@ -1393,18 +1422,15 @@ def evaluations(request, id_matiere):
     }
     return render(request, 'evaluations/index.html', data)
 
-
 @login_required(login_url=settings.LOGIN_URL)
 def createNotesByEvaluation(request, id_matiere, rattrapage, id_semestre):
     """
     Affiche un formulaire de création d'une évaluation et ensuite d'une note :model:`main.Note` selon la matière.
     """
-    # Rechercher la matière
     matiere = get_object_or_404(Matiere, pk=id_matiere)
     annee_universitaire = AnneeUniversitaire.static_get_current_annee_universitaire()
     semestre = get_object_or_404(Semestre, pk=id_semestre)
     if matiere.dans_semestre(semestre):
-        # Chercher les étudiants qui suivent la matière
         if rattrapage:
             etudiants = matiere.get_etudiants_en_rattrapage()
         else:
@@ -1437,6 +1463,8 @@ def createNotesByEvaluation(request, id_matiere, rattrapage, id_semestre):
                 for note in notes:
                     note.evaluation = evaluation
                     note.save()
+                    
+                messages.success(request, f"L 'évaluation {evaluation.libelle} a été ajouter.")
                 return redirect('main:evaluations', id_matiere=matiere.id)
         else:
             queryset = Note.objects.none()
@@ -1498,6 +1526,8 @@ def editeNoteByEvaluation(request, id):
             for note in notes:
                 note.evaluation = evaluation
                 note.save()
+                
+            messages.success(request, f"L 'évaluation {evaluation.libelle} a été mise à jours.")
             return redirect('main:evaluations', id_matiere=matiere.id)
     else:
         evaluation_form = EvaluationForm(instance=evaluation)
@@ -1530,6 +1560,7 @@ def deleteEvaluation(request, id):
     """
     evaluation = get_object_or_404(Evaluation, pk=id)
     matiere = evaluation.matiere
+    messages.success(request, f"L 'évaluation {evaluation.libelle} a été suprimmer.")
     evaluation.delete()
     return redirect('main:evaluations', id_matiere=matiere.id)
 
@@ -1539,9 +1570,13 @@ def uploadEvaluation(request, id_matiere, id_semestre):
     semestre = get_object_or_404(Semestre, pk=id_semestre)
     if request.method == "POST":
         if 'file' in request.FILES:
-            file = request.FILES.get('evaluation_data')
-            load_notes_from_evaluation(file, matiere, semestre)
-            #return HttpResponse("Hello")
+            file = request.FILES.get('file')
+            try:
+                load_notes_from_evaluation(file, matiere, semestre)
+            except ValueError as ve:
+                messages.error(request, str(ve))
+            
+            return HttpResponse("Hello")
         return redirect('main:evaluations', id_matiere=id_matiere)
         
     file_name = pre_load_evaluation_template_data(matiere, semestre)
@@ -1989,12 +2024,13 @@ def enregistrer_informations(request, id=0):
 @login_required(login_url=settings.LOGIN_URL)
 # Cette vue affiche la liste des semestre courants
 def semestres(request):
-    annee_universitaire_courante = AnneeUniversitaire.static_get_current_annee_universitaire()
-    semestres = Semestre.objects.filter(
-        annee_universitaire=annee_universitaire_courante)
+    
+    id_annee_selectionnee = request.session.get('id_annee_selectionnee')
+    annee_selectionnee = get_object_or_404(AnneeUniversitaire, pk=id_annee_selectionnee)
+    
+    semestres = Semestre.objects.filter(annee_universitaire=annee_selectionnee)
     context = {
         "semestres": semestres,
-        "annee_universitaire_courante": annee_universitaire_courante,
     }
     return render(request, 'semestres/semestres.html', context)
 

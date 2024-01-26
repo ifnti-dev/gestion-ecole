@@ -111,6 +111,13 @@ DATABASES = {
     }
 }
 
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.sqlite3",
+#         "NAME": "db",
+#     }
+# }
+
 # Database bacup
 
 DBBACKUP_STORAGE = 'django.core.files.storage.FileSystemStorage'

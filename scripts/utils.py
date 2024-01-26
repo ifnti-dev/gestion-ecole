@@ -248,7 +248,7 @@ def pre_load_evaluation_template_data(matiere, semestre):
 def load_notes_from_evaluation(path, matiere=None, semestre=None):
     # Charger le fichier excel des différentes notes d'une matière
     wb = openpyxl.load_workbook(path)
-    
+
     # Parcourir les evaluations
     for sheet in wb:
         columns = {
@@ -273,9 +273,8 @@ def load_notes_from_evaluation(path, matiere=None, semestre=None):
         evaluation_ponderation = int(str(ws['B7'].value))
         
         #evaluation_date = evaluation_date.date()
-        print(evaluation_date, " ", "")
         
-        if matiere.ponderation_restante() - evaluation_ponderation >= 0:
+        if matiere.ponderation_restante(semestre) - evaluation_ponderation >= 0:
             evaluation, _ = Evaluation.objects.get_or_create(
                     libelle=evaluation_name, 
                     ponderation=evaluation_ponderation,
@@ -298,7 +297,7 @@ def load_notes_from_evaluation(path, matiere=None, semestre=None):
                 Note.objects.create(valeurNote=int(row[2]), etudiant=etudiant, evaluation=evaluation)
 
         else:
-            raise Exception(f"Erreur de pondération pour l'évaluation : {evaluation_name} ")
+            raise ValueError(f"Erreur de pondération pour l'évaluation : {evaluation_name} ")
 
 @transaction.atomic         
 def load_maquette(path, annee):
@@ -396,4 +395,4 @@ def run():
     annee = AnneeUniversitaire.objects.filter(annee=2023).first()
     semestres  = annee.semestre_set.all().prefetch_related('programme_set').prefetch_related('etudiant_set')
     pre_load_note_ues_template_data(semestres)
-    
+
