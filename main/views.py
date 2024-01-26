@@ -856,16 +856,35 @@ def ues_semestre(request, semestre):
 @login_required(login_url=settings.LOGIN_URL)
 # methode générant la carte de l'étudiant
 def carte_etudiant(request, id, niveau):
+    """
+    Permet de générer sous format pdf la carte étudiante d'un étudiant
+
+    :param request: L'objet de requête Django.
+    :param id: Identifiant de l'étudiant
+    :param niveau: Le niveau de l'étudiant (L1, L2, L3)
+    :type niveau: str
+
+    :return: Une réponse HTTP affichant le pdf de la carte étudiante générée.
+    """
+
+    id_annee_selectionnee = request.session["id_annee_selectionnee"]
+    annee_universitaire = get_object_or_404(
+        AnneeUniversitaire, pk=id_annee_selectionnee)
+
     if request.user.groups.all().first().name not in ['directeur_des_etudes', 'secretaire']:
         return render(request, 'errors_pages/403.html')
 
     etudiant = get_object_or_404(Etudiant, id=id)
-
-    context = {'etudiant': etudiant, 'niveau': niveau}
+    in_format = "%Y-%m-%d"
+    out_format = "%d-%m-%Y"
+    date_formatee = datetime.strptime(
+        str(etudiant.datenaissance), in_format).strftime(out_format)
+    context = {'etudiant': etudiant, 'niveau': niveau, 'annee': str(
+        annee_universitaire.annee) + '-' + str(annee_universitaire.annee + 1), 'date_naissance': date_formatee}
 
     latex_input = 'carte_etudiant'
     latex_ouput = 'generated_carte_etudiant'
-    pdf_file = 'pdf_carte_etudiant'
+    pdf_file = 'pdf_carte_etudiant',
 
     # génération du pdf
     generate_pdf(context, latex_input, latex_ouput, pdf_file)
@@ -881,6 +900,14 @@ def carte_etudiant(request, id, niveau):
 @login_required(login_url=settings.LOGIN_URL)
 # methode générant la carte des étudiants d'un niveau
 def carte_etudiant_all(request, niveau):
+    """
+    Génére les cartes étudiantes de tout les étudiants d'un niveau donné
+    :param request: L'objet de requête Django.
+    :param niveau: Le niveau des étudiants (L1, L2, L3).
+    :type niveau: str
+
+    :return: Une réponse HTTP affichant le pdf des cartes étudiantes générées.
+    """
     if request.user.groups.all().first().name not in ['directeur_des_etudes', 'secretaire']:
         return render(request, 'errors_pages/403.html')
 
@@ -897,9 +924,15 @@ def carte_etudiant_all(request, niveau):
     etudiants, semestre = Etudiant.get_Ln(semestres, annee_universitaire=None)
     for etudiant in etudiants:
         etudiant.niveau, _ = etudiant.get_niveau_annee(annee_universitaire)
+        in_format = "%Y-%m-%d"
+        out_format = "%d-%m-%Y"
+        date_formatee = datetime.strptime(
+            str(etudiant.datenaissance), in_format).strftime(out_format)
+        etudiant.datenaissance = date_formatee
 
     # ajout des étudiants dans le dictionnaire
-    context = {'etudiants': etudiants, 'niveau': "niveau"}
+    context = {'etudiants': etudiants, 'annee': str(
+        annee_universitaire.annee) + '-' + str(annee_universitaire.annee + 1), 'niveau': "niveau"}
 
     latex_input = 'carte_etudiant_all'
     latex_ouput = 'generated_carte_etudiant_all'
@@ -919,13 +952,24 @@ def carte_etudiant_all(request, niveau):
 @login_required(login_url=settings.LOGIN_URL)
 # methode générant le diplome de l'étudiant
 def diplome_etudiant(request, id):
+    """
+    Génére le diplome d'un étudiant
+    :param request: L'objet de requête Django.
+    :param id: L'identifiant de l'étudiant.
 
+    :return: Une réponse HTTP affichant le pdf du diplome étudiant généré.
+    """
     if request.user.groups.all().first().name not in ['directeur_des_etudes']:
         return render(request, 'errors_pages/403.html')
 
     etudiant = get_object_or_404(Etudiant, id=id)
 
-    context = {'etudiant': etudiant}
+    id_annee_selectionnee = request.session["id_annee_selectionnee"]
+    annee_universitaire = get_object_or_404(
+        AnneeUniversitaire, pk=id_annee_selectionnee)
+
+    context = {'etudiant': etudiant, 'annee': str(
+        annee_universitaire.annee) + '-' + str(annee_universitaire.annee + 1), }
 
     latex_input = 'diplome'
     latex_ouput = 'generated_diplome'
@@ -945,6 +989,12 @@ def diplome_etudiant(request, id):
 @login_required(login_url=settings.LOGIN_URL)
 # methode générant le diplome de l'étudiant
 def diplome_etudiant_all(request):
+    """
+    Génére le diplome des étudiants de L3.
+    :param request: L'objet de requête Django.
+
+    :return: Une réponse HTTP affichant le pdf du diplomes étudiants générés.
+    """
     if request.user.groups.all().first().name not in ['directeur_des_etudes', 'secretaire']:
         return render(request, 'errors_pages/403.html')
 
@@ -979,6 +1029,14 @@ def diplome_etudiant_all(request):
 @login_required(login_url=settings.LOGIN_URL)
 # methode générant le certificat scolaire de l'étudiant
 def certificat_scolaire(request, id, niveau):
+    """
+    Génére l'attestation de scolaritée d'un étudiant
+    :param request: L'objet de requête Django.
+    :param id: L'identifiant de l'étudiant.
+    :param niveau: Le niveau de l'étudiant.
+
+    :return: Une réponse HTTP affichant le pdf de l'attestation de scolarité de l'étudiant générée.
+    """
     id_annee_selectionnee = request.session["id_annee_selectionnee"]
     annee_universitaire = get_object_or_404(
         AnneeUniversitaire, pk=id_annee_selectionnee)
@@ -1014,6 +1072,14 @@ def certificat_scolaire(request, id, niveau):
 @login_required(login_url=settings.LOGIN_URL)
 # methode générant le relevé de notes de l'étudiant
 def releve_notes(request, id, id_semestre):
+    """
+    Génére le relevé de notes semestriel d'un étudiant
+    :param request: L'objet de requête Django.
+    :param id: L'identifiant de l'étudiant.
+    :param id_semestre: L'identifiant du semestre.
+
+    :return: Une réponse HTTP affichant le pdf du relevé de notes généré.
+    """
     if request.user.groups.all().first().name not in ['directeur_des_etudes', 'secretaire', 'etudiant']:
         return render(request, 'errors_pages/403.html')
 
@@ -1074,7 +1140,13 @@ def releve_notes(request, id, id_semestre):
 @login_required(login_url=settings.LOGIN_URL)
 # methode générant le relevé de notes des étudiants de tout un semestre
 def releve_notes_semestre(request, id_semestre):
+    """
+    Génére les relevés de notes des étudiants du semestre
+    :param request: L'objet de requête Django.
+    :param id_semestre: L'identifiant du semestre.
 
+    :return: Une réponse HTTP affichant le pdf des relevés de notes générés.
+    """
     if request.user.groups.all().first().name not in ['directeur_des_etudes', 'secretaire']:
         return render(request, 'errors_pages/403.html')
 
@@ -1105,9 +1177,9 @@ def releve_notes_semestre(request, id_semestre):
 
         in_format = "%Y-%m-%d"
         out_format = "%d-%m-%Y"
-        date_formatee = datetime.strptime(str(etudiant.datenaissance), in_format).strftime(out_format)
-        
-        
+        date_formatee = datetime.strptime(
+            str(etudiant.datenaissance), in_format).strftime(out_format)
+
         releve_note['date_naissance'] = date_formatee
         releve_note['credits_obtenus'] = credits_obtenus
         releve_note['etudiant'] = etudiant
@@ -1139,7 +1211,14 @@ def releve_notes_semestre(request, id_semestre):
 @login_required(login_url=settings.LOGIN_URL)
 # methode générant le relevé détaillé d'un étudiant
 def releve_notes_detail(request, id, id_semestre):
+    """
+    Génére le relevé de notes détaillé par matière d'un étudiant au cours d'un semestre.
+    :param request: L'objet de requête Django.
+    :param id: L'identifiant de l'étudiant.
+    :param id_semestre: L'identifiant du semestre.
 
+    :return: Une réponse HTTP affichant le pdf du relevé de notes généré.
+    """
     if request.user.groups.all().first().name not in ['directeur_des_etudes', 'secretaire', 'etudiant']:
         return render(request, 'errors_pages/403.html')
 
@@ -1215,7 +1294,13 @@ def releve_notes_detail(request, id, id_semestre):
 # relevé de note détailé de tous les élèves du semestre
 @login_required(login_url=settings.LOGIN_URL)
 def releve_notes_details_all(request, id_semestre):
+    """
+    Génére le relevé de notes détaillé par matière des étudiants au cours d'un semestre.
+    :param request: L'objet de requête Django.
+    :param id_semestre: L'identifiant du semestre.
 
+    :return: Une réponse HTTP affichant le pdf des relevés de notes générés.
+    """
     if request.user.groups.all().first().name not in ['directeur_des_etudes', 'secretaire']:
         return render(request, 'errors_pages/403.html')
 
@@ -1291,7 +1376,15 @@ def releve_notes_details_all(request, id_semestre):
 
 @login_required(login_url=settings.LOGIN_URL)
 def recapitulatif_notes(request, id_matiere, id_semestre):
-    print(request.user.groups.all().first().name)
+    """
+    Génére le recaptitulatif des notes au cours d'un semestre dans une matière donnée.
+    :param request: L'objet de requête Django.
+    :param id_semestre: L'identifiant du semestre.
+    :param id_matiere: L'identifiant de la mamtière.
+
+    :return: Une réponse HTTP affichant le pdf du récapitulatif des notes de la matière.
+    """
+
     if request.user.groups.all().first().name not in ['enseignant', 'directeur_des_etudes']:
         return render(request, 'errors_pages/403.html')
 
@@ -1337,6 +1430,14 @@ def recapitulatif_notes(request, id_matiere, id_semestre):
 
 
 def recapitulatifs_des_notes_par_etudiant(request, id_semestre):
+    """
+    Affiche une page affichant l'ensemble des matières suivies au cours d'un semestre par l'étudiant, pour pouvoir choisir le récapitulatif de la matière recherchée.
+    :param request: L'objet de requête Django.
+    :param id_semestre: L'identifiant du semestre.
+    :param id_matiere: L'identifiant de la mamtière.
+
+    :return: Une réponse HTTP affichant une page html de contenant les matières.
+    """
     semestre = get_object_or_404(Semestre, pk=id_semestre)
     user = get_object_or_404(get_user_model(), pk=request.user.pk)
     etudiant = Etudiant.objects.get(user=user)
