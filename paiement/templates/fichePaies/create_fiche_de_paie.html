@@ -19,10 +19,10 @@ Enregistrement d'une fiche de paie
       <div class="d-flex justify-content-between">
         <h3>         
         </h3>
-    </div>
+      </div>
       <form class="container-fluid p-3" action="#" method="POST">
         {% csrf_token %}
-  
+
         <div class="form-row mb-3">
           <div class="col-md-6">
             {{ form.dateDebut.label_tag }}
@@ -43,36 +43,49 @@ Enregistrement d'une fiche de paie
             <span class="text-danger">{{ form.enseignant.errors }}</span>
           </div>
           <div class="col-md-6">
-            {{ form.matiere.label_tag }}
-            {{ form.matiere }}
-            <span class="text-danger">{{ form.matiere.errors }}</span>
-        </div> 
+            {{ form.prixUnitaire.label_tag }}
+            {{ form.prixUnitaire }}
+            <span class="text-danger">{{ form.prixUnitaire.errors }}</span>
+          </div>
         </div>
 
         <div class="form-row mb-3"> 
-           <div class="col-md-6">
+          <div class="col-md-6">
             {{ form.nombreHeureL1.label_tag }}
             {{ form.nombreHeureL1 }}
             <span class="text-danger">{{ form.nombreHeureL1.errors }}</span>
           </div>
           <div class="col-md-6">
+            <label for="matiere_L1">Matière L1</label>
+            {{ form.matieres_L1 }}
+            <span class="text-danger">{{ form.matieres_L1.errors }}</span>
+          </div> 
+        </div>
+
+        <div class="form-row mb-3">
+          <div class="col-md-6">
             {{ form.nombreHeureL2.label_tag }}
             {{ form.nombreHeureL2 }}
             <span class="text-danger">{{ form.nombreHeureL2.errors }}</span>
           </div>
+          <div class="col-md-6">
+            <label for="matiere_L2">Matière L2</label>
+            {{ form.matieres_L2 }}
+            <span class="text-danger">{{ form.matieres_L2.errors }}</span>
+          </div> 
         </div>
-
+          
         <div class="form-row mb-3"> 
-           <div class="col-md-6">
+          <div class="col-md-6">
             {{ form.nombreHeureL3.label_tag }}
             {{ form.nombreHeureL3 }}
             <span class="text-danger">{{ form.nombreHeureL3.errors }}</span>
-          </div>
+          </div> 
           <div class="col-md-6">
-            {{ form.prixUnitaire.label_tag }}
-            {{ form.prixUnitaire }}
-            <span class="text-danger">{{ form.prixUnitaire.errors }}</span>
-          </div>
+            <label for="matiere_L3">Matière L3</label>
+            {{ form.matieres_L3 }}
+            <span class="text-danger">{{ form.matieres_L3.errors }}</span>
+          </div>    
         </div>
 
         <div class="form-row mb-3">
@@ -87,4 +100,4 @@ Enregistrement d'une fiche de paie
       </form> 
     </div>
   </div>
-{% endblock %} 
+{% endblock %}

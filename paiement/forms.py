@@ -195,15 +195,32 @@ class FournisseurForm(forms.ModelForm):
         }
 
 
-
 class FicheDePaieForm(forms.ModelForm):
+    matieres_L1 = forms.ModelMultipleChoiceField(
+        queryset=Matiere.objects.filter(ue__programme__semestre__libelle__in=['S1', 'S2']),
+        widget=forms.SelectMultiple(attrs={'class': 'form-control'}),
+        label="Matière L1",
+        required=False
+    )
+    matieres_L2 = forms.ModelMultipleChoiceField(
+        queryset=Matiere.objects.filter(ue__programme__semestre__libelle__in=['S3', 'S4']),
+        widget=forms.SelectMultiple(attrs={'class': 'form-control'}),
+        label="Matière L2",
+        required=False
+    )
+    matieres_L3 = forms.ModelMultipleChoiceField(
+        queryset=Matiere.objects.filter(ue__programme__semestre__libelle__in=['S5', 'S6']),
+        widget=forms.SelectMultiple(attrs={'class': 'form-control'}),
+        label="Matière L3",
+        required=False
+    )
+
     class Meta:
         model = FicheDePaie
-        fields = ['dateDebut', 'dateFin',  'enseignant', 'prixUnitaire', 'acomptes', 'matiere', 'nombreHeureL1', 'nombreHeureL2', 'nombreHeureL3']   
+        fields = ['dateDebut', 'dateFin', 'enseignant', 'prixUnitaire', 'acomptes', 'nombreHeureL1', 'nombreHeureL2', 'nombreHeureL3']
         widgets = {
             'dateDebut': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
             'dateFin': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
-            'matiere': forms.Select(attrs={'class': 'form-control'}),
             'enseignant': forms.Select(attrs={'class': 'form-control'}),
             'nombreHeureL1': forms.NumberInput(attrs={'class': 'form-control'}),
             'nombreHeureL2': forms.NumberInput(attrs={'class': 'form-control'}),
@@ -212,7 +229,24 @@ class FicheDePaieForm(forms.ModelForm):
             'acomptes': forms.NumberInput(attrs={'class': 'form-control'}),
         }
 
-        
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['matieres_L1'].queryset = Matiere.objects.filter(ue__programme__semestre__libelle__in=['S1', 'S2'])
+        self.fields['matieres_L2'].queryset = Matiere.objects.filter(ue__programme__semestre__libelle__in=['S3', 'S4'])
+        self.fields['matieres_L3'].queryset = Matiere.objects.filter(ue__programme__semestre__libelle__in=['S5', 'S6'])
+
+    def clean(self):
+        cleaned_data = super().clean()
+        nombreHeureL1 = cleaned_data.get('nombreHeureL1')
+        nombreHeureL2 = cleaned_data.get('nombreHeureL2')
+        nombreHeureL3 = cleaned_data.get('nombreHeureL3')
+
+        # Vérifier si au moins un champ de nombre d'heures est renseigné
+        if nombreHeureL1 is None and nombreHeureL2 is None and nombreHeureL3 is None:
+            raise forms.ValidationError("Au moins un champ 'Nombre d'heures' doit être renseigné.")
+        return cleaned_data
+
+
 
 class ChargeForm(forms.ModelForm):
     class Meta:

@@ -259,6 +259,21 @@ def demandes_rejettees(request, id_annee_selectionnee):
 
 @login_required(login_url=settings.LOGIN_URL)
 def valider_conges(request, id):
+    """
+    Vue pour valider une demande de congé spécifique.
+
+    Args:
+        request (HttpRequest): L'objet de demande HTTP qui contient les détails de la demande.
+        id (int): L'ID de la demande de congé à valider.
+
+    Returns:
+        HttpResponseRedirect: Une redirection vers la vue 'conges:demandes_en_attentes', avec l'ID de l'année universitaire sélectionnée en tant que paramètre.
+
+    Raises:
+        Http404: Si aucune demande de congé correspondant à l'ID spécifié n'est trouvée.
+
+    """
+
     conge = get_object_or_404(Conge, id=id)
     conge.valider = "Actif"
     conge.save()
@@ -268,8 +283,19 @@ def valider_conges(request, id):
 
 
 def refuser_conge(request, id):
-    conge = get_object_or_404(Conge, id=id)
+    """
+    Cette vue permet de refuser une demande de congé.
 
+    Params:
+        - request: L'objet Request contenant les données de la requête HTTP.
+        - id: L'identifiant du congé à refuser.
+
+    Returns:
+        - Si la méthode de la requête est POST et le formulaire est valide, une redirection vers la liste des demandes en attente.
+        - Sinon, le rendu du template 'conges/demandes_rejettees.html' avec le formulaire et l'objet congé.
+
+    """
+    conge = get_object_or_404(Conge, id=id)
     if request.method == 'POST':
         form = RefusCongeForm(request.POST)
         if form.is_valid():
@@ -281,7 +307,6 @@ def refuser_conge(request, id):
 
             id_annee_selectionnee = AnneeUniversitaire.static_get_current_annee_universitaire().id
             return redirect('conges:demandes_en_attentes', id_annee_selectionnee=id_annee_selectionnee)
-
     else:
         form = RefusCongeForm()
 

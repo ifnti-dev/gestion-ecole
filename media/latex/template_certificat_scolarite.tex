@@ -40,7 +40,7 @@ Je soussigné, Sabirou TÉOURI, responsable d'établissement à l'Institut de fo
 
 Matricule : \VAR{etudiant.id},\\\vspace{-.4cm}
 
-né\BLOCK{if etudiant.sexe == 'F'}e\BLOCK{endif} le \VAR{etudiant.datenaissance} à \VAR{etudiant.lieunaissance},\\\vspace{-.3cm}
+né\BLOCK{if etudiant.sexe == 'F'}e\BLOCK{endif} le \VAR{date_naissance} à \VAR{etudiant.lieunaissance},\\\vspace{-.3cm}
 
 de nationalité \VAR{etudiant.nationalite},\\\normalsize
 
@@ -50,7 +50,7 @@ la licence "Sciences et Technologies",\\\vspace{-.4cm}
 
 la mention "Informatique des organisations",\\\vspace{-.3cm}
 
-l'année académique 2022-2023.\\\normalsize
+l'année académique \VAR{annee}-\VAR{annee + 1}.\\\normalsize
 
 \noindent Ce certificat lui est délivré pour servir et valoir ce que de droit.\\
 
