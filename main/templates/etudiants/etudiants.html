@@ -176,9 +176,9 @@
                                 </li>
 
 
-                                {% if is_etudiant and user.etudiant == etudiant.etudiant or is_directeur_des_etudes %}
+                                {% if is_etudiant and user.etudiant == etudiant.etudiant or is_directeur_des_etudes or is_secretaire %}
 
-                                {% if is_directeur_des_etudes %}
+                                {% if is_directeur_des_etudes or is_secretaire %}
 
                                 <li class="nav-main-item">
                                     <a class="nav-main-link nav-main-link-name" data-toggle="" aria-haspopup="true"
@@ -256,7 +256,7 @@
                                 {% comment %} Fin génération des notes {% endcomment %}
                                 {% endif %}
 
-                                {%  if is_secretaire  %}
+                                {%  if is_secretaire or is_directeur_des_etudes  %}
                                 {% comment %} Génération de la carte étudiant {% endcomment %}
                                 <li class="nav-main-item">
                                     <a class="nav-main-link nav-main-link-name" data-toggle="" aria-haspopup="true"
