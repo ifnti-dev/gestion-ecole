@@ -1,14 +1,19 @@
 
 import json
-import datetime 
+import datetime
+import random 
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
+from faker import Faker
+from main.pdfMaker import generate_pdf
 from main.models import Enseignant, Matiere, Etudiant ,AnneeUniversitaire , Semestre
 from cahier_de_texte.models import Seance
 from django.contrib.auth import authenticate, login , get_user_model
 
 import datetime
+
+from planning.models import SeancePlannifier
 
 def getMatieresEtudiant(etudiant):
     annee=AnneeUniversitaire.static_get_current_annee_universitaire().annee
@@ -24,8 +29,6 @@ def getMatieresEtudiant(etudiant):
 def getNiveauEtudiant(etudiant):
     annee=AnneeUniversitaire.static_get_current_annee_universitaire().annee
     semestre=etudiant.semestres.filter(courant=True,pk__contains=annee)
-    print(etudiant.nom)
-    print('semestre',semestre)
     if semestre:
         if semestre[0].libelle =="S1" or semestre[0].libelle =="S2":
             return "L1"
@@ -220,52 +223,53 @@ def datetime_serializer(obj):
 
 @login_required(login_url="/main/connexion")
 def cahier_de_text(request):
-    if request.user.is_authenticated:
-        if  request.user.groups.all()[0].name == "etudiant":
-            user_connecte=get_object_or_404(get_user_model(),id=request.user.id)
-            etudiant=get_object_or_404(Etudiant,user=user_connecte)
-            seances=Seance.objects.all()
-            events = set()
-            niveau=getNiveauEtudiant(etudiant)
-            for seance in seances:
-                if niveau== getNiveauEtudiant(seance.auteur):
-                    print("seance :", seance)
-                    events.add(seance)
-            print("seances :",events )
-            event_data = [{'title': event.intitule, 'start': event.date_et_heure_debut , 'end':event.date_et_heure_fin ,'url': '/cahier_de_texte/info_seance/' + str(event.id) + '/'} for event in events]
-            event_data = json.dumps(event_data, default=datetime_serializer)
-            return render(request,"cahier_de_text/cahier_de_texte.html",{"event_data":event_data,"niveau":niveau})
+    id_annee=request.session.get("id_annee_selectionnee")
+    annee=AnneeUniversitaire.objects.filter(id=id_annee).first()
+    if  request.user.groups.all()[0].name == "etudiant":
+        user_connecte=get_object_or_404(get_user_model(),id=request.user.id)
+        etudiant=get_object_or_404(Etudiant,user=user_connecte)
+        sem=etudiant.get_semestre_courant
+        niveau=getNiveauEtudiant(etudiant)
+        events=Seance.objects.filter(semestre=sem)
+        events = set()
+        print("seances :",events )
+        event_data = [{'title': event.intitule, 'start': event.date_et_heure_debut , 'end':event.date_et_heure_fin ,'url': '/cahier_de_texte/info_seance/' + str(event.id) + '/'} for event in events]
+        event_data = json.dumps(event_data, default=datetime_serializer)
+        return render(request,"cahier_de_text/cahier_de_texte.html",{"event_data":event_data,"niveau":niveau})
 
-        else:
-            events = set()
-            seances=Seance.objects.all()
-            semestres=Semestre.objects.all()
-            niveau=''
-            if request.method=="POST" and request.POST.get("niveau")=="L1" :
-                niveau= "L1" 
-                for seance in seances:
-                    if "L1"== getNiveauEtudiant(seance.auteur):
-                        events.add(seance)
-
-            elif request.method=="POST" and request.POST.get("niveau")=="L2" : 
-                niveau= "L2"
-                for seance in seances:
-                    if "L2"== getNiveauEtudiant(seance.auteur):
-                        events.add(seance)
-            elif request.method=="POST" and request.POST.get("niveau")=="L3" :
-                niveau= "L3" 
-                for seance in seances:
-                    if "L3"== getNiveauEtudiant(seance.auteur):
-                        events.add(seance)
-            else :
+    else:
+        semestres=Semestre.objects.all()
+        if request.method=="POST" :
+            niveau =request.POST.get("niveau")
+            if niveau == "L1" :
                 niveau="L1"
-                for seance in seances:
-                    if "L1"== getNiveauEtudiant(seance.auteur):
-                        events.add(seance)
+                s1='S1-'+str(annee.annee)
+                s2='S2-'+str(annee.annee)
+                events=Seance.objects.filter(semestre__in= [s1,s2])
+                print('nombre seances' , len(events))
 
-            event_data = [{'title': event.intitule, 'start': event.date_et_heure_debut , 'end':event.date_et_heure_fin ,'url': '/cahier_de_texte/info_seance/' + str(event.id) + '/'} for event in events]
-            event_data = json.dumps(event_data, default=datetime_serializer)
-            return render(request,"cahier_de_text/cahier_de_texte.html",{"event_data":event_data,"niveau":niveau,"semestres":semestres})
+            elif niveau=="L2" : 
+                niveau="L2"
+                s3='S3-'+str(annee.annee)
+                s4='S4-'+str(annee.annee)
+                events=Seance.objects.filter(semestre__in= [s3,s4])
+                print('nombre seances' , len(events))
+            elif niveau=="L3" :
+                niveau= "L3"
+                s5='S1-'+str(annee.annee)
+                s6='S2-'+str(annee.annee)
+                events=Seance.objects.filter(semestre__in= [s5,s6])
+                print('nombre seances' , len(events))
+        else :
+            niveau="L1"
+            s1='S1-'+str(annee.annee)
+            s2='S2-'+str(annee.annee)
+            events=Seance.objects.filter(semestre__in= [s1,s2])
+            print('nombre seances' , len(events))
+
+        event_data = [{'title': event.intitule, 'start': event.date_et_heure_debut , 'end':event.date_et_heure_fin ,'url': '/cahier_de_texte/info_seance/' + str(event.id) + '/'} for event in events]
+        event_data = json.dumps(event_data, default=datetime_serializer)
+        return render(request,"cahier_de_text/cahier_de_texte.html",{"event_data":event_data,"niveau":niveau,"semestres":semestres})
 
 @login_required(login_url="/main/connexion")
 def liste_seance(request):
@@ -295,59 +299,100 @@ def liste_seance_etudiant(request):
 def lancer_impression():
     return
 
+def nuance(valeur):
+    if valeur is None :
+        return False
+    elif valeur == 'on' :
+        return True
+
 @login_required(login_url="/main/connexion")
 def imprimer(request):
     semestres = request.POST.getlist("semestres")
-    nonvalider = request.POST.get("imprimer_non_validees")
+    print('semestres :',semestres)
+    valider = request.POST.get("imprimer_validees")
+    print('Recuperer uniquement les seances valider ? :',nuance(valider))
     commentaires = request.POST.get("imprimer_commentaires")
+    print('Recuperer les commentaires des professeurs  ? :',nuance(commentaires))
     listeAbsence = request.POST.get("eleves_absents")
+    print('Afficher la liste des absents par seances  ? :',nuance(listeAbsence))
     listeUe = request.POST.get("details_ue")
+    print('Afficher la liste des Ues du semestres   ? :',nuance(listeUe))
     listeMatiere = request.POST.get("details_matieres")
+    print('Afficher la liste des Matieres du semestres   ? :',nuance(listeMatiere))
     HeureConsomme = request.POST.get("details_heures_matieres")
+    print('Afficher le nombre d"heure consommer par matiere pendant le semestre   ? :',nuance(HeureConsomme))
     listeEtudiant = request.POST.get("details_etudiants")
-    sous_categorisation = request.POST.get("sous_categorisation")
+    print('Afficher la liste des etudiants du semestre   ? :',nuance(listeEtudiant))
+    par_matiere = request.POST.get("sous_categorisation")
+    print('Afficher la liste des seances regrouper par matiere  ? :',par_matiere)
+    
+    #si on veut un affichage par matiere , ca met automatiquement la liste des matieres a true 
     for semestre_id in semestres:
-        semestre =Semestre.objects.get(id=semestre_id)
-        programmes=semestre[0].programme_set.all() 
-        seances = set()
-        ues=set()
-        matieres=set()
-        if nonvalider :
-            try :
-                seances.add(Seance.objects.filter(semestre=semestre))
-            except :
-                pass
-        else :
-            try :
-                seances.add(seances = Seance.objects.filter(semestre=semestre,valider=True))
-            except :
-                pass
-        if listeUe and listeMatiere:                       
-            for programme in programmes:
-                ues.update([programme.ue])
-            
-            for ue in ues :
-                matieres.update(ue.matiere_set.all())         
-            return matieres
-        
-        elif listeMatiere and not listeUe:
-            programmes=semestre[0].programme_set.all()            
-            for programme in programmes:
-                ues.update([programme.ue])
-            
-            for ue in ues :
-                matieres.update(ue.matiere_set.all())         
-            return matieres
-        
-        elif listeUe and not listeMatiere:
-            programmes=semestre[0].programme_set.all()            
-            for programme in programmes:
-                ues.update([programme.ue])
-        
-        else :
-            pass
+        semestre = Semestre.objects.get(id=semestre_id)
+        seances_total = Seance.objects.filter(semestre=semestre,valider=nuance(valider)).order_by('date_et_heure_debut')
+        ues = semestre.get_all_ues()
+        matieres_dict = {}
 
-        print(seances)
+        if par_matiere != 'parMatieres' :
+            context={'listeAbsence':nuance(listeAbsence),'commentaires':nuance(commentaires),'listeUe':nuance(listeUe),'listeEtudiant':nuance(listeEtudiant),'seances':seances_total}                           
+            latex_input = 'cahier_de_texte2'
+            latex_ouput = 'CDT_'+str(semestre_id)+'_'+str(datetime.datetime.now())
+            pdf_file = 'CDT_'+str(semestre_id)+'_'+str(datetime.datetime.now())
+
+            # génération du pdf
+            generate_pdf(context, latex_input, latex_ouput, pdf_file)
+
+            # visualisation du pdf dans le navigateur
+            with open('media/pdf/' + str(pdf_file) + '.pdf', 'rb') as f:
+                pdf_preview = f.read()
+                response = HttpResponse(pdf_preview, content_type='application/pdf')
+                response['Content-Disposition'] = 'inline;filename=pdf_file.pdf'
+                return response
+            
+        if listeMatiere :                       
+            if HeureConsomme :
+                for ue in ues :                   
+                    matieres = ue.matiere_set.all()
+                    for matiere in matieres :
+                        seances_prime = seances_total.filter(matiere=matiere).order_by('date_et_heure_debut')
+                        temps=0
+                        for seance in seances_prime:
+                            temps+=(seance.date_et_heure_fin - seance.date_et_heure_debut).total_seconds()
+                        hours, remainder = divmod(temps, 3600)
+                        minutes, _ = divmod(remainder, 60)
+                        matiere['temps_effectuer']=str(hours)+'h '+str(minutes)+'min'
+                        matiere_key = matiere.libelle
+                        if matiere_key not in matieres_dict:
+                            matieres_dict[matiere_key] = {"HeureConsomme": 0, "seances": []}
+
+                        matieres_dict[matiere_key]["HeureConsomme"] += str(hours)+'h '+str(minutes)+'min'
+                        matieres_dict[matiere_key]["seances"]=seances_prime
+                
+                context={'listeAbsence':listeAbsence,'commentaires':commentaires,'listeUe':listeUe,'listeEtudiant':listeEtudiant,'seances':matieres_dict}       
+                    
+                latex_input = 'cahier_de_texte2'
+                latex_ouput = 'cdt'+str(semestre_id)+'_'+str(datetime.datetime.now)
+                pdf_file = 'cdt'+str(semestre_id)+'_'+str(datetime.datetime.now)
+
+                # génération du pdf
+                generate_pdf(context, latex_input, latex_ouput, pdf_file)
+
+                # visualisation du pdf dans le navigateur
+                with open('media/pdf/' + str(pdf_file) + '.pdf', 'rb') as f:
+                    pdf_preview = f.read()
+                    response = HttpResponse(pdf_preview, content_type='application/pdf')
+                    response['Content-Disposition'] = 'inline;filename=pdf_file.pdf'
+                    return response
+                
+            else :
+                for ue in ues :                   
+                    matieres = ue.matiere_set.all()
+
+
+            
+            
+                
+
                     
     
     return HttpResponse("traitement en cours ")
@@ -365,3 +410,57 @@ def commenter(request):
     seance.commentaire=commentaire
     seance.save()
     return redirect("/cahier_de_texte/info_seance/" + str(seance.id) + "/" )
+
+
+fake = Faker()
+
+def creer_seance(nombre):
+    semestre = Semestre.objects.filter(id='S1-2023' ).first()
+    print(semestre)
+    ues = semestre.get_all_ues()
+    print(ues)
+    matieres=list()
+    for ue in ues:
+        matt = ue.matiere_set.all()
+        for ma in matt:
+            matieres.append(ma)
+    taille=len(matieres)
+    
+    for _ in range(nombre):
+        mat=random.randint(0,taille)
+        matiere=matieres[mat-1]
+        fake=create_fake_seance(semestre, matiere)
+        print(fake)
+
+def create_fake_seance(seme, matieres):
+    
+    print(matieres)
+    
+    intitule = fake.sentence()
+    date_et_heure_debut = fake.date_time()
+    date_et_heure_fin = date_et_heure_debut + datetime.timedelta(hours=2)
+    description = fake.paragraph()
+    auteur = Etudiant.objects.order_by('?').first()  # Get a random Etudiant
+    valider = fake.boolean()
+    matiere =matieres  
+    semestre = seme  # Get a random Semestre
+    enseignant = Enseignant.objects.order_by('?').first()  # Get a random Enseignant
+    commentaire = fake.paragraph()
+    seance_plannifier = SeancePlannifier.objects.order_by('?').first()  # Get a random SeancePlannifier
+
+    seance_instance = Seance.objects.create(
+        intitule=intitule,
+        date_et_heure_debut=date_et_heure_debut,
+        date_et_heure_fin=date_et_heure_fin,
+        description=description,
+        auteur=auteur,
+        valider=valider,
+        matiere=matiere,
+        semestre=semestre,
+        enseignant=enseignant,
+        commentaire=commentaire,
+        seancePlannifier=seance_plannifier
+    )
+
+    return seance_instance
+

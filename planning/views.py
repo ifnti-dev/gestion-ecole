@@ -72,17 +72,21 @@ def nouveau_planning(request):
         annee = AnneeUniversitaire.static_get_current_annee_universitaire().annee
         semestre = Semestre.objects.filter(courant=True, pk__contains=annee,id=semestreId).first()
         planification = defaultdict(list)
+        
         ues = semestre.get_all_ues()
-
+        
         for ue in ues:
+            print('plan1')
             matieres_json = serialize('json', ue.matiere_set.all())
             matieres = json.loads(matieres_json)
             for matiere in matieres :
                 seances=Seance.objects.filter(semestre=semestre,matiere=matiere['pk'])
                 temps=0
                 for seance in seances:
-                    temps+=(seance.date_et_heure_fin - seance.date_et_heure_debut).total_seconds()/3600
-                matiere['temps_effectuer']=temps
+                    temps+=(seance.date_et_heure_fin - seance.date_et_heure_debut).total_seconds()
+                hours, remainder = divmod(temps, 3600)
+                minutes, _ = divmod(remainder, 60)
+                matiere['temps_effectuer']=str(hours)+'h '+str(minutes)+'min' 
                 
                 planning=Planning.objects.filter(semestre=semestre)
                 for plan in planning :
@@ -90,11 +94,13 @@ def nouveau_planning(request):
                     plannings=SeancePlannifier.objects.filter(planning=plan ,matiere=matiere['pk'])
                     temps_x=0
                     for planning in plannings:
-                        temps_x+=(planning.date_heure_fin - planning.date_heure_debut).total_seconds()/3600
-
-                    matiere['temps_plannifier']=temps_x                         
+                        temps_x+=(planning.date_heure_fin - planning.date_heure_debut).total_seconds()
+                    hours_x, remainder = divmod(temps_x, 3600)
+                    minutes_x, _ = divmod(remainder, 60)
+                    matiere['temps_plannifier']=str(hours_x)+'h '+str(minutes_x)+'min'                       
 
             planification[str(ue)].append({'matieres': matieres})
+            print('plan : ',planification)
             planification_json = json.dumps(planification)
         
 
@@ -156,10 +162,10 @@ def sauvegarder(request):
         planning.save()
         for event in events:
             title = event.get('title')
-            cleaned_title = re.sub(r'\s*\([^)]*\)$', '', title)
-            print(cleaned_title)
+            #cleaned_title = re.sub(r'\s*\([^)]*\)$', '', title)
+            #print(cleaned_title)
             print(title)
-            matiere = Matiere.objects.filter(libelle=cleaned_title).first()
+            matiere = Matiere.objects.filter(libelle=title).first()
             professeur = matiere.enseignant  # Remplacez cela par le champ approprié
             
             seance = SeancePlannifier(
@@ -319,7 +325,7 @@ def imprimer(request,planningId):
 
         day = jour +' '+valeur_jour+'/'+valeur_mois+' - J'+jour_n 
         
-        timeshot= str(planning.date_heure_debut.hour)+'h'+str(planning.date_heure_debut.minute) +' - '+str(planning.date_heure_fin.hour)+'h'+str(planning.date_heure_fin.minute)
+        timeshot= str(planning.date_heure_debut.hour)+'h'+str(planning.date_heure_debut.minute)
 
         planning.day = day
         planning.timeshot = timeshot
@@ -329,9 +335,49 @@ def imprimer(request,planningId):
         if timeshot not in timeslots:
             timeslots.append(timeshot)
 
-#
-    schedule = {}
+# #
+#     schedule = {}
 
+
+#     # # Populate the schedule dictionary with empty sub-dictionaries for each time slot
+#     # for time in timeslots:
+#     #     schedule[time] = {}
+
+#     # # Populate the schedule with planning information
+#     # for plan in plannings:
+#     #     time_slot = plan.timeshot  # Replace with your actual attribute for timeslot
+#     #     day = plan.day  # Replace with your actual attribute for day
+
+#     #     # Check if the time slot exists in the schedule dictionary
+#     #     if time_slot in schedule:
+#     #         # Check if the day exists in the sub-dictionary for the given time slot
+#     #         if day in schedule[time_slot]:
+#     #             # Append the planning information to the existing list for the day
+#     #             schedule[time_slot][day].append({
+#     #                 "intitule": plan.intitule,
+#     #                 "professeur": plan.professeur.nom if plan.professeur else "No Professor"
+#     #             })
+#     #         else:
+#     #             # Create a new list for the day and append the planning information
+#     #             schedule[time_slot][day] = [{
+#     #                 "intitule": plan.intitule,
+#     #                 "professeur": plan.professeur.nom if plan.professeur else "No Professor"
+#     #             }]
+#     #     else:
+#     #         # Handle the case where the time slot is not in the schedule (if needed)
+#     #         pass
+            
+    #     # Print the resulting schedule
+    # for time_slot, days_data in schedule.items():
+    #     print(f"Time Slot: {time_slot}")
+        
+    #     for day, planning_info_list in days_data.items():
+    #         print(f"  Day: {day}")
+            
+    #         for planning_info in planning_info_list:
+    #             print(f"    Intitule: {planning_info['intitule']}, Professeur: {planning_info['professeur']}")
+
+    schedule = {}
 
     # Populate the schedule dictionary with empty sub-dictionaries for each time slot
     for time in timeslots:
@@ -341,35 +387,45 @@ def imprimer(request,planningId):
     for plan in plannings:
         time_slot = plan.timeshot  # Replace with your actual attribute for timeslot
         day = plan.day  # Replace with your actual attribute for day
+        activity = plan.intitule
+        professor = plan.professeur.nom if plan.professeur else "No Professor"
 
         # Check if the time slot exists in the schedule dictionary
         if time_slot in schedule:
             # Check if the day exists in the sub-dictionary for the given time slot
             if day in schedule[time_slot]:
-                # Append the planning information to the existing list for the day
-                schedule[time_slot][day].append({
-                    "intitule": plan.intitule,
-                    "professeur": plan.professeur.nom if plan.professeur else "No Professor"
-                })
+                # Check if the activity exists for the given day and time
+                if activity in schedule[time_slot][day]:
+                    # Update the existing activity information
+                    schedule[time_slot][day][activity].append({
+                        "professeur": professor
+                    })
+                else:
+                    # Create a new sub-dictionary for the activity and append it to the day's list
+                    schedule[time_slot][day][activity] = [{
+                        "professeur": professor
+                    }]
             else:
-                # Create a new list for the day and append the planning information
-                schedule[time_slot][day] = [{
-                    "intitule": plan.intitule,
-                    "professeur": plan.professeur.nom if plan.professeur else "No Professor"
-                }]
+                # Create a new dictionary for the day and add it to the time slot's sub-dictionary
+                schedule[time_slot][day] = {activity: [{
+                    "professeur": professor
+                }]}
         else:
-            # Handle the case where the time slot is not in the schedule (if needed)
-            pass
+            # Create a new dictionary for the time slot and day
+            schedule[time_slot] = {day: {activity: [{
+                "professeur": professor
+            }]}}
 
-    # Print the resulting schedule
-    for time_slot, days_data in schedule.items():
-        print(f"Time Slot: {time_slot}")
-        
-        for day, planning_info_list in days_data.items():
-            print(f"  Day: {day}")
-            
-            for planning_info in planning_info_list:
-                print(f"    Intitule: {planning_info['intitule']}, Professeur: {planning_info['professeur']}")
+    for timeslot in schedule:
+        print("\nTime Slot:", timeslot)
+        for day in schedule[timeslot]:
+            print("Day:", day)
+            for activity in schedule[timeslot][day]:
+                print(activity, ":")
+                for professor in schedule[timeslot][day][activity]:
+                    print("\tProfessor:", professor["professeur"])
+
+
 
 
 

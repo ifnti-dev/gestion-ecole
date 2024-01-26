@@ -1,0 +1,34 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{longtable, array}
+\usepackage[left=1cm,right=1cm,top=1cm,bottom=2cm]{geometry}
+\begin{document}
+\VAR{seances|length}
+\begin{longtable}{|p{4cm}|p{9cm}|p{4cm}|}
+\hline
+\LARGE\textbf{Date} & \LARGE \textbf{Description} & \LARGE \textbf{Autres} \\
+ \hline
+
+ \BLOCK{for cour in seances}
+ \rule[-1ex]{0pt}{2.5ex}\LARGE\underline{Date}:
+\linebreak
+\VAR{cour.date_et_heure_debut.day} - \VAR{cour.date_et_heure_debut.month} - \VAR{cour.date_et_heure_debut.year}
+\linebreak    
+\underline{Heure}:
+\linebreak
+\VAR{cour.date_et_heure_debut.hour}h:\VAR{cour.date_et_heure_debut.minute} - \VAR{cour.date_et_heure_fin.hour}h:\VAR{cour.date_et_heure_fin.minute} 
+\linebreak
+\underline{Auteur}:
+\linebreak
+\VAR{cour.auteur.prenom} \VAR{cour.auteur.nom}
+
+    &\LARGE  \VAR{cour.description} 
+    & \LARGE  \VAR{cour.commentaire} \\ 
+ \hline 
+\BLOCK{endfor}
+ 
+ \end{longtable} 
+\end{document}
