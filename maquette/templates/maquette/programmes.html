@@ -11,9 +11,6 @@
             {% endfor %}
         </select>
         <div class="d-flex">
-            <button type="button" class="mr-3 btn btn-outline-primary" data-toggle="modal" data-target="#modal-block-vcenter">
-                <i class="fas fa-plus"></i> Importer
-            </button>
             <form action="{% url 'maquette:correspondances' %}" method="get">
                 <button type="submit" class="btn btn-outline-primary ml-3" id="add-form-row">
                     Correspondances
@@ -32,86 +29,51 @@
         </div>
     </div>
     <div class="block-content block-content-full">
-        <form action="" method="POST">
-            {% csrf_token %}
-            <table class="table table-bordered table-striped table-vcenter js-dataTable-full-pagination">
-                <table class="table table-bordered table-striped table-vcenter js-dataTable-full-pagination">
-                    <thead>
-                        <tr>
-                            <th class="d-none d-sm-table-cell text-center" >Semestre</th>
-                            <th class="d-none d-sm-table-cell text-center" >Ues</th>
-                            <th style="width: 15%;">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for programme in programmes  %}
-                        <tr class="model-form-row">
-                            <td style="text-align: center;">
-                                {{ programme.semestre }}
-                            </td>
-                            <td style="text-align: center;">
-                                {% for ue in programme.ues.all  %}
-                                <span class="badge badge-primary">{{ ue.libelle }}</span>
-                                {% endfor %}
-                            </td>
-                            <td style="text-align: center;"> 
-                                <button type="button" class="btn btn-secondary dropdown-toggle" id="dropdown-default-secondary" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    <i class="fa fa-bars" aria-hidden="true"></i>
-                                </button>
-                                <div class="dropdown-menu font-size-sm" aria-labelledby="dropdown-default-secondary">
-                                    <li class="nav-main-item">
-                                        <a class="nav-main-link nav-main-link-name" data-toggle="" aria-haspopup="true" aria-expanded="false" href="{% url 'maquette:edit_programme' programme.id %}">
-                                            <i class="fa fa-edit mr-1 text-primary" aria-hidden="true"></i>
-                                            <span class="nav-main-link-name">Editer</span>
-                                        </a>                   
-                                    </li>
-                                    <li class="nav-main-item">
-                                        <a class="nav-main-link nav-main-link-name" data-toggle="" aria-haspopup="true" aria-expanded="false" href="{% url 'maquette:delete_programme' programme.id %}">
-                                            <i class="fa fa-trash mr-1 text-danger" aria-hidden="true"></i>
-                                            <span class="nav-main-link-name">Supprimer</span>
-                                        </a>                   
-                                    </li>
-                                </div>                              
-                            </td> 
-                        </tr>
-                        {% endfor %} 
-                    </tbody>
-                </table>
-            </table>
-        </form>
-    </div>
-</div>
-<div class="" id="modal-block-vcenter" tabindex="-1" role="dialog" aria-labelledby="modal-block-vcenter" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="block block-rounded block-themed block-transparent mb-0">
-                <div class="block-header bg-primary-dark">
-                    <h3 class="block-title">Maquette : Import</h3>
-                    <div class="block-options">
-                        <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
-                            <i class="fa fa-fw fa-times"></i>
+        <table class="table table-bordered table-striped table-vcenter js-dataTable-full-pagination">
+            <thead>
+                <tr>
+                    <th class="d-none d-sm-table-cell text-center" >Semestre</th>
+                    <th class="d-none d-sm-table-cell text-center" >Ues</th>
+                    <th style="width: 15%;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for programme in programmes  %}
+                <tr class="model-form-row">
+                    <td style="text-align: center;">
+                        {{ programme.semestre }}
+                    </td>
+                    <td style="text-align: center;">
+                        {% for ue in programme.ues.all  %}
+                        <span class="badge badge-primary">{{ ue.libelle }}</span>
+                        {% endfor %}
+                    </td>
+                    <td style="text-align: center;"> 
+                        <button type="button" class="btn btn-secondary dropdown-toggle" id="dropdown-default-secondary" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fa fa-bars" aria-hidden="true"></i>
                         </button>
-                    </div>
-                </div>
-                <div class="block-content font-size-sm">
-                    <div class="d-flex flex-column my-3">
-                        <a href="/media/excel_templates/maquette_general_[annee].xlsx">
-                            <button class="btn btn-primary w-100">Template</button>
-                        </a>
-                        <form action="{% url 'maquette:data' %}" method="post" enctype="multipart/form-data">
-                            {% csrf_token %}
-                            <div class="mt-4">
-                                <input type="file" name="maquette_excel_file" multiple class="btn btn-primary w-100" name="" id="">
-                            </div>
-                            <button type="submit" class="btn btn-primary mt-5" data-dismiss="modal">Charger</button>
-                        </form>
-                    </div>
-                </div>
-                <div class="block-content block-content-full text-right border-top">
-                    <button type="button" class="btn btn-alt-primary mr-1" data-dismiss="modal">Fermer</button>
-                </div>
-            </div>
-        </div>
+                        <div class="dropdown-menu font-size-sm" aria-labelledby="dropdown-default-secondary">
+                            <li class="nav-main-item">
+                                <a class="nav-main-link nav-main-link-name" data-toggle="" aria-haspopup="true" aria-expanded="false" href="{% url 'maquette:edit_programme' programme.id %}">
+                                    <i class="fa fa-edit mr-1 text-primary" aria-hidden="true"></i>
+                                    <span class="nav-main-link-name">Editer</span>
+                                </a>                   
+                            </li>
+                            <li class="nav-main-item">
+                                <a class="nav-main-link nav-main-link-name" 
+                                    onclick="delete_object('/maquette/delete_programme/{{ programme.id }}/')"
+                                    href="#"
+                                    >
+                                    <i class="fa fa-trash mr-1 text-danger" aria-hidden="true"></i>
+                                    <span class="nav-main-link-name">Supprimer</span>
+                                </a>                   
+                            </li>
+                        </div>                              
+                    </td> 
+                </tr>
+                {% endfor %} 
+            </tbody>
+        </table>
     </div>
 </div>
 {% endblock content %}

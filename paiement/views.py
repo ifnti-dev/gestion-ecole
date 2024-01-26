@@ -39,6 +39,22 @@ def liste_frais(request, id_annee_selectionnee):
 
 @login_required(login_url=settings.LOGIN_URL)
 def enregistrer_frais(request, id=0):
+    """
+    Cette vue permet d'enregistrer ou de modifier le montant des frais de scolarité.
+    Si l'ID est fourni, elle met à jour le montant des frais existant avec les nouvelles données.
+    Sinon, elle crée une nouvelle instance de frais scolaire.
+
+    Args:
+        request (HttpRequest): L'objet HttpRequest reçu.
+        id (int, optional): L'identifiant du frais à mettre à jour. Par défaut 0.
+
+    Returns:
+        HttpResponse: La réponse HTTP rendue par la vue.
+    'frais/enregistrer_frais.html' : correspond au template qui est renvoyer.
+
+    Raises:
+        None
+    """
     if request.method == "GET":
         if id == 0:
             form = FraisForm()
@@ -63,6 +79,22 @@ def enregistrer_frais(request, id=0):
 
 @login_required(login_url=settings.LOGIN_URL)
 def create_comptable(request, id=0):
+    """
+    Cette vue permet d'enregistrer ou de modifier un comptable.
+    Si l'ID est fourni, elle met à jour les informations du comptable existante avec les nouvelles données.
+    Sinon, elle crée une nouvelle instance de comptable.
+
+    Args:
+        request (HttpRequest): L'objet HttpRequest reçu.
+        id (int, optional): L'identifiant du comptable à mettre à jour. Par défaut 0.
+
+    Returns:
+        HttpResponse: La réponse HTTP rendue par la vue.
+    'comptables/create_comptable.html' : correspond au template qui est renvoyer.
+
+    Raises:
+        None
+    """
     if request.method == "GET":
         if id == 0:
             form = ComptableForm()
@@ -167,6 +199,22 @@ def liste_paiements(request, id_annee_selectionnee):
 
 @login_required(login_url=settings.LOGIN_URL)
 def enregistrer_paiement(request, id=0):
+    """
+    Cette vue permet d'enregistrer ou de mettre à jour les informations concernant le paiement des frais scolaires.
+    Si l'ID est fourni, elle met à jour les informations concernant le paiement existant avec les nouvelles données.
+    Sinon, elle crée une nouvelle instance pour stocker les informations concernant le paiement.
+
+    Args:
+        request (HttpRequest): L'objet HttpRequest reçu.
+        id (int, optional): L'identifiant du paiement à mettre à jour. Par défaut 0.
+
+    Returns:
+        HttpResponse: La réponse HTTP rendue par la vue.
+    'paiements/enregistrer_paiement.html' : correspond au template qui est renvoyer.
+
+    Raises:
+        None
+    """
     if request.method == "GET":
         if id == 0:
             form = PaiementForm()
@@ -212,6 +260,23 @@ def enregistrer_paiement(request, id=0):
 
 
 def etat_paiements(request, id_annee_selectionnee, id):
+    """
+        Affiche les informations concernant l'état de paiement d'un étudiant donnée pour une année universitaire sélectionnée.
+
+        Paramètres :
+            request – L’objet HttpRequest utilisé pour effectuer la requête.
+            id_annee_selectionnee – est l'identifiant de l’année universitaire sélectionnée et  
+            id - correspond à l'identifiant de l'étudiant sélectionné.
+
+        Renvoie :
+        Un objet HttpResponse contenant le rendu de la page 'paiements/etat_paiements.html'.
+
+        Raises :
+            Http404 si l’année universitaire sélectionnée n’est pas trouvée.
+
+        Cette vue récupère les informations concernant l'état de paiement actuel d'un étudiant associés à l’année universitaire spécifiée, puis les renvoie au template 'paiements/etat_paiements.html' pour affichage.
+    
+    """
     etudiant = get_object_or_404(Etudiant, pk=id)
     annee_selectionnee = AnneeUniversitaire.objects.get(pk=id_annee_selectionnee)
     paiements = Paiement.objects.filter(annee_universitaire=id_annee_selectionnee, etudiant=etudiant)
@@ -229,11 +294,15 @@ def etat_paiements(request, id_annee_selectionnee, id):
         }
         return render(request, 'paiements/etat_paiements.html', context)
 
-    # Calcul du montant total pour l'étudiant
+    """
+        Calcul du montant total pour l'étudiant 
+    """
     montant_verse = paiements.filter(etudiant=etudiant).aggregate(Sum('montant'))['montant__sum'] or 0
     total_frais_courante = frais_etudiant.montant_inscription + frais_etudiant.montant_scolarite if frais_etudiant else 0
     
-    # Calcul des arriérés pour l'étudiant
+    """
+        alcul des arriérés pour l'étudiant
+    """
     annees_etudiant = etudiant.semestres.values_list('annee_universitaire', flat=True).distinct()
     if len(annees_etudiant) > 1:
         frais_annees_etudiant = Frais.objects.filter(annee_universitaire__in=annees_etudiant)
@@ -266,6 +335,20 @@ def etat_paiements(request, id_annee_selectionnee, id):
 
 @login_required(login_url=settings.LOGIN_URL)
 def create_compte(request, id=0):
+    """
+    Vue pour créer ou mettre à jour un compte bancaire.
+
+    Args:
+        request (HttpRequest): L'objet HttpRequest représentant la requête HTTP reçue.
+        id (int, optional): L'identifiant du compte bancaire à mettre à jour, par défaut 0.
+
+    Returns:
+        HttpResponse: L'objet HttpResponse représentant la réponse HTTP retournée.
+    'compte_bancaire/create_compte.html' : correspond au template qui est renvoyer.
+    Raises:
+        N/A
+
+    """
     if request.method == "GET":
         if id == 0:
             form = CompteBancaireForm()
@@ -348,6 +431,23 @@ def compte_bancaire(request, id_annee_selectionnee):
 
 @login_required(login_url=settings.LOGIN_URL)
 def etat_compte_bancaire(request, id_annee_selectionnee, compte_bancaire_id):
+    """
+        Affiche les informations concernant l'état du compte bancaire de l'institut pour une année universitaire sélectionnée.
+
+        Paramètres :
+            request – L’objet HttpRequest utilisé pour effectuer la requête.
+            id_annee_selectionnee – est l'identifiant de l’année universitaire sélectionnée et  
+            compte_bancaire_id - correspond à l'identifiant du compte bancaire sélectionné.
+
+        Renvoie :
+        Un objet HttpResponse contenant le rendu de la page 'compte_bancaire/etat_compte_bancaire.html'.
+
+        Raises :
+            Http404 si l’année universitaire sélectionnée n’est pas trouvée.
+
+        Cette vue récupère les informations le compte bancaire associés à l’année universitaire spécifiée, puis les renvoie au template 'compte_bancaire/etat_compte_bancaire.html' pour affichage.
+    
+    """
     compte_bancaire = CompteBancaire.objects.get(id=compte_bancaire_id)
     semestres_annee = Semestre.objects.filter(annee_universitaire=id_annee_selectionnee)
     etudiants_annee = Etudiant.objects.filter(semestres__in=semestres_annee)
@@ -372,35 +472,77 @@ def etat_compte_bancaire(request, id_annee_selectionnee, compte_bancaire_id):
 
 
 def liste_etudiants(request, id_annee_selectionnee):
+    """
+        Affiche la liste des étudiants avec le montant totale à payer, le montant restant à payer pour l'année universitaire courante ainsi que les arriérés des années dernières.
+
+        Paramètres :
+            request – L’objet HttpRequest utilisé pour effectuer la requête.
+            id_annee_selectionnee – L’ID de l’année universitaire sélectionnée.
+
+        Renvoie :
+        Un objet HttpResponse contenant le rendu de la page 'liste_etudiants.html'.
+
+        Raises :
+            Http404 si l’année universitaire sélectionnée n’est pas trouvée.
+
+        Cette vue récupère la liste des étudiants associés à l’année universitaire spécifiée, puis les renvoie au template 'liste_etudiants.html' pour affichage.
+    
+    """
+    # Récupérer les étudiants pour l'année universitaire sélectionnée
     etudiants_annee = Etudiant.objects.filter(semestres__annee_universitaire=id_annee_selectionnee).distinct()
+
+    # Récupérer l'objet AnneeUniversitaire correspondant à l'id fourni
     annee_selectionnee = AnneeUniversitaire.objects.get(pk=id_annee_selectionnee)
+
+    # Récupérer les paiements pour l'année universitaire sélectionnée
     paiements = Paiement.objects.filter(annee_universitaire=id_annee_selectionnee)
+
+    # Récupérer les frais pour l'année universitaire sélectionnée
     frais_etudiant = Frais.objects.filter(annee_universitaire=id_annee_selectionnee).first()
+
+    # Initialiser une liste pour stocker les étudiants avec leur montant total et restant
     etudiants_avec_montant_total = []
+
+    # Initialiser une variable pour stocker le total des frais de scolarité courante
     total_frais_courante = 0
 
     for etudiant in etudiants_annee:
         montant_du = 0
         somme_restante = 0
         arrierees = 0
+
+        # Calculer le montant total payé par l'étudiant
         montant_total = paiements.filter(etudiant=etudiant).aggregate(Sum('montant'))['montant__sum'] or 0
+
+        # Calculer le total des frais de scolarité courante
         total_frais_courante = frais_etudiant.montant_inscription + frais_etudiant.montant_scolarite if frais_etudiant else 0
+
+        # Calculer le montant restant à payer
         somme_restante = total_frais_courante - montant_total
-        annees_etudiant = etudiant.semestres.values_list('annee_universitaire', flat=True).distinct()
 
-        # Vérifiez si l'étudiant est lié à une seule année universitaire
-        if len(annees_etudiant) == 1:
+        """
+            Vérifier si l'étudiant est lié à une seule année universitaire
+            Si oui, pas d'arriérés
+        """
+        if len(etudiant.semestres.values_list('annee_universitaire', flat=True).distinct()) == 1:
             arrierees = 0
-
         else:
-            frais_annees_etudiant = Frais.objects.filter(annee_universitaire__in=annees_etudiant)
+            """
+                Calculer le montant total dû pour toutes les années universitaires
+            """
+            frais_annees_etudiant = Frais.objects.filter(annee_universitaire__in=etudiant.semestres.values_list('annee_universitaire', flat=True).distinct())
             for frais_annee_etudiant in frais_annees_etudiant:
                 montant_du += frais_annee_etudiant.montant_inscription + frais_annee_etudiant.montant_scolarite
-       
+
+            """
+                Calculer le montant restant à payer et les arriérés
+            """
             montant_total = paiements.filter(etudiant=etudiant).aggregate(Sum('montant'))['montant__sum'] or 0
             somme_restante = montant_du - montant_total
             arrierees = montant_du - total_frais_courante
-
+        """
+            Ajouter l'étudiant avec les montants calculés à la liste
+        """
         etudiants_avec_montant_total.append({
             'etudiant': etudiant,
             'montant_total': montant_total,
@@ -408,16 +550,19 @@ def liste_etudiants(request, id_annee_selectionnee):
             'arrierees': arrierees,
         })
 
+    """
+        Créer un contexte contenant les données nécessaires pour le template
+    """
     context = {
         'id_annee_selectionnee': id_annee_selectionnee,
         'etudiants_avec_montant_total': etudiants_avec_montant_total,
-        'montant_du': montant_du,
-        'frais_etudiant': frais_etudiant,
-        'arrierees': arrierees,
-        'total_frais_courante': total_frais_courante, 
+        'total_frais_courante': total_frais_courante,
     }
 
-    return render(request, 'bilan/bilan.html', context)
+    """ 
+        Rendre le template avec le contexte 
+    """
+    return render(request, 'liste_etudiants.html', context)
 
 
 #Méthode affichant le bilan annuel des paiements des frais scolaires
@@ -519,6 +664,22 @@ def les_bulletins_de_paye(request, id_annee_selectionnee):
 
 @login_required(login_url=settings.LOGIN_URL)
 def enregistrer_bulletin(request, id=0):    
+    """
+    Enregistre ou met à jour le bulletin de paie dans le système.
+    Si l’ID est fourni, elle met à jour les informations concernant le bulletin de paie existant avec les nouvelles données. Sinon, elle crée une nouvelle instance de bulletin de paie.
+
+    Args:
+        request: L'objet HttpRequest qui représente la requête HTTP reçue.
+        id (int, optional): L'identifiant du bulletin de paie à modifier (par défaut : 0).
+
+    Returns:
+        HttpResponse: La réponse HTTP renvoyée au client.
+    'salaires/enregistrer_bulletin.html' : correspond au template qui est renvoyer.
+
+    Raises:
+        None
+
+    """
     if request.method == "GET":
         if id == 0:
             form = SalaireForm()
@@ -564,6 +725,17 @@ def enregistrer_bulletin(request, id=0):
 
 
 def delete_bulletin(request):
+    """
+        Supprime un bulletin de paie.
+
+    :param request: L'objet HttpRequest utilisé pour effectuer la requête.
+    :return: redirect : redirige l'utilisateur vers la page affichant la liste des bulletins de paie de l'année universitaire courante.
+    
+        **Context**
+
+        ``bulletin``
+            une instance du :model:`main.Salaire`.
+    """
     if request.method == 'GET':
         bulletin_id = request.GET.get('id')
         bulletin = get_object_or_404(Salaire, id=bulletin_id)
@@ -647,7 +819,7 @@ def bulletin_de_paye(request, id):
     retenues_cnss_personnel = Decimal(frais_prestations_familiale_salsalaire) + Decimal(tcs) + Decimal(irpp)
     salaire_net = (Decimal(Salaire_brut) - Decimal(retenues_cnss_personnel))
     salaire_net = salaire_net.quantize(Decimal('0.000'), rounding=ROUND_DOWN) 
-    bulletin.salaire_net_a_payer = salaire_net
+    bulletin.salaire_net_a_payer = salaire_net - bulletin.acomptes
 
     ## pour l'employeur
     frais_prestations_familiales = bulletin.frais_prestations_familiales * bulletin.personnel.salaireBrut
@@ -709,6 +881,22 @@ def liste_paiements_fournisseurs(request, id_annee_selectionnee):
 
 @login_required(login_url=settings.LOGIN_URL)
 def enregistrer_paiement_fournisseur(request, id=0):
+    """
+    Cette vue permet d'enregistrer ou de mettre à jour les informations concernant les paiements effectués aux fournisseurs de service.
+    Si l'ID est fourni, elle met à jour les informations concernant le paiement existant avec les nouvelles données.
+    Sinon, elle crée une nouvelle instance pour stocker les informations concernant le paiement.
+
+    Args:
+        request (HttpRequest): L'objet HttpRequest reçu.
+        id (int, optional): L'identifiant du paiement à mettre à jour. Par défaut 0.
+
+    Returns:
+        HttpResponse: La réponse HTTP rendue par la vue.
+    'fournisseurs/enregistrer_paiement_fournisseur.html' : correspond au template qui est renvoyer.
+
+    Raises:
+        None
+    """
     if request.method == "GET":
         if id == 0:
             form = FournisseurForm()
@@ -763,7 +951,19 @@ def liste_fiches_de_paie(request, id_annee_selectionnee):
     return render(request, 'fichePaies/fiche_de_paie_list.html', context)
 
 
+
 def delete_fiches_de_paie(request):
+    """
+        Supprime une fiche de paie.
+
+    :param request: L'objet HttpRequest utilisé pour effectuer la requête.
+    :return: redirect : redirige l'utilisateur vers la page affichant la liste des fiches de paie de l'année universitaire courante.
+    
+        **Context**
+
+        ``fiche_paie``
+            une instance du : model:`main.FicheDePaie`.
+    """
     if request.method == 'GET':
         fiche_paie_id = request.GET.get('id')
         fiche_paie = get_object_or_404(FicheDePaie, id=fiche_paie_id)
@@ -774,6 +974,22 @@ def delete_fiches_de_paie(request):
 
 @login_required(login_url=settings.LOGIN_URL)
 def enregistrer_fiche_de_paie(request, id=0):
+    """
+    Enregistre ou met à jour la fiche de paie dans le système.
+    Si l’ID est fourni, elle met à jour les informations concernant la fiche de paie existante avec les nouvelles données. Sinon, elle crée une nouvelle instance de fiche de paie.
+
+    Args:
+        request: L'objet HttpRequest qui représente la requête HTTP reçue.
+        id (int, optional): L'identifiant de la fiche de paie à modifier (par défaut : 0).
+
+    Returns:
+        HttpResponse: La réponse HTTP renvoyée au client.
+    'fichePaies/create_fiche_de_paie.html' : correspond au template qui est renvoyer.
+
+    Raises:
+        None
+
+    """
     if request.method == "GET":
         if id == 0:
             form = FicheDePaieForm()
@@ -868,6 +1084,17 @@ def liste_fiches_de_prise_en_charge(request, id_annee_selectionnee):
 
 
 def delete_fiches_de_paie(request):
+    """
+        Supprime une fiche de paie.
+
+    :param request: L'objet HttpRequest utilisé pour effectuer la requête.
+    :return: redirect : redirige l'utilisateur vers la page affichant la liste des fiches de paie de l'année universitaire courante.
+    
+        **Context**
+
+        ``fiche_paie``
+            une instance du : model:`main.FicheDePaie`.
+    """
     if request.method == 'GET':
         fiche_de_charge_id = request.GET.get('id')
         fiche_de_charge = get_object_or_404(Charge, id=fiche_de_charge_id)
@@ -878,6 +1105,22 @@ def delete_fiches_de_paie(request):
 
 @login_required(login_url=settings.LOGIN_URL)
 def enregistrer_fiche_de_prise_en_charge(request, id=0):
+    """
+    Enregistre ou met à jour la fiche de prise en charge dans le système.
+    Si l’ID est fourni, elle met à jour les informations concernant la fiche de prise en charge existante avec les nouvelles données. Sinon, elle crée une nouvelle instance de fiche de prise en charge.
+
+    Args:
+        request: L'objet HttpRequest qui représente la requête HTTP reçue.
+        id (int, optional): L'identifiant de la fiche de prise en charge à modifier (par défaut : 0).
+
+    Returns:
+        HttpResponse: La réponse HTTP renvoyée au client.
+    'charges/create_fiche_de_prise_en_charge.html' : correspond au template qui est renvoyer.
+
+    Raises:
+        None
+
+    """
     if request.method == "GET":
         if id == 0:
             form = ChargeForm()

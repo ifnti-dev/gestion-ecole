@@ -1,19 +1,13 @@
-import datetime
 import os
-from numpy import NaN
 import openpyxl
-from main.models import Charge, Competence, Comptable, CompteBancaire, CompteEtudiant, Conge, DirecteurDesEtudes, Domaine, Enseignant, Etudiant, FicheDePaie, Fournisseur, Frais, Information, Note, Paiement, Personnel, Salaire, Semestre, Tuteur, Ue, Evaluation, Parcours, AnneeUniversitaire, Programme, Matiere
-from cahier_de_texte.models import Seance
-from main.resources import get_model_by_name, get_resource_by_name
-from scripts.factory import clean_data_base
-
-import os
 import shutil 
-from django.db import transaction
 import re
-import zipfile
-import zipfile
-import openpyxl
+
+from main.models import Etudiant, Note, Semestre, Ue, Evaluation, Parcours, AnneeUniversitaire, Programme, Matiere
+from django.db import DataError, IntegrityError, transaction
+from datetime import datetime, timedelta
+
+BASE_PATH = "media/excel_templates"
 
 def trim_str(string):
     string = str(string).lower()
@@ -25,25 +19,37 @@ def convert_serial_temporel_number_to_date(numero_serie_temporelle):
     # Date de référence d'Excel
     date_reference = datetime(1899, 12, 30)  
     # Ajouter le nombre de jours au format de série temporelle à la date de référence
-    date_resultat = date_reference + datetime.timedelta(days=numero_serie_temporelle)
+    date_resultat = date_reference + timedelta(days=numero_serie_temporelle)
     
     return date_resultat
 
 @transaction.atomic
-def pre_load_ue_matiere_template_data_by_year(annee):
-    result_path = 'media/excel_templates/ues_matieres.xlsx'
-    file_path = "media/excel_templates/ues_matieres_tmp.xlsx"
-    wb = openpyxl.load_workbook(filename=file_path)
-    template_sheet = wb.active
-    ues = Ue.objects.filter(programme__semestre__annee_universitaire__annee=annee)
-    new_sheets = []
-    for ue in ues:
-        new_sheet = wb.copy_worksheet(template_sheet)
-        new_sheet.title = ue.codeUE
-        new_sheet['A1'] = ue.libelle
-        new_sheets.append(new_sheets)
-    wb.save(result_path)   
-    wb.close()
+def pre_load_ue_matiere_template_data_by_year(annees):
+    folder_path = f"{BASE_PATH}/matieres_templates"
+    os.mkdir(folder_path)
+    template_path = f"{BASE_PATH}/ues_matieres_tmp.xlsx"
+    
+    for annee in annees:
+        result_name = f"{folder_path}/ues_matieres_{annee}.xlsx"
+        wb = openpyxl.load_workbook(filename=template_path)
+        template_sheet = wb.active
+        ues = Ue.objects.filter(programme__semestre__annee_universitaire__annee=annee.annee)
+        new_sheets = []
+        for ue in ues:
+            new_sheet = wb.copy_worksheet(template_sheet)
+            new_sheet.title = ue.codeUE
+            new_sheet['A1'] = ue.libelle
+            new_sheets.append(new_sheets)
+        wb.save(result_name)   
+        wb.close()
+
+    shutil.make_archive(folder_path, 'zip', folder_path)
+    
+    for file_path in os.listdir(folder_path):
+        os.remove(folder_path+"/"+file_path)
+    os.rmdir(folder_path)
+    
+    return folder_path+".zip"
 
 @transaction.atomic
 def load_matieres_by_year(path, annee, batch_size=100):
@@ -54,17 +60,15 @@ def load_matieres_by_year(path, annee, batch_size=100):
 
     # Utiliser prefetch_related pour minimiser les requêtes SQL lors de la récupération des objets Ue
     ues = Ue.objects.filter(codeUE__in=[sheet.title for sheet in workbook]).prefetch_related('matiere_set')
-
     for ue_sheet in workbook:
         try:
             ue = next(ue for ue in ues if ue.codeUE == ue_sheet.title)
-            print(ue)
         except StopIteration:
             continue
-
         matieres_to_create = []
-        for row in ue_sheet.iter_rows(values_only=True, min_row=3, max_col=5):
+        for i, row in enumerate(ue_sheet.iter_rows(values_only=True, min_row=3, max_col=5)):
             libelle = row[0].strip()
+            
             matieres_to_create.append(Matiere(
                 libelle=libelle,
                 coefficient=int(trim_str(row[1])),
@@ -72,53 +76,77 @@ def load_matieres_by_year(path, annee, batch_size=100):
                 heures=int(trim_str(row[3])),
                 abbreviation=trim_str(row[4]),
                 ue=ue,
+                codematiere=f"{i+1}{ue.codeUE}",
             ))
-
-            if len(matieres_to_create) == batch_size:      
-                Matiere.objects.bulk_create(matieres_to_create)
+            
+            
+            if len(matieres_to_create) == batch_size:   
+                try:
+                    Matiere.objects.bulk_create(matieres_to_create)
+                except DataError as _:
+                    raise DataError("Vérifier les valeurs de vos champs !")
+                except IntegrityError as _:
+                    raise IntegrityError("L'abbréviation d'une matière est unique !")
+                
                 matieres_to_create = []
 
         if matieres_to_create:
-            Matiere.objects.bulk_create(matieres_to_create)
+            try:
+                Matiere.objects.bulk_create(matieres_to_create)
+            except DataError as de:
+                raise DataError("Vérifier les valeurs de vos champs !")
+            except IntegrityError as _:
+                raise IntegrityError("L'abbréviation d'une matière est unique !")
 
 @transaction.atomic
-def pre_load_note_ues_template_data(semestre):
-    semestre = Semestre.objects.all().last()
-    ues = Programme.objects.filter(semestre=semestre).first().ues.all()
-    base_path ='media/excel_templates/notes_templates'
+def pre_load_note_ues_template_data(semestres):
+    template_folder_base_path ='media/excel_templates/notes_templates'
     
-    os.mkdir(base_path)
+    if not os.path.exists(template_folder_base_path):
+        os.mkdir(template_folder_base_path)
+    
+    for semestre in semestres: 
+        try:
+            programme = semestre.programme_set.all().get()
+        except Exception:
+            raise Programme.DoesNotExist
+        ues = programme.ues.all()  
+        etudiants = semestre.etudiant_set.all()
+        base_path =f'media/excel_templates/notes_templates/{semestre.libelle}'
         
-    for ue in ues:
-        path = f'{base_path}/notes_{ue.codeUE}.xlsx'
-        wb = openpyxl.load_workbook(filename=f"media/excel_templates/notes_ue_tmplt.xlsx")
-        template_sheet = wb.active
-        for matiere in ue.matiere_set.all():
-            new_sheet = wb.copy_worksheet(template_sheet)
-            new_sheet.title = matiere.codematiere+"22"
-            new_sheet['B1'].value = ue.libelle
-            new_sheet['B2'].value = semestre.annee_universitaire.annee
-            new_sheet['B3'].value = semestre.libelle
-            new_sheet['B4'].value = matiere.libelle
-            etudiants = matiere.get_etudiant_semestre(semestre)
-            min_row = 16
-            max_row = min_row + len(etudiants)-1
-            i = 0
-            for row in new_sheet.iter_rows(min_row=min_row, max_row=max_row, max_col=3):
-                row[0].value = etudiants[i].nom
-                row[1].value = etudiants[i].prenom
-                row[2].value = ""
-                i += 1
-        wb.save(path)
-        wb.close()
-        
-    shutil.make_archive(base_path, 'zip', base_path)
+        if not os.path.exists(base_path):
+            os.mkdir(base_path)
+        # path_part = f'{semestre.libelle}_{semestre.annee_universitaire}'
+        for ue in ues:
+            path = f'{base_path}/notes_{ue.codeUE}_{semestre.libelle}_{semestre.annee_universitaire}.xlsx'
+            wb = openpyxl.load_workbook(filename=f"media/excel_templates/notes_ue_tmplt.xlsx")
+            template_sheet = wb.active
+            for matiere in ue.matiere_set.all():
+                new_sheet = wb.copy_worksheet(template_sheet)
+                new_sheet.title = matiere.codematiere
+                new_sheet['B1'].value = ue.libelle
+                new_sheet['B2'].value = semestre.annee_universitaire.annee
+                new_sheet['B3'].value = semestre.libelle
+                new_sheet['B4'].value = matiere.libelle
+                min_row = 17
+                max_row = min_row + len(etudiants)-1
+                for i, row in enumerate(new_sheet.iter_rows(min_row=min_row, max_row=max_row, max_col=3)):
+                    row[0].value = f"{etudiants[i].id} | {etudiants[i].nom}"
+                    row[1].value = etudiants[i].prenom
+                    row[2].value = ""
+            wb.save(path)
+            wb.close()
+            
+    shutil.make_archive(template_folder_base_path, 'zip', template_folder_base_path)
     
-    for file_path in os.listdir(base_path):
-        os.remove(base_path+"/"+file_path)
-    os.rmdir(base_path)
+    for file_path in os.listdir(template_folder_base_path):
+        path = template_folder_base_path+"/"+file_path
+        for p in os.listdir(path):
+            os.remove(path+"/"+p)
+        os.rmdir(path)
+    os.rmdir(template_folder_base_path)
     
-    return base_path+".zip"
+    return template_folder_base_path+".zip"
 
 @transaction.atomic
 def load_notes_from_ue_file(path, ue, semestre):
@@ -139,17 +167,23 @@ def load_notes_from_ue_file(path, ue, semestre):
     
     for sheet in workbook:
         matiere = sheet.title
-        matiere = Matiere.objects.get(libelle=matiere)
+        try:
+            matiere = ue.matiere_set.get(codematiere=matiere)
+        except Matiere.DoesNotExist:
+            continue
         
-        min_row = 6
+        min_row = 7
         max_row = 13
         
-        for row in sheet.iter_rows(min_row=min_row, max_row=max_row ,values_only=True):
-            if row[3].value:
-                evaluation_date = convert_serial_temporel_number_to_date(int(trim_str(row[1].value)))
-                evaluation_name = str(row[2].value)
-                evaluation_ponderation = int(trim_str(row[1].value))
-                cell_A_n = trim_str(row[0].value)
+        for row in sheet.iter_rows(min_row=min_row, max_row=max_row, values_only=True):
+            if row[3]:
+                try:
+                    evaluation_date = convert_serial_temporel_number_to_date(int(trim_str(row[1])))
+                except ValueError as v:
+                    raise v
+                evaluation_name = str(row[2])
+                evaluation_ponderation = int(trim_str(row[1]))
+                cell_A_n = trim_str(row[0])
                 rattrapage = cell_A_n == "rattrapage"
                 evaluation, _ = Evaluation.objects.get_or_create(
                     libelle=evaluation_name, 
@@ -161,22 +195,25 @@ def load_notes_from_ue_file(path, ue, semestre):
                 )
                 evaluations[cell_A_n][1] = evaluation
 
-        min_row = 15
-        max_row = 30
-        
-        for row in sheet.iter_rows(min_row=min_row, max_row=max_row ,values_only=True):
-            nom = str(row[0])
-            prenom = str(row[1])
-            try:
-                etudiant = Etudiant.objects.get(nom__icontains=nom, prenom__icontains=prenom)
-                print(etudiant)
-                for data_evaluation in evaluations:
-                    index = data_evaluation[0]
-                    evaluation = data_evaluation[1]
-                    Note.objects.create(valeurNote=int(trim_str(row[index])), etudiant=etudiant, evaluation=evaluation)
-            except Exception as e:
-                raise Etudiant.DoesNotExist(f'Nom = {nom} | Prénom = {prenom}')
+        min_row = 17
+        max_row = sheet.max_row
 
+        for row in sheet.iter_rows(min_row=min_row, max_row=max_row ,values_only=True):
+            matricule, _ = str(row[0]).split('|')
+
+            try:
+                matricule = trim_str(matricule).upper()
+                etudiant = semestre.etudiant_set.get(id=matricule)
+            except Exception as e:
+                raise Etudiant.DoesNotExist(f'ID = {matricule}')
+            for key in evaluations:
+                data = evaluations[key]
+                index = data[0]
+                evaluation = data[1]
+                valeur = trim_str(row[index])
+                if evaluation and len(valeur) > 0:
+                    valeur = int(valeur)
+                    Note.objects.create(valeurNote=valeur, etudiant=etudiant, evaluation=evaluation)
 
 @transaction.atomic
 def pre_load_evaluation_template_data(matiere, semestre):
@@ -204,7 +241,8 @@ def pre_load_evaluation_template_data(matiere, semestre):
         i += 1
     wb.save(path)
     
-    os.remove(path)
+    #os.remove(path)
+    return path
 
 @transaction.atomic
 def load_notes_from_evaluation(path, matiere=None, semestre=None):
@@ -276,12 +314,17 @@ def load_maquette(path, annee):
 
         for row in sheet.iter_rows(values_only=True):
             if row[0] and row[0] != "libelle":
-                libelle = row[0].strip()
-                libelle = libelle.replace("  ", " ")
-                code  = "_".join([mot[0].lower() for mot in libelle.split(' ')])
-                code_ue[code] = libelle
-                ue = Ue.objects.create(libelle=libelle, type=row[1], niveau=row[2].split('=')[1], nbreCredits=row[3].split('=')[1], heures=row[4].split('=')[1])
-                semestre_ue[semestre].append(ue)
+                try:
+                    libelle = row[0].strip()
+                    libelle = libelle.replace("  ", " ")
+                    type = row[1]
+                    niveau=row[2].split("=")[1] if "=" in row[2] else row[2]
+                    nbreCredits = row[3].split("=")[1] if "=" in row[3] else row[3]
+                    heures = row[4].split("=")[1] if "=" in row[4] else row[4]
+                    ue, _ = Ue.objects.get_or_create(libelle=libelle, type=type, niveau=niveau, nbreCredits=nbreCredits, heures=heures)
+                    semestre_ue[semestre].append(ue)
+                except Exception as e:
+                    raise ValueError("Le fichier n'est pas dans le bon format ! ")
 
     parcours = Parcours.objects.all().first()
     semestres = annee.semestre_set.all()
@@ -290,27 +333,8 @@ def load_maquette(path, annee):
         programme = Programme.objects.create(
             semestre=semestre, parcours=parcours)
         programme.ues.set(semestre_ue[semestre.libelle.lower()])
-    return code_ue
 
-def load_matieres(path):
-    # Clean matières data
-    Matiere.objects.all().delete()
-    workbook = openpyxl.load_workbook(filename=path)
-    for ue_sheet in workbook:
-        ue = Ue.objects.filter(libelle=CODE_UE[ue_sheet.title]).get()
-        for row in ue_sheet.iter_rows(values_only=True):
-           if row[0] and row[0] != "libelle" and 'nom:' not in trim_str(row[0]).lower():
-                libelle = row[0].strip()
-                libelle = libelle.replace("  ", " ")
-                
-                Matiere.objects.create(
-                            libelle=libelle,
-                            coefficient=get_cell_int_value(row[1]),
-                            minValue=get_cell_int_value(row[2]),
-                            heures=get_cell_int_value(row[3]),
-                            ue=ue
-                            )
-
+@transaction.atomic
 def load_notes_from_matiere(path):
     Evaluation.objects.all().delete()
     # Charger le fichier excel des différentes notes d'une matière
@@ -368,6 +392,8 @@ def load_notes_from_matiere(path):
 
 def run():
     #clean_data_base()
-    print("::: Import begining :::::")
-    pass
+    print("::::: Import begining :::::")
+    annee = AnneeUniversitaire.objects.filter(annee=2023).first()
+    semestres  = annee.semestre_set.all().prefetch_related('programme_set').prefetch_related('etudiant_set')
+    pre_load_note_ues_template_data(semestres)
     

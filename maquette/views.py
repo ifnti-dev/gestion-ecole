@@ -3,10 +3,12 @@ from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from main.pdfMaker import generate_pdf
 from main.models import AnneeUniversitaire, CorrespondanceMaquette, Matiere, Programme, Semestre, Ue, Domaine, Parcours
-from scripts.utils import load_maquette,load_notes_from_ue_file, pre_load_note_ues_template_data
+from scripts.utils import load_maquette, load_matieres_by_year, load_notes_from_ue_file, pre_load_note_ues_template_data, pre_load_ue_matiere_template_data_by_year
 from .forms import CorrespondanceMaquetteForm, DataForm, GenerateMaquetteForm, ProgrammeForm, DomaineForm, ParcoursForm
 import os
-from django.core import serializers
+from django.contrib import messages
+from django.db import DataError, IntegrityError
+
 
 def programmes(request):
     id_annee_selectionnee = request.session.get('id_annee_selectionnee')
@@ -69,7 +71,6 @@ def delete_programme(request, id):
     programme.delete()
     return redirect('maquette:programmes')
 
-
 def correspondances(request):
     if request.method == "POST":
         if 'form_id' in request.POST and request.POST.get('form_id') != '-1':
@@ -130,36 +131,44 @@ def generateDictFromProgrammeData(semestre, parcours, annee_accademique):
     else:
         semestres = annee_accademique.semestre_set.all()
         titre = ""
-    programmes = Programme.objects.filter(parcours=parcours, semestre__in=semestres, semestre__annee_universitaire=annee_accademique)
-    ues_list = []
+    programmes = Programme.objects.filter(parcours=parcours, semestre__in=semestres, semestre__annee_universitaire=annee_accademique).prefetch_related('ues')
+    semestres_data = []
     for programme in programmes:
-        for ue in programme.ues.all():
-            matires = [matiere.libelle for matiere in ue.matiere_set.all()]
-            horaires = [matiere.heures if matiere.heures else 0  for matiere in ue.matiere_set.all()]
-            enseignants = []
-            for matiere in ue.matiere_set.all():
-                if matiere.enseignant:
-                    enseignants.append(matiere.enseignant)
-                else:
-                    enseignants.append("pas de prof")
-            enseignant_principale = ue.enseignant
-            ue_dict = {
-                    "semestre" : programme.semestre.libelle,
-                    "intitule" : ue.libelle,
-                    "type_ue" : ue.type,
-                    "matieres" : matires,
-                    "credit" : ue.nbreCredits,
-                    "volumes_horaires" : horaires,
-                    "enseignants" : enseignants,
-                    "enseignants_principaux" : enseignant_principale,
-                }
-            
-            ues_list.append(ue_dict)
+        ues = programme.ues.all().prefetch_related('matiere_set')
+        semestre_data = {
+            "semsetre" : programme.semestre,
+            "ues" : ues,
+            "ues_length" : ues.count(),
+        }
+
+        semestres_data.append(semestre_data)
+        
+        # for ue in programme.ues.all():
+        #     matires = [matiere.libelle for matiere in ue.matiere_set.all()]
+        #     horaires = [matiere.heures if matiere.heures else 0  for matiere in ue.matiere_set.all()]
+        #     enseignants = []
+        #     for matiere in ue.matiere_set.all():
+        #         if matiere.enseignant:
+        #             enseignants.append(matiere.enseignant)
+        #         else:
+        #             enseignants.append("pas de prof")
+        #     enseignant_principale = ue.enseignant
+        #     ue_dict = {
+        #             "semestre" : programme.semestre.libelle,
+        #             "intitule" : ue.libelle,
+        #             "type_ue" : ue.type,
+        #             "matieres" : matires,
+        #             "credit" : ue.nbreCredits,
+        #             "volumes_horaires" : horaires,
+        #             "enseignants" : enseignants,
+        #             "enseignants_principaux" : enseignant_principale,
+        #         }
+        #     ues_list.append(ue_dict)
     data={
         "titre" : titre,
-        "tatale_credit" : sum([ue["credit"] for ue in ues_list]),
-        "totale_volume_horaire" : [sum(sum(ue["volumes_horaires"]) for ue in ues_list)],
-        "ues" : ues_list
+        # "tatale_credit" : sum([ue["credit"] for ue in ues_list]),
+        # "totale_volume_horaire" : [sum(sum(ue["volumes_horaires"]) for ue in ues_list)],
+        "semestres_data" : semestres_data
     }
     return data
 
@@ -215,7 +224,6 @@ def delete_domaine(request, id):
     domaine = get_object_or_404(Domaine, pk=id)
     domaine.delete()
     return redirect('maquette:domaines')
-
 
 def parcours(request, id_domaine):
     domaine = get_object_or_404(Domaine, pk=id_domaine)
@@ -280,32 +288,143 @@ def data(request):
                         year_part = name_part[2].split('-')
                         if len(year_part) == 2:
                             annee_selectionnee = int(year_part[0])
-                            annee_selectionnee = AnneeUniversitaire.objects.get(annee=2022)
+                            annee_selectionnee = AnneeUniversitaire.objects.get(annee=annee_selectionnee)
                             print(annee_selectionnee)
                             load_maquette(file_cache_tmp, annee_selectionnee)
-            if matieres_excel_file:
-                load_matieres(matieres_excel_file)
-            if notes_excel_file:
-                load_notes_from_matiere(notes_excel_file)
+
+        if matieres_excel_file:
+            load_matieres_by_year(matieres_excel_file, annee_selectionnee)
+            return HttpResponse("Vrai")
+        if notes_excel_file:
+            full_data = str(notes_excel_file).split('_')
+            code_ue = full_data[1]
+            semestre = full_data[2]
+            annee_selectionnee = int(full_data[3].split('-')[0])
+            
+            annee_selectionnee = AnneeUniversitaire.objects.get(annee=annee_selectionnee)
+            ue = Ue.objects.get(codeUE=code_ue)
+            semestre = annee_selectionnee.semestre_set.get(libelle=semestre)
+            load_notes_from_ue_file(notes_excel_file, ue, semestre)
+            return HttpResponse("Vrai")
+            
         return redirect('maquette:data')
     data = {
         'form' : DataForm()
     }
     return render(request, 'data/index.html', context=data)
 
-def generate_note_template(request):
-    zip_path = pre_load_note_ues_template_data(request.session.get('id_annee_selectionnee'))
-    zip_file = open(zip_path, 'r')
+def upload_note(request):
+    if request.POST:
+        if 'file' in request.FILES :
+            message = ""
+            files = request.FILES.getlist('file')
+            for file in files:
+                full_data = str(file).split('_')
+                try:
+                    code_ue = full_data[1]
+                    semestre = full_data[2]
+                    annee_selectionnee = int(full_data[3].split('-')[0])
+                except Exception as e:
+                    messages.error(request, "Votre fichier n'est pas sous le format notes_code_Sn_20xx-20xy")
+                    break
+                annee_selectionnee = AnneeUniversitaire.objects.get(annee=annee_selectionnee)
+                ue = Ue.objects.get(codeUE=code_ue)
+                semestre = annee_selectionnee.semestre_set.get(libelle=semestre)
+                load_notes_from_ue_file(file, ue, semestre)
+        else:
+            messages.info(request, "Vous devez séléctionner un fichier ! ")
+        return redirect('maquette:data')
+        
+    annee = request.GET.get('annee_universitaire')
+    annee = AnneeUniversitaire.objects.filter(pk=annee).first()
+    semestres  = annee.semestre_set.all().prefetch_related('programme_set').prefetch_related('etudiant_set')
+    zip_path = pre_load_note_ues_template_data(semestres)
     with open(zip_path, 'rb') as zip_file:
         response = HttpResponse(zip_file.read(), content_type='application/force-download')
         response['Content-Disposition'] = 'attachment; filename="{}"'.format(os.path.basename(zip_path))
         return response
 
-def generate_maquette_template(request):
+def upload_maquette(request):
+    if request.method == "POST":
+        if 'file' in request.FILES :
+            message = ""
+            maquette_excel_file = request.FILES.getlist('file')
+            for file_cache_tmp in maquette_excel_file:
+                name = str(file_cache_tmp)
+                name_part = name.split('_')
+                if len(name_part) == 3:
+                    year_part = name_part[2].split('-')
+                    if len(year_part) == 2:
+                        annee_selectionnee = int(year_part[0])
+                        annee_selectionnee = AnneeUniversitaire.objects.get(annee=annee_selectionnee)
+                        message += f"{annee_selectionnee}; " 
+                        try:
+                            load_maquette(file_cache_tmp, annee_selectionnee)
+                        except ValueError as ve:
+                            messages.error(request, str(ve))
+            
+            message_array = message.split(';')
+            if len(message_array) == 2:
+                message = f"La maquette de l'année {message_array[0]}  a été chargé !"
+            else :
+                message = f"La maquette des années {message}  à été chargé !"
+                
+            messages.success(request, message)
+        else:
+            messages.info(request, "Vous devez séléctionner un fichier ! ")
+        return redirect('maquette:data')
+    
+    annee_universitaire = request.GET.get("annee_universitaire")
+    annee_universitaire = get_object_or_404(AnneeUniversitaire, pk=annee_universitaire)
     file_name = 'maquette_general_[annee].xlsx'
     file_path = 'media/excel_templates/'+file_name
+    file_name = f'maquette_general_{annee_universitaire}.xlsx'
     with open(file_path, 'rb') as file:
         response = HttpResponse(file.read(), content_type="application/force-download")
         response['Content-Disposition'] = 'attachment; filename="{}"'.format(os.path.basename(file_name))
         return response
+
+def upload_matieres(request):
+    if request.method == "POST":
+        if 'file' in request.FILES :
+            message = ""
+            matieres_excel_file = request.FILES.getlist('file')
+            for file_cache_tmp in matieres_excel_file:
+                name = str(file_cache_tmp)
+                annee_str = name.split('_')[-1]
+                annee_str = annee_str.split('-')[0]
+                annee = AnneeUniversitaire.objects.get(annee=annee_str)
+                try:
+                    load_matieres_by_year(file_cache_tmp, annee)
+                except DataError as de:
+                    messages.error(request, str(de))
+                    return redirect('maquette:data')
+                except IntegrityError as ie:
+                    messages.error(request, str(ie))
+                    return redirect('maquette:data')
+                except Exception as e:
+                    print(e)
+                    return redirect('maquette:data')
+                    
+            message = f"{annee}; "
+            message_array = message.split(';')
+            if len(message_array) == 2:
+                message = f"Les matières de l'annéé {message_array[0]} on été chargé !"
+            else :
+                message = f"La maquette des années {message} on été chargé !"
+                
+            messages.success(request, message)
+        else:
+            messages.info(request, "Vous devez séléctionner un fichier ! ")
+        
+        return redirect('maquette:data')
+        
+    annees = AnneeUniversitaire.objects.all()
+    file_name = pre_load_ue_matiere_template_data_by_year(annees)
+    file_path = 'media/excel_templates/'+file_name
+    with open(file_name, 'rb') as file:
+        response = HttpResponse(file.read(), content_type="application/force-download")
+        response['Content-Disposition'] = 'attachment; filename="{}"'.format(os.path.basename(file_name))
+        return response
+
 

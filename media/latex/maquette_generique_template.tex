@@ -7,6 +7,8 @@
 \usepackage{multirow}
 \usepackage{longtable}
 \usepackage[left=0.3cm,right=0.3cm,top=2cm,bottom=2cm]{geometry}
+\usepackage{array}
+\usepackage{enumitem}
 \begin{document}
 \begin{center}
 % Définition du titre
@@ -16,27 +18,54 @@ IFNTI : Maquette \VAR{titre}
 \end{center}
 \begin{center}
 % Définition du tableau
-\begin{longtable}{|c|c|c|c|c|c|c|c|}
+\setlength{\tabcolsep}{0pt}
+\renewcommand{\arraystretch}{1}
+
+% Définition d'une nouvelle liste personnalisée avec un espacement nul
+\newlist{myitemize}{itemize}{1}
+\setlist[myitemize,1]{label=--,left=0pt,labelsep=0pt,topsep=0pt,partopsep=0pt,parsep=0pt,itemsep=0pt}
+
+\begin{longtable}{|m{2cm}|m{6cm}|m{3cm}|m{7cm}|m{1.5cm}|m{2cm}|m{3cm}|m{3cm}|}
 \hline
-Semestre & Intitulé UE & Type UE & Matières & Crédit UE & Volume Horaire (H) & Enseignant principal & Enseignant secondaire  \\ 
+\centering Semestre & \centering Intitulé UE & \centering Type UE & \centering Matières & \centering Crédit UE & \centering Volume Horaire (H) & \centering Enseignant Responsable & \centering Enseignant principal \arraybackslash \\ 
 \hline
-\BLOCK{for ue in ues}
-\multicolumn{1}{|c|}{\multirow{\VAR{ue.matieres|length}}{*}{\VAR{ue.semestre}}}
-     & \multicolumn{1}{c|}{\multirow{\VAR{ue.matieres|length}}{*}{\VAR{ue.intitule}}} & \multicolumn{1}{c|}{\multirow{\VAR{ue.matieres|length}}{*}{\VAR{ue.type_ue}}} & \VAR{ue.matieres[0]} & \multicolumn{1}{c|}{\multirow{\VAR{ue.matieres|length}}{*}{\VAR{ue.credit}}} & \VAR{ue.volumes_horaires[0]} & \VAR{ue.enseignants[0]} & \VAR{ue.enseignants_principaux} \\ \cline{4-3} \cline{6-3} \cline{7-3} \cline{8-3}
-	 \BLOCK{for i in range(1, ue.matieres|length)}
-	 \multicolumn{1}{|c|}{}
-	 & & & \VAR{ue.matieres[i]} & & \VAR{ue.volumes_horaires[i]} & \VAR{ue.enseignants[i]} & \VAR{ue.enseignants_principaux}\\ 
-	 \BLOCK{if not loop.last}
-	 	\cline{4-3} \cline{6-3} \cline{7-3} \cline{8-3}
-	 \BLOCK{endif}
-	 \BLOCK{endfor}
-\hline
-\BLOCK{endfor}
-Total &  &  &  & \VAR{tatale_credit} & \VAR{totale_volume_horaire} &  &  \\ 
+\BLOCK{ for semestre_data in semestres_data }
+\multirow{\VAR{semestre_data.ues_length}}{*}{\VAR{semestre_data.semsetre.libelle}} 
+\BLOCK{ for ue in semestre_data.ues }
+ & \centering \VAR{ue.libelle} 
+ & \centering \VAR{ue.type}  
+ & 	\BLOCK{ if ue.matiere_set.all()  }
+ 	\begin{myitemize}
+	\BLOCK{ for matiere in ue.matiere_set.all() }
+	\item[] \centering \VAR{matiere.libelle}
+	\item[] \hrulefill
+	\BLOCK{ endfor }
+	\end{myitemize}
+	\BLOCK{ endif }
+ &  
+	\centering \VAR{ue.nbreCredits} 
+ & 
+ 	\centering \VAR{ue.heures}  
+ & 
+   \BLOCK{ if ue.matiere_set.all()  }
+ 	\begin{myitemize}
+	\BLOCK{ for matiere in ue.matiere_set.all() }
+	\item[] \centering \VAR{matiere.enseignant}
+	\item[] \hrulefill
+	\BLOCK{ endfor }
+	\end{myitemize}
+	\BLOCK{ endif }
+ & \centering \VAR{ue.enseignant} \arraybackslash  \\
+\cline{2-4} \cline{6-8} 
+\BLOCK{ endfor }
+\cline{1-1} \cline{5-5}
+\BLOCK{ endfor }
+Total &  &  &  & 64 & 8 &  &  \\ 
 \hline 
 \end{longtable}
 
 \end{center}
+
 
 
 \end{document}

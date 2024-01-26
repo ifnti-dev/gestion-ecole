@@ -292,21 +292,22 @@ def imprimer(request,planningId):
     # if request.user.groups.all().first().name not in ['directeur_des_etudes']:
     #     return render(request, 'errors_pages/403.html')
     
-    plan = Planning.objects.filter(id=planningId).first()
+    planns = Planning.objects.filter(id=planningId).first()
     days =[]
     timeslots=['']
-    if plan.semestre.libelle == 'S1' or 'S2' :
-        niveau='L1 '+ plan.semestre.libelle + ' '+str(plan.semestre.annee_universitaire)
-    elif  plan.semestre.libelle == 'S3' or 'S4' :
-        niveau='L2 '+ plan.semestre.libelle + ' '+str(plan.semestre.annee_universitaire)
-    elif  plan.semestre.libelle == 'S5' or 'S6' :
-        niveau='L3 '+ plan.semestre.libelle + ' '+str(plan.semestre.annee_universitaire)
+    tenues=[ 'Veste', 'Tricot' , 'Veste' , 'Tricot' ,'Bigarré' , 'Bigarré']
+    if planns.semestre.libelle == 'S1' or 'S2' :
+        niveau='L1 '+ planns.semestre.libelle + ' '+str(planns.semestre.annee_universitaire)
+    elif  planns.semestre.libelle == 'S3' or 'S4' :
+        niveau='L2 '+ planns.semestre.libelle + ' '+str(planns.semestre.annee_universitaire)
+    elif  planns.semestre.libelle == 'S5' or 'S6' :
+        niveau='L3 '+ planns.semestre.libelle + ' '+str(planns.semestre.annee_universitaire)
     
     print(niveau)
 
-    plannings=SeancePlannifier.objects.filter(planning=plan)
+    plannings=SeancePlannifier.objects.filter(planning=planns)
     for planning in plannings :
-        jour_n=(plan.semaine-1)*5 + planning.date_heure_debut.weekday() +1
+        jour_n=(planns.semaine-1)*5 + planning.date_heure_debut.weekday() +1
         jour_n=str(jour_n)
         valeur_jour= str(planning.date_heure_debut.day)
         if len(valeur_jour) == 1 :
@@ -372,11 +373,11 @@ def imprimer(request,planningId):
 
 
 
-    context = {'planning': schedule}          
+    context = {'planning': schedule,'niveau':niveau,'days':days,'taille':22.5/len(days),'tenues':tenues}          
                     
     latex_input = 'planning_week'
-    latex_ouput = 'planning_week_'+str(plan.semaine)+str(plan.semestre)
-    pdf_file ='planning_week_'+str(plan.semaine)+str(plan.semestre)
+    latex_ouput = 'planning_week_'+str(planns.semaine)+'_'+str(planns.semestre.libelle)+'_'+str(planns.semestre.annee_universitaire)
+    pdf_file = 'planning_week_'+str(planns.semaine)+'_'+str(planns.semestre.libelle)+'_'+str(planns.semestre.annee_universitaire)
 
     # génération du pdf
     generate_pdf(context, latex_input, latex_ouput, pdf_file)

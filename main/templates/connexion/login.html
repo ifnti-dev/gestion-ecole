@@ -1,140 +1,46 @@
-<html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
-
-        <title>LOGIN</title>
-        {% load static %}
-
-           <link rel="stylesheet" href="{% static  'assets/css/oneui.css' %}">
-
-    <link rel="shortcut icon" href="{% static '/assets/media/logo.jpeg' %}">
-    <link rel="icon" type="image/png" sizes="192x192" href="{% static '/assets/media/logo.jpeg' %}">
-    <link rel="apple-touch-icon" sizes="180x180" href="{% static '/assets/media/logo.jpeg' %}">
-    <!-- END Icons -->
-
-    <!-- Stylesheets -->
-    <!-- Page JS Plugins CSS -->
-    <link rel="stylesheet" href="{% static 'assets/js/plugins/datatables/dataTables.bootstrap4.css' %}">
-    <link rel="stylesheet" href="{% static 'assets/js/plugins/datatables/buttons-bs4/buttons.bootstrap4.min.css' %}">
-    <link rel="stylesheet" href="{% static 'assets/js/plugins/bootstrap-datepicker/css/bootstrap-datepicker3.min.css' %}">
-    <link rel="stylesheet" href="{% static 'assets/js/plugins/bootstrap-colorpicker/css/bootstrap-colorpicker.min.css' %}">
-    <link rel="stylesheet" href="{% static 'assets/js/plugins/select2/css/select2.min.css' %}">
-    <link rel="stylesheet" href="{% static 'assets/js/plugins/ion-rangeslider/css/ion.rangeSlider.css' %}">
-    <link rel="stylesheet" href="{% static 'assets/js/plugins/dropzone/dist/min/dropzone.min.css' %}">
-    <link rel="stylesheet" href="{% static 'assets/js/plugins/flatpickr/flatpickr.min.css' %}">
-
-    <!-- Fonts and OneUI framework -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
-    <link rel="stylesheet" id="css-main" href="{% static 'assets/css/oneui.min.css' %}">
-
-        <!-- You can include a specific file from css/themes/ folder to alter the default color theme of the template. eg: -->
-        <!-- <link rel="stylesheet" id="css-theme" href="assets/css/themes/amethyst.min.css"> -->
-        <!-- END Stylesheets -->
-    </head>
-    <body>
-
-    <main id="main-container" style="background-image: url('{% static '/assets/media/ifnti_background.jpeg' %}');">
-        <!-- Page Content -->
-        <div class="hero-static d-flex align-items-center">
-            <div class="w-100">
-                <!-- Sign In Section -->
-                <div class="">
-                    <div class="content content-full">
-                        <div class="row justify-content-center">
-                            <div class="col-md-8 col-lg-6 col-xl-4 py-4 px-4 bg-white">
-                                <!-- Header -->
-                                <div class="text-center">
-                                    <p class="mb-2">
-                                        <img src="{% static '/assets/media/logo.jpeg' %}" alt="" width="50px">
-                                    </p>
-                                    <h1 class="h4 mb-1">
-                                        Se connecter
-                                    </h1>
-                                    {% comment %} <h2 class="h6 font-w400 text-muted mb-3">
-                                        A perfect match for your project
-                                    </h2> {% endcomment %}
-                                </div>
-                                <!-- END Header -->
-
-                                <!-- Sign In Form -->
-                                <!-- jQuery Validation (.js-validation-signin class is initialized in js/pages/op_auth_signin.min.js which was auto compiled from _es6/pages/op_auth_signin.js) -->
-                                <!-- For more info and examples you can check out https://github.com/jzaefferer/jquery-validation -->
-                                <form class="js-validation-signin" action="{% url 'main:connexion' %}" method="POST">
-                                    {% csrf_token %}
-                                    <div class="py-3">
-                                        <div class="form-group">
-                                            <input type="text" class="form-control form-control-lg form-control-alt" id="login-username" name="login-username" placeholder="Username">
-                                        </div>
-                                        <div class="form-group">
-                                            <input type="password" class="form-control form-control-lg form-control-alt" id="login-password" name="login-password" placeholder="Password">
-                                        </div>
-                                        <div class="form-group">
-                                            <div class="d-md-flex align-items-md-center justify-content-md-between">
-                                                <div class="py-2">
-                                                    <a class="font-size-sm font-w500" href="{% url 'main:reminder' %}">Mot de passe Oublié ?</a>
-                                                </div>
-                                            </div>
-                                        </div> 
-                                        {% if error %}
-                                        <div class="text-danger">
-                                                {{error}}
-                                        </div>
-                                        {% endif %}
-                                        
-                                    </div>
-                                    <div class="form-group row justify-content-center mb-0">
-                                        <div class="col-md-6 col-xl-5">
-                                            <button type="submit" class="btn btn-block btn-primary">
-                                                <i class="fa fa-fw fa-sign-in-alt mr-1"></i> Connexion
-                                            </button>
-                                        </div>
-                                    </div>
-                                </form>
-                                <!-- END Sign In Form -->
-                            </div>
+{% extends 'auth.html' %}
+{% load static %}
+{% block content %}
+<div class="d-flex flex-column align-items-center justify-content-center">
+    <img src="{% static '/assets/media/logo.png' %}" alt="" width="50px">                
+    <h1 class="mt-4">Se connecter</h1>
+    <div>
+        <form action="" method="post">
+            {% csrf_token %}
+            <div class="d-flex flex-column mt-4">
+                <label for="username" class="">Nom utilisateur</label>
+                <input class="form-control" name="username" type="text" id="username" placeholder="Nom utilisateur">
+            </div>
+            <div class="d-flex flex-column mt-4">
+                <label for="username" class="">Mot de passe</label>
+                <div class="input-group mb-2">
+                    <input class="form-control" name="password" type="password" id="password" placeholder="Mot de passe">
+                    <div class="input-group-prepend">
+                        <div class="input-group-text" id="show_password">
+                            <i class="fa fa-eye-slash" id="show_password_eyes"></i>
                         </div>
                     </div>
                 </div>
-                <!-- END Sign In Section -->
-
-                <!-- Footer -->
-                <div class="font-size-sm text-center text-muted py-3">
-                    <strong>IFNTI</strong> &copy; <span data-toggle="year-copy"></span>
-                </div>
-                <!-- END Footer -->
             </div>
+            <div class="d-flex flex-row-reverse mt-2 mb-2">
+                <span>
+                    <a href="{% url 'main:reminder' %}">
+                        <small>Oups ! j'ai oublier mon mot de passe.</small>
+                    </a>
+                </span>
+            </div>
+            <div class="mt-4">
+                <button class="btn btn-primary w-100">Se connecter</button>
+            </div>
+        </form>
+        <hr class="">
+        <div>
+            <a href="">
+                <span></span>
+                <button class="btn border">google</button>
+            </a>
         </div>
-        <!-- END Page Content -->
-    </main>
+    </div>
 </div>
-</body>
-
-
-
-<script src="{% static 'assets/js/oneui.core.min.js' %}"></script>
-<script src="{% static 'assets/js/oneui.app.min.js' %}"></script>
-<script src="{% static 'assets/js/plugins/datatables/jquery.dataTables.min.js' %}"></script>
-<script src="{% static 'assets/js/plugins/datatables/dataTables.bootstrap4.min.js' %}"></script>
-<script src="{% static 'assets/js/plugins/datatables/buttons/dataTables.buttons.min.js' %}"></script>
-<script src="{% static 'assets/js/plugins/datatables/buttons/buttons.print.min.js' %}"></script>
-<script src="{% static 'assets/js/plugins/datatables/buttons/buttons.html5.min.js' %}"></script>
-<script src="{% static 'assets/js/plugins/datatables/buttons/buttons.flash.min.js' %}"></script>
-<script src="{% static 'assets/js/plugins/datatables/buttons/buttons.colVis.min.js' %}"></script>
-<script src="{% static 'assets/js/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js' %}"></script>
-<script src="{% static 'assets/js/plugins/bootstrap-colorpicker/js/bootstrap-colorpicker.min.js' %}"></script>
-<script src="{% static 'assets/js/plugins/bootstrap-maxlength/bootstrap-maxlength.min.js' %}"></script>
-<script src="{% static 'assets/js/plugins/select2/js/select2.full.min.js' %}"></script>
-<script src="{% static 'assets/js/plugins/jquery.maskedinput/jquery.maskedinput.min.js' %}"></script>
-<script src="{% static 'assets/js/plugins/ion-rangeslider/js/ion.rangeSlider.min.js' %}"></script>
-<script src="{% static 'assets/js/plugins/dropzone/dropzone.min.js' %}"></script>
-<script src="{% static 'assets/js/plugins/flatpickr/flatpickr.min.js' %}"></script>
-<script src="{% static 'assets/js/pages/be_tables_datatables.min.js' %}"></script>
-<script src="{% static 'assets/js/plugins/fullcalendar/main.min.js' %}"></script>
-<script src="{% static 'assets/js/pages/be_comp_calendar.min.js' %}"></script>
-
-
-
-{% block scripts %}{% endblock scripts %}
-
-</html>
+{% endblock content %}
+    

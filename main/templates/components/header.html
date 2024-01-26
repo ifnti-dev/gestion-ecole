@@ -1,24 +1,14 @@
 {% load static %}
-<header id="page-header" class="bg-chart-orange-color">
-    <!-- Header Content -->
-    <div class="content-header bg-chart-orange-color">
-        <!-- Left Section -->
+<header id="page-header" class="">
+    <div class="content-header">
         <div class="d-flex align-items-center">
-            <!-- Toggle Sidebar -->
-            <!-- Layout API, functionality initialized in Template._uiApiLayout()-->
             <button type="button" class="btn btn-sm btn-dual mr-2 d-lg-none" data-toggle="layout" data-action="sidebar_toggle">
                 <i class="fa fa-fw fa-bars"></i>
             </button>
-            <!-- END Toggle Sidebar -->
-            <!-- Toggle Mini Sidebar -->
-            <!-- Layout API, functionality initialized in Template._uiApiLayout()-->
             <button type="button" class="btn btn-sm btn-dual mr-2 d-none d-lg-inline-block" data-toggle="layout" data-action="sidebar_mini_toggle">
                 <i class="fa fa-fw fa-ellipsis-v"></i>
             </button>
         </div>
-        <!-- END Left Section -->
-
-        <!-- Right Section -->
         <div class="d-flex align-items-center">
             <form method="GET" action="{% url 'main:change_annee_universitaire' %}" id="form-annee-universitaire">
                 {% csrf_token %}
@@ -32,7 +22,7 @@
                     </select>
                 </div>
             </form>
-            <!-- User Dropdown -->
+
             <div class="dropdown d-inline-block ml-2">
                 <button type="button" class="btn btn-sm btn-dual d-flex align-items-center" id="page-header-user-dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <img class="rounded-circle" src="/media/assets/avatar.png" alt="" style="width: 21px;">
@@ -66,7 +56,6 @@
             <form class="w-100" action="be_pages_generic_search.html" method="POST">
                 <div class="input-group">
                     <div class="input-group-prepend">
-                        <!-- Layout API, functionality initialized in Template._uiApiLayout() -->
                         <button type="button" class="btn btn-alt-danger" data-toggle="layout" data-action="header_search_off">
                             <i class="fa fa-fw fa-times-circle"></i>
                         </button>

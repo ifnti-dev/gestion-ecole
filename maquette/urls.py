@@ -20,6 +20,7 @@ urlpatterns = [
     path('add_parcours/<int:id_domaine>/', views.add_parcours, name='add_parcours'),
     path('edit_parcours/<int:id>', views.edit_parcours, name='edit_parcours'),
     path('delete_parcours/<int:id>/', views.delete_parcours, name='delete_parcours'),
-    path('notes/ues/template/', views.generate_note_template, name='note_template'),
-    path('template/', views.generate_maquette_template, name='maquette_template'),
+    path('upload/notes/', views.upload_note, name='note_template'),
+    path('upload/maquette/', views.upload_maquette, name='upload_maquette'),
+    path('upload/matieres/', views.upload_matieres, name='upload_matiere'),
 ]

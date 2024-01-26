@@ -1,0 +1,59 @@
+{% load static %}
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+
+        <title>Se connecter</title>
+        <link rel="stylesheet" href="{% static  'assets/css/oneui.css' %}">
+
+        <link rel="shortcut icon" href="{% static '/assets/media/logo.jpeg' %}">
+        <link rel="icon" type="image/png" sizes="192x192" href="{% static '/assets/media/logo.jpeg' %}">
+        <link rel="apple-touch-icon" sizes="180x180" href="{% static '/assets/media/logo.jpeg' %}">
+        <!-- END Icons -->
+
+        <!-- Stylesheets -->
+        <!-- Page JS Plugins CSS -->
+        <link rel="stylesheet" href="{% static 'assets/js/plugins/slick-carousel/slick.css' %}">
+        <link rel="stylesheet" href="{% static 'assets/js/plugins/slick-carousel/slick-theme.css' %}">
+
+        <!-- Fonts and OneUI framework -->
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+        <link rel="stylesheet" id="css-main" href="{% static 'assets/css/oneui.min.css' %}">
+    </head>
+    <style>
+        
+
+    </style>
+<body class="bg-danger">
+    <main class="vh-100 w-100 row flex-row-reverse">
+        <div class="col-12 col-md-6 d-flex align-items-center justify-content-center">
+            <div class="d-flex flex-column align-items-center justify-content-center">
+                <div class="">
+                    <div>
+                        <img class="" src="{% static '/assets/media/sliders/1.png' %}" alt="">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="bg-white h-100 col-12 col-md-6 d-flex align-items-center justify-content-center">
+            {% block content %}
+            {% endblock content %}
+        </div>
+    </main>
+</body>
+<script src="{% static 'assets/js/jquery-3.7.1.min.js' %}"></script>
+<script type="text/javascript">
+    $("#show_password").on('click', function(){
+        if ($('#password')[0].type==='password'){
+            $('#password')[0].type='text';
+            $('#show_password_eyes').removeClass("fa-eye-slash");
+            $('#show_password_eyes').addClass("fa-eye");
+        } else {
+            $('#password')[0].type='password';
+            $('#show_password_eyes').removeClass("fa-eye");
+            $('#show_password_eyes').addClass("fa-eye-slash");
+        }
+    });
+</script>
+</html>

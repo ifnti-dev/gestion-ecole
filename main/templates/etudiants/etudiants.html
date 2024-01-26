@@ -5,15 +5,14 @@
         <h3 class="block-title">{{ niveau }} </h3>
         <form action="" method="post" id="form-semestre" class="d-flex mr-3">
             {% csrf_token %}
-            <!-- {% if is_directeur_des_etudes %}
+            {% if is_directeur_des_etudes %}
             <select name="etat" id="etat" class="form-control mr-3">
-                <option value="">Etat</option>
                 <option value="__all__" {% if selected_etat.id == '__all__' %}selected{% endif %}>Tous</option>
                 {% for etat in etats %}
                     <option value="{{ etat.id }}" {% if selected_etat.id == etat.id %}selected{% endif %}>{{ etat.value }}</option>
                 {% endfor %}
             </select>  
-            {% endif %} -->
+            {% endif %}
             <select name="semestre" id="semestre" class="form-control">
                 <option value="">Semestres</option>
                 {% for semestre in semestres %}

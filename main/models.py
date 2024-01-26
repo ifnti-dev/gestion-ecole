@@ -1465,7 +1465,8 @@ class Matiere(models.Model):
     """
 
     def save(self, *args, **kwargs):
-        if not self.codematiere:
+        print("Save Matière")
+        if not self.codematiere and len(self.codematiere) == 0:
             # Calculer le préfixe numérique en fonction de l'ordre des matières dans l'UE
             ordre_matiere = Matiere.objects.filter(ue=self.ue).count() + 1
 
@@ -1575,12 +1576,11 @@ class Matiere(models.Model):
         :param annee_selectionnee: Année universitaire de recherche
         :type annee_selectionnee: AnneeUniversitaire ou __all__
 
-        :param type: Type de semestre
+        :param type: :;,  
         :type type: __current__ ou __all__
 
         :return: Liste des semestres dans lesquels la matière est enseignée
         :retype: list[Semestre]
-
         """
 
         # Passer plus tard le parcours
@@ -1594,8 +1594,7 @@ class Matiere(models.Model):
         else:
             annee_selectionnees = [annee_selectionnee]
 
-        programmes = self.ue.programme_set.filter(
-            semestre__annee_universitaire__in=annee_selectionnees, semestre__courant__in=type_semestres)
+        programmes = self.ue.programme_set.filter(semestre__annee_universitaire__in=annee_selectionnees, semestre__courant__in=type_semestres).order_by("-semestre")
         semestres = set()
 
         for programme in programmes:
@@ -1611,9 +1610,6 @@ class Matiere(models.Model):
         :retype: list[Etudiant]
 
         """
-
-        # Passer plus tard le parcours
-
         etudiants = set()
         semestres = self.get_semestres('__all__', '__all__')
         for semestre in semestres:
@@ -1622,6 +1618,7 @@ class Matiere(models.Model):
                     self, semestre)
                 if not a_valide:
                     etudiants.update([etudiant])
+                    
         return list(etudiants)
 
     def get_etudiant_semestre(self, semestre):
@@ -1653,7 +1650,7 @@ class Evaluation(models.Model):
 
     """
     ponderation = models.IntegerField(
-        default=1, verbose_name="Pondération (1-100)", validators=[MinValueValidator(1), MaxValueValidator(100)])
+        default=100, verbose_name="Pondération (1-100)", validators=[MinValueValidator(1), MaxValueValidator(100)])
     """
         Pondération de l'évaluation
 
@@ -1778,9 +1775,6 @@ class AnneeUniversitaire(models.Model):
     """
 
     def save(self, *args, **kwargs):
-        annee = AnneeUniversitaire.objects.filter(annee=self.annee)
-        if not self.pk and annee:
-            return
         super().save(*args, **kwargs)
         self.generateSemeste()
 
@@ -1827,17 +1821,20 @@ class AnneeUniversitaire(models.Model):
             :retype: AnneeUniversitaire
         """
         current_date = datetime.datetime.now()
-        try:
-            # Rechercher l'année accadémique courrante
-            virtual_current_university_date = AnneeUniversitaire.objects.get(
-                annee_courante=True)
-            # Rechercher l'année courante
-            if current_date.month >= 8 and virtual_current_university_date.annee < current_date.year:
-                virtual_current_university_date.disable()
-                return AnneeUniversitaire.objects.create(annee=current_date.year, annee_courante=True)
-            return virtual_current_university_date
-        except Exception as e:
-            return AnneeUniversitaire.objects.create(annee=current_date.year, annee_courante=True)
+        return AnneeUniversitaire.objects.get(annee=2023)
+        # try:
+        #     # Rechercher l'année accadémique courrante
+        #     virtual_current_university_date = AnneeUniversitaire.objects.get(annee_courante=True)
+        #     # Rechercher l'année  réel courante
+        #     print("::: IN TRY ::::")
+        #     if virtual_current_university_date.annee == current_date.year and current_date.month >= 8 :
+        #         virtual_current_university_date.disable()
+        #         return AnneeUniversitaire.objects.create(annee=current_date.year, annee_courante=True)
+        #     return virtual_current_university_date
+        # except Exception as e:
+        #     print("::: IN except ::::")
+        #     return -1
+        
 
     @staticmethod
     def getNiveau(semestre_libelle):
@@ -2074,6 +2071,8 @@ class Programme(models.Model):
     class Meta:
         unique_together = ["parcours", "semestre"]
 
+class Settings(models.Model):
+    pass
 
 class CorrespondanceMaquette(models.Model):
     """
@@ -2815,6 +2814,7 @@ class Fournisseur(models.Model):
         **Nullable:** true
 
     """
+    
     annee_universitaire = models.ForeignKey(
         'AnneeUniversitaire', on_delete=models.CASCADE, verbose_name="Année Universitaire", null=True, blank=True)
     """
@@ -2941,10 +2941,9 @@ class FicheDePaie(models.Model):
         **Nullable:** true
 
     """
-    matiere = models.ForeignKey(
-        'Matiere', on_delete=models.CASCADE, verbose_name="Matière")
+    matiere = models.ManyToManyField('Matiere', related_name="Matières", blank=True, null=True)
     """
-        Matière enseignée par le reçeveur de la fiche de paie
+        Matières enseignées par le reçeveur de la fiche de paie
 
         **Type:** string
 
@@ -3117,7 +3116,6 @@ class Charge(models.Model):
         **Type:** string
 
         **Nullable:** true
-
     """
     dateFin = models.DateField(verbose_name="Date de fin", null=True)
     """
@@ -3196,9 +3194,15 @@ class Charge(models.Model):
     """
 
     def __str__(self):
+        """
+             __str__(): Renvoie une représentation en chaîne de caractères de la prise en charge.
+        """
         return str(self.personnel.nom) + "  " + str(self.personnel.prenom) + "  " + str(self.dateDebut) + "-" + str(self.dateFin)
 
     def save(self, *args, **kwargs):
+        """
+            save(*args, **kwargs): Enregistre les détails de la prise en charge dans la base de données.
+        """
         if not self.annee_universitaire:
             self.annee_universitaire = AnneeUniversitaire.static_get_current_annee_universitaire()
 

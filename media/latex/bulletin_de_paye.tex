@@ -7,7 +7,7 @@
 
 \usepackage{fancyhdr}
 \pagestyle{fancyplain}
-\cfoot{\vspace{.5cm}Institut de formation aux normes et technologies de l'informatique\\300 BP 40, Sokodé TOGO -- Tél. : +228 90 91 81 41\\Agrément N\textdegree2019/064/MESR/SG/DES }
+\cfoot{\vspace{.5cm}Institut de formation aux normes et technologies de l'informatique\\300 BP 40, Sokodé TOGO -- Tél. : +228 90 91 81 41}
 
 \usepackage{eso-pic, graphicx}
 
@@ -34,10 +34,12 @@
 \section*{Employé}
 \begin{tabular}{@{}ll}
     Période: & Du \VAR{bulletin.date_debut} au \VAR{bulletin.date_fin} \\
-    Nom de l'employé: &  \VAR{bulletin.personnel.nom}  \VAR{bulletin.personnel.prenom} \\
+    Nom et Prénoms: &  \VAR{bulletin.personnel.nom}  \VAR{bulletin.personnel.prenom} \\
     Qualification professionnelle: &  \VAR{bulletin.qualification_professionnel} \\
-    N° CNSS: &  \VAR{bulletin.numero_cnss} \\ \\
+    N° CNSS: &  \VAR{bulletin.numero_cnss} \\
+    Nbre de personnes pris en charge : &  \VAR{bulletin.personnel.nombre_de_personnes_en_charge} \\ \\
 \end{tabular}
+
 
 \begin{tabular}{@{}l@{\hspace{1cm}}r} 
     Salaire de base: & \VAR{bulletin.personnel.salaireBrut} FCFA \\
@@ -50,23 +52,29 @@
 \end{tabular}
 	
 \section*{Retenues obligatoires} 
-\begin{center}
-	\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}l c c}
-		\textbf{ } & \textbf{Employeur} &     \textbf{Salarié} \\  	           
-                \textbf{Totaux CNSS}   & \textbf{\VAR{retenues_cnss_employeur}}  &\textbf{\VAR{frais_prestations_familiale_salsalaire}}\\ 
-                 Prestations familiales et maternités   & \VAR{frais_prestations_familiales}   \\ 
-                 Risques professionnels   & \VAR{frais_risques_professionnel}   \\ 
-                 Pension vieillesse   & \VAR{frais_pension_vieillesse_emsalaire}   & \VAR{frais_prestations_familiale_salsalaire} \\ \\
-                 
-                 TCS   &    & \VAR{bulletin.tcs} \\ 
-                 IRPP   &    & \VAR{bulletin.irpp} \\ 
-                        
-	\end{tabular*}
-\end{center}
+\begin{tabular}{|c|c|c|c|c|}
+\hline 
+\textbf{ÉLÉMENTS} & \textbf{\%} & \textbf{Employeur} & \textbf{\%} & \textbf{Salarié} \\ 
+\hline 
+Prestations familiales et maternités & 3 & \VAR{frais_prestations_familiales} & 0 & 0 \\ 
+\hline 
+Risques professionnels & 2 & \VAR{frais_risques_professionnel} & 0 & 0 \\ 
+\hline 
+Pension vieillesse & 12,5 & \VAR{frais_pension_vieillesse_emsalaire} & 4 & \VAR{frais_prestations_familiale_salsalaire} \\ 
+\hline  
+\textbf{Totaux CNSS} &\multicolumn{2}{|c|}{\VAR{retenues_cnss_employeur}} &\multicolumn{2}{|c|}{\VAR{frais_prestations_familiale_salsalaire}}\\ 
+\hline 
+TCS &\multicolumn{2}{|c|}{0} &\multicolumn{2}{|c|}{\VAR{bulletin.tcs}}\\ 
+\hline 
+IRPP &\multicolumn{2}{|c|}{0} &\multicolumn{2}{|c|}{\VAR{bulletin.irpp}}\\ 
+\hline 
+\textbf{SALAIRE NET} & \multicolumn{4}{|c|}{\VAR{salaire_net}}\\ 
+\hline 
+\end{tabular} 
+
 
 \begin{flushleft}
 \begin{tabular}{@{}ll}
-Salaire net: & \VAR{salaire_net} \\
 Accomptes: & \VAR{bulletin.acomptes}  \\
 Primes forfaitaires: & \VAR{bulletin.prime_forfaitaire}  \\\\
 \end{tabular}
@@ -79,9 +87,9 @@ Primes forfaitaires: & \VAR{bulletin.prime_forfaitaire}  \\\\
 
 \vspace{1cm}
 
-\begin{tabular}{@{}l@{\hspace{5cm}}l}
-    									  &  \\
-     Le Responsable d'établissement  &  \VAR{bulletin.personnel.nom}  \VAR{bulletin.personnel.prenom} 
-\end{tabular}
+\begin{flushright}
+Le Responsable d'établissement
+\end{flushright}
+
 
 \end{document}

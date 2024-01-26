@@ -199,18 +199,33 @@ class FournisseurForm(forms.ModelForm):
 class FicheDePaieForm(forms.ModelForm):
     class Meta:
         model = FicheDePaie
+        matiere = forms.ModelMultipleChoiceField(
+                queryset=Matiere.objects.all(),
+                widget=forms.SelectMultiple(attrs={'class': 'form-control'}),
+                label="Matière L1",
+                required=False
+            ),
         fields = ['dateDebut', 'dateFin',  'enseignant', 'prixUnitaire', 'acomptes', 'matiere', 'nombreHeureL1', 'nombreHeureL2', 'nombreHeureL3']   
         widgets = {
             'dateDebut': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
             'dateFin': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
-            'matiere': forms.Select(attrs={'class': 'form-control'}),
             'enseignant': forms.Select(attrs={'class': 'form-control'}),
             'nombreHeureL1': forms.NumberInput(attrs={'class': 'form-control'}),
             'nombreHeureL2': forms.NumberInput(attrs={'class': 'form-control'}),
             'nombreHeureL3': forms.NumberInput(attrs={'class': 'form-control'}),
             'prixUnitaire': forms.NumberInput(attrs={'class': 'form-control'}),
             'acomptes': forms.NumberInput(attrs={'class': 'form-control'}),
+#            'matiere' : forms.SelectMultiple(attrs={'class': 'form-control'}),
+            
         }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['matiere'].queryset = self.get_matiere_choices()
+
+    def get_matiere_choices(self):
+        # Filtrer les matières de L1 (Semestre1 et Semestre2)
+        return Matiere.objects.filter(ue__programme__semestre__libelle__in=['S1', 'S2'])
 
         
 
