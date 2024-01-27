@@ -1,11 +1,16 @@
 {% extends 'index.html' %}
 {% block content_title %}
-Enregistrement d'une evaluation
-  <h1>
-   <a href="{% url 'main:evaluations' matiere.id %}" class="btn btn-outline-warning">
-        <i class="fas fa-chevron-left fa-lg"></i> Retour
-      </a>
-  </h1>
+    <div>
+        Matiere : {{ matiere.libelle }}
+    </div>
+    <div>
+        Enregistrement d'une evaluation
+    </div>
+    <h1>
+    <a href="{% url 'main:evaluations' matiere.id %}" class="btn btn-outline-warning">
+            <i class="fas fa-chevron-left fa-lg"></i> Retour
+        </a>
+    </h1>
 {% endblock %}
 {% block content_title_description %}
 

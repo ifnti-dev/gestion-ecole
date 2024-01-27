@@ -1,61 +1,66 @@
 {% extends '../index.html' %}
 
-{% load static %}
+{% block content_title %}
+    Enregistrement une matière
+    <h1>
+        <a href="{% url 'main:etudiants' %}" class="btn btn-outline-warning">
+            <i class="fas fa-chevron-left fa-lg"></i> Retour
+        </a>
+    </h1>
+{% endblock %}
 
 {% block content %}
-
-    <div id="content-wrapper">
-        <div class="container-fluid">
-            <div class="card mb-3">
-                <div class="card-header">
-                    <h3><i class="fas fa-table"></i> Enregistrement d'une matière <a class="btn btn-sm btn-success" href="{% url 'main:matieres_etudiant' %}" style="padding: 8px; float: right; background-color: blue; color: white;"><i class="fas fa-chevron-left fa-lg"></i>
-                        Retour</a></h3>
-                </div>
-                <div class="card-body">
-                  <form class="form-horizontal" action="#" method="POST">
-                    {% csrf_token %}
-
-
-                    <div class="form-group row">
-                        <label for="{{ form.libelle.id_for_label }}" class="col-md-2 col-form-label">Libellé de la matière:</label>
-                        <div class="col-md-10">
-                            {{ form.libelle }}
-                        </div>
-                    </div>
-
-                    <div class="form-group row">
-                        <label for="{{ form.ponderation.id_for_label }}" class="col-md-2 col-form-label">Coefficient:</label>
-                        <div class="col-md-10">
-                            {{ form.coefficient }}
-                        </div>
-                    </div>
-
-                    <div class="form-group row">
-                        <label for="{{ form.minValue.id_for_label }}" class="col-md-2 col-form-label">Valeur minimale:</label>
-                        <div class="col-md-10">
-                            {{ form.minValue }}
-                        </div>
-                    </div>
-
-
-                    <div class="form-group row">
-                        <label for="{{ form.ue.id_for_label }}" class="col-md-2 col-form-label">Ue:</label>
-                        <div class="col-md-10">
-                            {{ form.ue }}
-                        </div>
-                    </div>
-                           
-                    <div class="form-group row">
-                        <label for="{{ form.enseignant.id_for_label }}" class="col-md-2 col-form-label">Enseignant responsable:</label>
-                        <div class="col-md-10">
-                            {{ form.enseignant }}
-                        </div>
-                    </div>
-
-                    <button class="btn btn-primary btn-block" type="submit"><i class="fas fa-database"></i> Enregistrer &nbsp;&nbsp;&nbsp;<span></span></button>
-                </form>
-                </div>
+    <div class="d-flex justify-content-center">
+        <div class="block-content card m-4 col-md-10 col-lg-8 col-xl-6">
+            <div class="d-flex justify-content-between">
+            <h3>         
+            </h3>
+                <a href="{% url 'main:importer_les_donnees' %}" class="btn btn-outline-primary">
+                <i class="fas fa-plus"></i> Importer
+                </a>
             </div>
+            <form class="container-fluid p-3" action="#" method="POST">
+                {% csrf_token %}
+                <div class="form-row mb-3">
+                    <div class="col-12">
+                        {{ form.libelle.label_tag }}
+                        {{ form.libelle }}
+                        <span class="text-danger">{{ form.libelle.errors }}</span>
+                    </div>
+                </div>
+                <div class="form-row mb-3">
+                    <div class="col-md-6">
+                        {{ form.abbreviation.label_tag }}
+                        {{ form.abbreviation }}
+                        <span class="text-danger">{{ form.abbreviation.errors }}</span>
+                    </div>
+                    <div class="col-md-6">
+                        {{ form.ue.label_tag }}
+                        {{ form.ue }}
+                        <span class="text-danger">{{ form.ue.errors }}</span>
+                    </div>
+                </div>
+                <div class="form-row mb-3">
+                    <div class="col-md-6">
+                        {{ form.coefficient.label_tag }}
+                        {{ form.coefficient }}
+                        <span class="text-danger">{{ form.coefficient.errors }}</span>
+                    </div>
+                    <div class="col-md-6">
+                        {{ form.minValue.label_tag }}
+                        {{ form.minValue }}
+                        <span class="text-danger">{{ form.minValue.errors }}</span>
+                    </div>
+                </div>
+                <div class="form-row mb-3">
+                    <div class="col-md-12">
+                        {{ form.enseignant.label_tag }}
+                        {{ form.enseignant }}
+                        <span class="text-danger">{{ form.enseignant.errors }}</span>
+                    </div>
+                </div>
+                <button class="btn btn-primary btn-block mt-3" type="submit"><i class="fas fa-database"></i> Enrégistrer &nbsp;&nbsp;&nbsp;<span></span></button>
+            </form> 
         </div>
     </div>
 {% endblock %}

@@ -97,21 +97,7 @@ urlpatterns = [
      path('detail_matiere/<int:id>/', views.detailMatiere, name='detail_matiere'),
      path('create_matiere/', views.create_matiere, name='create_matiere'),
      path('update_matiere/<int:id>/', views.create_matiere, name='update_matiere'),
-
-
-
-     path('matieres/semestre/1/', views.matiere_semestre,
-          {'semestre': 1}, name='matiere_semestre1'),
-     path('matieres/semestre/2/', views.matiere_semestre,
-          {'semestre': 2}, name='matiere_semestre2'),
-     path('matieres/semestre/3/', views.matiere_semestre,
-          {'semestre': 3}, name='matiere_semestre3'),
-     path('matieres/semestre/4/', views.matiere_semestre,
-          {'semestre': 4}, name='matiere_semestre4'),
-     path('matieres/semestre/5/', views.matiere_semestre,
-          {'semestre': 5}, name='matiere_semestre5'),
-     path('matieres/semestre/6/', views.matiere_semestre,
-          {'semestre': 6}, name='matiere_semestre6'),
+     path('delete_matiere/<int:id_matiere>/', views.delete_matiere, name='delete_matiere'),
 
 
      #### UEs ####
@@ -121,19 +107,6 @@ urlpatterns = [
      path('create_ue/', views.create_ue, name='create_ue'),
      path('update_ue/<int:id>/', views.create_ue, name='update_ue'),
 
-     # UE par semestre
-     path('ues_semestre/semestre1/', views.ues_semestre,
-          {'semestre': 'S1'}, name='ues_semestre1'),
-     path('ues_semestre/semestre2/', views.ues_semestre,
-          {'semestre': 'S2'}, name='ues_semestre2'),
-     path('ues_semestre/semestre3/', views.ues_semestre,
-          {'semestre': 'S3'}, name='ues_semestre3'),
-     path('ues_semestre/semestre4/', views.ues_semestre,
-          {'semestre': 'S4'}, name='ues_semestre4'),
-     path('ues_semestre/semestre5/', views.ues_semestre,
-          {'semestre': 'S5'}, name='ues_semestre5'),
-     path('ues_semestre/semestre6/', views.ues_semestre,
-          {'semestre': 'S6'}, name='ues_semestre6'),
 
                     #### Enseignant ####
      path('enseignants/',views.enseignants, name='enseignants'),
