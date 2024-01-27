@@ -10,7 +10,7 @@
             </button>
         </div>
         <div class="d-flex align-items-center">
-            <form method="GET" action="{% url 'main:change_annee_universitaire' %}" id="form-annee-universitaire">
+            <form method="POST" action="{% url 'main:change_annee_universitaire' %}" id="form-annee-universitaire">
                 {% csrf_token %}
                 <div class="form-row">
                     <input type="text" name="origin_path" value="{{ request.path }}" hidden>

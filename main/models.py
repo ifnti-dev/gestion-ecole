@@ -1820,20 +1820,12 @@ class AnneeUniversitaire(models.Model):
             :return: Un objet AnneUniversitaire correspondant à l'année universitaire en cours
             :retype: AnneeUniversitaire
         """
-        current_date = datetime.datetime.now()
-        return AnneeUniversitaire.objects.get(annee=2023)
-        # try:
-        #     # Rechercher l'année accadémique courrante
-        #     virtual_current_university_date = AnneeUniversitaire.objects.get(annee_courante=True)
-        #     # Rechercher l'année  réel courante
-        #     print("::: IN TRY ::::")
-        #     if virtual_current_university_date.annee == current_date.year and current_date.month >= 8 :
-        #         virtual_current_university_date.disable()
-        #         return AnneeUniversitaire.objects.create(annee=current_date.year, annee_courante=True)
-        #     return virtual_current_university_date
-        # except Exception as e:
-        #     print("::: IN except ::::")
-        #     return -1
+        current_date = timezone.now()
+        virtual_current_university_date, created = AnneeUniversitaire.objects.get_or_create(annee_courante=True, defaults={'annee': current_date.year-1})
+        if virtual_current_university_date.annee == current_date.year-1 and current_date.month >= 8:
+            virtual_current_university_date.disable()
+            return AnneeUniversitaire.objects.create(annee=timezone.now().year, annee_courante=True)
+        return virtual_current_university_date
         
 
     @staticmethod
@@ -1911,7 +1903,6 @@ class Semestre(models.Model):
         return super().save()
 
     def static_get_current_semestre():
-
         try:
             annee = AnneeUniversitaire.static_get_current_annee_universitaire()
             # Revoir cette partie retourner S1,S3,S5 ou S2,S4,S6

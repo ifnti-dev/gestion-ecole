@@ -32,11 +32,6 @@ class GenerateMaquetteForm(forms.Form):
         
         return cleaned_data
 
-class DataForm(forms.Form):
-    maquette_excel_file = forms.FileField(widget=forms.FileInput(attrs={'class': 'form-control'}), required=False, label="Fichier maquette")
-    matieres_excel_file = forms.FileField(widget=forms.FileInput(attrs={'class': 'form-control'}), required=False, label="Fichier matières")
-    notes_excel_file = forms.FileField(widget=forms.FileInput(attrs={'class': 'form-control'}), required=False, label="Fichier notes")
-
 class CorrespondanceMaquetteForm(forms.ModelForm):
     error = forms.CharField(max_length=255, required=False) 
     class Meta:

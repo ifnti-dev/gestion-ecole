@@ -1,7 +1,7 @@
 import datetime
 import json
 from django import forms
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseNotFound
 from main.pdfMaker import generate_pdf
 from django.conf import settings
 from main.forms import EnseignantForm, EtudiantForm, EvaluationForm, InformationForm, ProgrammeForm, NoteForm, TuteurForm, UeForm, MatiereForm
@@ -16,9 +16,9 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth import authenticate, login, logout, get_user_model
 from .resources import EtudiantResource, EnseignantResource
 from tablib import Dataset
-from .custom_permission_required import evaluation_permission, show_recapitulatif_note_permission
+from .custom_permission_required import evaluation_permission, evaluation_upload_permission, show_recapitulatif_note_permission
 from django.contrib import messages
-
+from django.core.cache import cache
 
 def datetime_serializer(obj):
     if isinstance(obj, datetime.datetime):
@@ -80,11 +80,10 @@ def change_annee_universitaire(request):
         :param request: L'objet de requête Django.
         :return: Une redirection HTTP sur l'URL précédente avec l'année scolaire selectionnée .
     """
-    if 'annee_universitaire' in request.GET:
-        request.session["id_annee_selectionnee"] = request.GET.get(
-            'annee_universitaire')
-        # print(request.session["id_annee_selectionnee"])
-    return redirect(request.GET.get('origin_path'))
+    print(request.POST)
+    if request.POST:
+        request.session["id_annee_selectionnee"] = request.POST.get('annee_universitaire')
+        return redirect(request.POST.get('origin_path'))
 
 
 @login_required(login_url=settings.LOGIN_URL)
@@ -652,13 +651,8 @@ def create_matiere(request, id=0):
             message = "a été mis a jour"
             
         if form.is_valid():
-<<<<<<< HEAD
             matiere = form.save()
             messages.success(request, f"La matière {matiere.libelle} {message} !")
-=======
-            form.save()
-            # id_annee_selectionnee = AnneeUniversitaire.static_get_current_annee_universitaire().id
->>>>>>> eaf6e617f39a4b8d77d181c4c3d610d55bbcf6e4
             return redirect('main:matieres_etudiant')
 
 def delete_matiere(request, id_matiere):
@@ -1484,32 +1478,38 @@ def recapitulatifs_des_notes_par_etudiant(request, id_semestre):
     }
     return render(request, 'evaluations/recapitulatifs_des_notes_etudiant.html', context=data)
 
-
 @show_recapitulatif_note_permission("show_recapitulatif")
 def recapitulatifs_des_notes_par_matiere(request, id_semestre, id_matiere):
-
+    id_annee = request.session.get("id_annee_selectionnee")
+    annee_selectionnee = get_object_or_404(AnneeUniversitaire, pk=id_annee)
+    
     semestre = get_object_or_404(Semestre, pk=id_semestre)
-    matiere = get_object_or_404(Matiere, pk=id_matiere)
-    etudiants = semestre.etudiant_set.all()
-    data = {
-        'evaluations': matiere.evaluation_set.all(),
-        'etudiants': [],
-        'matiere': matiere,
-        'semestre': semestre,
-    }
+    
+    if semestre.annee_universitaire.id == annee_selectionnee.id:
+        matiere = get_object_or_404(Matiere, pk=id_matiere)
+        
+        etudiants = []
+        _etudiants = semestre.etudiant_set.all()
+        for etudiant in _etudiants:
+            moyenne, a_valider, _ = etudiant.moyenne_etudiant_matiere(
+                matiere, semestre)
+            etudiants.append({
+                'full_name': etudiant.full_name(),
+                'notes': etudiant.notes_etudiant_matiere(matiere, semestre),
+                'moyenne': moyenne,
+                'a_valider': a_valider,
+            })
+        
+        data = {
+            'evaluations': matiere.evaluation_set.all(),
+            'etudiants': etudiants,
+            'matiere': matiere,
+            'semestre': semestre,
+        }
 
-    for etudiant in etudiants:
-        moyenne, a_valider, _ = etudiant.moyenne_etudiant_matiere(
-            matiere, semestre)
-        data['etudiants'].append({
-            'full_name': etudiant.full_name(),
-            'notes': etudiant.notes_etudiant_matiere(matiere, semestre),
-            'moyenne': moyenne,
-            'a_valider': a_valider,
-        })
-
-    return render(request, 'evaluations/recapitulatifs_des_notes.html', context=data)
-
+        return render(request, 'evaluations/recapitulatifs_des_notes.html', context=data)
+    
+    return HttpResponseNotFound(render(request, 'errors_pages/404.html'))
 
 @login_required(login_url=settings.LOGIN_URL)
 def evaluations_etudiant(request, id_matiere, id_etudiant):
@@ -1590,6 +1590,7 @@ def evaluations(request, id_matiere):
     return render(request, 'evaluations/index.html', data)
 
 @login_required(login_url=settings.LOGIN_URL)
+@evaluation_permission('main.add_evaluation')
 def createNotesByEvaluation(request, id_matiere, rattrapage, id_semestre):
     """
     Affiche un formulaire de création d'une évaluation et ensuite d'une note :model:`main.Note` selon la matière.
@@ -1603,7 +1604,7 @@ def createNotesByEvaluation(request, id_matiere, rattrapage, id_semestre):
         else:
             if not matiere.is_available_to_add_evaluation(semestre):
                 return redirect('main:evaluations', id_matiere=matiere.id)
-            etudiants = semestre.etudiant_set.all()
+            etudiants = semestre.etudiant_set.all().order_by("nom")
 
         NoteFormSet = forms.inlineformset_factory(
             parent_model=Evaluation,
@@ -1653,6 +1654,7 @@ def createNotesByEvaluation(request, id_matiere, rattrapage, id_semestre):
 
 
 @login_required(login_url=settings.LOGIN_URL)
+@evaluation_permission('main.edit_evaluation')
 def editeNoteByEvaluation(request, id):
     """
     Affiche un formulaire d'édition d'une note :model:`main.Note`.
@@ -1721,6 +1723,7 @@ def editeNoteByEvaluation(request, id):
 
 
 @login_required(login_url=settings.LOGIN_URL)
+@evaluation_permission('main.delete_evaluation')
 def deleteEvaluation(request, id):
     """
         Supprime une evaluation :model:`main.Note`.
@@ -1736,8 +1739,8 @@ def deleteEvaluation(request, id):
     evaluation.delete()
     return redirect('main:evaluations', id_matiere=matiere.id)
 
-
 @login_required(login_url=settings.LOGIN_URL)
+@evaluation_upload_permission('main.upload_evaluation')
 def uploadEvaluation(request, id_matiere, id_semestre):
     matiere = get_object_or_404(Matiere, pk=id_matiere)
     semestre = get_object_or_404(Semestre, pk=id_semestre)
@@ -1747,10 +1750,9 @@ def uploadEvaluation(request, id_matiere, id_semestre):
             file = request.FILES.get('file')
             try:
                 load_notes_from_evaluation(file, matiere, semestre)
+                messages.success(request, "L'evaluation a été chargé !")
             except ValueError as ve:
                 messages.error(request, str(ve))
-            
-            return HttpResponse("Hello")
         return redirect('main:evaluations', id_matiere=id_matiere)
         
     file_name = pre_load_evaluation_template_data(matiere, semestre)
@@ -1758,8 +1760,6 @@ def uploadEvaluation(request, id_matiere, id_semestre):
         response = HttpResponse(file.read(), content_type="application/force-download")
         response['Content-Disposition'] = 'attachment; filename="{}"'.format(os.path.basename(file_name))
         return response
-
-
 
 @login_required(login_url=settings.LOGIN_URL)
 def affectation_matieres_professeur(request):

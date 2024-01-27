@@ -3,13 +3,17 @@ from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from main.pdfMaker import generate_pdf
 from main.models import AnneeUniversitaire, CorrespondanceMaquette, Matiere, Programme, Semestre, Ue, Domaine, Parcours
+from maquette.custom_permission_required import data_permission
 from scripts.utils import load_maquette, load_matieres_by_year, load_notes_from_ue_file, pre_load_note_ues_template_data, pre_load_ue_matiere_template_data_by_year
-from .forms import CorrespondanceMaquetteForm, DataForm, GenerateMaquetteForm, ProgrammeForm, DomaineForm, ParcoursForm
+from .forms import CorrespondanceMaquetteForm, GenerateMaquetteForm, ProgrammeForm, DomaineForm, ParcoursForm
 import os
 from django.contrib import messages
 from django.db import DataError, IntegrityError
+from django.conf import settings
+from django.contrib.auth.decorators import login_required, permission_required
 
 
+@login_required(login_url=settings.LOGIN_URL)
 def programmes(request):
     id_annee_selectionnee = request.session.get('id_annee_selectionnee')
     annee_universitaire = get_object_or_404(AnneeUniversitaire, pk=id_annee_selectionnee)
@@ -34,6 +38,7 @@ def programmes(request):
     }
     return render(request, 'maquette/programmes.html', context=data)
 
+@login_required(login_url=settings.LOGIN_URL)
 def add_programme(request):
     data = {}
     id_annee_selectionnee = request.session.get('id_annee_selectionnee')
@@ -49,6 +54,7 @@ def add_programme(request):
     
     return render(request, 'maquette/create_or_edit.html', context=data)
 
+@login_required(login_url=settings.LOGIN_URL)
 def edit_programme(request, id):
     data = {}
     id_annee_selectionnee = request.session.get('id_annee_selectionnee')
@@ -65,12 +71,14 @@ def edit_programme(request, id):
     
     return render(request, 'maquette/create_or_edit.html', context=data)
 
+@login_required(login_url=settings.LOGIN_URL)
 def delete_programme(request, id):
     id_annee_selectionnee = request.session.get('id_annee_selectionnee')
     programme = get_object_or_404(Programme, pk=id)
     programme.delete()
     return redirect('maquette:programmes')
 
+@login_required(login_url=settings.LOGIN_URL)
 def correspondances(request):
     if request.method == "POST":
         if 'form_id' in request.POST and request.POST.get('form_id') != '-1':
@@ -95,11 +103,13 @@ def correspondances(request):
     }
     return render(request, 'maquette/correspondances.html', context=data)
 
+@login_required(login_url=settings.LOGIN_URL)
 def delete_correspondance(request, id):
     correspondance = get_object_or_404(CorrespondanceMaquette, pk=id)
     correspondance.delete()
     return redirect('maquette:correspondances')
 
+@login_required(login_url=settings.LOGIN_URL)
 def generate_maquette(request, id_annee_selectionnee):
     data = {}
     annee_accademique = get_object_or_404(AnneeUniversitaire, pk=id_annee_selectionnee)
@@ -140,34 +150,11 @@ def generateDictFromProgrammeData(semestre, parcours, annee_accademique):
             "ues" : ues,
             "ues_length" : ues.count(),
         }
-
-        semestres_data.append(semestre_data)
         
-        # for ue in programme.ues.all():
-        #     matires = [matiere.libelle for matiere in ue.matiere_set.all()]
-        #     horaires = [matiere.heures if matiere.heures else 0  for matiere in ue.matiere_set.all()]
-        #     enseignants = []
-        #     for matiere in ue.matiere_set.all():
-        #         if matiere.enseignant:
-        #             enseignants.append(matiere.enseignant)
-        #         else:
-        #             enseignants.append("pas de prof")
-        #     enseignant_principale = ue.enseignant
-        #     ue_dict = {
-        #             "semestre" : programme.semestre.libelle,
-        #             "intitule" : ue.libelle,
-        #             "type_ue" : ue.type,
-        #             "matieres" : matires,
-        #             "credit" : ue.nbreCredits,
-        #             "volumes_horaires" : horaires,
-        #             "enseignants" : enseignants,
-        #             "enseignants_principaux" : enseignant_principale,
-        #         }
-        #     ues_list.append(ue_dict)
+        semestres_data.append(semestre_data)
+    
     data={
         "titre" : titre,
-        # "tatale_credit" : sum([ue["credit"] for ue in ues_list]),
-        # "totale_volume_horaire" : [sum(sum(ue["volumes_horaires"]) for ue in ues_list)],
         "semestres_data" : semestres_data
     }
     return data
@@ -185,6 +172,7 @@ def generate_maquette_pdf(context):
         response['Content-Disposition'] = 'inline;filename=pdf_file.pdf'
         return response
 
+@login_required(login_url=settings.LOGIN_URL)
 def domaines(request):
     domaines =Domaine.objects.all()
     
@@ -193,6 +181,7 @@ def domaines(request):
     }
     return render(request, 'domaines/list.html', context=data)
 
+@login_required(login_url=settings.LOGIN_URL)
 def add_domaine(request):
     data = {}
     if request.POST:
@@ -206,6 +195,7 @@ def add_domaine(request):
     
     return render(request, 'domaines/create_or_edit.html', context=data)
 
+@login_required(login_url=settings.LOGIN_URL)
 def edit_domaine(request, id):
     data = {}
     domaine = get_object_or_404(Domaine, pk=id)
@@ -220,11 +210,13 @@ def edit_domaine(request, id):
     
     return render(request, 'domaines/create_or_edit.html', context=data)
 
+@login_required(login_url=settings.LOGIN_URL)
 def delete_domaine(request, id):
     domaine = get_object_or_404(Domaine, pk=id)
     domaine.delete()
     return redirect('maquette:domaines')
 
+@login_required(login_url=settings.LOGIN_URL)
 def parcours(request, id_domaine):
     domaine = get_object_or_404(Domaine, pk=id_domaine)
     parcours = domaine.parcours_set.all()
@@ -234,6 +226,7 @@ def parcours(request, id_domaine):
     }
     return render(request, 'parcours/list.html', context=data)
 
+@login_required(login_url=settings.LOGIN_URL)
 def add_parcours(request, id_domaine):
     domaine = get_object_or_404(Domaine, pk=id_domaine)
     data = {}
@@ -250,6 +243,7 @@ def add_parcours(request, id_domaine):
     
     return render(request, 'parcours/create_or_edit.html', context=data)
 
+@login_required(login_url=settings.LOGIN_URL)
 def edit_parcours(request, id):
     data = {}
     parcours = get_object_or_404(Parcours, pk=id)
@@ -264,55 +258,18 @@ def edit_parcours(request, id):
     
     return render(request, 'domaines/create_or_edit.html', context=data)
 
+@login_required(login_url=settings.LOGIN_URL)
 def delete_parcours(request, id):
     parcours = get_object_or_404(Parcours, pk=id)
     parcours.delete()
     return redirect('maquette:domaines')
 
+@login_required(login_url=settings.LOGIN_URL)
+@data_permission('view_data')
 def data(request):
-    id_annee_selectionnee = request.session.get('id_annee_selectionnee')
-    annee_selectionnee = get_object_or_404(AnneeUniversitaire, pk=id_annee_selectionnee)
-    if request.method == "POST":
-        form = DataForm(request.POST, request.FILES)
-        if form.is_valid():
-            cleaned_data = form.clean()
-            maquette_excel_file = request.FILES.getlist('maquette_excel_file')
-            matieres_excel_file = cleaned_data.get('matieres_excel_file')
-            notes_excel_file = cleaned_data.get('notes_excel_file')
-            
-            if maquette_excel_file:
-                for file_cache_tmp in maquette_excel_file:
-                    name = str(file_cache_tmp)
-                    name_part = name.split('_')
-                    if len(name_part) == 3:
-                        year_part = name_part[2].split('-')
-                        if len(year_part) == 2:
-                            annee_selectionnee = int(year_part[0])
-                            annee_selectionnee = AnneeUniversitaire.objects.get(annee=annee_selectionnee)
-                            print(annee_selectionnee)
-                            load_maquette(file_cache_tmp, annee_selectionnee)
+    return render(request, 'data/index.html')
 
-        if matieres_excel_file:
-            load_matieres_by_year(matieres_excel_file, annee_selectionnee)
-            return HttpResponse("Vrai")
-        if notes_excel_file:
-            full_data = str(notes_excel_file).split('_')
-            code_ue = full_data[1]
-            semestre = full_data[2]
-            annee_selectionnee = int(full_data[3].split('-')[0])
-            
-            annee_selectionnee = AnneeUniversitaire.objects.get(annee=annee_selectionnee)
-            ue = Ue.objects.get(codeUE=code_ue)
-            semestre = annee_selectionnee.semestre_set.get(libelle=semestre)
-            load_notes_from_ue_file(notes_excel_file, ue, semestre)
-            return HttpResponse("Vrai")
-            
-        return redirect('maquette:data')
-    data = {
-        'form' : DataForm()
-    }
-    return render(request, 'data/index.html', context=data)
-
+@login_required(login_url=settings.LOGIN_URL)
 def upload_note(request):
     if request.POST:
         if 'file' in request.FILES :
@@ -344,6 +301,7 @@ def upload_note(request):
         response['Content-Disposition'] = 'attachment; filename="{}"'.format(os.path.basename(zip_path))
         return response
 
+@login_required(login_url=settings.LOGIN_URL)
 def upload_maquette(request):
     if request.method == "POST":
         if 'file' in request.FILES :
@@ -384,6 +342,7 @@ def upload_maquette(request):
         response['Content-Disposition'] = 'attachment; filename="{}"'.format(os.path.basename(file_name))
         return response
 
+@login_required(login_url=settings.LOGIN_URL)
 def upload_matieres(request):
     if request.method == "POST":
         if 'file' in request.FILES :
@@ -426,5 +385,3 @@ def upload_matieres(request):
         response = HttpResponse(file.read(), content_type="application/force-download")
         response['Content-Disposition'] = 'attachment; filename="{}"'.format(os.path.basename(file_name))
         return response
-
-

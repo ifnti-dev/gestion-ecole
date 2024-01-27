@@ -228,7 +228,7 @@ def pre_load_evaluation_template_data(matiere, semestre):
     ws['B6'].value = ""
     ws['B7'].value = ""
     
-    etudiants = matiere.get_etudiant_semestre(semestre)
+    etudiants = matiere.get_etudiant_semestre(semestre).order_by("nom")
     
     min_row = 10
     max_row = min_row + len(etudiants)
