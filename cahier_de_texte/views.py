@@ -329,13 +329,17 @@ def imprimer(request):
     #si on veut un affichage par matiere , ca met automatiquement la liste des matieres a true 
     for semestre_id in semestres:
         semestre = Semestre.objects.get(id=semestre_id)
-        seances_total = Seance.objects.filter(semestre=semestre,valider=nuance(valider)).order_by('date_et_heure_debut')
+        if nuance(valider) :
+            seances_total = Seance.objects.filter(semestre=semestre,valider=nuance(valider)).order_by('date_et_heure_debut')
+        else :
+            seances_total = Seance.objects.filter(semestre=semestre).order_by('date_et_heure_debut')    
         ues = semestre.get_all_ues()
         matieres_dict = {}
         etudiants=semestre.etudiant_set.all()
 
         if par_matiere != 'parMatieres' :
-            context={'etudiants':etudiants,'semestre':semestre_id,'listeAbsence':nuance(listeAbsence),'ues':ues,'commentaires':nuance(commentaires),'listeUe':nuance(listeUe),'listeEtudiant':nuance(listeEtudiant),'seances':seances_total}                           
+            print(nuance(commentaires))
+            context={'etudiants':etudiants,'semestre':semestre_id,'listeAbsence':listeAbsence,'ues':ues,'commentaires':commentaires,'listeUe':listeUe,'listeEtudiant':listeEtudiant,'seances':seances_total}                           
             latex_input = 'cahier_de_texte'
             latex_ouput = 'CDT_'+str(semestre_id)+'_'+str(datetime.datetime.now())
             pdf_file = 'CDT_'+str(semestre_id)+'_'+str(datetime.datetime.now())
@@ -369,11 +373,11 @@ def imprimer(request):
                         matieres_dict[matiere_key]["HeureConsomme"] += str(hours)+'h '+str(minutes)+'min'
                         matieres_dict[matiere_key]["seances"]=seances_prime
                 
-                context={'listeAbsence':listeAbsence,'commentaires':commentaires,'listeUe':listeUe,'listeEtudiant':listeEtudiant,'seances':matieres_dict}       
+                context={'listeAbsence':listeAbsence,'commentaires':commentaires,'listeUe':listeUe,'listeEtudiant':listeEtudiant,'seances':matieres_dict,'type':par_matiere}       
                     
-                latex_input = 'cahier_de_texte2'
-                latex_ouput = 'cdt'+str(semestre_id)+'_'+str(datetime.datetime.now)
-                pdf_file = 'cdt'+str(semestre_id)+'_'+str(datetime.datetime.now)
+                latex_input = 'cahier_de_texte'
+                latex_ouput = 'CDT_'+str(semestre_id)+'_'+str(datetime.datetime.now())
+                pdf_file = 'CDT_'+str(semestre_id)+'_'+str(datetime.datetime.now())
 
                 # génération du pdf
                 generate_pdf(context, latex_input, latex_ouput, pdf_file)
@@ -414,6 +418,28 @@ def commenter(request):
 
 
 fake = Faker()
+def creer_etudiant(nombre):
+    for _ in range(nombre):
+        etu=creer_fake_etudiant()
+        print(etu)
+
+
+def creer_fake_etudiant():
+    etudiant = Etudiant.objects.create(
+        nom=fake.name(),
+        prenom=fake.first_name(),
+        sexe="M",
+        datenaissance=fake.date_of_birth(),
+        adresse=fake.address(),
+        email=fake.email(),
+        contact=fake.phone_number(),
+        
+        
+    )
+    semestres = [Semestre.objects.order_by('?').first(),Semestre.objects.order_by('?').first(),Semestre.objects.order_by('?').first()
+    ]
+    etudiant.semestres.set(semestres)
+    return etudiant
 
 def creer_seance(nombre):
     semestre = Semestre.objects.filter(id='S1-2023' ).first()
@@ -428,6 +454,7 @@ def creer_seance(nombre):
     taille=len(matieres)
     
     for _ in range(nombre):
+        print(_)
         mat=random.randint(0,taille)
         matiere=matieres[mat-1]
         fake=create_fake_seance(semestre, matiere)
@@ -449,6 +476,8 @@ def create_fake_seance(seme, matieres):
     commentaire = fake.paragraph()
     seance_plannifier = SeancePlannifier.objects.order_by('?').first()  # Get a random SeancePlannifier
 
+    absents=[Etudiant.objects.order_by('?').first(),Etudiant.objects.order_by('?').first(),Etudiant.objects.order_by('?').first()]
+
     seance_instance = Seance.objects.create(
         intitule=intitule,
         date_et_heure_debut=date_et_heure_debut,
@@ -462,6 +491,10 @@ def create_fake_seance(seme, matieres):
         commentaire=commentaire,
         seancePlannifier=seance_plannifier
     )
+    print("les absents",absents[0])
+    for student in absents:
+        if len(student.nom) <= 12:
+            seance_instance.eleves_presents.add(student)
 
     return seance_instance
 

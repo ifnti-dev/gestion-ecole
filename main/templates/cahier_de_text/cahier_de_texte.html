@@ -104,7 +104,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <form method="post" action="{% url 'cahier_de_texte:imprimer' %}">
                                     {% csrf_token %}
                                     <div class="block block-rounded block-themed block-transparent mb-0">
-                                        <div class="block-header bg-primary-dark">
+                                        <div class="block-header bg-primary">
                                             <h3 class="block-title">Options d'Impression</h3>
                                             <div class="block-options">
                                                 <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
@@ -190,5 +190,65 @@ document.addEventListener('DOMContentLoaded', function() {
     
     
               </main>
-
+              <script>
+                document.addEventListener("DOMContentLoaded", function () {
+                    var detailsUECheckbox = document.getElementById("details_ue");
+                    var detailsEtudiantsCheckbox = document.getElementById("details_etudiants");
+                    var detailsMatieresCheckbox = document.getElementById("details_matieres");
+                    var detailsHeuresMatieresCheckbox = document.getElementById("details_heures_matieres");
+                    var imprimerCommentairesCheckbox = document.getElementById("imprimer_commentaires");
+                    var imprimerValideesCheckbox = document.getElementById("imprimer_validees");
+                    var elevesAbsentsCheckbox = document.getElementById("eleves_absents");
+            
+                    detailsUECheckbox.addEventListener("change", updateDetailsUE);
+                    detailsEtudiantsCheckbox.addEventListener("change", updateDetailsEtudiants);
+                    detailsMatieresCheckbox.addEventListener("change", updateDetailsMatieres);
+                    imprimerCommentairesCheckbox.addEventListener("change", updateImprimerCommentaires);
+                    imprimerValideesCheckbox.addEventListener("change", updateImprimerValidees);
+                    elevesAbsentsCheckbox.addEventListener("change", updateElevesAbsents);
+            
+                    function updateDetailsUE() {
+                        // Si "Heures consommées par matière" est coché, cocher automatiquement "Liste des matières"
+                        if (detailsHeuresMatieresCheckbox.checked) {
+                            detailsMatieresCheckbox.checked = true;
+                        }
+                    }
+            
+                    function updateDetailsEtudiants() {
+                        // Si "Élèves Absents" est coché, cocher automatiquement "Liste des Étudiants"
+                        if (elevesAbsentsCheckbox.checked) {
+                            detailsEtudiantsCheckbox.checked = true;
+                        }
+                    }
+            
+                    function updateDetailsMatieres() {
+                        // Si "Liste des matières" est décoché, décocher automatiquement "Heures consommées par matière"
+                        if (!detailsMatieresCheckbox.checked) {
+                            detailsHeuresMatieresCheckbox.checked = false;
+                        }
+                    }
+            
+                    function updateImprimerCommentaires() {
+                        // Si "Commentaires des Enseignants" est coché, décocher automatiquement "Uniquement Séances Validées"
+                        if (imprimerCommentairesCheckbox.checked) {
+                            imprimerValideesCheckbox.checked = false;
+                        }
+                    }
+            
+                    function updateImprimerValidees() {
+                        // Si "Uniquement Séances Validées" est coché, décocher automatiquement "Commentaires des Enseignants"
+                        if (imprimerValideesCheckbox.checked) {
+                            imprimerCommentairesCheckbox.checked = false;
+                        }
+                    }
+            
+                    function updateElevesAbsents() {
+                        // Si "Élèves Absents" est décoché, décocher automatiquement "Liste des Étudiants"
+                        if (!elevesAbsentsCheckbox.checked) {
+                            detailsEtudiantsCheckbox.checked = false;
+                        }
+                    }
+                });
+            </script>
+            
 {% endblock %}

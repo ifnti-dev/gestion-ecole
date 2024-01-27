@@ -182,7 +182,8 @@ def sauvegarder(request):
             seance.save()
         
         return JsonResponse({'status':"reussite"})
-    
+
+from django.db.models import Count    
 def resume(request,semestreId):
     semestre=Semestre.objects.filter(id=semestreId).first()
     liste_absence={}
@@ -191,12 +192,39 @@ def resume(request,semestreId):
     for plan in planning:
         plannings.add(SeancePlannifier.objects.filter(planning=plan))
 
-    seances= Seance.objects.filter(semestre=semestre)
-    for seance in seances :
-        if len(seance.eleves_presents) > 0 :
-            for eleve in seance.eleves_presents :
-                liste_absence[eleve.nom +' '+eleve.prenom] = 'Matiere : '+seance.matiere.libelle +' Date et Heure : '+seance.date_et_heure_debut +' à '+seance.date_et_heure_fin
 
+    valeur_min = 0
+
+# Filtrer les objets Seance en fonction de la valeur de eleves_present
+    seances = Seance.objects.filter(semestre=semestre).annotate(num_eleves=Count('eleves_presents')).filter(num_eleves__gt=valeur_min)
+
+
+    for seance in seances :
+        for eleve in seance.eleves_presents.all() :
+            liste_absence[eleve.nom +' '+eleve.prenom] = 'Matiere : '+seance.matiere.libelle +', Date et Heure : '+str(seance.date_et_heure_debut) +' à '+str(seance.date_et_heure_fin)
+
+
+# Dictionnaire pour stocker le nombre d'absences par élève
+    nombre_absences_par_eleve = {}
+
+    # Boucle pour parcourir la liste d'absence
+    for eleve, details_absence in liste_absence.items():
+        # Extraire le nom de l'élève
+        nom_eleve = eleve.split(' ', 1)[1]  # Supposant que le nom de famille est après le premier espace
+
+        # Vérifier si l'élève est déjà dans le dictionnaire
+        if nom_eleve in nombre_absences_par_eleve:
+            # Incrémenter le nombre d'absences
+            nombre_absences_par_eleve[nom_eleve] += 1
+        else:
+            # Ajouter l'élève au dictionnaire avec une absence
+            nombre_absences_par_eleve[nom_eleve] = 1
+
+    # Afficher le résultat
+    for eleve, nombre_absences in nombre_absences_par_eleve.items():
+        print(f"{eleve}: {nombre_absences} absence(s)")
+
+    
     #faire une boucle sur la liste d'absence et recenser le nombre d'absence par eleves present dans la liste 
     #recuperer le nombre de fois qu'une matiere a ete plannifier et le nombre de fois qu'elle a été enregistrer comme realiser
     #recuperer les date et heure des seance plannifier mais non enregistrer (facultatif)
