@@ -4,19 +4,11 @@
 <div class="block block-rounded m-5">
     <div class="block-header p-4">
         <h3 class="block-title">Liste des matières de {{ niveau }}</h3>
-       <form action="" method="get" id="form-semestre" class="w-full">
-            <select name="semestre" id="semestre" class="form-control">
-                <option value="">Semestres</option>
-                {% for semestre in semestres %}
-                    <option value="{{ semestre.id }}" {% if selected_semestre.id == semestre.id %}selected{% endif %}>{{ semestre }}</option>
-                {% endfor %}
-            </select>  
-       </form> 
-       {% if is_directeur_des_etudes or secretaire %}
+        {% if is_directeur_des_etudes or secretaire %}
         <a href="{% url 'main:create_matiere' %}" class="btn btn-outline-primary ml-3">
             <i class="fas fa-plus"></i> Ajout Matière
         </a> 
-       {% endif %} 
+        {% endif %} 
     </div>
     {% if is_etudiant %}
     <div class="mx-4 my-2">
@@ -27,6 +19,22 @@
         </a>
     </div>
     {% endif %} 
+    <div class="px-3">
+        <form action="" method="post" id="form-semestre" class="row col-12">
+            {% csrf_token %}
+            <select name="semestre" id="semestre" class="form-control col-3 col-md-2 mr-3">
+                {% for semestre in semestres %}
+                    <option value="{{ semestre.id }}" {% if selected_semestre.id == semestre.id %}selected{% endif %}>{{ semestre.libelle }}</option>
+                {% endfor %}
+            </select>
+            <select name="ue" id="ue" class="form-control col-3 col-md-2">
+                <option value="-1">Toutes Ues</option>
+                {% for ue in ues %}
+                    <option value="{{ ue.id }}" {% if selected_ue.id == ue.id %}selected{% endif %}>{{ ue.libelle }}</option>
+                {% endfor %}
+            </select>
+        </form> 
+    </div>
     <div class="block-content block-content-full">
         <table class="table table-bordered table-striped table-vcenter js-dataTable-full-pagination">
             <thead>
@@ -36,14 +44,12 @@
                     <th class="text-center">Coefficient</th>
                     <th class="text-center">Valeur minimale</th>
                     <th class="text-center" style="width: 30%;">Enseignant</th>
-                    
                     {% if is_etudiant %}
                     <th class="text-center">Evaluations</th>
                     {% endif %}
                     {% if is_directeur_des_etudes or is_enseignant or is_secretaire %}
                     <th scope="col" class="" style="width: 15%;">Actions</th>
                     {% endif %}
-                        
                 </tr>
             </thead>
             <tbody>
@@ -82,8 +88,8 @@
                             {% if matiere.enseignant.user.id == user.id or is_directeur_des_etudes or is_secretaire %}
                             <li class="nav-main-item">
                                 <a href="{% url 'main:evaluations' matiere.id %}" class="nav-main-link nav-main-link-name" data-toggle="" aria-haspopup="true" aria-expanded="false">
-                                    <i class="fa fa-eye mr-1" aria-hidden="true"></i>
-                                    <span class="nav-main-link-name">Voir évaluations</span>
+                                    <i class="fa fa-folder-open mr-1" aria-hidden="true"></i>
+                                    <span class="nav-main-link-name">Gestion evaluations</span>
                                 </a>                   
                             </li>
                             <li class="nav-main-item">
@@ -100,6 +106,14 @@
                                     <span class="nav-main-link-name">Edit</span>
                                 </a>                   
                             </li>
+                            <li class="nav-main-item">
+                                <a class="nav-main-link nav-main-link-name"
+                                onclick="delete_object('/main/delete_matiere/{{ matiere.id }}/', 'une matière')"
+                                href="#">
+                                    <i class="fa fa-trash mr-1 text-danger"></i>
+                                    <span class="nav-main-link-name">Supprimer</span>
+                                </a>   
+                            </li>
                             {% endif %}
                         </div>                              
                     </td> 
@@ -115,6 +129,10 @@
     <script type="text/javascript">
         form_tag = $('#form-semestre');
         $('#semestre').on('change', function() {
+            form_tag.submit();
+        });
+        form_tag = $('#form-semestre');
+        $('#ue').on('change', function() {
             form_tag.submit();
         });
     </script>

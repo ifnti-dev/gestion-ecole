@@ -16,6 +16,7 @@ def bootstrap(request):
         niveau = ''
         
     id_auth_model = get_id_authenticate_user_model(request)
+    
     try:
         id_annee_selectionnee = int(request.session.get("id_annee_selectionnee"))
     except:

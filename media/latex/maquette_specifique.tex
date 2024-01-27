@@ -1,0 +1,64 @@
+\documentclass[12pt,a4paper,landscape]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{multirow}
+\usepackage{longtable}
+\usepackage[left=0.3cm,right=0.3cm,top=2cm,bottom=2cm]{geometry}
+\usepackage{array}
+\usepackage{enumitem}
+\begin{document}
+\begin{center}
+% Définition du titre
+\begin{LARGE}
+IFNTI : Maquette \VAR{titre}
+\end{LARGE}
+\end{center}
+\begin{center}
+% Définition du tableau
+\setlength{\tabcolsep}{0pt}
+\renewcommand{\arraystretch}{1}
+
+% Définition d'une nouvelle liste personnalisée avec un espacement nul
+\newlist{myitemize}{itemize}{1}
+\setlist[myitemize,1]{label=--,left=0pt,labelsep=0pt,topsep=0pt,partopsep=0pt,parsep=0pt,itemsep=0pt}
+
+\begin{longtable}{|m{2cm}|m{6cm}|m{3cm}|m{7cm}|m{1.5cm}|m{2cm}|m{3cm}|m{3cm}|}
+\hline
+\centering Semestre & \centering Intitulé UE & \centering Type UE & \centering Crédit UE & \centering Volume Horaire (H) & \centering Enseignant Responsable & \centering Enseignant principal \arraybackslash \\ 
+\hline
+\BLOCK{ for semestre_data in semestres_data }
+\multirow{\VAR{semestre_data.ues_length}}{*}{\VAR{semestre_data.semsetre.libelle}} 
+\BLOCK{ for ue in semestre_data.ues }
+ & \centering \VAR{ue.libelle} 
+ & \centering \VAR{ue.type}  
+ 
+ &  
+	\centering \VAR{ue.nbreCredits} 
+ & 
+ 	\centering \VAR{ue.heures}  
+ & 
+   \BLOCK{ if ue.matiere_set.all()  }
+ 	\begin{myitemize}
+	\BLOCK{ for matiere in ue.matiere_set.all() }
+	\item[] \centering \VAR{matiere.enseignant}
+	\item[] \hrulefill
+	\BLOCK{ endfor }
+	\end{myitemize}
+	\BLOCK{ endif }
+ & \centering \VAR{ue.enseignant} \arraybackslash  \\
+\cline{2-4} \cline{6-8} 
+\BLOCK{ endfor }
+\cline{1-1} \cline{5-5}
+\BLOCK{ endfor }
+Total &  &  &  & 64 & 8 &  &  \\ 
+\hline 
+\end{longtable}
+
+\end{center}
+
+
+
+\end{document}

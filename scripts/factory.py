@@ -21,7 +21,7 @@ def clean_data_base():
         print(f"::::::::::::::::::::::: Delete Model {model.__name__} :::::::::::::::::::::::")
         model.objects.all().delete()
         
-    print("::::::::::::::::::::::: Create Faker :::::::::::::::::::::::")
+    print("::::::::::::::::::::::: Create Faker Data :::::::::::::::::::::::")
     # Génération des fausses instances pour le modèle AnneeUniversitaire
     current = False
     for i in range(1,11):
@@ -32,7 +32,7 @@ def clean_data_base():
             annee_courante=current
         )
         annee_universitaire.save()
-        print(f"AnneeUniversitaire créé : {annee_universitaire}")
+        print(f"::: AnneeUniversitaire créé : {annee_universitaire} :::")
     
     # Génération des fausses instances pour le modèle Domaine
     domaine = Domaine(
@@ -40,7 +40,7 @@ def clean_data_base():
         description="Siences et technologie"
     )
     domaine.save()
-    print(f"Domaine créé : {domaine}")
+    print(f"::: Domaine créé : {domaine} :::")
 
     # Génération des fausses instances pour le modèle Parcours
     domaines = Domaine.objects.all()
@@ -52,8 +52,114 @@ def clean_data_base():
     )
     
     parcours.save()
-    print(f"Parcours créé : {parcours}")
+    print(f"::: Parcours créé : {parcours} :::")
+    
+    response = input("Veux tu créer des instances de tests ? (oui|non) ")
+    if response.lower() in ['o', 'oui', 'y', 'yes']:
+        fake = Faker()
+        s1 = AnneeUniversitaire.objects.last().semestre_set.first()
+        for _ in range(10):
+            etudiant = Etudiant(
+                nom=fake.last_name(),
+                prenom=fake.first_name(),
+                sexe=random.choice(['F', 'M']),
+                datenaissance=fake.date_of_birth(minimum_age=18, maximum_age=30),
+                lieunaissance=fake.city(),
+                contact=fake.phone_number(),
+                email=fake.email(),
+                adresse=fake.address(),
+                prefecture=fake.city(),
+                carte_identity=fake.random_number(digits=10),
+                nationalite='Togolaise',
+                anneeentree = fake.random_int(min=2010, max=2023),
+                seriebac1 = random.choice(['A', 'C', 'D', 'E', 'F1', 'F2', 'F3', 'F4', 'G2']),
+                seriebac2 = random.choice(['A', 'C', 'D', 'E', 'F1', 'F2', 'F3', 'F4', 'G2']),
+                anneebac1 = fake.random_int(min=2000, max=2022),
+                anneebac2 = fake.random_int(min=2000, max=2022),
+                etablissementSeconde = fake.company(),
+                francaisSeconde = round(random.uniform(10, 20), 2),
+                anglaisSeconde = round(random.uniform(10, 20), 2),
+                mathematiqueSeconde = round(random.uniform(10, 20), 2),
+                etablissementPremiere = fake.company(),
+                francaisPremiere = round(random.uniform(10, 20), 2),
+                anglaisPremiere = round(random.uniform(10, 20), 2),
+                mathematiquePremiere = round(random.uniform(10, 20), 2),
+                etablissementTerminale = fake.company(),
+                francaisTerminale = round(random.uniform(10, 20), 2),
+                anglaisTerminale = round(random.uniform(10, 20), 2),
+                mathematiqueTerminale = round(random.uniform(10, 20), 2),
+            )
+            
+            #etudiant.semestre.add(Semestre.objects.all()[0])
+            etudiant.save()
+            etudiant.semestres.add(s1)
+            print(f"Etudiant créé : {etudiant.user.username}")
+    
+        for _ in range(10):
+            # Génération des données aléatoires
+            nom = fake.last_name()
+            prenom = fake.first_name()
+            sexe = random.choice(['F', 'M'])
+            datenaissance = fake.date_of_birth(minimum_age=18, maximum_age=60)
+            lieunaissance = fake.city()
+            contact = fake.phone_number()
+            email = fake.email()
+            adresse = fake.address()
+            prefecture = fake.city()
+            carte_identity = fake.random_number(digits=8)
+            nationalite = fake.country()
+            salaireBrut = fake.pydecimal(left_digits=5, right_digits=2, positive=True)
+            nbreJrsCongesRestant = random.randint(0, 30)
 
+            # Création de l'objet Personnel
+            personnel = Personnel(
+                nom=nom,
+                prenom=prenom,
+                sexe=sexe,
+                datenaissance=datenaissance,
+                lieunaissance=lieunaissance,
+                contact=contact,
+                email=email,
+                adresse=adresse,
+                prefecture=prefecture,
+                carte_identity=carte_identity,
+                nationalite=nationalite,
+                salaireBrut=salaireBrut,
+                nbreJrsCongesRestant=nbreJrsCongesRestant,
+                nbreJrsConsomme=0
+            )
+            personnel.save()
+
+            print(f"Personnel créé : {personnel}")
+
+        personnels = Personnel.objects.all()
+        for _ in range(10):
+            nom = fake.last_name()
+            prenom = fake.first_name()
+            username = f"{prenom.lower()}.{nom.lower()}"
+            password = fake.password()
+            enseignant = Enseignant(
+                nom=fake.last_name(),
+                prenom=fake.first_name(),
+                sexe=random.choice(['F', 'M']),
+                datenaissance=fake.date_of_birth(minimum_age=25, maximum_age=60),
+                lieunaissance=fake.city(),
+                contact=fake.phone_number(),
+                email=fake.email(),
+                adresse=fake.address(),
+                prefecture=fake.city(),
+                carte_identity=fake.random_number(digits=10),
+                nationalite='Togolaise',
+                salaireBrut=random.uniform(1000, 5000),
+                dernierdiplome=None,
+                nbreJrsCongesRestant=random.randint(0, 30),
+                nbreJrsConsomme=random.randint(0, 30),
+                specialite=fake.job(),
+            )
+            enseignant.save()
+            print(f"Enseignant créé : {enseignant}")
+
+    
 def create_groups_if_exist():
     permissions = [
         'view', 'add', 'change', 'delete', "diplome", "carte", "releve_details", "releve_synthetique",

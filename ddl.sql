@@ -1,3 +1,3 @@
 \c amk
-drop database if exists ifnti;
-create database ifnti;
+drop database if exists ifnti2;
+create database ifnti2;
