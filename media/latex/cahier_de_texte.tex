@@ -73,97 +73,167 @@
 
 \vspace{6cm} \uuline{\textbf{Details Du Semestre \VAR{semestre}}}
 
-\begin{center}
-	{\textbf{Liste Des Ues :}}\begin{tabular}{|>{\raggedright}p{6cm}|P{2.1cm}|P{2.6cm}|P{2.4cm}|}
+\BLOCK{if listeUe == 'on'}
+	\begin{center}
+		{\textbf{Liste Des Ues :}}\begin{tabular}{|>{\raggedright}p{6cm}|P{2.1cm}|P{2.6cm}|P{2.4cm}|}
+			\hline
+			\textbf{Code \& Libellé} & \textbf{Type} & \textbf{Nombre d'heure} & \textbf{Nombre de Credit}\\
+			\hline
+		\BLOCK{for ue in ues}
+		\VAR{ue.codeUE}::\VAR{ue.libelle} & \VAR{ue.type} &\VAR{ue.heures}  & \VAR{ue.nbreCredits}\\
 		\hline
-		\textbf{Code \& Libellé} & \textbf{Type} & \textbf{Nombre d'heure} & \textbf{Nombre de Credit}\\
+		\BLOCK{endfor}
+		\end{tabular}
+	\end{center}
+\BLOCK{endif}
+
+\BLOCK{if listeEtudiant == 'on'}
+	\begin{center}
+		{\textbf{Liste Des Etudiants :}}\begin{tabular}{|>{\raggedright}p{4.3cm}|P{1.8cm}|P{5cm}|P{2cm}|}
+			\hline
+			\textbf{Prénom \& Nom} & \textbf{Contact} & \textbf{Mail} & \textbf{Username}\\
+			\hline
+		\BLOCK{for etudiant in etudiants}
+		\VAR{etudiant.prenom} \VAR{etudiant.nom} & \VAR{etudiant.contact} &\VAR{etudiant.email}  & \VAR{etudiant.username}\\
 		\hline
-	\BLOCK{for ue in ues}
-	\VAR{ue.codeUE}::\VAR{ue.libelle} & \VAR{ue.type} &\VAR{ue.heures}  & \VAR{ue.nbreCredits}\\
-	\hline
-	\BLOCK{endfor}
-\end{tabular}
-\end{center}
-\begin{center}
-	{\textbf{Liste Des Etudiants :}}\begin{tabular}{|>{\raggedright}p{4.3cm}|P{1.8cm}|P{5cm}|P{2cm}|}
+		\BLOCK{endfor}
+	\end{tabular}
+	\end{center}
+\BLOCK{endif}
+\BLOCK{if listeMatiere == 'on'}
+	\begin{center}
+		{\textbf{Liste Des Matieres :}}\begin{tabular}{|>{\raggedright}p{5cm}|P{1.8cm}|P{1.5cm}|P{1.8cm}|P{3cm}}
+			\hline
+			\textbf{Code \& Libellé} & \textbf{Coefficient} & \textbf{Heures} & \textbf{Abbreviation} & \textbf{Moyenne Minimale}\\
+			\hline
+		\BLOCK{for mat in matieres}
+		\VAR{mat.codematiere} \VAR{mat.libelle} & \VAR{mat.coefficient} &\VAR{mat.heures}  & \VAR{mat.abbreviation} & \VAR{mat.minValue}\\
 		\hline
-		\textbf{Prénom \& Nom} & \textbf{Contact} & \textbf{Mail} & \textbf{Username}\\
-		\hline
-	\BLOCK{for etudiant in etudiants}
-	\VAR{etudiant.prenom} \VAR{etudiant.nom} & \VAR{etudiant.contact} &\VAR{etudiant.email}  & \VAR{etudiant.username}\\
-	\hline
-	\BLOCK{endfor}
-\end{tabular}
-\end{center}
-\begin{center}
-	{\textbf{Liste Des Matieres :}}\begin{tabular}{|>{\raggedright}p{4.3cm}|P{1.8cm}|P{5cm}|P{2cm}|}
-		\hline
-		\textbf{Prénom \& Nom} & \textbf{Contact} & \textbf{Mail} & \textbf{Username}\\
-		\hline
-	\BLOCK{for etudiant in etudiants}
-	\VAR{etudiant.prenom} \VAR{etudiant.nom} & \VAR{etudiant.contact} &\VAR{etudiant.email}  & \VAR{etudiant.username}\\
-	\hline
-	\BLOCK{endfor}
-\end{tabular}
-\end{center}
+		\BLOCK{endfor}
+	\end{tabular}
+	\end{center}
+\BLOCK{endif}
 
 \newpage
 \clearpage % or \cleardoublepage
 
+\BLOCK{if sousCategorisation == 'parMatieres'}
+	\BLOCK{for mat  in seances}
+		
+		\LARGE Matieres : \textbf{\VAR{mat}} , Heures Consommées : \textbf{\VAR{seances[mat].HeureConsomme}}
+		
+		\begin{longtable}{|P{4cm}|P{9cm}|P{4cm}|}
+			\hline
+			\LARGE\textbf{Date} & \LARGE \textbf{Description} & \LARGE \textbf{Autres} \\
+			\hline
+			
+			\BLOCK{for cour in seances[mat].seances}
+				\rule[-1ex]{0pt}{2.5ex}\underline{Date}: \linebreak \VAR{cour.date_et_heure_debut.day} - \VAR{cour.date_et_heure_debut.month} - \VAR{cour.date_et_heure_debut.year}
+				\linebreak    
+				\underline{Heure}:
+				\linebreak 
+				\VAR{cour.date_et_heure_debut.hour}h:\VAR{cour.date_et_heure_debut.minute} - \VAR{cour.date_et_heure_fin.hour}h:\VAR{cour.date_et_heure_fin.minute} 
+				\linebreak
+				\underline{Auteur}:
+				\linebreak
+				\VAR{cour.auteur.prenom} \VAR{cour.auteur.nom}
+				\linebreak
+				\BLOCK{if listeAbsence =="on"}
+				\underline{Absents}:
+				\linebreak
+				\BLOCK{for eleve in cour.eleves_presents.all()}
+					\VAR{eleve.prenom} \VAR{eleve.nom}
+				\BLOCK{endfor}
+				\BLOCK{endif}
+			
+				&\underline{Intitulé}:
+				\linebreak
+				\VAR{cour.intitule}
+				\linebreak
+				\underline{Details Séance}:
+				\linebreak
+				\VAR{cour.description}
+				\linebreak
+				\linebreak
+				\linebreak
+				\linebreak
+				\underline{Validé par l'enseignant ?}: \VAR{cour.valider}
+				&\underline{Matiere}:
+				\linebreak
+				\VAR{cour.matiere.codematiere}::\VAR{cour.matiere.libelle}
+				\linebreak    
+				\underline{Enseignant}:
+				\linebreak
+				\VAR{cour.enseignant.prenom} \VAR{cour.enseignant.nom}
+				\linebreak
+				\BLOCK{if commentaires =="on"}
+				\underline{Commentaires Prof}:
+				\linebreak
+				\VAR{cour.commentaire}
+				\BLOCK{endif}
 
-\begin{longtable}{|p{4cm}|p{9cm}|p{4cm}|}
-	\hline
-	\LARGE\textbf{Date} & \LARGE \textbf{Description} & \LARGE \textbf{Autres} \\
-	\hline
-	\BLOCK{for cour in seances}
-		\rule[-1ex]{0pt}{2.5ex}\underline{Date}: \linebreak \VAR{cour.date_et_heure_debut.day} - \VAR{cour.date_et_heure_debut.month} - \VAR{cour.date_et_heure_debut.year}
-		\linebreak    
-		\underline{Heure}:
-		\linebreak 
-		\VAR{cour.date_et_heure_debut.hour}h:\VAR{cour.date_et_heure_debut.minute} - \VAR{cour.date_et_heure_fin.hour}h:\VAR{cour.date_et_heure_fin.minute} 
-		\linebreak
-		\underline{Auteur}:
-		\linebreak
-		\VAR{cour.auteur.prenom} \VAR{cour.auteur.nom}
-		\linebreak
-		\BLOCK{if listeAbsence =="on"}
-		\underline{Absents}:
-		\linebreak
-		\BLOCK{for eleve in cour.eleves_presents.all()}
-			\VAR{eleve.prenom} \VAR{eleve.nom}
-		\BLOCK{endfor}
-		\BLOCK{endif}
-	
-		&\underline{Intitulé}:
-		\linebreak
-		\VAR{cour.intitule}
-		\linebreak
-		\underline{Details Séance}:
-		\linebreak
-		\VAR{cour.description}
-		\linebreak
-		\linebreak
-		\linebreak
-		\linebreak
-		\underline{Validé par l'enseignant ?}: \VAR{cour.valider}
-		&\underline{Matiere}:
-		\linebreak
-		\VAR{cour.matiere.codematiere}::\VAR{cour.matiere.libelle}
-		\linebreak    
-		\underline{Enseignant}:
-		\linebreak
-		\VAR{cour.enseignant.prenom} \VAR{cour.enseignant.nom}
-		\linebreak
-		\BLOCK{if commentaires =="on"}
-		\underline{Commentaires Prof}:
-		\linebreak
-		\VAR{cour.commentaire}
-		\BLOCK{endif}
-
-		\\ 
-		\hline 
+				\\ 
+				\hline 
+			\BLOCK{endfor}
+		\end{longtable}
 	\BLOCK{endfor}
-\end{longtable}
+\BLOCK{endif}
+\BLOCK{if sousCategorisation == 'chronologieHoraire'}
+	\begin{longtable}{|p{4cm}|p{9cm}|p{4cm}|}
+		\hline
+		\LARGE\textbf{Date} & \LARGE \textbf{Description} & \LARGE \textbf{Autres} \\
+		\hline
+		\BLOCK{for cour in seances}
+			\rule[-1ex]{0pt}{2.5ex}\underline{Date}: \linebreak \VAR{cour.date_et_heure_debut.day} - \VAR{cour.date_et_heure_debut.month} - \VAR{cour.date_et_heure_debut.year}
+			\linebreak    
+			\underline{Heure}:
+			\linebreak 
+			\VAR{cour.date_et_heure_debut.hour}h:\VAR{cour.date_et_heure_debut.minute} - \VAR{cour.date_et_heure_fin.hour}h:\VAR{cour.date_et_heure_fin.minute} 
+			\linebreak
+			\underline{Auteur}:
+			\linebreak
+			\VAR{cour.auteur.prenom} \VAR{cour.auteur.nom}
+			\linebreak
+			\BLOCK{if listeAbsence =="on"}
+			\underline{Absents}:
+			\linebreak
+			\BLOCK{for eleve in cour.eleves_presents.all()}
+				\VAR{eleve.prenom} \VAR{eleve.nom}
+			\BLOCK{endfor}
+			\BLOCK{endif}
+		
+			&\underline{Intitulé}:
+			\linebreak
+			\VAR{cour.intitule}
+			\linebreak
+			\underline{Details Séance}:
+			\linebreak
+			\VAR{cour.description}
+			\linebreak
+			\linebreak
+			\linebreak
+			\linebreak
+			\underline{Validé par l'enseignant ?}: \VAR{cour.valider}
+			&\underline{Matiere}:
+			\linebreak
+			\VAR{cour.matiere.codematiere}::\VAR{cour.matiere.libelle}
+			\linebreak    
+			\underline{Enseignant}:
+			\linebreak
+			\VAR{cour.enseignant.prenom} \VAR{cour.enseignant.nom}
+			\linebreak
+			\BLOCK{if commentaires =="on"}
+			\underline{Commentaires Prof}:
+			\linebreak
+			\VAR{cour.commentaire}
+			\BLOCK{endif}
+
+			\\ 
+			\hline 
+		\BLOCK{endfor}
+	\end{longtable}
+\BLOCK{endif}
+
 
 \end{document}
 

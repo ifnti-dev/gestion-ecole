@@ -17,4 +17,5 @@ urlpatterns = [
     path('commenter/', views.commenter, name='commenter'),
     path('changer_secretaire/',views.changer_secretaire,name='changer_secretaire'),
     path('gestion_classe',views.gestion_classe,name='gestion_classe'),
+    path('signature',views.signature_prof,name='signature'),
 ]

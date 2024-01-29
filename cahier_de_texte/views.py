@@ -205,7 +205,7 @@ def info_seance(request, seance_id):
     new_debut =(str)(date_debut.strftime("%d %B %Y, %H:%M")) 
     new_fin = (str)(date_fin.strftime("%d %B %Y, %H:%M"))
     print((str)(new_debut))
-    return render(request, "cahier_de_text/details_seance.html", {"seance": seance,"date_debut":new_debut,"date_fin":new_fin})
+    return render(request, "cahier_de_text/details.html", {"seance": seance,"date_debut":new_debut,"date_fin":new_fin})
 
 @login_required(login_url="/main/connexion")
 def valider_seance(request,seance_id):
@@ -215,6 +215,25 @@ def valider_seance(request,seance_id):
     seance.save()
     return redirect("/cahier_de_texte/liste_seance/") 
 
+@login_required(login_url="/main/connexion")
+def signature_prof(request):
+    seance=request.POST.get("seance_id")
+    username = request.POST.get("teacherName")
+    password = request.POST.get("password")
+    seance = get_object_or_404(Seance, id=seance)
+    user = authenticate(request, username=username, password=password)
+    if user is not None:
+        seance = get_object_or_404(Seance, id=seance)            
+        if seance.enseignant.user == user:
+            print("c'est signer")
+            seance.valider=True
+            seance.commentaire=""
+            seance.save()
+            return render(request, "cahier_de_text/details.html", {"seance": seance,"message": "seance signer aveec succes"})
+        else:
+            return render(request, "cahier_de_text/details.html", {"message": "Invalid teacher for this seance"})
+    else:  
+        return render(request, "cahier_de_text/details.html", {"seance": seance,"message": "verifier vos identifiant et reessayer"})
 
 def datetime_serializer(obj):
     if isinstance(obj, datetime.datetime):
@@ -304,6 +323,8 @@ def nuance(valeur):
         return False
     elif valeur == 'on' :
         return True
+    
+
 
 @login_required(login_url="/main/connexion")
 def imprimer(request):
@@ -323,8 +344,8 @@ def imprimer(request):
     print('Afficher le nombre d"heure consommer par matiere pendant le semestre   ? :',nuance(HeureConsomme))
     listeEtudiant = request.POST.get("details_etudiants")
     print('Afficher la liste des etudiants du semestre   ? :',nuance(listeEtudiant))
-    par_matiere = request.POST.get("sous_categorisation")
-    print('Afficher la liste des seances regrouper par matiere  ? :',par_matiere)
+    sousCategorisation = request.POST.get("sous_categorisation")
+    print('Afficher la liste des seances regrouper par matiere  ? :',sousCategorisation)
     
     #si on veut un affichage par matiere , ca met automatiquement la liste des matieres a true 
     for semestre_id in semestres:
@@ -336,10 +357,24 @@ def imprimer(request):
         ues = semestre.get_all_ues()
         matieres_dict = {}
         etudiants=semestre.etudiant_set.all()
+        for ue in ues :                   
+            matieres = ue.matiere_set.all()
 
-        if par_matiere != 'parMatieres' :
+        if sousCategorisation != 'parMatieres' :
             print(nuance(commentaires))
-            context={'etudiants':etudiants,'semestre':semestre_id,'listeAbsence':listeAbsence,'ues':ues,'commentaires':commentaires,'listeUe':listeUe,'listeEtudiant':listeEtudiant,'seances':seances_total}                           
+            context={'etudiants':etudiants,
+                     'semestre':semestre_id,
+                     'listeAbsence':listeAbsence,
+                     'ues':ues,
+                     'commentaires':commentaires,
+                     'listeUe':listeUe,
+                     'listeEtudiant':listeEtudiant,
+                     'listeMatiere':listeMatiere,
+                     'seances':seances_total,
+                     'matieres':matieres,
+                     'sousCategorisation':sousCategorisation
+                     }
+                                       
             latex_input = 'cahier_de_texte'
             latex_ouput = 'CDT_'+str(semestre_id)+'_'+str(datetime.datetime.now())
             pdf_file = 'CDT_'+str(semestre_id)+'_'+str(datetime.datetime.now())
@@ -347,34 +382,42 @@ def imprimer(request):
             # génération du pdf
             generate_pdf(context, latex_input, latex_ouput, pdf_file)
 
-            # visualisation du pdf dans le navigateur
             with open('media/pdf/' + str(pdf_file) + '.pdf', 'rb') as f:
                 pdf_preview = f.read()
                 response = HttpResponse(pdf_preview, content_type='application/pdf')
                 response['Content-Disposition'] = 'inline;filename=pdf_file.pdf'
                 return response
             
-        if listeMatiere :                       
-            if HeureConsomme :
-                for ue in ues :                   
-                    matieres = ue.matiere_set.all()
-                    for matiere in matieres :
-                        seances_prime = seances_total.filter(matiere=matiere).order_by('date_et_heure_debut')
-                        temps=0
-                        for seance in seances_prime:
-                            temps+=(seance.date_et_heure_fin - seance.date_et_heure_debut).total_seconds()
-                        hours, remainder = divmod(temps, 3600)
-                        minutes, _ = divmod(remainder, 60)
-                        matiere['temps_effectuer']=str(hours)+'h '+str(minutes)+'min'
-                        matiere_key = matiere.libelle
-                        if matiere_key not in matieres_dict:
-                            matieres_dict[matiere_key] = {"HeureConsomme": 0, "seances": []}
+        else :                       
+            if nuance(HeureConsomme) :
+                for matiere in matieres :
+                    seances_prime = seances_total.filter(matiere=matiere).order_by('date_et_heure_debut')
+                    temps=0
+                    for seance in seances_prime:
+                        temps+=(seance.date_et_heure_fin - seance.date_et_heure_debut).total_seconds()
+                    hours, remainder = divmod(temps, 3600)
+                    minutes, _ = divmod(remainder, 60)
 
-                        matieres_dict[matiere_key]["HeureConsomme"] += str(hours)+'h '+str(minutes)+'min'
-                        matieres_dict[matiere_key]["seances"]=seances_prime
+                    matiere_key = matiere.libelle
+                    if matiere_key not in matieres_dict:
+                        matieres_dict[matiere_key] = {"HeureConsomme": 0, "seances": []}
+
+                    matieres_dict[matiere_key]["HeureConsomme"] = str(hours)+'h '+str(minutes)+'min'
+                    matieres_dict[matiere_key]["seances"]=seances_prime
                 
-                context={'listeAbsence':listeAbsence,'commentaires':commentaires,'listeUe':listeUe,'listeEtudiant':listeEtudiant,'seances':matieres_dict,'type':par_matiere}       
-                    
+                context={'etudiants':etudiants,
+                         'semestre':semestre_id,
+                         'ues':ues,
+                         'matieres' : matieres,
+                         'listeEtudiant':listeEtudiant,
+                         'listeMatiere':listeMatiere,
+                         'listeAbsence':listeAbsence,
+                         'commentaires':commentaires,
+                         'listeUe':listeUe,
+                         'listeEtudiant':listeEtudiant,
+                         'seances':matieres_dict,
+                         'sousCategorisation':sousCategorisation
+                        }        
                 latex_input = 'cahier_de_texte'
                 latex_ouput = 'CDT_'+str(semestre_id)+'_'+str(datetime.datetime.now())
                 pdf_file = 'CDT_'+str(semestre_id)+'_'+str(datetime.datetime.now())
@@ -389,17 +432,7 @@ def imprimer(request):
                     response['Content-Disposition'] = 'inline;filename=pdf_file.pdf'
                     return response
                 
-            else :
-                for ue in ues :                   
-                    matieres = ue.matiere_set.all()
 
-
-            
-            
-                
-
-                    
-    
     return HttpResponse("traitement en cours ")
 
 

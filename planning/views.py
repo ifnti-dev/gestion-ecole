@@ -313,7 +313,7 @@ def ajouter_cours(request,planningId):
 
 def seance(request,seanceId):
     seance=SeancePlannifier.objects.filter(id=seanceId).first()
-    return render(request,'details_planning.html',{'seance':seance})
+    return render(request,'details.html',{'seance':seance})
 
 
 def french_day(day,):
