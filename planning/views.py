@@ -187,51 +187,102 @@ from django.db.models import Count
 def resume(request,semestreId):
     semestre=Semestre.objects.filter(id=semestreId).first()
     liste_absence={}
+    etudiants=semestre.etudiant_set.all()
     planning=Planning.objects.filter(semestre=semestre)
     plannings=set()
     for plan in planning:
         plannings.add(SeancePlannifier.objects.filter(planning=plan))
-
-
     valeur_min = 0
-
-# Filtrer les objets Seance en fonction de la valeur de eleves_present
     seances = Seance.objects.filter(semestre=semestre).annotate(num_eleves=Count('eleves_presents')).filter(num_eleves__gt=valeur_min)
-
-
     for seance in seances :
         for eleve in seance.eleves_presents.all() :
             liste_absence[eleve.nom +' '+eleve.prenom] = 'Matiere : '+seance.matiere.libelle +', Date et Heure : '+str(seance.date_et_heure_debut) +' à '+str(seance.date_et_heure_fin)
 
-
-# Dictionnaire pour stocker le nombre d'absences par élève
     nombre_absences_par_eleve = {}
-
-    # Boucle pour parcourir la liste d'absence
     for eleve, details_absence in liste_absence.items():
-        # Extraire le nom de l'élève
-        nom_eleve = eleve.split(' ', 1)[1]  # Supposant que le nom de famille est après le premier espace
-
-        # Vérifier si l'élève est déjà dans le dictionnaire
-        if nom_eleve in nombre_absences_par_eleve:
-            # Incrémenter le nombre d'absences
-            nombre_absences_par_eleve[nom_eleve] += 1
+        if eleve in nombre_absences_par_eleve:
+            nombre_absences_par_eleve[eleve] += 1
         else:
-            # Ajouter l'élève au dictionnaire avec une absence
-            nombre_absences_par_eleve[nom_eleve] = 1
+            nombre_absences_par_eleve[eleve] = 1
 
-    # Afficher le résultat
     for eleve, nombre_absences in nombre_absences_par_eleve.items():
         print(f"{eleve}: {nombre_absences} absence(s)")
 
+    activite_prof={}
+    enseignants=Enseignant.objects.all()
+    for prof in enseignants :
+        seances_prof = Seance.objects.filter(semestre=semestre,enseignant=prof)
+        if seances_prof.exists():
+            temps = 0
+            activity = {}
+            
+            for seance_p in seances_prof:
+                temps += (seance_p.date_et_heure_fin - seance_p.date_et_heure_debut).total_seconds()
+                activity[seance_p.matiere]= 'Date et Heure : ' + str(seance_p.date_et_heure_debut) + ' à ' + str(seance_p.date_et_heure_fin)
+            
+            hours_x, remainder = divmod(temps, 3600)
+            minutes_x, _ = divmod(remainder, 60)
+            hours_x=int(hours_x)
+            minutes_x=int(minutes_x)
+            prof_key = prof.prenom + ' ' + prof.nom
+            
+            # Utilisez setdefault pour créer une entrée pour le professeur s'il n'existe pas
+            activite_prof.setdefault(prof_key, {})
+            
+            activite_prof[prof_key]['activité'] = str(hours_x) + 'h' + str(minutes_x) + 'min'
+            activite_prof[prof_key]['seances'] = activity
+
+    planification = defaultdict(list)
+    activite_matiere={}
+    ues = semestre.get_all_ues()
     
-    #faire une boucle sur la liste d'absence et recenser le nombre d'absence par eleves present dans la liste 
+    for ue in ues:
+        matieres = matieres = ue.matiere_set.all()
+        for matiere in matieres :
+            seances=Seance.objects.filter(semestre=semestre,matiere=matiere)
+            temps=0
+            for seance in seances:
+                temps+=(seance.date_et_heure_fin - seance.date_et_heure_debut).total_seconds()
+            hours, remainder = divmod(temps, 3600)
+            minutes, _ = divmod(remainder, 60)
+            hours=int(hours)
+            minutes=int(minutes)
+
+            planning=Planning.objects.filter(semestre=semestre)
+            for plan in planning :
+                plannings=SeancePlannifier.objects.filter(planning=plan ,matiere=matiere)
+                temps_x=0
+                for planning in plannings:
+                    temps_x+=(planning.date_heure_fin - planning.date_heure_debut).total_seconds()
+                hours_x, remainder = divmod(temps_x, 3600)
+                minutes_x, _ = divmod(remainder, 60)
+                hours_x=int(hours_x)
+                minutes_x=int(minutes_x)
+            mat_key = str(ue)
+            if mat_key not in activite_matiere:
+                activite_matiere[mat_key] = {'professeur':'','libelle':'','temps_prevu':'','temps_effectuer': '','ue':'', 'temps_plannifier': ''}
+
+            activite_matiere[mat_key]['temps_effectuer'] = str(hours) + 'h' + str(minutes) + 'min'
+            activite_matiere[mat_key]['temps_plannifier'] = str(hours_x) + 'h' + str(minutes_x) + 'min'  
+            activite_matiere[mat_key]['temps_prevu'] = str(matiere.heures) + 'h' 
+            activite_matiere[mat_key]['libelle'] = str(matiere)                  
+            activite_matiere[mat_key]['ue'] = str(ue)  
+            activite_matiere[mat_key]['professeur'] = matiere.enseignant.nom + ' ' + matiere.enseignant.prenom  
+
+        
+            
+            
+
+
+    
+    context={'absences':liste_absence,'absence_eleve':nombre_absences_par_eleve,'semestre':semestre,'etudiants':etudiants,'activite_prof':activite_prof,'activite_matiere':activite_matiere}
+    #recuperer le nombre d'evaluation par matiere et la moyenne globale de la classe pour chacune des evaluations
     #recuperer le nombre de fois qu'une matiere a ete plannifier et le nombre de fois qu'elle a été enregistrer comme realiser
     #recuperer les date et heure des seance plannifier mais non enregistrer (facultatif)
     #recuperer le nombre d'heure prevues et effectuer par matieres
     #recuperer le nombre d'heure effectuer par enseignant (suite logique de la partie plus haut)
      
-    return HttpResponse('en devellopement')
+    return render(request,'semestre_recap.html',context)
         
 
 def modifier(request):
@@ -313,18 +364,20 @@ def ajouter_cours(request,planningId):
 
 def seance(request,seanceId):
     seance=SeancePlannifier.objects.filter(id=seanceId).first()
-    return render(request,'details.html',{'seance':seance})
+    etudiants=seance.planning.semestre.etudiant_set.all()
+    return render(request,'details.html',{'seance':seance,'etudiants':etudiants})
 
 
-def french_day(day,):
+def french_day(day):
+    print(day)
     french_correspondance_days = {'Monday':'Lundi','Tuesday' :'Mardi','Wednesday' :'Mercredi','Thursday' :'Jeudi','Friday' :'Vendredi','Saturday' :'Samedi'}
     return french_correspondance_days[day]
 
 
 
 def imprimer(request,planningId):
-    # if request.user.groups.all().first().name not in ['directeur_des_etudes']:
-    #     return render(request, 'errors_pages/403.html')
+    if request.user.groups.all().first().name not in ['directeur_des_etudes']:
+        return render(request, 'errors_pages/403.html')
     
     planns = Planning.objects.filter(id=planningId).first()
     days =[]

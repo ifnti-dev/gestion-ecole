@@ -131,13 +131,13 @@
                                 {% for etudiant in seance.eleves_presents.all %}
                                     <tr>
                                         <td>
-                                            <i class="fa fa-fw fa-calendar mr-1"></i> {{ etudiant.nom }} {{ etudiant.prenom }}
+                                            <i class="fa fa-fw fa-user mr-1"></i> {{ etudiant.nom }} {{ etudiant.prenom }}
                                         </td>
                                     </tr>
                                 {% empty %}
                                     <tr>
                                         <td>
-                                            <i class="fa fa-fw fa-calendar mr-1"></i> Aucun élève absent
+                                            <i class="fa fa-fw fa-user mr-1"></i> Aucun élève absent
                                         </td>
                                     </tr>
                                 {% endfor %}

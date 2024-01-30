@@ -217,23 +217,28 @@ def valider_seance(request,seance_id):
 
 @login_required(login_url="/main/connexion")
 def signature_prof(request):
-    seance=request.POST.get("seance_id")
+    seance_id=request.POST.get("seance_id")
     username = request.POST.get("teacherName")
     password = request.POST.get("password")
-    seance = get_object_or_404(Seance, id=seance)
+    seance = get_object_or_404(Seance, id=seance_id)
     user = authenticate(request, username=username, password=password)
-    if user is not None:
-        seance = get_object_or_404(Seance, id=seance)            
+    notification = {
+                "message": "verifier vos identifiant et reessayer", "type": "erreur"}
+    context = {"seance": seance, "notification": notification }
+    print(username,user)
+    if user :           
         if seance.enseignant.user == user:
             print("c'est signer")
             seance.valider=True
             seance.commentaire=""
             seance.save()
-            return render(request, "cahier_de_text/details.html", {"seance": seance,"message": "seance signer aveec succes"})
-        else:
-            return render(request, "cahier_de_text/details.html", {"message": "Invalid teacher for this seance"})
+            notification
+            notification = {
+                "message": "seance signer et valider avec succes", "type": "succes"}
+            context = {"seance": seance, "notification": notification }
+            return render(request, "cahier_de_text/details.html",context)
     else:  
-        return render(request, "cahier_de_text/details.html", {"seance": seance,"message": "verifier vos identifiant et reessayer"})
+        return render(request, "cahier_de_text/details.html", context)
 
 def datetime_serializer(obj):
     if isinstance(obj, datetime.datetime):
@@ -242,7 +247,6 @@ def datetime_serializer(obj):
 
 @login_required(login_url="/main/connexion")
 def cahier_de_text(request):
-    creer_prof(15)
     id_annee=request.session.get("id_annee_selectionnee")
     annee=AnneeUniversitaire.objects.filter(id=id_annee).first()
     if  request.user.groups.all()[0].name == "etudiant":
@@ -276,8 +280,8 @@ def cahier_de_text(request):
                 print('nombre seances' , len(events))
             elif niveau=="L3" :
                 niveau= "L3"
-                s5='S1-'+str(annee.annee)
-                s6='S2-'+str(annee.annee)
+                s5='S5-'+str(annee.annee)
+                s6='S6-'+str(annee.annee)
                 events=Seance.objects.filter(semestre__in= [s5,s6])
                 print('nombre seances' , len(events))
         else :
@@ -347,7 +351,7 @@ def imprimer(request):
     print('Afficher la liste des etudiants du semestre   ? :',nuance(listeEtudiant))
     sousCategorisation = request.POST.get("sous_categorisation")
     print('Afficher la liste des seances regrouper par matiere  ? :',sousCategorisation)
-    
+    pdf_paths = []
     #si on veut un affichage par matiere , ca met automatiquement la liste des matieres a true 
     for semestre_id in semestres:
         semestre = Semestre.objects.get(id=semestre_id)
@@ -357,10 +361,11 @@ def imprimer(request):
             seances_total = Seance.objects.filter(semestre=semestre).order_by('date_et_heure_debut')    
         ues = semestre.get_all_ues()
         matieres_dict = {}
+        matieres=[]
         etudiants=semestre.etudiant_set.all()
         for ue in ues :                   
-            matieres = ue.matiere_set.all()
-
+            matieres += ue.matiere_set.all()
+        print(matieres)
         if sousCategorisation != 'parMatieres' :
             print(nuance(commentaires))
             context={'etudiants':etudiants,
@@ -382,12 +387,7 @@ def imprimer(request):
 
             # génération du pdf
             generate_pdf(context, latex_input, latex_ouput, pdf_file)
-
-            with open('media/pdf/' + str(pdf_file) + '.pdf', 'rb') as f:
-                pdf_preview = f.read()
-                response = HttpResponse(pdf_preview, content_type='application/pdf')
-                response['Content-Disposition'] = 'inline;filename=pdf_file.pdf'
-                return response
+            pdf_paths.append('media/pdf/' + pdf_file)
             
         else :                       
             if nuance(HeureConsomme) :
@@ -425,16 +425,17 @@ def imprimer(request):
 
                 # génération du pdf
                 generate_pdf(context, latex_input, latex_ouput, pdf_file)
+                pdf_paths.append('media/pdf/' + pdf_file)
 
-                # visualisation du pdf dans le navigateur
-                with open('media/pdf/' + str(pdf_file) + '.pdf', 'rb') as f:
-                    pdf_preview = f.read()
-                    response = HttpResponse(pdf_preview, content_type='application/pdf')
-                    response['Content-Disposition'] = 'inline;filename=pdf_file.pdf'
-                    return response
+    pdf_paths = [pdf_path + '.pdf' for pdf_path in pdf_paths]
+    merged_pdf_content = b''.join([open(pdf_path, 'rb').read() for pdf_path in pdf_paths])
+
+    response = HttpResponse(merged_pdf_content, content_type='application/pdf')
+    response['Content-Disposition'] = 'inline;filename=merged_pdfs.pdf'
+    return response
+        
                 
 
-    return HttpResponse("traitement en cours ")
 
 
 
@@ -470,25 +471,27 @@ def creer_fake_etudiant():
         
         
     )
-    semestres = [Semestre.objects.order_by('?').first(),Semestre.objects.order_by('?').first(),Semestre.objects.order_by('?').first()
-    ]
+    semestre1 = Semestre.objects.filter(id='S1-2023' ).first()
+    semestre2 = Semestre.objects.filter(id='S3-2023' ).first()
+    semestres = [random.choice([semestre1,semestre2])]
     etudiant.semestres.set(semestres)
     return etudiant
 
 def creer_seance(nombre):
-    semestre = Semestre.objects.filter(id='S1-2023' ).first()
-    print(semestre)
-    ues = semestre.get_all_ues()
-    print(ues)
-    matieres=list()
-    for ue in ues:
-        matt = ue.matiere_set.all()
-        for ma in matt:
-            matieres.append(ma)
-    taille=len(matieres)
+    semestre1 = Semestre.objects.filter(id='S1-2023' ).first()
+    semestre2 = Semestre.objects.filter(id='S3-2023' ).first()
     
     for _ in range(nombre):
         print(_)
+        semestre=random.choice([semestre1,semestre2])
+        ues = semestre.get_all_ues()
+        print(ues)
+        matieres=list()
+        for ue in ues:
+            matt = ue.matiere_set.all()
+            for ma in matt:
+                matieres.append(ma)
+        taille=len(matieres)
         mat=random.randint(0,taille)
         matiere=matieres[mat-1]
         fake=create_fake_seance(semestre, matiere)
@@ -499,14 +502,14 @@ def create_fake_seance(seme, matieres):
     print(matieres)
     
     intitule = fake.sentence()
-    date_et_heure_debut = fake.date_time()
+    date_et_heure_debut = fake.date_time_this_year()
     date_et_heure_fin = date_et_heure_debut + datetime.timedelta(hours=2)
     description = fake.paragraph()
     auteur = Etudiant.objects.order_by('?').first()  # Get a random Etudiant
     valider = fake.boolean()
     matiere =matieres  
     semestre = seme  # Get a random Semestre
-    enseignant = Enseignant.objects.order_by('?').first()  # Get a random Enseignant
+    enseignant = matiere.enseignant  # Get a random Enseignant
     commentaire = fake.paragraph()
     seance_plannifier = SeancePlannifier.objects.order_by('?').first()  # Get a random SeancePlannifier
 
