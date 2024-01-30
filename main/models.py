@@ -28,7 +28,7 @@ class Utilisateur(models.Model):
         ('F', 'Feminin'),
         ('M', 'Masculin')
     ]
-    nom = models.CharField(max_length=50)
+    nom = models.CharField(max_length=50, verbose_name="Nom")
 
     """
         Nom de l'utilisateur
@@ -928,6 +928,25 @@ class Personnel(Utilisateur):
 
         **Type**:    string
     """
+    numero_cnss = models.CharField(
+        max_length=30, verbose_name="Numéro CNSS", default=0)
+    """
+        Numéro CNSS (Caisse Nationale de Sécurité Sociale)
+
+        **Type:** string
+
+        **Valeur par défaut:** "0"
+
+    """
+    nif = models.CharField(max_length=50, verbose_name="Num d'identification fiscale", default=0)
+    """
+        Numéro d'identification fiscale
+
+        **Type:** string
+
+        **Valeur par défaut:** "0"
+
+    """
     salaireBrut = models.DecimalField(
         max_digits=15, decimal_places=2,  verbose_name="Salaire Brut", default=0)
     """
@@ -1594,7 +1613,8 @@ class Matiere(models.Model):
         else:
             annee_selectionnees = [annee_selectionnee]
 
-        programmes = self.ue.programme_set.filter(semestre__annee_universitaire__in=annee_selectionnees, semestre__courant__in=type_semestres).order_by("-semestre")
+        programmes = self.ue.programme_set.filter(
+            semestre__annee_universitaire__in=annee_selectionnees, semestre__courant__in=type_semestres)
         semestres = set()
 
         for programme in programmes:
@@ -1610,6 +1630,9 @@ class Matiere(models.Model):
         :retype: list[Etudiant]
 
         """
+
+        # Passer plus tard le parcours
+
         etudiants = set()
         semestres = self.get_semestres('__all__', '__all__')
         for semestre in semestres:
@@ -1618,7 +1641,6 @@ class Matiere(models.Model):
                     self, semestre)
                 if not a_valide:
                     etudiants.update([etudiant])
-                    
         return list(etudiants)
 
     def get_etudiant_semestre(self, semestre):
@@ -1650,7 +1672,7 @@ class Evaluation(models.Model):
 
     """
     ponderation = models.IntegerField(
-        default=100, verbose_name="Pondération (1-100)", validators=[MinValueValidator(1), MaxValueValidator(100)])
+        default=1, verbose_name="Pondération (1-100)", validators=[MinValueValidator(1), MaxValueValidator(100)])
     """
         Pondération de l'évaluation
 
@@ -2409,16 +2431,6 @@ class Salaire(models.Model):
         **Nullable:** true
 
     """
-    numero_cnss = models.CharField(
-        max_length=30, verbose_name="Numéro CNSS", default=0)
-    """
-        Numéro CNSS (Caisse Nationale de Sécurité Sociale)
-
-        **Type:** string
-
-        **Valeur par défaut:** "0"
-
-    """
     qualification_professionnel = models.CharField(
         max_length=30, choices=TYPE_CHOICES, verbose_name="Qualification professionnelle")
     """
@@ -2468,7 +2480,7 @@ class Salaire(models.Model):
 
     """
     frais_prestations_familiales = models.DecimalField(
-        max_digits=10, decimal_places=3, default=0.03)
+        max_digits=10, decimal_places=2, default=0.03)
     """
         Frais des prestations familiales de l'employé
 
@@ -2478,7 +2490,7 @@ class Salaire(models.Model):
 
     """
     frais_risques_professionnel = models.DecimalField(
-        max_digits=10, decimal_places=3, default=0.02)
+        max_digits=10, decimal_places=2, default=0.02)
     """
         Frais des risques professionnels
 
@@ -2498,13 +2510,22 @@ class Salaire(models.Model):
 
     """
     frais_prestations_familiale_salsalaire = models.DecimalField(
-        max_digits=10, decimal_places=3, default=0.04)
+        max_digits=10, decimal_places=2, default=0.04)
     """
         Frais prestations familiale salariales
 
         **Type:** Decimal
 
         **Valeur par défaut:** 0.04
+
+    """
+    assurance_maladie_universelle = models.DecimalField(max_digits=10, decimal_places=2, default=0.05, verbose_name="Assurance maladie universelle")
+    """
+        Frais pour l'assurance maladie universelle
+
+        **Type:** Decimal
+
+        **Valeur par défaut:** 0.05
 
     """
     tcs = models.DecimalField(
@@ -2814,7 +2835,6 @@ class Fournisseur(models.Model):
         **Nullable:** true
 
     """
-    
     annee_universitaire = models.ForeignKey(
         'AnneeUniversitaire', on_delete=models.CASCADE, verbose_name="Année Universitaire", null=True, blank=True)
     """
