@@ -19,8 +19,8 @@ class CongeForm(forms.ModelForm):
         widgets = {
             'nature': forms.Select(attrs={'class': 'form-control'}),
             'autre_nature': forms.TextInput(attrs={'class': 'form-control'}), 
-            'date_et_heure_debut': forms.DateTimeInput(attrs={'type': 'date'}),
-            'date_et_heure_fin': forms.DateTimeInput(attrs={'type': 'date'}),
+            'date_et_heure_debut': forms.DateTimeInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'date_et_heure_fin': forms.DateTimeInput(attrs={'type': 'date', 'class': 'form-control'}),
         }
 
 
