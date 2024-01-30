@@ -238,7 +238,7 @@ class EnseignantForm(forms.ModelForm):
     datenaissance = DateField(widget=forms.SelectDateWidget(years=range(1990, 2006)), label='Date de naissance')
     class Meta:
         model = Enseignant
-        fields = ['nom', 'prenom', 'contact', 'sexe', 'email', 'adresse', 'datenaissance', 'lieunaissance', 'photo_passport', 'salaireBrut', 'nombre_de_personnes_en_charge', 'dernierdiplome', 'is_active', 'type', 'specialite']
+        fields = ['nom', 'prenom', 'contact', 'sexe', 'email', 'adresse', 'datenaissance', 'lieunaissance', 'numero_cnss', 'nif', 'photo_passport', 'salaireBrut', 'nombre_de_personnes_en_charge', 'dernierdiplome', 'is_active', 'type', 'specialite']
         widgets = {
             'nom': forms.TextInput(attrs={'class': 'form-control'}),
             'prenom': forms.TextInput(attrs={'class': 'form-control'}),
@@ -248,6 +248,8 @@ class EnseignantForm(forms.ModelForm):
             'adresse': forms.TextInput(attrs={'class': 'form-control'}),
             'datenaissance': DateField(widget=forms.SelectDateWidget(years=range(1900, 2006)), label="Date de naissance"),
             'lieunaissance': forms.TextInput(attrs={'class': 'form-control'}),
+            'numero_cnss': forms.TextInput(attrs={'class': 'form-control'}),
+            'nif': forms.TextInput(attrs={'class': 'form-control'}),
             'photo_passport': forms.FileInput(attrs={'class': 'form-control'}),
             'salaireBrut': forms.NumberInput(attrs={'class': 'form-control'}),
             'nombre_de_personnes_en_charge': forms.NumberInput(attrs={'class': 'form-control'}),

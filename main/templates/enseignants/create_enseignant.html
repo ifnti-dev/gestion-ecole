@@ -74,8 +74,20 @@ Enregistrement d'un enseignant
           </div>
         </div>
 
-      <div class="form-row mb-3">
-          
+        <div class="form-row mb-3">
+          <div class="col-md-6">
+            {{ form.numero_cnss.label_tag }}
+            <div class="d-flex">{{ form.numero_cnss }}</div>
+            <span class="text-danger">{{ form.numero_cnss.errors }}</span>
+          </div>
+          <div class="col-md-6">
+            {{ form.nif.label_tag }}
+            {{ form.nif }}
+            <span class="text-danger">{{ form.nif.errors }}</span>
+          </div>
+        </div>
+
+        <div class="form-row mb-3">       
            <div class="col-md-6">
             {{ form.salaireBrut.label_tag }}
             <div class="d-flex">{{ form.salaireBrut }}</div>

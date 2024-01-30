@@ -23,7 +23,7 @@
 </style>
 <div class="block block-rounded m-5">
     <div class="block-header p-4">
-        <h3 class="block-title">Détails du comptable {{enseignant.nom}} {{enseignant.prenom}}</h3>
+        <h3 class="block-title">Information détaillés du comptable {{comptable.nom}} {{comptable.prenom}}</h3>
         <a class="btn btn-sm btn-success"  href="{% url 'paiement:comptable_list' %}" style="padding: 8px; float: right; background-color: blue; color: white;"><i class="fas fa-chevron-left fa-lg"></i>
             Retour</a>
     </div>
@@ -59,9 +59,10 @@
         <table id="etudiant">
             <thead class="thead-dark">
                 <tr>
-                    <th class="text-center" style="width: 20%;">Nationalité</th>
-                    <th class="text-center" style="width: 20%;">Nbre de personne pris en charge</th>
+                    <th class="text-center" style="width: 80px;">Numéro CNSS</th>
+                    <th class="text-center" style="width: 80px;">Numéro d'Identification fiscale</th>
                     <th class="text-center" style="width: 80px;">Salaire brut</th>
+                    <th class="text-center" style="width: 80px;">Nbre de personne pris en charge</th>
                     <th class="text-center" style="width: 80px;">Nbre jours de congés restant</th>
                     <th class="text-center" style="width: 15%;">Nombre de jours consommé</th>  
                 </tr>
@@ -69,11 +70,33 @@
             
             <tbody>
                 <tr>
-                    <td class="text-center font-size-sm">{{comptable.nationalite}}</td>
+                    <td class="text-center font-size-sm">{{comptable.numero_cnss}}</td>
+                    <td class="text-center font-size-sm">{{comptable.nif}}</td>
+                    <td class="text-center font-size-sm">{{comptable.salaireBrut}} FCFA</td>
                     <td class="text-center font-size-sm">{{comptable.nombre_de_personnes_en_charge}}</td>
-                    <td class="text-center font-size-sm">{{comptable.salaireBrut}}</td>
                     <td class="text-center font-size-sm">{{comptable.nbreJrsCongesRestant}}</td>
                     <td class="text-center font-size-sm">{{comptable.nbreJrsConsomme}}</td>
+                </tr>
+            </tbody>
+        </table>
+
+         <br>
+        <br>
+
+        <table id="etudiant">
+            <thead class="thead-dark">
+                <tr>
+                    <th class="text-center" style="width: 25%;">Salaire Brut Total</th>
+                    <th class="text-center" style="width: 25%;">IRPP & TCS Total</th>
+                    <th class="text-center" style="width: 25%;">Contributions CNSS Total</th>
+                </tr>
+            </thead>
+            
+            <tbody>
+                <tr>
+                    <td class="text-center font-size-sm">{{comptable.calculer_salaire_brut_annuel}} FCFA</td>
+                    <td class="text-center font-size-sm">{{comptable.calculer_irpp_tcs_annuel}} FCFA</td>
+                    <td class="text-center font-size-sm">{{comptable.calcule_deductions_cnss_annuel}} FCFA</td>
                 </tr>
             </tbody>
         </table>

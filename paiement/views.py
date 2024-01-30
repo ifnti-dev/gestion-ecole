@@ -812,6 +812,7 @@ def bulletin_de_paye(request, id):
 
     total_primes = bulletin.prime_efficacite + bulletin.prime_qualite + bulletin.frais_travaux_complementaires
     frais_prestations_familiale_salsalaire = bulletin.frais_prestations_familiale_salsalaire * bulletin.personnel.salaireBrut
+    assurance_maladie_universelle = bulletin.assurance_maladie_universelle * bulletin.personnel.salaireBrut
     primes = (
             bulletin.prime_efficacite
             + bulletin.prime_qualite
@@ -847,6 +848,7 @@ def bulletin_de_paye(request, id):
         'frais_prestations_familiales' : frais_prestations_familiales,
         'frais_pension_vieillesse_emsalaire' : frais_pension_vieillesse_emsalaire,
         'frais_prestations_familiale_salsalaire' : frais_prestations_familiale_salsalaire,
+        'assurance_maladie_universelle' : assurance_maladie_universelle,
         "date_debut_formatted" : date_debut_formatted,
         "date_fin_formatted" : date_fin_formatted,
     }
