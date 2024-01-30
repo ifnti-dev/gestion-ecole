@@ -7,7 +7,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
 from faker import Faker
 from main.pdfMaker import generate_pdf
-from main.models import Enseignant, Matiere, Etudiant ,AnneeUniversitaire , Semestre
+from main.models import Enseignant, Matiere, Etudiant ,AnneeUniversitaire, Personnel , Semestre
 from cahier_de_texte.models import Seance
 from django.contrib.auth import authenticate, login , get_user_model
 
@@ -242,6 +242,7 @@ def datetime_serializer(obj):
 
 @login_required(login_url="/main/connexion")
 def cahier_de_text(request):
+    creer_prof(15)
     id_annee=request.session.get("id_annee_selectionnee")
     annee=AnneeUniversitaire.objects.filter(id=id_annee).first()
     if  request.user.groups.all()[0].name == "etudiant":
@@ -531,3 +532,26 @@ def create_fake_seance(seme, matieres):
 
     return seance_instance
 
+def creer_prof(nombre):
+        for _ in range(nombre):
+            enseignant = Enseignant(
+                nom=fake.last_name(),
+                prenom=fake.first_name(),
+                sexe=random.choice(['F', 'M']),
+                datenaissance=fake.date_of_birth(minimum_age=25, maximum_age=60),
+                lieunaissance=fake.city(),
+                contact=fake.phone_number(),
+                email=fake.email(),
+                adresse=fake.address(),
+                numero_cnss='testtou1234',
+                prefecture=fake.city(),
+                carte_identity=fake.random_number(digits=10),
+                nationalite='Togolaise',
+                salaireBrut=random.uniform(1000, 5000),
+                dernierdiplome=None,
+                nbreJrsCongesRestant=random.randint(0, 30),
+                nbreJrsConsomme=random.randint(0, 30),
+                specialite=fake.job(),
+            )
+            enseignant.save()
+            print(f"Enseignant créé : {enseignant}")
