@@ -25,42 +25,25 @@ IFNTI : Maquette \VAR{titre}
 \newlist{myitemize}{itemize}{1}
 \setlist[myitemize,1]{label=--,left=0pt,labelsep=0pt,topsep=0pt,partopsep=0pt,parsep=0pt,itemsep=0pt}
 
-\begin{longtable}{|m{2cm}|m{6cm}|m{3cm}|m{7cm}|m{1.5cm}|m{2cm}|m{3cm}|m{3cm}|}
+
+\begin{longtable}{|m{2cm}|m{6cm}|m{3cm}|m{1.5cm}|m{2cm}|m{3cm}|m{3cm}|}
 \hline
-\centering Semestre & \centering Intitulé UE & \centering Type UE & \centering Matières & \centering Crédit UE & \centering Volume Horaire (H) & \centering Enseignant Responsable & \centering Enseignant principal \arraybackslash \\ 
+Semestre & Intitulé UE & Type UE & Crédit UE & Volume Horaire (H) & \centering Enseignant principal & \centering Enseignant secondaire \arraybackslash \\ 
 \hline
+
 \BLOCK{ for semestre_data in semestres_data }
-\multirow{\VAR{semestre_data.ues_length}}{*}{\VAR{semestre_data.semsetre.libelle}} 
-\BLOCK{ for ue in semestre_data.ues }
- & \centering \VAR{ue.libelle} 
- & \centering \VAR{ue.type}  
- & 	\BLOCK{ if ue.matiere_set.all()  }
- 	\begin{myitemize}
-	\BLOCK{ for matiere in ue.matiere_set.all() }
-	\item[] \centering \VAR{matiere.libelle}
-	\item[] \hrulefill
-	\BLOCK{ endfor }
-	\end{myitemize}
-	\BLOCK{ endif }
- &  
-	\centering \VAR{ue.nbreCredits} 
- & 
- 	\centering \VAR{ue.heures}  
- & 
-   \BLOCK{ if ue.matiere_set.all()  }
- 	\begin{myitemize}
-	\BLOCK{ for matiere in ue.matiere_set.all() }
-	\item[] \centering \VAR{matiere.enseignant}
-	\item[] \hrulefill
-	\BLOCK{ endfor }
-	\end{myitemize}
-	\BLOCK{ endif }
- & \centering \VAR{ue.enseignant} \arraybackslash  \\
-\cline{2-4} \cline{6-8} 
+
+\hline
+\multirow{\VAR{semestre_data.ues|length}}{*}{\VAR{semestre_data.semsetre}} 
+\BLOCK{ for ue in semestre_data.ues}
+& \VAR{ue.libelle} & \VAR{ue.type} & \VAR{ue.nbreCredit} & \VAR{ue.heurs} & \VAR{ue.enseignant} &  \\
+\cline{2-7} 
 \BLOCK{ endfor }
-\cline{1-1} \cline{5-5}
+
 \BLOCK{ endfor }
-Total &  &  &  & 64 & 8 &  &  \\ 
+
+\cline{1-1} \cline{6-6}
+Total &  &  & 64 & 8 &  &  \\ 
 \hline 
 \end{longtable}
 
