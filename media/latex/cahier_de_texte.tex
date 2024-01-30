@@ -2,7 +2,7 @@
 
 \usepackage[utf8]{inputenc}
 \usepackage[OT1]{fontenc}
-\usepackage[bottom=2.5cm, top=3.5cm, left=2.8cm, right=2.5cm]{geometry}
+\usepackage[left=1cm,right=1cm,top=1cm,bottom=2cm]{geometry}
 \usepackage[table]{xcolor}
 \usepackage{fmtcount}
 \usepackage{tcolorbox}
@@ -11,12 +11,13 @@
 \usepackage[autolanguage,np]{numprint}
 \usepackage{fancyhdr}
 \usepackage{graphicx}
+\usepackage{longtable, array}
 \usepackage{eso-pic}
 \usepackage{ulem}
-\usepackage[french]{babel}
-
+\usepackage{babel}[french]
 
 \usepackage{array}
+
 \graphicspath{ {\VAR{image_path}} }
 \newcolumntype{P}[1]{>{\centering\arraybackslash}p{#1}} %Permet d'avoir des colonnes de taille fixe et centrées.
 
@@ -24,14 +25,14 @@
 \cfoot{\vspace{-.5cm}Institut de formation aux normes et technologies de l'informatique\\300 BP 40, Sokodé TOGO -- Tél. : +228 90 91 81 41\\Agrément N\textdegree2019/064/MESR/SG/DES}
 \renewcommand{\headrulewidth}{0pt}
 
-\title{\vspace{1cm} {\LARGE \uuline{\textbf{CAHIER DE TEXTE}}}}
+\title{\vspace{10cm} {\LARGE \uuline{\textbf{CAHIER DE TEXTE}}}}
 \date{}
 
 
 \newcommand\BackgroundPic{
 \put(0,0){
 \parbox[b][\paperheight]{\paperwidth}{
-	\includegraphics[width=\paperwidth,height=\paperheight]{CharteGraphiqueDocumentPageDeGardeLogo.png}
+	\includegraphics[width=\paperwidth,height=\paperheight]{CharteGraphiqueDocumentCahierDeTexte.png}
 	}}}
 
 \begin{document}
@@ -48,49 +49,15 @@
 \noindent
 
 
-\hspace{11.5cm}\begin{minipage}{0.3\textwidth}
-	\vspace{-13cm}
-	
-	\begin{center}
-	REPUBLIQUE TOGOLAISE \\
-	Travail-Liberté-Patrie \\
-	\vspace{0.5cm}
-	MINISTÉRE DE l'ENSEIGNEMENT \\ SUPÉRIEUR ET DE LA RECHERCHE
-	\end{center}
-\end{minipage}
-
-\Col{Identité de l'étudiant}%
-{
-\textbf{Matricule:} \VAR{etudiant.id}\\
-\textbf{Nom:}   \VAR{etudiant.nom}  \\
-\textbf{Prénom:} \VAR{etudiant.prenom} \\
-\textbf{Téléphone: } \VAR{etudiant.contact}\\
-\textbf{Date de naissance :} \VAR{etudiant.datenaissance}\\
-\textbf{Lieu de naissance :} \VAR{etudiant.lieunaissance}
-}
-\hfill
-\Col{Période}%
-{
-\textbf{Année Académique:} \VAR{annee}\\
-\textbf{Semestre:}  \VAR{semestre.libelle}  \\
-}
 
 
 
-\vspace{1cm}
-\begin{center}
-\begin{tabular}{|>{\raggedright}p{9cm}|P{1.1cm}|P{1.6cm}|P{2.4cm}|}
-	\hline
-	\textbf{Unité d'enseignement} & \textbf{Note} & \textbf{Crédits} & \textbf{Année d'obtention}\\
-	\hline
-\BLOCK{for ue in ues}
-\VAR{ue['ue'].libelle} & \VAR{ue['moyenne']} & \BLOCK{if ue['validation'] == True} \VAR{ue['ue'].nbreCredits} \BLOCK{else} 0  \BLOCK{endif} & \VAR{annee}\\
-\hline
-\BLOCK{endfor}
 
-\multicolumn{2}{|l|}{\textbf{Total crédits obtenus}} & \textbf{\VAR{credits_obtenus}} & \multicolumn{1}{c}{}\\\cline{1-3}
-\end{tabular}
-\end{center}
+
+
+
+
+
 \vspace{1cm}
 \null\hfill Fait à Sokodé, le \today\\
 \null\hfill Le Responsable d'établissement\\
@@ -103,12 +70,170 @@
 
 \vfill
 
-\begin{longtable}{|p{4cm}|p{9cm}|p{4cm}|}
-\hline
-\LARGE\textbf{Date} & \LARGE \textbf{Description} & \LARGE \textbf{Autres} \\
- \hline 
- \rule[-1ex]{0pt}{2.5ex} \LARGE Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec justo eget justo iaculis blandit. Integer varius, velit id fermentum fringilla, elit nisl auctor velit, ac tristique enim massa at lorem. &\LARGE  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec justo eget justo iaculis blandit. Integer varius, velit id fermentum fringilla, elit nisl auctor velit, ac tristique enim massa at lorem. & \LARGE  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec justo eget justo iaculis blandit. Integer varius, velit id fermentum fringilla, elit nisl auctor velit, ac tristique enim massa at lorem. \\ 
- \hline 
-\end{longtable} 
+
+\vspace{6cm} \uuline{\textbf{Details Du Semestre \VAR{semestre}}}
+
+\BLOCK{if listeUe == 'on'}
+	\begin{center}
+		{\textbf{Liste Des Ues :}}\begin{tabular}{|>{\raggedright}p{6cm}|P{2.1cm}|P{2.6cm}|P{2.4cm}|}
+			\hline
+			\textbf{Code \& Libellé} & \textbf{Type} & \textbf{Nombre d'heure} & \textbf{Nombre de Credit}\\
+			\hline
+		\BLOCK{for ue in ues}
+		\VAR{ue.codeUE}::\VAR{ue.libelle} & \VAR{ue.type} &\VAR{ue.heures}  & \VAR{ue.nbreCredits}\\
+		\hline
+		\BLOCK{endfor}
+		\end{tabular}
+	\end{center}
+\BLOCK{endif}
+
+\BLOCK{if listeEtudiant == 'on'}
+	\begin{center}
+		{\textbf{Liste Des Etudiants :}}\begin{tabular}{|>{\raggedright}p{4.3cm}|P{1.8cm}|P{5cm}|P{2cm}|}
+			\hline
+			\textbf{Prénom \& Nom} & \textbf{Contact} & \textbf{Mail} & \textbf{Username}\\
+			\hline
+		\BLOCK{for etudiant in etudiants}
+		\VAR{etudiant.prenom} \VAR{etudiant.nom} & \VAR{etudiant.contact} &\VAR{etudiant.email}  & \VAR{etudiant.username}\\
+		\hline
+		\BLOCK{endfor}
+	\end{tabular}
+	\end{center}
+\BLOCK{endif}
+\BLOCK{if listeMatiere == 'on'}
+	\begin{center}
+		{\textbf{Liste Des Matieres :}}\begin{tabular}{|>{\raggedright}p{5cm}|P{1.8cm}|P{1.5cm}|P{1.8cm}|P{3cm}}
+			\hline
+			\textbf{Code \& Libellé} & \textbf{Coefficient} & \textbf{Heures} & \textbf{Abbreviation} & \textbf{Moyenne Minimale}\\
+			\hline
+		\BLOCK{for mat in matieres}
+		\VAR{mat.codematiere} \VAR{mat.libelle} & \VAR{mat.coefficient} &\VAR{mat.heures}  & \VAR{mat.abbreviation} & \VAR{mat.minValue}\\
+		\hline
+		\BLOCK{endfor}
+	\end{tabular}
+	\end{center}
+\BLOCK{endif}
+
+\newpage
+\clearpage % or \cleardoublepage
+
+\BLOCK{if sousCategorisation == 'parMatieres'}
+	\BLOCK{for mat  in seances}
+		
+		\LARGE Matieres : \textbf{\VAR{mat}} , Heures Consommées : \textbf{\VAR{seances[mat].HeureConsomme}}
+		
+		\begin{longtable}{|P{4cm}|P{9cm}|P{4cm}|}
+			\hline
+			\LARGE\textbf{Date} & \LARGE \textbf{Description} & \LARGE \textbf{Autres} \\
+			\hline
+			
+			\BLOCK{for cour in seances[mat].seances}
+				\rule[-1ex]{0pt}{2.5ex}\underline{Date}: \linebreak \VAR{cour.date_et_heure_debut.day} - \VAR{cour.date_et_heure_debut.month} - \VAR{cour.date_et_heure_debut.year}
+				\linebreak    
+				\underline{Heure}:
+				\linebreak 
+				\VAR{cour.date_et_heure_debut.hour}h:\VAR{cour.date_et_heure_debut.minute} - \VAR{cour.date_et_heure_fin.hour}h:\VAR{cour.date_et_heure_fin.minute} 
+				\linebreak
+				\underline{Auteur}:
+				\linebreak
+				\VAR{cour.auteur.prenom} \VAR{cour.auteur.nom}
+				\linebreak
+				\BLOCK{if listeAbsence =="on"}
+				\underline{Absents}:
+				\linebreak
+				\BLOCK{for eleve in cour.eleves_presents.all()}
+					\VAR{eleve.prenom} \VAR{eleve.nom}
+				\BLOCK{endfor}
+				\BLOCK{endif}
+			
+				&\underline{Intitulé}:
+				\linebreak
+				\VAR{cour.intitule}
+				\linebreak
+				\underline{Details Séance}:
+				\linebreak
+				\VAR{cour.description}
+				\linebreak
+				\linebreak
+				\linebreak
+				\linebreak
+				\underline{Validé par l'enseignant ?}: \VAR{cour.valider}
+				&\underline{Matiere}:
+				\linebreak
+				\VAR{cour.matiere.codematiere}::\VAR{cour.matiere.libelle}
+				\linebreak    
+				\underline{Enseignant}:
+				\linebreak
+				\VAR{cour.enseignant.prenom} \VAR{cour.enseignant.nom}
+				\linebreak
+				\BLOCK{if commentaires =="on"}
+				\underline{Commentaires Prof}:
+				\linebreak
+				\VAR{cour.commentaire}
+				\BLOCK{endif}
+
+				\\ 
+				\hline 
+			\BLOCK{endfor}
+		\end{longtable}
+	\BLOCK{endfor}
+\BLOCK{endif}
+\BLOCK{if sousCategorisation == 'chronologieHoraire'}
+	\begin{longtable}{|p{4cm}|p{9cm}|p{4cm}|}
+		\hline
+		\LARGE\textbf{Date} & \LARGE \textbf{Description} & \LARGE \textbf{Autres} \\
+		\hline
+		\BLOCK{for cour in seances}
+			\rule[-1ex]{0pt}{2.5ex}\underline{Date}: \linebreak \VAR{cour.date_et_heure_debut.day} - \VAR{cour.date_et_heure_debut.month} - \VAR{cour.date_et_heure_debut.year}
+			\linebreak    
+			\underline{Heure}:
+			\linebreak 
+			\VAR{cour.date_et_heure_debut.hour}h:\VAR{cour.date_et_heure_debut.minute} - \VAR{cour.date_et_heure_fin.hour}h:\VAR{cour.date_et_heure_fin.minute} 
+			\linebreak
+			\underline{Auteur}:
+			\linebreak
+			\VAR{cour.auteur.prenom} \VAR{cour.auteur.nom}
+			\linebreak
+			\BLOCK{if listeAbsence =="on"}
+			\underline{Absents}:
+			\linebreak
+			\BLOCK{for eleve in cour.eleves_presents.all()}
+				\VAR{eleve.prenom} \VAR{eleve.nom}
+			\BLOCK{endfor}
+			\BLOCK{endif}
+		
+			&\underline{Intitulé}:
+			\linebreak
+			\VAR{cour.intitule}
+			\linebreak
+			\underline{Details Séance}:
+			\linebreak
+			\VAR{cour.description}
+			\linebreak
+			\linebreak
+			\linebreak
+			\linebreak
+			\underline{Validé par l'enseignant ?}: \VAR{cour.valider}
+			&\underline{Matiere}:
+			\linebreak
+			\VAR{cour.matiere.codematiere}::\VAR{cour.matiere.libelle}
+			\linebreak    
+			\underline{Enseignant}:
+			\linebreak
+			\VAR{cour.enseignant.prenom} \VAR{cour.enseignant.nom}
+			\linebreak
+			\BLOCK{if commentaires =="on"}
+			\underline{Commentaires Prof}:
+			\linebreak
+			\VAR{cour.commentaire}
+			\BLOCK{endif}
+
+			\\ 
+			\hline 
+		\BLOCK{endfor}
+	\end{longtable}
+\BLOCK{endif}
+
+
 \end{document}
 
