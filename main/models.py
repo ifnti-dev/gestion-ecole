@@ -1034,7 +1034,8 @@ class Personnel(Utilisateur):
         salaires = Salaire.objects.filter(personnel=self)
         total_salaire_brut_annuel = sum(
             salaire.calculer_salaire_brut_mensuel() for salaire in salaires)
-        return total_salaire_brut_annuel
+        return int(total_salaire_brut_annuel)
+
 
     def calculer_irpp_tcs_annuel(self):
         """
@@ -1051,9 +1052,8 @@ class Personnel(Utilisateur):
         total_tcs_annuel = sum(salaire.tcs for salaire in salaires)
         total_irpp_tcs_annuel = Decimal(
             total_irpp_annuel) + Decimal(total_tcs_annuel)
-        total_irpp_tcs_annuel = total_irpp_tcs_annuel.quantize(
-            Decimal('0.00'), rounding=ROUND_DOWN)
-        return total_irpp_tcs_annuel
+        return int(total_irpp_tcs_annuel)
+
 
     def calcule_deductions_cnss_annuel(self):
         """
@@ -1070,7 +1070,7 @@ class Personnel(Utilisateur):
             salaire.calculer_deductions_cnss() for salaire in salaires)
         # total_deductions_cnss = total_deductions_cnss.quantize(Decimal('0.00'), rounding=ROUND_DOWN)
 
-        return Decimal(total_deductions_cnss)
+        return int(total_deductions_cnss)
 
 
 class DirecteurDesEtudes(Personnel):

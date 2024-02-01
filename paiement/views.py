@@ -807,50 +807,93 @@ def bulletin_de_paye(request, id):
     """
 
     bulletin = get_object_or_404(Salaire, id=id)
+    salaireDeBase = int(bulletin.personnel.salaireBrut)
+    prime_efficacite = int(bulletin.prime_efficacite)
+    prime_qualite = int(bulletin.prime_qualite)
+    frais_travaux_complementaires = int(bulletin.frais_travaux_complementaires)
+    prime_anciennete = int(bulletin.prime_anciennete)
     date_debut_formatted = datetime.strptime(str(bulletin.date_debut), "%Y-%m-%d").strftime("%d %B %Y")
     date_fin_formatted = datetime.strptime(str(bulletin.date_fin), "%Y-%m-%d").strftime("%d %B %Y")
 
-    total_primes = bulletin.prime_efficacite + bulletin.prime_qualite + bulletin.frais_travaux_complementaires
-    frais_prestations_familiale_salsalaire = bulletin.frais_prestations_familiale_salsalaire * bulletin.personnel.salaireBrut
-    assurance_maladie_universelle = bulletin.assurance_maladie_universelle * bulletin.personnel.salaireBrut
+    total_primes = int(bulletin.prime_efficacite + bulletin.prime_qualite + bulletin.frais_travaux_complementaires)
     primes = (
             bulletin.prime_efficacite
             + bulletin.prime_qualite
             + bulletin.frais_travaux_complementaires
             + bulletin.prime_anciennete
     )
-    Salaire_brut = bulletin.personnel.salaireBrut + primes 
+    Salaire_brut = int(bulletin.personnel.salaireBrut + primes)
+    
     ## pour le salarié
-    tcs = bulletin.tcs
-    irpp = bulletin.calculer_irpp_mensuel()
+    frais_prestations_familiale_salsalaire = int(bulletin.frais_prestations_familiale_salsalaire * bulletin.personnel.salaireBrut)
+    assurance_maladie_universelle = int(bulletin.assurance_maladie_universelle * bulletin.personnel.salaireBrut)
+    retenues_cnss_salarie = int(frais_prestations_familiale_salsalaire + assurance_maladie_universelle)
+    tcs = int(bulletin.tcs)
+    irpp = int(bulletin.calculer_irpp_mensuel())
+    acomptes = int(bulletin.acomptes)
+    prime_forfaitaire = int(bulletin.prime_forfaitaire)
     print("calculer_irpp_mensuel   " + str(irpp))
 
-    retenues_cnss_personnel = Decimal(frais_prestations_familiale_salsalaire) + Decimal(tcs) + Decimal(irpp)
+    retenues_cnss_personnel = Decimal(retenues_cnss_salarie) + Decimal(tcs) + Decimal(irpp)
     salaire_net = (Decimal(Salaire_brut) - Decimal(retenues_cnss_personnel))
-    salaire_net = salaire_net.quantize(Decimal('0.000'), rounding=ROUND_DOWN) 
-    bulletin.salaire_net_a_payer = salaire_net - bulletin.acomptes
+    bulletin.salaire_net_a_payer = int(salaire_net - bulletin.acomptes)  # Conversion en entier
+    # Convertir le montant en une chaîne de caractères
+    salaire_net_str = "{:,.0f}".format(bulletin.salaire_net_a_payer)
+    # Assigner la chaîne de caractères formatée à salaire_net_a_payer
+    bulletin.salaire_net_a_payer = salaire_net_str
+
 
     ## pour l'employeur
-    frais_prestations_familiales = bulletin.frais_prestations_familiales * bulletin.personnel.salaireBrut
-    frais_risques_professionnel = bulletin.frais_risques_professionnel * bulletin.personnel.salaireBrut
-    frais_pension_vieillesse_emsalaire = bulletin.frais_pension_vieillesse_emsalaire * bulletin.personnel.salaireBrut
-    retenues_cnss_employeur = frais_prestations_familiales + frais_risques_professionnel + frais_pension_vieillesse_emsalaire
+    frais_prestations_familiales = int(bulletin.frais_prestations_familiales * bulletin.personnel.salaireBrut)
+    frais_risques_professionnel = int(bulletin.frais_risques_professionnel * bulletin.personnel.salaireBrut)
+    frais_pension_vieillesse_emsalaire = int(bulletin.frais_pension_vieillesse_emsalaire * bulletin.personnel.salaireBrut)
+    retenues_cnss_employeur = int(frais_prestations_familiales + frais_risques_professionnel + frais_pension_vieillesse_emsalaire + assurance_maladie_universelle)
 
+    # Convertir les montants en chaînes de caractères formatées avec des séparateurs de milliers
+    prime_efficacite_str = "{:,.0f}".format(prime_efficacite)
+    prime_qualite_str = "{:,.0f}".format(prime_qualite)
+    frais_travaux_complementaires_str = "{:,.0f}".format(frais_travaux_complementaires)
+    prime_anciennete_str = "{:,.0f}".format(prime_anciennete)
+    salaireDeBase_str = "{:,.0f}".format(salaireDeBase)
+    Salaire_brut_str = "{:,.0f}".format(Salaire_brut)
+    irpp_str = "{:,.0f}".format(irpp)
+    tcs_str = "{:,.0f}".format(tcs)
+    acomptes_str = "{:,.0f}".format(acomptes)
+    prime_forfaitaire_str = "{:,.0f}".format(prime_forfaitaire)
+    total_primes_str = "{:,.0f}".format(total_primes)
+    retenues_cnss_employeur_str = "{:,.0f}".format(retenues_cnss_employeur)
+    frais_risques_professionnel_str = "{:,.0f}".format(frais_risques_professionnel)
+    frais_prestations_familiales_str = "{:,.0f}".format(frais_prestations_familiales)
+    frais_pension_vieillesse_emsalaire_str = "{:,.0f}".format(frais_pension_vieillesse_emsalaire)
+    frais_prestations_familiale_salsalaire_str = "{:,.0f}".format(frais_prestations_familiale_salsalaire)
+    assurance_maladie_universelle_str = "{:,.0f}".format(assurance_maladie_universelle)
+    retenues_cnss_salarie_str = "{:,.0f}".format(retenues_cnss_salarie)
+    salaire_net_str = "{:,.0f}".format(salaire_net)
+
+    # Assigner les chaînes de caractères formatées aux variables correspondantes
     context = {
-        'bulletin' : bulletin,
-        'Salaire_brut': Salaire_brut,
-        'irpp' : irpp,
-        'tcs' : tcs,
-        'salaire_net' : salaire_net,
-        'total_primes' : total_primes,
-        'retenues_cnss_employeur' : retenues_cnss_employeur,
-        'frais_risques_professionnel' : frais_risques_professionnel,
-        'frais_prestations_familiales' : frais_prestations_familiales,
-        'frais_pension_vieillesse_emsalaire' : frais_pension_vieillesse_emsalaire,
-        'frais_prestations_familiale_salsalaire' : frais_prestations_familiale_salsalaire,
-        'assurance_maladie_universelle' : assurance_maladie_universelle,
-        "date_debut_formatted" : date_debut_formatted,
-        "date_fin_formatted" : date_fin_formatted,
+        'bulletin': bulletin,
+        'prime_efficacite': prime_efficacite_str,
+        'prime_qualite': prime_qualite_str,
+        'frais_travaux_complementaires': frais_travaux_complementaires_str,
+        'prime_anciennete': prime_anciennete_str,
+        'salaireDeBase': salaireDeBase_str,
+        'Salaire_brut': Salaire_brut_str,
+        'irpp': irpp_str,
+        'tcs': tcs_str,
+        'acomptes': acomptes_str,
+        'prime_forfaitaire': prime_forfaitaire_str,
+        'salaire_net': salaire_net_str,
+        'total_primes': total_primes_str,
+        'retenues_cnss_employeur': retenues_cnss_employeur_str,
+        'frais_risques_professionnel': frais_risques_professionnel_str,
+        'frais_prestations_familiales': frais_prestations_familiales_str,
+        'frais_pension_vieillesse_emsalaire': frais_pension_vieillesse_emsalaire_str,
+        'frais_prestations_familiale_salsalaire': frais_prestations_familiale_salsalaire_str,
+        'assurance_maladie_universelle': assurance_maladie_universelle_str,
+        "date_debut_formatted": date_debut_formatted,
+        "date_fin_formatted": date_fin_formatted,
+        "retenues_cnss_salarie": retenues_cnss_salarie_str,
     }
 
     latex_input = 'bulletin_de_paye'
@@ -1067,16 +1110,39 @@ def fiche_paie(request, id):
     date_debut_formatted = datetime.strptime(str(fiche_paie.dateDebut), "%Y-%m-%d").strftime("%d %B %Y")
     date_fin_formatted = datetime.strptime(str(fiche_paie.dateFin), "%Y-%m-%d").strftime("%d %B %Y")
 
-
     matieres_L1 = ", ".join([matiere.libelle for matiere in fiche_paie.matiere.filter(ue__programme__semestre__libelle__in=['S1', 'S2'])])
     matieres_L2 = ", ".join([matiere.libelle for matiere in fiche_paie.matiere.filter(ue__programme__semestre__libelle__in=['S3', 'S4'])])
     matieres_L3 = ", ".join([matiere.libelle for matiere in fiche_paie.matiere.filter(ue__programme__semestre__libelle__in=['S5', 'S6'])])
+    
+    prixUnitaire = fiche_paie.prixUnitaire
+    montantL1 = fiche_paie.montantL1
+    montantL2 = fiche_paie.montantL2
+    montantL3 = fiche_paie.montantL3
+    montant = fiche_paie.montant
+    acomptes = fiche_paie.acomptes
+    difference = fiche_paie.difference
+
+    # Convertir les montants en chaînes de caractères formatées avec des séparateurs de milliers
+    prixUnitaire_str = "{:,.0f}".format(prixUnitaire)
+    montantL1_str = "{:,.0f}".format(montantL1)
+    montantL2_str = "{:,.0f}".format(montantL2)
+    montantL3_str = "{:,.0f}".format(montantL3)
+    montant_str = "{:,.0f}".format(montant)
+    acomptes_str = "{:,.0f}".format(acomptes)
+    difference_str = "{:,.0f}".format(difference)
 
     context = {
         'fiche_paie': fiche_paie,
+        'prixUnitaire' : prixUnitaire_str,
+        'montantL1' : montantL1_str,
+        'montantL2' : montantL2_str,
+        'montantL3' : montantL3_str,
         'matieres_L1': matieres_L1,
         'matieres_L2': matieres_L2,
         'matieres_L3': matieres_L3,
+        'montant': montant_str,
+        'acomptes': acomptes_str,
+        'difference': difference_str,
         'date_debut_formatted': date_debut_formatted,
         'date_fin_formatted': date_fin_formatted,
     }
@@ -1191,8 +1257,19 @@ def fiche_de_charge(request, id):
     date_debut_formatted = datetime.strptime(str(fiche_de_charge.dateDebut), "%Y-%m-%d").strftime("%d %B %Y")
     date_fin_formatted = datetime.strptime(str(fiche_de_charge.dateFin), "%Y-%m-%d").strftime("%d %B %Y")
 
+    frais_nourriture = fiche_de_charge.frais_nourriture
+    frais_de_vie = fiche_de_charge.frais_de_vie
+    montant = fiche_de_charge.montant
+
+    frais_nourriture_str = "{:,.0f}".format(frais_nourriture)
+    frais_de_vie_str = "{:,.0f}".format(frais_de_vie)
+    montant_str = "{:,.0f}".format(montant)
+
     context = {
         'fiche_de_charge': fiche_de_charge,
+        'frais_de_vie' : frais_de_vie_str,
+        'frais_nourriture' : frais_nourriture_str,
+        'montant' : montant_str,
         'date_debut_formatted' :date_debut_formatted,
         'date_fin_formatted' : date_fin_formatted,
     }
