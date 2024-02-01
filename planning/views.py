@@ -8,7 +8,7 @@ import re
 from django.core.serializers import serialize
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
-from main.models import Enseignant, Matiere, Etudiant ,AnneeUniversitaire , Semestre
+from main.models import Enseignant, Evaluation, Matiere, Etudiant ,AnneeUniversitaire , Semestre
 from cahier_de_texte.models import Seance
 from planning.models import Planning , SeancePlannifier
 from django.contrib.auth import authenticate, login , get_user_model
@@ -194,19 +194,22 @@ def resume(request,semestreId):
         plannings.add(SeancePlannifier.objects.filter(planning=plan))
     valeur_min = 0
     seances = Seance.objects.filter(semestre=semestre).annotate(num_eleves=Count('eleves_presents')).filter(num_eleves__gt=valeur_min)
-    for seance in seances :
-        for eleve in seance.eleves_presents.all() :
-            liste_absence[eleve.nom +' '+eleve.prenom] = 'Matiere : '+seance.matiere.libelle +', Date et Heure : '+str(seance.date_et_heure_debut) +' à '+str(seance.date_et_heure_fin)
+    print(seances.count())
 
-    nombre_absences_par_eleve = {}
-    for eleve, details_absence in liste_absence.items():
-        if eleve in nombre_absences_par_eleve:
-            nombre_absences_par_eleve[eleve] += 1
-        else:
-            nombre_absences_par_eleve[eleve] = 1
+    for seance in seances:
+        for eleve in seance.eleves_presents.all():
+            eleve_key = eleve.nom + ' ' + eleve.prenom
+            absence_details = "Matiere : " + seance.matiere.libelle + ", Date et Heure : " + str(seance.date_et_heure_debut.date()) + " " + str(seance.date_et_heure_debut.time()) + " à " + str(seance.date_et_heure_fin.time())
 
-    for eleve, nombre_absences in nombre_absences_par_eleve.items():
-        print(f"{eleve}: {nombre_absences} absence(s)")
+            if eleve_key in liste_absence:
+                liste_absence[eleve_key].append(absence_details)
+            else:
+                liste_absence[eleve_key] = [absence_details]
+
+
+
+
+
 
     activite_prof={}
     enseignants=Enseignant.objects.all()
@@ -232,15 +235,16 @@ def resume(request,semestreId):
             activite_prof[prof_key]['activité'] = str(hours_x) + 'h' + str(minutes_x) + 'min'
             activite_prof[prof_key]['seances'] = activity
 
-    planification = defaultdict(list)
     activite_matiere={}
     ues = semestre.get_all_ues()
     
     for ue in ues:
-        matieres = matieres = ue.matiere_set.all()
+        matieres = ue.matiere_set.all()
         for matiere in matieres :
             seances=Seance.objects.filter(semestre=semestre,matiere=matiere)
             temps=0
+            nmbre_planifier=0
+            nombre_effectuer=0
             for seance in seances:
                 temps+=(seance.date_et_heure_fin - seance.date_et_heure_debut).total_seconds()
             hours, remainder = divmod(temps, 3600)
@@ -251,36 +255,39 @@ def resume(request,semestreId):
             planning=Planning.objects.filter(semestre=semestre)
             for plan in planning :
                 plannings=SeancePlannifier.objects.filter(planning=plan ,matiere=matiere)
+                nmbre_planifier+=plannings.count()
                 temps_x=0
                 for planning in plannings:
                     temps_x+=(planning.date_heure_fin - planning.date_heure_debut).total_seconds()
+                    if planning.valider:
+                        nombre_effectuer+=1
                 hours_x, remainder = divmod(temps_x, 3600)
                 minutes_x, _ = divmod(remainder, 60)
                 hours_x=int(hours_x)
                 minutes_x=int(minutes_x)
-            mat_key = str(ue)
+            mat_key = str(ue)+str(matiere)
             if mat_key not in activite_matiere:
                 activite_matiere[mat_key] = {'professeur':'','libelle':'','temps_prevu':'','temps_effectuer': '','ue':'', 'temps_plannifier': ''}
 
             activite_matiere[mat_key]['temps_effectuer'] = str(hours) + 'h' + str(minutes) + 'min'
             activite_matiere[mat_key]['temps_plannifier'] = str(hours_x) + 'h' + str(minutes_x) + 'min'  
-            activite_matiere[mat_key]['temps_prevu'] = str(matiere.heures) + 'h' 
+            activite_matiere[mat_key]['temps_prevu'] = str(int(matiere.heures)) + 'h' 
             activite_matiere[mat_key]['libelle'] = str(matiere)                  
             activite_matiere[mat_key]['ue'] = str(ue)  
-            activite_matiere[mat_key]['professeur'] = matiere.enseignant.nom + ' ' + matiere.enseignant.prenom  
+            activite_matiere[mat_key]['professeur'] = matiere.enseignant.nom + ' ' + matiere.enseignant.prenom
+            activite_matiere[mat_key]['nmbre_planifier'] = nmbre_planifier
+            activite_matiere[mat_key]['nombre_effectuer'] = nombre_effectuer
+            activite_matiere[mat_key]['nombre_enregistrer'] = seances.count()
+            activite_matiere[mat_key]['nombre_enregistrer_valider'] = seances.filter(valider=True).count()
+            activite_matiere[mat_key]['nombre_evaluations'] = Evaluation.objects.filter(semestre=semestre,matiere=matiere).count()
+            activite_matiere[mat_key]['rattrapage'] =Evaluation.objects.filter(semestre=semestre,matiere=matiere,rattrapage=True).count()
 
-        
+
             
-            
 
-
-    
-    context={'absences':liste_absence,'absence_eleve':nombre_absences_par_eleve,'semestre':semestre,'etudiants':etudiants,'activite_prof':activite_prof,'activite_matiere':activite_matiere}
-    #recuperer le nombre d'evaluation par matiere et la moyenne globale de la classe pour chacune des evaluations
-    #recuperer le nombre de fois qu'une matiere a ete plannifier et le nombre de fois qu'elle a été enregistrer comme realiser
+    print(json.dumps(liste_absence))
+    context={'liste_absences':liste_absence,'liste_absences_json':json.dumps(liste_absence),'semestre':semestre,'etudiants':etudiants,'activite_prof':activite_prof,'activite_matiere':activite_matiere,'ues':ues}
     #recuperer les date et heure des seance plannifier mais non enregistrer (facultatif)
-    #recuperer le nombre d'heure prevues et effectuer par matieres
-    #recuperer le nombre d'heure effectuer par enseignant (suite logique de la partie plus haut)
      
     return render(request,'semestre_recap.html',context)
         
