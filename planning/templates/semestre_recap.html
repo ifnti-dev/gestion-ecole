@@ -16,20 +16,20 @@
             <div class="block-content bg-body-light text-center">
                 <div class="row items-push text-uppercase">
                     <div class="col-6 col-md-3">
-                        <div class="font-w600 text-dark mb-1">Orders</div>
-                        <a class="link-fx font-size-h3 text-primary" href="javascript:void(0)">5</a>
+                        <div class="font-w600 text-dark mb-1">UEs</div>
+                        <div class="link-fx font-size-h3 text-primary" > {{ues|length}} </div>
                     </div>
                     <div class="col-6 col-md-3">
-                        <div class="font-w600 text-dark mb-1">Orders Value</div>
-                        <a class="link-fx font-size-h3 text-primary" href="javascript:void(0)">$3.580,00</a>
+                        <div class="font-w600 text-dark mb-1">Etudiants</div>
+                        <div class="link-fx font-size-h3 text-primary" > {{etudiants|length}} </div>
                     </div>
                     <div class="col-6 col-md-3">
-                        <div class="font-w600 text-dark mb-1">Cart</div>
-                        <a class="link-fx font-size-h3 text-primary" href="javascript:void(0)">4</a>
+                        <div class="font-w600 text-dark mb-1">Matieres</div>
+                        <div class="link-fx font-size-h3 text-primary" > {{activite_matiere|length}} </div>
                     </div>
                     <div class="col-6 col-md-3">
-                        <div class="font-w600 text-dark mb-1">Referred</div>
-                        <a class="link-fx font-size-h3 text-primary" href="javascript:void(0)">3</a>
+                        <div class="font-w600 text-dark mb-1">Heures</div>
+                        <div class="link-fx font-size-h3 text-primary" > 5 </div>
                     </div>
                 </div>
             </div>
@@ -37,48 +37,30 @@
         
         <div class="block block-rounded">
             <div class="block-header block-header-default">
-                <h3 class="block-title">Addresses (2)</h3>
+                <h3 class="block-title">Activitées des Matieres</h3>
             </div>
             <div class="block-content">
                 <div class="row">
-                    <div class="col-lg-6">
+                    {% for ue, donnee in activite_matiere.items %}
+                    <div class="col-lg-4">
                         <!-- Billing Address -->
                         <div class="block block-rounded block-bordered">
                             <div class="block-header border-bottom">
-                                <h3 class="block-title">Billing Address</h3>
+                                <h3 class="block-title">{{ donnee.libelle }}</h3>
                             </div>
                             <div class="block-content">
-                                <div class="font-size-h4 mb-1">John Parker</div>
-                                <address class="font-size-sm">
-                                    Sunrise Str 620<br>
-                                    Melbourne<br>
-                                    Australia, 11-587<br><br>
-                                    <i class="fa fa-phone"></i> (999) 888-55555<br>
-                                    <i class="fa fa-envelope-o"></i> <a href="javascript:void(0)">company@example.com</a>
-                                </address>
+                                <div class="font-size-h6 mb-1">{{ donnee.nombre_evaluations }} évaluation(s)</div>
+                                <div class="font-size-h6 mb-1">{{ donnee.nombre_evaluations }} rattrapage(s)</div>
+                                <div class="font-size-h6 mb-1">{{ donnee.nmbre_planifier }} seance(s) plannifier</div>
+                                <div class="font-size-h6 mb-1">{{ donnee.nombre_effectuer }} seance(s) plannifier et valider</div>
+                                <div class="font-size-h6 mb-1">{{ donnee.nombre_enregistrer }} seance(s) enregistrer dans le cahier de texte</div>
+                                <div class="font-size-h6 mb-1">{{ donnee.nombre_enregistrer_valider }} seance(s) enregistrer dans le cahier de texte et valider par l'enseignant</div>
+                                
                             </div>
                         </div>
                         <!-- END Billing Address -->
                     </div>
-                    <div class="col-lg-6">
-                        <!-- Shipping Address -->
-                        <div class="block block-rounded block-bordered">
-                            <div class="block-header border-bottom">
-                                <h3 class="block-title">Shipping Address</h3>
-                            </div>
-                            <div class="block-content">
-                                <div class="font-size-h4 mb-1">John Parker</div>
-                                <address class="font-size-sm">
-                                    Sunrise Str 620<br>
-                                    Melbourne<br>
-                                    Australia, 11-587<br><br>
-                                    <i class="fa fa-phone"></i> (999) 888-55555<br>
-                                    <i class="fa fa-envelope-o"></i> <a href="javascript:void(0)">company@example.com</a>
-                                </address>
-                            </div>
-                        </div>
-                        <!-- END Shipping Address -->
-                    </div>
+                    {% endfor %}
                 </div>
             </div>
         </div>
@@ -87,7 +69,7 @@
         <!-- Shopping Cart -->
         <div class="block block-rounded">
             <div class="block-header block-header-default">
-                <h3 class="block-title">Plannification des cours par matiere</h3>
+                <h3 class="block-title">Plannification des cours par matiere (en Heures)</h3>
             </div>
             <div class="block-content">
                 <div class="table-responsive">
@@ -162,14 +144,13 @@
             </div>
             <div class="block-content">
                 <div class="row row-deck">
-                    {% for eleve, nombre_absences in absence_eleve.items %}
+                    {% for eleve, absences in liste_absences.items %}
                     <div class="col-md-4">
-                        <!-- Referred User -->
-                        <a class="block block-rounded block-bordered block-link-shadow" href="javascript:void(0)">
+                        <a class="block block-rounded block-bordered block-link-shadow" href="#" data-toggle="modal" data-target="#detailsModal" data-eleve="{{ eleve }}">
                             <div class="block-content block-content-full d-flex align-items-center justify-content-between">
                                 <div>
                                     <div class="font-w600 mb-1">{{eleve}}</div>
-                                    <div class="font-size-sm text-muted">{{nombre_absences}} absence(s)</div>
+                                    <div class="font-size-sm text-muted">{{absences|length}} absence(s)</div>
                                 </div>
                                 <div class="ml-3">
                                     <img class="img-avatar" src="{% static 'assets/media/avatars/avatar7.jpg'%}" alt="">
@@ -177,7 +158,6 @@
                                 </div>
                             </div>
                         </a>
-                        <!-- END Referred User -->
                     </div>
                     {% endfor%}
                 </div>
@@ -185,7 +165,7 @@
         </div>
         <div class="block block-rounded">
             <div class="block-header block-header-default">
-                <h3 class="block-title">Liste des etudiants ({{etudiants|length}})</h3>
+                <h3 class="block-title">Liste des etudiants </h3>
             </div>
             <div class="block-content">
                 <div class="table-responsive">
@@ -232,6 +212,45 @@
 
         
     </div>
-    <!-- END Page Content -->
+    <div class="modal fade" id="detailsModal" tabindex="-1" role="dialog" aria-labelledby="detailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="detailsModalLabel">Détails de(s) l'absence(s)</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div id="absenceDetails">
+                        
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+<script src="{% static 'assets/js/jquery-3.7.1.min.js' %}"></script>
+<script>
+    $(document).ready(function () {
+        var listeAbsence = '{{ liste_absences_json|safe }}';
+        var absencesDetails = JSON.parse(listeAbsence);
+    $('a[data-toggle="modal"]').on('click', function () {
+        var eleve = $(this).data('eleve');
+        $('#detailsModal').on('show.bs.modal', function (e) {
+            var absenceDetailsElement = $('#absenceDetails');
+            absenceDetailsElement.empty();
+            var absences = absencesDetails[eleve]; 
+            for (var i = 0; i < absences.length; i++) {
+                        absenceDetailsElement.append('<p>' + absences[i] + '</p>');
+            }
+        });
+    });
+});
+
+</script>
+
 </main>
 {% endblock %}
