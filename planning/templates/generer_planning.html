@@ -56,8 +56,111 @@
                     <div class="form-group">
                         <a id="btnEnregistrer" class="btn btn-success">Enregistrer</a>
                     </div>
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#horaireModal">
+                        Ouvrir le tableau
+                    </button>
                     </div>
             </div>
+            <div class="modal fade" id="horaireModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Tableau d'horaires</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <table class="table">
+                                <thead>
+                                <tr>
+                                    <th scope="col"></th>
+                                    <th scope="col">Lundi</th>
+                                    <th scope="col">Mardi</th>
+                                    <th scope="col">Mercredi</th>
+                                    <th scope="col">Jeudi</th>
+                                    <th scope="col">Vendredi</th>
+                                    <th scope="col">Samedi</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <!-- Lignes pour chaque jour de la semaine -->
+                                <tr>
+                                    <th scope="row">7h-8h30</th>
+                                    <td><input type="checkbox"></td>
+                                    <td><input type="checkbox"></td>
+                                    <td><input type="checkbox"></td>
+                                    <td><input type="checkbox"></td>
+                                    <td><input type="checkbox"></td>
+                                    <td><input type="checkbox"></td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">8h45-10h15</th>
+                                    <td><input type="checkbox"></td>
+                                    <td><input type="checkbox"></td>
+                                    <td><input type="checkbox"></td>
+                                    <td><input type="checkbox"></td>
+                                    <td><input type="checkbox"></td>
+                                    <td><input type="checkbox"></td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">10h30-12h</th>
+                                    <td><input type="checkbox"></td>
+                                    <td><input type="checkbox"></td>
+                                    <td><input type="checkbox"></td>
+                                    <td><input type="checkbox"></td>
+                                    <td><input type="checkbox"></td>
+                                    <td><input type="checkbox"></td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">14h-15h30</th>
+                                    <td><input type="checkbox"></td>
+                                    <td><input type="checkbox"></td>
+                                    <td><input type="checkbox"></td>
+                                    <td><input type="checkbox"></td>
+                                    <td><input type="checkbox"></td>
+                                    <td><input type="checkbox"></td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">15h45-17h15</th>
+                                    <td><input type="checkbox"></td>
+                                    <td><input type="checkbox"></td>
+                                    <td><input type="checkbox"></td>
+                                    <td><input type="checkbox"></td>
+                                    <td><input type="checkbox"></td>
+                                    <td><input type="checkbox"></td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">17h15-18h</th>
+                                    <td><input type="checkbox"></td>
+                                    <td><input type="checkbox"></td>
+                                    <td><input type="checkbox"></td>
+                                    <td><input type="checkbox"></td>
+                                    <td><input type="checkbox"></td>
+                                    <td><input type="checkbox"></td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">18h-20h</th>
+                                    <td><input type="checkbox"></td>
+                                    <td><input type="checkbox"></td>
+                                    <td><input type="checkbox"></td>
+                                    <td><input type="checkbox"></td>
+                                    <td><input type="checkbox"></td>
+                                    <td><input type="checkbox"></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+                            <button type="button" class="btn btn-primary">Enregistrer</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            
+            
         </div>
 
       
@@ -86,6 +189,7 @@
                             
                         });
 
+                        
   
                
                                   // Fonction pour ajouter un événement à la liste
@@ -253,18 +357,30 @@
                                     initCalendar: function () {
                                         var e = new Date(), t = e.getDate(), n = e.getMonth(), r = e.getFullYear();
                                         calendar = new FullCalendar.Calendar(document.getElementById("js-calendar"), {
+                                            contentHeight: 600,
                                             locale: 'fr',
                                             themeSystem: "bootstrap",
                                             firstDay: 1,
                                             editable: !0,
-                                            droppable: !0,
+                                            droppable: true,
+                                            selectable: true,
                                             headerToolbar: {
-                                                left: "title",
-                                                right: "prev,next today dayGridMonth,timeGridWeek,timeGridDay,listWeek"
+                                                left: 'prev,next today',
+                                                center:"title",
+                                                right: "dayGridMonth,timeGridWeek,timeGridDay,listWeek"
                                             },
-                                            slotMinTime: "06:00:00",
+                                            buttonText:{
+                                                today:    "Aujourd'hui",
+                                                month:    "Mois",
+                                                week:     'Semaine',
+                                                day:      'Jour',
+                                                list:     'Liste'
+
+                                            },
+                                            slotMinTime: "07:00:00",
                                             slotMaxTime: "20:00:00",
                                             slotDuration: "00:15:00",
+                                            slotLabelInterval: "01:00:00",
                                             initialView: "timeGridWeek",
                                             initialDate:datedebut,
                                             hiddenDays: [0],
