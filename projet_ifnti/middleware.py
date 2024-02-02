@@ -9,5 +9,5 @@ class AuthUserMiddleware(MiddlewareMixin):
         if "id_annee_selectionnee" not in request.session:
             current_annee_universitaire = AnneeUniversitaire.static_get_current_annee_universitaire()
             request.session['id_annee_selectionnee'] = current_annee_universitaire.id
-            
+        
         return

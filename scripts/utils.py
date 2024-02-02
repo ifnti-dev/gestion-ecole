@@ -13,6 +13,7 @@ def trim_str(string):
     string = str(string).lower()
     string = re.sub(r'\s+', '', string.strip())
     string = re.sub(r'=', '', string)
+    print(string)
     return string
 
 def convert_serial_temporel_number_to_date(numero_serie_temporelle):
@@ -274,7 +275,7 @@ def load_notes_from_evaluation(path, matiere=None, semestre=None):
         
         #evaluation_date = evaluation_date.date()
         
-        if matiere.ponderation_restante(semestre) - evaluation_ponderation >= 0:
+        if (matiere.ponderation_restante(semestre) - evaluation_ponderation) >= 0:
             evaluation, _ = Evaluation.objects.get_or_create(
                     libelle=evaluation_name, 
                     ponderation=evaluation_ponderation,
@@ -293,8 +294,7 @@ def load_notes_from_evaluation(path, matiere=None, semestre=None):
                 etudiant = etudiants.get(nom__contains=row[0], prenom__contains=row[1])
                 if Note.objects.filter(etudiant=etudiant, evaluation=evaluation):
                     continue
-                
-                Note.objects.create(valeurNote=int(row[2]), etudiant=etudiant, evaluation=evaluation)
+                Note.objects.create(valeurNote=int(trim_str(row[2])), etudiant=etudiant, evaluation=evaluation)
 
         else:
             raise ValueError(f"Erreur de pondération pour l'évaluation : {evaluation_name} ")

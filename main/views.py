@@ -1749,6 +1749,8 @@ def uploadEvaluation(request, id_matiere, id_semestre):
                 messages.success(request, "L'evaluation a été chargé !")
             except ValueError as ve:
                 messages.error(request, str(ve))
+            except Exception as e:
+                messages.error(request, e)
         return redirect('main:evaluations', id_matiere=id_matiere)
         
     file_name = pre_load_evaluation_template_data(matiere, semestre)
