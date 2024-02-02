@@ -549,6 +549,7 @@ def matieres(request):
     :param request: L'objet de requête Django.
     :return: Une réponse HTTP redirigeant vers la liste des tuteurs après la création ou la modification.
     """
+    print(Matiere.objects.all())
     id_annee_selectionnee = request.session.get("id_annee_selectionnee")
     annee_universitaire = get_object_or_404(AnneeUniversitaire, pk=id_annee_selectionnee)
     niveau = "IFNTI"
@@ -561,7 +562,7 @@ def matieres(request):
         ue_id = request.POST.get('ue')
         if semestre_id != "":
             semestres_selected = semestres.filter(pk=semestre_id)
-            
+    
     programme = semestres_selected[0].programme_set.first()
     if programme:
         ues = programme.ues.all().prefetch_related('matiere_set')
@@ -575,6 +576,7 @@ def matieres(request):
             for matiere in _matieres:
                 matiere.nb_evaluations = matiere.count_evaluations(annee_universitaire, semestres_selected)
             matieres.update(_matieres)
+        ue = None
     else:
         ue = ues.filter(id=ue_id).first()
         if ue:
@@ -587,9 +589,9 @@ def matieres(request):
         semestres_selected = semestres_selected[0]
         
     try:
-        selected_ue = ue
+        selected_ue = ue.id
     except:
-        selected_ue = ""
+        selected_ue = ue_id
 
     data = {
         'matieres': matieres,

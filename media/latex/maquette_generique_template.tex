@@ -7,48 +7,54 @@
 \usepackage{multirow}
 \usepackage{longtable}
 \usepackage[left=0.3cm,right=0.3cm,top=2cm,bottom=2cm]{geometry}
-\usepackage{array}
-\usepackage{enumitem}
 \begin{document}
 \begin{center}
 % Définition du titre
 \begin{LARGE}
-IFNTI : Maquette \VAR{titre}
+IFNTI : Maquette semestre S3 2022-2023
 \end{LARGE}
 \end{center}
 \begin{center}
-% Définition du tableau
+
 \setlength{\tabcolsep}{0pt}
 \renewcommand{\arraystretch}{1}
 
-% Définition d'une nouvelle liste personnalisée avec un espacement nul
-\newlist{myitemize}{itemize}{1}
-\setlist[myitemize,1]{label=--,left=0pt,labelsep=0pt,topsep=0pt,partopsep=0pt,parsep=0pt,itemsep=0pt}
-
-
-\begin{longtable}{|m{2cm}|m{6cm}|m{3cm}|m{1.5cm}|m{2cm}|m{3cm}|m{3cm}|}
+\begin{longtable}{|c|c|c|c|c|c|c|c|}
 \hline
-Semestre & Intitulé UE & Type UE & Crédit UE & Volume Horaire (H) & \centering Enseignant principal & \centering Enseignant secondaire \arraybackslash \\ 
+Semestre & Intitulé UE & Type UE & Matières & Crédit UE & Volume Horaire (H) & Enseignant principal & Enseignant secondaire  \\ 
 \hline
 
 \BLOCK{ for semestre_data in semestres_data }
 
+\multicolumn{1}{|c|}{\multirow{\VAR{semestre_data.ues|length}}{*}{\VAR{semestre_data.semsetre.libelle}}}
+	\BLOCK{ for ue in semestre_data.ues}
+     & \multicolumn{1}{c|}{\multirow{\VAR{ue.matiere_set.all().count()}}{*}{\VAR{ue.libelle}}} 
+     & \multicolumn{1}{c|}{\multirow{\VAR{ue.matiere_set.all().count()}}{*}{\VAR{ue.type}}} 
+     & Python & \multicolumn{1}{c|}{\VAR{ue.matiere_set.all().count()}}{*}{\VAR{ue.nbreCredit}}} 
+     & 16.1 & sgallagher & sgallagher \\
+
+     \cline{4-3} \cline{6-3} \cline{7-3} \cline{8-3}
+
+	 \BLOCK{ for matiere in ue.matiere_set.all() }     
+     
+	 \multicolumn{1}{|c|}{}
+	 & & & \VAR{ue.type} & & 49.0 & sgallagher & sgallagher\\ 
+	 
+	 \cline{4-3} \cline{6-3} \cline{7-3} \cline{8-3}
+	 
+	 \BLOCK{ endfor }
+	 
+	 \cline{2-8}
+	 \BLOCK{ endfor }
+	 
 \hline
-\multirow{\VAR{semestre_data.ues|length}}{*}{\VAR{semestre_data.semsetre}} 
-\BLOCK{ for ue in semestre_data.ues}
-& \VAR{ue.libelle} & \VAR{ue.type} & \VAR{ue.nbreCredit} & \VAR{ue.heurs} & \VAR{ue.enseignant} &  \\
-\cline{2-7} 
 \BLOCK{ endfor }
 
-\BLOCK{ endfor }
-
-\cline{1-1} \cline{6-6}
-Total &  &  & 64 & 8 &  &  \\ 
+Total &  &  &  & 8 & 422.6 &  &  \\ 
 \hline 
 \end{longtable}
 
 \end{center}
-
 
 
 \end{document}

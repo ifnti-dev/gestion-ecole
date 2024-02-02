@@ -30,7 +30,7 @@
             <select name="ue" id="ue" class="form-control col-3 col-md-2">
                 <option value="-1">Toutes Ues</option>
                 {% for ue in ues %}
-                    <option value="{{ ue.id }}" {% if selected_ue.id == ue.id %}selected{% endif %}>{{ ue.libelle }}</option>
+                    <option value="{{ ue.id }}" {% if selected_ue == ue.id %}selected{% endif %}>{{ ue.libelle }}</option>
                 {% endfor %}
             </select>
         </form> 
