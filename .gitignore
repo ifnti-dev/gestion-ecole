@@ -7,9 +7,8 @@ __pycache__
 **/__pycache__/**
 db.sqlite3
 
-main/migrations/*
-planning/migrations/*
-cahier_de_texte/migrations/*
+**/.zip
+**/migrations/**
 docs/build/*
 
 # Backup files # 

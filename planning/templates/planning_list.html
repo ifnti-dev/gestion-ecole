@@ -16,10 +16,8 @@
         <a data-toggle="modal" data-target="#newPlanningModal" class="btn btn-outline-primary">
             <i class="fas fa-plus"></i> Nouveau planning
         </a> 
-       </div>
+    </div>
     <div class="block-content block-content-full">
-
-        
         <table class="table table-bordered table-striped table-vcenter js-dataTable-full-pagination">
             <thead>
                 <tr>
@@ -32,41 +30,39 @@
             </thead>
             <tbody>
                 {% for planning in plannings %}
+                <tr>
                     <td class="text-center font-size-sm">{{ planning.id }}</td>
-                    <td class="text-center font-w600 font-size-sm"> <a href="details/{{planning.id}}" target="_blank">{{ planning.semaine }}</a></td>
+                    <td class="text-center font-w600 font-size-sm"> <a href="details/{{planning.id}}" >{{ planning.semaine }}</a></td>
                     <td class="text-center font-w600 font-size-sm">{{ planning.semestre }}</td>
-
                     <td class="text-center font-w600 font-size-sm">{% if not planning.intervalle %} {{ planning.datedebut }} au {{ planning.datefin }} {% else %} {{ planning.intervalle }} {% endif %}</td>
-
                     <td class="text-center">
-                        <button type="button" class="btn btn-secondary dropdown-toggle" id="dropdown-default-secondary" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <i class="fa fa-bars" aria-hidden="true"></i>
-                        </button>
-                        <div class="dropdown-menu font-size-sm" aria-labelledby="dropdown-default-secondary">
-                            <li class="nav-main-item">
-
-                                <a class="nav-main-link nav-main-link-name" data-toggle="" aria-haspopup="true" aria-expanded="false" href="imprimer/{{planning.id}}">
-
-                                    <i class="fa fa-print mr-1" aria-hidden="true"></i>
-                                    <span class="nav-main-link-name">Imprimer</span>
-                                </a>
-                            </li>
-                            <li class="nav-main-item">
-                                <a class="nav-main-link nav-main-link-name" data-toggle="" aria-haspopup="true" aria-expanded="false" href="edit/{{planning.id}}">
-                                    <i class="fa fa-edit mr-1" aria-hidden="true"></i>
-
-                                    <span class="nav-main-link-name">Ajouter cours</span>
-
-                                </a>
-                            </li>
-                            <li class="nav-main-item">
-                                <a class="nav-main-link nav-main-link-name" data-toggle="" aria-haspopup="true" aria-expanded="false" href="delete/{{planning.id}}">
-                                    <i class="fa fa-trash mr-1 text-danger" aria-hidden="true"></i>
-                                    <span class="nav-main-link-name">Supprimer</span>
-                                </a>
-                            </li>
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-secondary dropdown-toggle" id="dropdown-default-secondary" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="fa fa-bars" aria-hidden="true"></i>
+                            </button>
+                            <div class="dropdown-menu font-size-sm" aria-labelledby="dropdown-default-secondary">
+                                <li class="nav-main-item">
+                                    <a class="nav-main-link nav-main-link-name" data-toggle="" aria-haspopup="true" aria-expanded="false" href="imprimer/{{planning.id}}">
+                                        <i class="fa fa-print mr-1" aria-hidden="true"></i>
+                                        <span class="nav-main-link-name">Imprimer</span>
+                                    </a>
+                                </li>
+                                <li class="nav-main-item">
+                                    <a class="nav-main-link nav-main-link-name" data-toggle="" aria-haspopup="true" aria-expanded="false" href="edit/{{planning.id}}">
+                                        <i class="fa fa-edit mr-1" aria-hidden="true"></i>
+                                        <span class="nav-main-link-name">Ajouter cours</span>
+                                    </a>
+                                </li>
+                                <li class="nav-main-item">
+                                    <a class="nav-main-link nav-main-link-name" data-toggle="" aria-haspopup="true" aria-expanded="false" href="delete/{{planning.id}}">
+                                        <i class="fa fa-trash mr-1 text-danger" aria-hidden="true"></i>
+                                        <span class="nav-main-link-name">Supprimer</span>
+                                    </a>
+                                </li>
+                            </div>
                         </div>
                     </td>
+                </tr>
                 {% endfor %}
             </tbody>
         </table>

@@ -1,0 +1,256 @@
+{% extends './index.html' %}
+{% block content_title %} INFOS SUR LE SEMESTRE {% endblock content_title %}
+{% load static %}
+{% block content %}
+<main id="main-container">
+    <div class="content">
+        <div class="block block-rounded">
+            <div class="block-content text-center">
+                <div class="py-4">
+                    <h1 class="font-size-lg mb-0">
+                         {{semestre.libelle}}
+                    </h1>
+                    <p class="font-size-sm text-muted">{{semestre.annee_universitaire}}</p>
+                </div>
+            </div>
+            <div class="block-content bg-body-light text-center">
+                <div class="row items-push text-uppercase">
+                    <div class="col-6 col-md-3">
+                        <div class="font-w600 text-dark mb-1">UEs</div>
+                        <div class="link-fx font-size-h3 text-primary" > {{ues|length}} </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="font-w600 text-dark mb-1">Etudiants</div>
+                        <div class="link-fx font-size-h3 text-primary" > {{etudiants|length}} </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="font-w600 text-dark mb-1">Matieres</div>
+                        <div class="link-fx font-size-h3 text-primary" > {{activite_matiere|length}} </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="font-w600 text-dark mb-1">Heures</div>
+                        <div class="link-fx font-size-h3 text-primary" > 5 </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="block block-rounded">
+            <div class="block-header block-header-default">
+                <h3 class="block-title">Activitées des Matieres</h3>
+            </div>
+            <div class="block-content">
+                <div class="row">
+                    {% for ue, donnee in activite_matiere.items %}
+                    <div class="col-lg-4">
+                        <!-- Billing Address -->
+                        <div class="block block-rounded block-bordered">
+                            <div class="block-header border-bottom">
+                                <h3 class="block-title">{{ donnee.libelle }}</h3>
+                            </div>
+                            <div class="block-content">
+                                <div class="font-size-h6 mb-1">{{ donnee.nombre_evaluations }} évaluation(s)</div>
+                                <div class="font-size-h6 mb-1">{{ donnee.nombre_evaluations }} rattrapage(s)</div>
+                                <div class="font-size-h6 mb-1">{{ donnee.nmbre_planifier }} seance(s) plannifier</div>
+                                <div class="font-size-h6 mb-1">{{ donnee.nombre_effectuer }} seance(s) plannifier et valider</div>
+                                <div class="font-size-h6 mb-1">{{ donnee.nombre_enregistrer }} seance(s) enregistrer dans le cahier de texte</div>
+                                <div class="font-size-h6 mb-1">{{ donnee.nombre_enregistrer_valider }} seance(s) enregistrer dans le cahier de texte et valider par l'enseignant</div>
+                                
+                            </div>
+                        </div>
+                        <!-- END Billing Address -->
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <!-- END Addresses -->
+
+        <!-- Shopping Cart -->
+        <div class="block block-rounded">
+            <div class="block-header block-header-default">
+                <h3 class="block-title">Plannification des cours par matiere (en Heures)</h3>
+            </div>
+            <div class="block-content">
+                <div class="table-responsive">
+                    <table class="table table-borderless table-striped table-vcenter">
+                        <thead>
+                            <tr>
+                                <th class="d-none d-md-table-cell text-center">Matière</th>
+                                <th class="d-none d-sm-table-cell text-center">Temps Prévu</th>
+                                <th class="d-none d-md-table-cell">Temps Plannifié</th>
+                                <th class="d-none d-sm-table-cell text-center">Temps Réalisé</th>
+                                <th class="d-none d-sm-table-cell text-center">Professeur</th>
+                                <th class="text-center">UE</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for ue, donnee in activite_matiere.items %}
+                            
+                            <tr>
+                                <td class="d-none d-sm-table-cell text-center">
+                                    {{ donnee.libelle }}
+                                </td>
+                                <td class="d-none d-sm-table-cell text-center">{{ donnee.temps_prevu }}</td>
+                                <td class="d-none d-md-table-cell">{{ donnee.temps_plannifier }}</td>
+                                <td class="d-none d-sm-table-cell text-center">{{ donnee.temps_effectuer }}</td>
+                                <td class="d-none d-sm-table-cell text-center">
+                                    {% if donnee.professeur %}
+                                        {{ donnee.professeur }}
+                                    {% else %}
+                                        N/A
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">{{ donnee.ue }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    
+                </div>
+            </div>
+        </div>
+        
+        <div class="block block-rounded">
+            <div class="block-header block-header-default">
+                <h3 class="block-title">Temps d'activité par Enseignant</h3>
+            </div>
+            <div class="block-content">
+                <div class="row row-deck">
+                    {% for prof, nombre_absences in activite_prof.items %}
+                    <div class="col-md-4">
+                        <!-- Referred User -->
+                        <a class="block block-rounded block-bordered block-link-shadow" href="javascript:void(0)">
+                            <div class="block-content block-content-full d-flex align-items-center justify-content-between">
+                                <div>
+                                    <div class="font-w600 mb-1">{{prof}}</div>
+                                    <div class="font-size-sm text-muted">{{nombre_absences.activité}}</div>
+                                </div>
+                                <div class="ml-3">
+                                    <img class="img-avatar" src="{% static 'assets/media/avatars/avatar7.jpg'%}" alt="">
+
+                                </div>
+                            </div>
+                        </a>
+                        <!-- END Referred User -->
+                    </div>
+                    {% endfor%}
+                </div>
+            </div>
+        </div>
+        <div class="block block-rounded">
+            <div class="block-header block-header-default">
+                <h3 class="block-title">Les Absences</h3>
+            </div>
+            <div class="block-content">
+                <div class="row row-deck">
+                    {% for eleve, absences in liste_absences.items %}
+                    <div class="col-md-4">
+                        <a class="block block-rounded block-bordered block-link-shadow" href="#" data-toggle="modal" data-target="#detailsModal" data-eleve="{{ eleve }}">
+                            <div class="block-content block-content-full d-flex align-items-center justify-content-between">
+                                <div>
+                                    <div class="font-w600 mb-1">{{eleve}}</div>
+                                    <div class="font-size-sm text-muted">{{absences|length}} absence(s)</div>
+                                </div>
+                                <div class="ml-3">
+                                    <img class="img-avatar" src="{% static 'assets/media/avatars/avatar7.jpg'%}" alt="">
+
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    {% endfor%}
+                </div>
+            </div>
+        </div>
+        <div class="block block-rounded">
+            <div class="block-header block-header-default">
+                <h3 class="block-title">Liste des etudiants </h3>
+            </div>
+            <div class="block-content">
+                <div class="table-responsive">
+                    <table class="table table-borderless table-striped table-vcenter">
+                        <thead>
+                            <tr>
+                                <th class="d-none d-md-table-cell text-center">Profil</th>
+                                <th class="d-none d-md-table-cell text-center">Nom & Prénom</th>
+                                <th class="d-none d-sm-table-cell text-center">Date de naissance</th>
+                                <th>Contact</th>
+                                <th class="d-none d-sm-table-cell text-center">Email</th>
+                                <th class="d-none d-md-table-cell text-center">Username</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for etudiant in etudiants %}
+                            <tr>
+                                <td class="d-none d-md-table-cell text-center ">
+                                    {% if etudiant.profil %}
+                                    <img class="img-avatar" src="{% static 'assets/media/avatars/avatar7.jpg'%}" alt="">
+                                        {% else %} <img class="img-avatar" src="{% static 'assets/media/avatars/avatar7.jpg'%}" alt="">
+                                    {% endif %}
+                                </td>
+                                <td class="text-center font-size-sm">
+                                    {{etudiant.nom}} {{etudiant.prenom}}
+                                </td>
+                                <td class="d-none d-sm-table-cell text-center font-size-sm">{{etudiant.datenaissance}}</td>
+                                <td>
+                                    <span class="badge badge-success">{{etudiant.contact}}</span>
+                                </td>
+                                <td class="text-center d-none d-sm-table-cell ">
+                                    <strong>{{etudiant.email}}</strong>
+                                </td>
+                                <td class="d-none d-md-table-cell text-center ">
+                                    <span class="badge badge-success">{{etudiant.user}}</span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        
+    </div>
+    <div class="modal fade" id="detailsModal" tabindex="-1" role="dialog" aria-labelledby="detailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="detailsModalLabel">Détails de(s) l'absence(s)</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div id="absenceDetails">
+                        
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+<script src="{% static 'assets/js/jquery-3.7.1.min.js' %}"></script>
+<script>
+    $(document).ready(function () {
+        var listeAbsence = '{{ liste_absences_json|safe }}';
+        var absencesDetails = JSON.parse(listeAbsence);
+    $('a[data-toggle="modal"]').on('click', function () {
+        var eleve = $(this).data('eleve');
+        $('#detailsModal').on('show.bs.modal', function (e) {
+            var absenceDetailsElement = $('#absenceDetails');
+            absenceDetailsElement.empty();
+            var absences = absencesDetails[eleve]; 
+            for (var i = 0; i < absences.length; i++) {
+                        absenceDetailsElement.append('<p>' + absences[i] + '</p>');
+            }
+        });
+    });
+});
+
+</script>
+
+</main>
+{% endblock %}

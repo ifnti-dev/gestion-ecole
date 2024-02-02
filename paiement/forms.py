@@ -76,7 +76,7 @@ class ComptableForm(forms.ModelForm):
     datenaissance = DateField(widget=forms.SelectDateWidget(years=range(1990, 2006)), label='Date de naissance')
     class Meta:
         model = Comptable
-        fields = ['nom', 'prenom', 'contact', 'sexe', 'email', 'adresse', 'datenaissance', 'lieunaissance', 'photo_passport', 'salaireBrut', 'nombre_de_personnes_en_charge', 'dernierdiplome', 'is_active']
+        fields = ['nom', 'prenom', 'contact', 'sexe', 'email', 'adresse', 'datenaissance', 'lieunaissance', 'numero_cnss', 'nif', 'photo_passport', 'salaireBrut', 'nombre_de_personnes_en_charge', 'dernierdiplome', 'is_active']
         widgets = {
             'nom': forms.TextInput(attrs={'class': 'form-control'}),
             'prenom': forms.TextInput(attrs={'class': 'form-control'}),
@@ -86,6 +86,8 @@ class ComptableForm(forms.ModelForm):
             'adresse': forms.TextInput(attrs={'class': 'form-control'}),
             'datenaissance': DateField(widget=forms.SelectDateWidget(years=range(1900, 2006)), label="Date de naissance"),
             'lieunaissance': forms.TextInput(attrs={'class': 'form-control'}),
+            'numero_cnss': forms.TextInput(attrs={'class': 'form-control'}),
+            'nif': forms.TextInput(attrs={'class': 'form-control'}),
             'photo_passport': forms.FileInput(attrs={'class': 'form-control'}),
             'salaireBrut': forms.NumberInput(attrs={'class': 'form-control'}),
             'nombre_de_personnes_en_charge': forms.NumberInput(attrs={'class': 'form-control'}),
@@ -165,14 +167,13 @@ class ComptableForm(forms.ModelForm):
 class SalaireForm(forms.ModelForm):
     class Meta:
         model = Salaire
-        fields = ['date_debut','date_fin', 'personnel', 'numero_cnss', 'qualification_professionnel', 'tcs', 'prime_efficacite', 'prime_qualite', 'frais_travaux_complementaires', 'prime_anciennete', 'prime_forfaitaire', 'acomptes']
+        fields = ['date_debut','date_fin', 'personnel', 'qualification_professionnel', 'prime_efficacite', 'prime_qualite', 'frais_travaux_complementaires', 'prime_anciennete', 'prime_forfaitaire', 'acomptes']
         widgets = {
             'date_debut': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}), 
             'date_fin': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
             'personnel': forms.Select(attrs={'class': 'form-control'}),
-            'numero_cnss': forms.TextInput(attrs={'class': 'form-control'}),
             'qualification_professionnel': forms.Select(attrs={'class': 'form-control'}),
-            'tcs': forms.NumberInput(attrs={'class': 'form-control'}),
+           # 'tcs': forms.NumberInput(attrs={'class': 'form-control'}),
             'prime_efficacite': forms.NumberInput(attrs={'class': 'form-control'}),
             'prime_qualite': forms.NumberInput(attrs={'class': 'form-control'}),
             'frais_travaux_complementaires': forms.NumberInput(attrs={'class': 'form-control'}),

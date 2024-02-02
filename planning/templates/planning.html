@@ -35,17 +35,31 @@ document.addEventListener('DOMContentLoaded', function() {
           var r = e.getFullYear();
 
           calendar = new FullCalendar.Calendar(document.getElementById("js-calendar"), {
+            contentHeight: 600,
             locale: 'fr',
             themeSystem: "bootstrap",
-            firstDay:1,
+            firstDay: 1,
+            editable: !0,
+            droppable: true,
+            selectable: true,
             headerToolbar: {
-              left: "title",
-              right: "prev,next today dayGridMonth,timeGridWeek,timeGridDay,listWeek"
+                        left: "title",
+                        right: "prev,next today dayGridMonth,timeGridWeek,timeGridDay,listWeek"
+                    },
+            buttonText:{
+                today:    "Aujourd'hui",
+                month:    "Mois",
+                week:     'Semaine',
+                day:      'Jour',
+                list:     'Liste'
+
             },
-            slotMinTime: "06:00:00",
+            slotMinTime: "07:00:00",
             slotMaxTime: "20:00:00",
             slotDuration: "00:15:00",
+            slotLabelInterval: "01:00:00",
             initialView: "timeGridWeek",
+
             hiddenDays: [0],
             initialDate: mostRecentEventDate, //
             events: event_data

@@ -65,6 +65,16 @@ def get_id_authenticate_user_model(request):
             return Enseignant.objects.get(user=request.user).id
     return 0
 
+def get_authenticate_user_model(request):
+    role = get_user_role(request)
+    if role:
+        role = role.name
+        if role == "etudiant":
+            return Etudiant.objects.get(user=request.user)
+        if role == "enseignant":
+            return Enseignant.objects.get(user=request.user)
+    return 0
+
 def trim_str(string):
     result = ""
     string = str(string)
