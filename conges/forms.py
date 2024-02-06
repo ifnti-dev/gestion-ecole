@@ -26,3 +26,15 @@ class CongeForm(forms.ModelForm):
 
 class RefusCongeForm(forms.Form):
     motif_refus = forms.CharField(widget=forms.Textarea)
+
+
+class ModifierCongeForm(forms.ModelForm):
+    class Meta:
+        model = Conge
+        fields = ['nature', 'autre_nature', 'date_et_heure_debut', 'date_et_heure_fin']
+        widgets = {
+            'nature': forms.Select(attrs={'class': 'form-control'}),
+            'autre_nature': forms.TextInput(attrs={'class': 'form-control'}), 
+            'date_et_heure_debut': forms.DateTimeInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'date_et_heure_fin': forms.DateTimeInput(attrs={'type': 'date', 'class': 'form-control'}),
+        }

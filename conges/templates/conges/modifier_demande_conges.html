@@ -1,0 +1,67 @@
+<!-- modifier_demande_conges.html -->
+{% extends 'index.html' %}
+{% block content_title %}
+  Modification d'une demande de congés
+  <h1>
+    <a href="{% url 'conges:demandes_en_attentes' id_annee_selectionnee %}" class="btn btn-outline-warning">
+      <i class="fas fa-chevron-left fa-lg"></i> Retour
+    </a>
+  </h1>
+{% endblock %}
+{% block content_title_description %}
+
+{% endblock %}
+{% block content %}
+  <div class="d-flex justify-content-center">
+    <div class="block-content card m-4 col-md-10 col-lg-8 col-xl-6">
+      <div class="d-flex justify-content-between">
+        <h3></h3>
+      </div>
+      <form class="container-fluid p-3" action="" method="POST">
+        {% csrf_token %}
+
+        {% if messages %}
+          <ul class="messages">
+            {% for message in messages %}
+              <li{% if message.tags %} class="{{ message.tags }}"{% endif %} style="color: red;">{{ message }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+
+        <div class="form-row mb-3">
+          <div class="col-md-6">
+            {{ form.nature.label_tag }}
+            {{ form.nature }}
+            <span class="text-danger">{{ form.nature.errors }}</span>
+          </div>
+
+          <div class="col-md-6">
+            {{ form.autre_nature.label_tag }}
+            {{ form.autre_nature }}
+            <span class="text-danger">{{ form.autre_nature.errors }}</span>
+          </div>
+        </div>
+
+        <br>
+
+        <div class="form-row mb-3">        
+          <div class="col-md-6">
+            {{ form.date_et_heure_debut.label_tag }}
+            {{ form.date_et_heure_debut }}
+            <span class="text-danger">{{ form.date_et_heure_debut.errors }}</span>
+          </div>
+
+          <div class="col-md-6">
+            {{ form.date_et_heure_fin.label_tag }}
+            {{ form.date_et_heure_fin }}
+            <span class="text-danger">{{ form.date_et_heure_fin.errors }}</span>
+          </div>
+        </div>
+
+        <br>
+
+        <button class="btn btn-primary btn-block" type="submit"><i class="fas fa-database"></i> Enregistrer &nbsp;&nbsp;&nbsp;<span></span></button>
+      </form> 
+    </div>
+  </div>
+{% endblock %}

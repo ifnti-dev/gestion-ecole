@@ -26,7 +26,7 @@
                 {% for conge in demandes_en_attentes %}
                 <tr>
                     <td class="text-center font-size-sm">{{ conge.personnel.nom }} {{ conge.personnel.prenom }}</td>
-                    <td class="text-center font-size-sm">Du {{ conge.date_et_heure_debut }} au  {{ conge.date_et_heure_fin }}</td>
+                    <td class="text-center font-size-sm">Du {{ date_debut_formatted }} au  {{ date_fin_formatted }}</td>
                     <td class="text-center font-size-sm">{{conge.nombre_de_jours_de_conge }} jours</td>
                     <td style="text-align: center;">                      
                         <button type="button" class="update-book btn btn-sm btn-primary">
@@ -36,6 +36,11 @@
                         </button>
                         <button type="submit" class="update-book btn btn-sm btn-danger" href="{% url 'conges:refuser_conge' conge.id %}" >
                             <span><i class="far fa-calendar-times"></i></span>
+                        </button>
+                        <button type="button" class="update-book btn btn-sm btn-success">
+                            <a style="color: blanchedalmond;" href="{% url 'conges:modifier_demande_conge' conge.id %}">
+                                <span><i class="far fa-edit"></i></span> 
+                            </a>
                         </button>
                     </td>
                 </tr>
