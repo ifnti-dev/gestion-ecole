@@ -1,69 +1,61 @@
 {% extends '../index.html' %}
 
-{% load static %}
+{% block content_title %}
+    Enregistrement une UE
+    <h1>
+        <a href="{% url 'main:ues' %}" class="btn btn-outline-warning">
+            <i class="fas fa-chevron-left fa-lg"></i> Retour
+        </a>
+    </h1>
+{% endblock %}
 
 {% block content %}
-    <div id="content-wrapper">
-        <div class="container-fluid">        
-            <div class="card mb-3">
-                <div class="card-header">
-                    <h3><i class="fas fa-table"></i> Enregistrement d'une UE
-                        <a class="btn btn-sm btn-success" href="{% url 'main:liste_des_ues' %}" style="padding: 8px; float: right; background-color: blue; color: white;"><i class="fas fa-chevron-left fa-lg"></i>
-                            Retour
-                        </a>
-                    </h3>
-                </div>
-                <div class="card-body">
-                  <form class="form-horizontal" action="#" method="POST">
-                    {% csrf_token %}               
-                
-                    <div class="form-group row">
-                        <label for="{{ form.libelle.id_for_label }}" class="col-md-2 col-form-label">Libellé de l'UE:</label>
-                        <div class="col-md-10">
-                            {{ form.libelle }}
-                        </div>
-                    </div>
-
-                    <div class="form-group row">
-                        <label for="{{ form.type.id_for_label }}" class="col-md-2 col-form-label">Type de l'UE:</label>
-                        <div class="col-md-10">
-                            {{ form.type }}
-                        </div>
-                    </div>
-
-                     <div class="form-group row">
-                        <label for="{{ form.type.id_for_label }}" class="col-md-2 col-form-label">Niveau d'Étude:</label>
-                        <div class="col-md-10">
-                            {{ form.niveau }}
-                        </div>
-                    </div>
-
-                    <div class="form-group row">
-                        <label for="{{ form.nbreCredits.id_for_label }}" class="col-md-2 col-form-label">Nombre de crédit:</label>
-                        <div class="col-md-10">
-                            {{ form.nbreCredits }}
-                        </div>
-                    </div> 
-
-                    <div class="form-group row">
-                        <label for="{{ form.heures.id_for_label }}" class="col-md-2 col-form-label">Nombre d'heure:</label>
-                        <div class="col-md-10">
-                            {{ form.heures }}
-                        </div>
-                    </div>
-                               
-                    <div class="form-group row">
-                        <label for="{{ form.enseignant.id_for_label }}" class="col-md-2 col-form-label">Enseignant responsable:</label>
-                        <div class="col-md-10">
-                            {{ form.enseignant }}
-                        </div>
-                    </div>
-
-                    <button class="btn btn-primary btn-block" type="submit"><i class="fas fa-database"></i> Enregistrer &nbsp;&nbsp;&nbsp;<span></span></button>
-                </form>
-                </div>
+    <div class="d-flex justify-content-center">
+        <div class="block-content card m-4 col-md-10 col-lg-8 col-xl-6">
+            <div class="d-flex justify-content-between"> 
             </div>
+            <form class="container-fluid p-3" action="#" method="POST">
+                {% csrf_token %}
+                <div class="form-row mb-3">
+                    <div class="col-12">
+                        {{ form.libelle.label_tag }}
+                        {{ form.libelle }}
+                        <span class="text-danger">{{ form.libelle.errors }}</span>
+                    </div>
+                </div>
+                <div class="form-row mb-3">
+                    <div class="col-md-6">
+                        {{ form.type.label_tag }}
+                        {{ form.type }}
+                        <span class="text-danger">{{ form.type.errors }}</span>
+                    </div>
+                    <div class="col-md-6">
+                        {{ form.niveau.label_tag }}
+                        {{ form.niveau }}
+                        <span class="text-danger">{{ form.niveau.errors }}</span>
+                    </div>
+                </div>
+                <div class="form-row mb-3">
+                    <div class="col-md-6">
+                        {{ form.nbreCredits.label_tag }}
+                        {{ form.nbreCredits }}
+                        <span class="text-danger">{{ form.nbreCredits.errors }}</span>
+                    </div>
+                    <div class="col-md-6">
+                        {{ form.heures.label_tag }}
+                        {{ form.heures }}
+                        <span class="text-danger">{{ form.heures.errors }}</span>
+                    </div>
+                </div>
+                <div class="form-row mb-3">
+                    <div class="col-md-12">
+                        {{ form.enseignant.label_tag }}
+                        {{ form.enseignant }}
+                        <span class="text-danger">{{ form.enseignant.errors }}</span>
+                    </div>
+                </div>
+                <button class="btn btn-primary btn-block mt-3" type="submit"><i class="fas fa-database"></i> Enrégistrer &nbsp;&nbsp;&nbsp;<span></span></button>
+            </form> 
         </div>
     </div>
-
 {% endblock %}

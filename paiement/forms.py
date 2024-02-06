@@ -76,7 +76,7 @@ class ComptableForm(forms.ModelForm):
     datenaissance = DateField(widget=forms.SelectDateWidget(years=range(1990, 2006)), label='Date de naissance')
     class Meta:
         model = Comptable
-        fields = ['nom', 'prenom', 'contact', 'sexe', 'email', 'adresse', 'datenaissance', 'lieunaissance', 'numero_cnss', 'nif', 'photo_passport', 'salaireBrut', 'nombre_de_personnes_en_charge', 'dernierdiplome', 'is_active']
+        fields = ['nom', 'prenom', 'contact', 'sexe', 'email', 'adresse', 'datenaissance', 'lieunaissance', 'numero_cnss', 'nif', 'profil', 'salaireBrut', 'nombre_de_personnes_en_charge', 'dernierdiplome', 'is_active']
         widgets = {
             'nom': forms.TextInput(attrs={'class': 'form-control'}),
             'prenom': forms.TextInput(attrs={'class': 'form-control'}),
@@ -88,7 +88,7 @@ class ComptableForm(forms.ModelForm):
             'lieunaissance': forms.TextInput(attrs={'class': 'form-control'}),
             'numero_cnss': forms.TextInput(attrs={'class': 'form-control'}),
             'nif': forms.TextInput(attrs={'class': 'form-control'}),
-            'photo_passport': forms.FileInput(attrs={'class': 'form-control'}),
+            'profil': forms.FileInput(attrs={'class': 'form-control'}),
             'salaireBrut': forms.NumberInput(attrs={'class': 'form-control'}),
             'nombre_de_personnes_en_charge': forms.NumberInput(attrs={'class': 'form-control'}),
             'dernierdiplome': forms.FileInput(attrs={'class': 'form-control'}),

@@ -24,6 +24,8 @@ load_dotenv()
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv('SECRET_KEY')
 
+X_FRAME_OPTIONS = 'SAMEORIGIN'
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
@@ -98,25 +100,34 @@ WSGI_APPLICATION = 'projet_ifnti.wsgi.application'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-
-        'NAME': os.getenv('DATABASE'),
-        'USER': os.getenv('DB_USER'),
-        'PASSWORD': os.getenv('DB_PASSWORD'),
-        'HOST': os.getenv('DB_FIRST_HOST'),
-        'HOST': os.getenv('DB_SECOND_HOST'),
-        'PORT': os.getenv('DB_PORT'),
-
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": "db.sqlite3",
     }
 }
 
 # DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.sqlite3",
-#         "NAME": "db.sqlite3",
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+
+#         'NAME': os.getenv('DATABASE'),
+#         'USER': os.getenv('DB_USER'),
+#         'PASSWORD': os.getenv('DB_PASSWORD'),
+#         'HOST': os.getenv('DB_FIRST_HOST'),
+#         'HOST': os.getenv('DB_SECOND_HOST'),
+#         'PORT': os.getenv('DB_PORT'),
+
 #     }
 # }
+# Email configuration
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp-mail.outlook.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'malik.kondi@ifnti.com'
+EMAIL_HOST_PASSWORD = 'Malik,2.0'
+RECIPIENT_ADDRESS = EMAIL_HOST_USER
 
 # Database bacup
 
@@ -128,6 +139,10 @@ DBBACKUP_STORAGE_OPTIONS = {'location': BASE_DIR / 'backup'}
 CRONJOBS = [
     ('*/30- * * * *', 'projet_ifnti.cron.backup') , # Backup database evry 5 minute
 ]
+
+# Celery settings
+CELERY_BROKER_URL = "redis://localhost:6379"
+CELERY_RESULT_BACKEND = "redis://localhost:6379"
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators

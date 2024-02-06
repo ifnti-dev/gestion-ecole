@@ -109,7 +109,7 @@
     <div class="block-content block-content-full">
         <form action="{% url 'main:passage_etudiants' %}" method="post" onsubmit="return confirmPassageEtudiants();">
             {% csrf_token %}
-            <table class="table table-bordered table-striped table-vcenter js-dataTable-full-pagination">
+            <table class="table table-bordered table-vcenter js-dataTable-full-pagination">
                 <thead>
                     <tr>
                         <th class="text-center" style="width: 30%;">Nom & Prénoms</th>
@@ -126,8 +126,8 @@
                 </thead>
                 <tbody>
                     {% for etudiant in etudiants %}
-                    <tr {% if etudiant in etudiants_insuffisants %}class="bg-danger text-white" {% endif %}>
-                        <td class="text-center font-size-sm">{{etudiant.etudiant.nom}} {{etudiant.etudiant.prenom}}</td>
+                    <tr class=" {% if etudiant in etudiants_insuffisants %} bg-danger text-white {% endif %} {% if not etudiant.etudiant.is_active %} text-danger {% endif %}" >
+                        <td class="text-center font-size-sm">{{etudiant.etudiant.nom}} {{etudiant.etudiant.prenom}} </td>
                         <td class="text-center d-sm-table-cell">
                             {% if etudiant.niveau == 'L1' %}
                             <span class="badge badge-info">{{etudiant.niveau}}</span>

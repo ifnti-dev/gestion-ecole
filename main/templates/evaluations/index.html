@@ -1,6 +1,6 @@
 {% extends 'index.html' %}
-{% block content_title %} Evaluations {% endblock content_title %}
-{% block content_title_description %} Liste des evaluations de {{ matiere.libelle }} {% endblock content_title_description %}
+{% block content_title %} Evaluations : {{ matiere.libelle }} {% endblock content_title %}
+{% block content_title_description %}  {% endblock content_title_description %}
 {% block backURl %}  
 <a href="{% url 'main:matieres_etudiant' %}">
     <button class="btn btn-warning">
@@ -10,9 +10,10 @@
 </a>
 {% endblock backURl %}
 {% block content %}
+
 <div class="block block-rounded">
     <div class="block-header">
-        <h3 class="block-title"> Matiere : {{ matiere.libelle }} </h3>
+        <h3 class="block-title"> </h3>
         <button type="button" class="mr-3 btn btn-outline-primary" data-toggle="modal" data-target="#evaluation">
             <i class="fas fa-plus"></i> Importer
         </button>
@@ -23,17 +24,25 @@
             <i class="fas fa-plus"></i> rattrapage
         </a>
     </div>
+    <div class="d-flex scrolling-wrapper py-2 border my-3 mx-4">
+        {% for mat in matieres %}
+            {% if mat.enseignant.user.id == user.id  %}
+            <a href="{% url 'main:evaluations' mat.id %}">    
+                <span class="border-right px-3 py-2 {% if matiere.id == mat.id %} bg-primary {% else %} bg-gray {% endif %} text-white"> {{ mat.libelle }} </span>
+            </a>
+            {% endif %}
+        {% endfor %}
+    </div>
     <div class="mx-4 d-flex justify-content-between">
-        <form action="" method="get" class="form-row" id="form-semestre">
-            <select name="semestre" id="semestre" class="form-control col-md-5">
+        <form action="" method="get" class="form-row">
+            <select name="semestre" id="semestre" class="form-control col-md-5" onchange="this.form.submit()">
                 <option value="">Semestres</option>
                 {% for semestre in semestres %}
-                    <option value="{{ semestre.id }}" {% if selected_semestre.id == semestre.id %}selected{% endif %}>{{ semestre }}</option>
+                    <option value="{{ semestre.id }}" {% if selected_semestre.id == semestre.id %}selected{% endif %}>{{ semestre.libelle }}</option>
                 {% endfor %}
             </select>
-            <select name="type" id="" class="form-control col-md-6 ml-2">
+            <select name="type" id="" class="form-control col-md-6 ml-2" onchange="this.form.submit()">
                 <option value="">Types évaluation</option>
-                <option value="">Tous type</option>
                 <option value="0">évaluation</option>
                 <option value="1">rattrapage</option>
             </select>
@@ -129,11 +138,3 @@
 {% include 'components/modal_import_evaluation.html' with title="Importer des evaluations" modal_id="evaluation" url=url_path %}
 
 {% endblock content %}
-{% block scripts %}
-    <script type="text/javascript">
-        form_tag = $('#form-semestre');
-        $('#semestre').on('change', function() {
-            form_tag.submit();
-        });
-    </script>
-{% endblock scripts %}

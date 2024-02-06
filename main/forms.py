@@ -9,10 +9,7 @@ from django.forms.utils import ErrorList,ErrorDict
 from django.utils.translation import gettext_lazy as _
 
 
-def contains_special_caractere(word):
-    if not word:
-        return True
-    carractere_speciaux = ";/.,:!?*+=@#$%&()[]{}_<>|~\"\'\\`" 
+def contains_special_caractere(word, carractere_speciaux="/:!?*+=@#$%&()[]{_<>}|~\"\\`"):
     for caractere in word:
         if caractere in carractere_speciaux:
             return True
@@ -85,7 +82,7 @@ class EtudiantForm(forms.ModelForm):
     datenaissance = DateField(widget=forms.SelectDateWidget(years=range(1900, 2006), attrs={'class': 'form-control'}), label="Date de naissance")
     class Meta:
         model = Etudiant
-        fields = ['nom', 'prenom', 'contact', 'sexe', 'adresse', 'datenaissance', 'lieunaissance', 'prefecture', 'is_active', 'seriebac1', 'seriebac2', 'anneebac1', 'anneebac2', 'etablissementSeconde', 'etablissementPremiere', 'etablissementTerminale', 'francaisSeconde', 'francaisPremiere','francaisTerminale', 'anglaisSeconde', 'anglaisPremiere', 'anglaisTerminale', 'mathematiqueSeconde', 'mathematiquePremiere', 'mathematiqueTerminale', 'semestres']
+        fields = ['nom', 'prenom', 'contact', 'sexe', 'adresse', 'datenaissance', 'lieunaissance', 'profil', 'prefecture', 'is_active', 'seriebac1', 'seriebac2', 'anneebac1', 'anneebac2', 'etablissementSeconde', 'etablissementPremiere', 'etablissementTerminale', 'francaisSeconde', 'francaisPremiere','francaisTerminale', 'anglaisSeconde', 'anglaisPremiere', 'anglaisTerminale', 'mathematiqueSeconde', 'mathematiquePremiere', 'mathematiqueTerminale', 'semestres', 'photo_passport']
         widgets = {
             'nom': forms.TextInput(attrs={'class': 'form-control'}),
             'prenom': forms.TextInput(attrs={'class': 'form-control'}),
@@ -112,6 +109,7 @@ class EtudiantForm(forms.ModelForm):
             'mathematiqueSeconde': forms.TextInput(attrs={'class': 'form-control'}),
             'mathematiquePremiere': forms.TextInput(attrs={'class': 'form-control'}),
             'mathematiqueTerminale': forms.TextInput(attrs={'class': 'form-control'}),
+            'semestres' : forms.SelectMultiple(attrs={'class': 'form-control js-select2 col-md-12'}),
         }
         
 
@@ -145,8 +143,10 @@ class EtudiantForm(forms.ModelForm):
 
         #if contact.isdecimal():
         #   self._errors['contact'] = 'Le contact ne doit pas contenir des lettres'
-
-        if contains_special_caractere(adresse):
+        
+        carractere_speciaux = "/:!?*+=@#$%&()[]{}_<>|~\"\\`" 
+        
+        if adresse and contains_special_caractere(adresse):
             self._errors['adresse'] = 'L\'adresse ne doit pas contenir des caractères spéciaux'
 
         if contains_special_caractere(lieunaissance):
@@ -179,13 +179,13 @@ class TuteurForm(forms.ModelForm):
         model = Tuteur
         fields = ['nom', 'prenom', 'contact', 'sexe', 'adresse', 'profession', 'type']
         widgets = {
-            'nom': forms.TextInput(attrs={'class': 'form-control col-md-6'}),
-            'prenom': forms.TextInput(attrs={'class': 'form-control col-md-6'}),
-            'contact': forms.TextInput(attrs={'class': 'form-control col-md-6'}),
-            'sexe': forms.Select(choices=Tuteur.CHOIX_SEX, attrs={'class': 'form-control col-md-6'}),
-            'adresse': forms.TextInput(attrs={'class': 'form-control col-md-6'}),
-            'profession': forms.TextInput(attrs={'class': 'form-control col-md-6'}),
-            'type': forms.Select(choices=Tuteur.CHOIX_TYPE, attrs={'class': 'form-control col-md-6'}),
+            'nom': forms.TextInput(attrs={'class': 'form-control col-md-12'}),
+            'prenom': forms.TextInput(attrs={'class': 'form-control col-md-12'}),
+            'contact': forms.TextInput(attrs={'class': 'form-control col-md-12'}),
+            'sexe': forms.Select(choices=Tuteur.CHOIX_SEX, attrs={'class': 'form-control col-md-12'}),
+            'adresse': forms.TextInput(attrs={'class': 'form-control col-md-12'}),
+            'profession': forms.TextInput(attrs={'class': 'form-control col-md-12'}),
+            'type': forms.Select(choices=Tuteur.CHOIX_TYPE, attrs={'class': 'form-control col-md-12'}),
         }
 
 
@@ -209,28 +209,29 @@ class UeForm(forms.ModelForm):
         model = Ue
         fields = ['libelle', 'type', 'niveau', 'nbreCredits', 'heures', 'enseignant']
         widgets = {
-            'libelle': forms.TextInput(attrs={'class': 'form-control col-md-6'}),
-            'type': forms.Select(attrs={'class': 'form-control col-md-6'}),       
-            'niveau': forms.Select(attrs={'class': 'form-control col-md-6'}),       
-            'nbreCredits': forms.TextInput(attrs={'class': 'form-control col-md-6'}),
-            'heures': forms.TextInput(attrs={'class': 'form-control col-md-6'}),
-            'enseignant': forms.Select(attrs={'class': 'form-control col-md-6'}),       
+            'libelle': forms.TextInput(attrs={'class': 'form-control col-md-12'}),
+            'type': forms.Select(attrs={'class': 'form-control col-md-12'}),       
+            'niveau': forms.Select(attrs={'class': 'form-control col-md-12'}),       
+            'nbreCredits': forms.TextInput(attrs={'class': 'form-control col-md-12'}),
+            'heures': forms.TextInput(attrs={'class': 'form-control col-md-12'}),
+            'enseignant': forms.Select(attrs={'class': 'form-control col-md-12'}),       
 
         }
  
 
 class MatiereForm(forms.ModelForm):
-    ue = forms.ModelChoiceField(queryset=Ue.objects.all())    
+
     class Meta:
         model = Matiere
-        fields = ['libelle', 'coefficient', 'minValue', 'ue', 'enseignant', 'abbreviation']
+        fields = ['libelle', 'coefficient', 'minValue', 'ue', 'enseignant', 'abbreviation', 'heures']
         widgets = {
             'libelle': forms.TextInput(attrs={'class': 'form-control col-md-12'}),
             'coefficient': forms.TextInput(attrs={'class': 'form-control col-md-12'}),
             'minValue': forms.TextInput(attrs={'class': 'form-control col-md-12'}),
-            'ue': forms.Select(attrs={'class': 'form-control col-md-12'}),   
+            'ue': forms.Select(attrs={'class': 'form-control js-select2 col-md-12'}),  
             'enseignant': forms.Select(attrs={'class': 'form-control col-md-12'}),  
             'abbreviation': forms.TextInput(attrs={'class': 'form-control col-md-12'}),
+            'heures': forms.NumberInput(attrs={'class': 'form-control col-md-12'}),
         }
 
 
@@ -238,7 +239,7 @@ class EnseignantForm(forms.ModelForm):
     datenaissance = DateField(widget=forms.SelectDateWidget(years=range(1990, 2006)), label='Date de naissance')
     class Meta:
         model = Enseignant
-        fields = ['nom', 'prenom', 'contact', 'sexe', 'email', 'adresse', 'datenaissance', 'lieunaissance', 'numero_cnss', 'nif', 'photo_passport', 'salaireBrut', 'nombre_de_personnes_en_charge', 'dernierdiplome', 'is_active', 'type', 'specialite']
+        fields = ['nom', 'prenom', 'contact', 'sexe', 'email', 'adresse', 'datenaissance', 'lieunaissance', 'numero_cnss', 'nif', 'profil', 'salaireBrut', 'nombre_de_personnes_en_charge', 'dernierdiplome', 'is_active', 'type', 'specialite']
         widgets = {
             'nom': forms.TextInput(attrs={'class': 'form-control'}),
             'prenom': forms.TextInput(attrs={'class': 'form-control'}),
@@ -250,7 +251,7 @@ class EnseignantForm(forms.ModelForm):
             'lieunaissance': forms.TextInput(attrs={'class': 'form-control'}),
             'numero_cnss': forms.TextInput(attrs={'class': 'form-control'}),
             'nif': forms.TextInput(attrs={'class': 'form-control'}),
-            'photo_passport': forms.FileInput(attrs={'class': 'form-control'}),
+            'profil': forms.FileInput(attrs={'class': 'form-control'}),
             'salaireBrut': forms.NumberInput(attrs={'class': 'form-control'}),
             'nombre_de_personnes_en_charge': forms.NumberInput(attrs={'class': 'form-control'}),
             'dernierdiplome': forms.FileInput(attrs={'class': 'form-control'}),
