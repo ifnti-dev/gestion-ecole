@@ -99,34 +99,35 @@ WSGI_APPLICATION = 'projet_ifnti.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.sqlite3",
+#         "NAME": "db.sqlite3",
+#     }
+# }
+
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": "db.sqlite3",
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+
+        'NAME': os.getenv('DATABASE'),
+        'USER': os.getenv('DB_USER'),
+        'PASSWORD': os.getenv('DB_PASSWORD'),
+        'HOST': os.getenv('DB_FIRST_HOST'),
+        'HOST': os.getenv('DB_SECOND_HOST'),
+        'PORT': os.getenv('DB_PORT'),
+
     }
 }
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-
-#         'NAME': os.getenv('DATABASE'),
-#         'USER': os.getenv('DB_USER'),
-#         'PASSWORD': os.getenv('DB_PASSWORD'),
-#         'HOST': os.getenv('DB_FIRST_HOST'),
-#         'HOST': os.getenv('DB_SECOND_HOST'),
-#         'PORT': os.getenv('DB_PORT'),
-
-#     }
-# }
 # Email configuration
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp-mail.outlook.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'malik.kondi@ifnti.com'
-EMAIL_HOST_PASSWORD = 'Malik,2.0'
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 RECIPIENT_ADDRESS = EMAIL_HOST_USER
 
 # Database bacup
