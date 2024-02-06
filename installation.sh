@@ -8,7 +8,7 @@ DB_PASSWORD="ifnti"
 
 # 🚀 Installation des dépendances
 echo "🔍 🌀 Installation des dépendances en cours..."
-sudo apt-get install postgresql texmaker python3-virtualenv
+sudo apt-get install postgresql texmaker python3-virtualenv redis
 
 # 🌐 Création de la base de données et de l'utilisateur
 echo "⚙️ Configuration de la base de données..."
