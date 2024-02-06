@@ -6,7 +6,9 @@ from main.models import AnneeUniversitaire
 
 class AuthUserMiddleware(MiddlewareMixin):
     def process_request(self, request):
-        if "id_annee_selectionnee" not in request.session:
+        try:
+            annee = AnneeUniversitaire.objects.get(id=request.session['id_annee_selectionnee'])
+        except:
             current_annee_universitaire = AnneeUniversitaire.static_get_current_annee_universitaire()
             request.session['id_annee_selectionnee'] = current_annee_universitaire.id
             

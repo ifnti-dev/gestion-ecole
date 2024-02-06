@@ -5,11 +5,9 @@ from main.helpers import get_authenticate_profile_path, get_user_role, get_id_au
 
 def bootstrap(request):
     current_annee_accademique = AnneeUniversitaire.static_get_current_annee_universitaire()
-    auth_user_role = get_user_role(request)
-    role_name = ""
-    if auth_user_role:
-        role_name = auth_user_role.name
-    if role_name == "etudiant":
+    
+        
+    if request.session.get('is_etudiant'):
         etudiant = request.user.etudiant
         niveau = etudiant.get_niveau_annee(current_annee_accademique)[0]
     else:
@@ -25,16 +23,15 @@ def bootstrap(request):
     return {
         'annee_universitaire': current_annee_accademique if current_annee_accademique else "-",
         'annees_universitaire': AnneeUniversitaire.objects.all().order_by('-annee'),
-        'auth_user_role': auth_user_role,
-        'is_etudiant': role_name == 'etudiant',
-        'is_directeur_des_etudes': role_name == 'directeur_des_etudes',
-        'is_enseignant': role_name == 'enseignant',
-        'is_secretaire': role_name == 'secretaire',
-        'is_comptable': role_name == 'comptable',
-        'id_authenticate_user_model': id_auth_model,
+        'is_etudiant': request.session.get('is_etudiant'),
+        'is_directeur_des_etudes': request.session.get('is_directeur_des_etudes'),
+        'is_enseignant': request.session.get('is_enseignant'),
+        'is_secretaire': request.session.get('is_secretaire'),
+        'is_comptable': request.session.get('is_comptable'),
+        'id_authenticate_user_model': request.session.get('id_auth_model'),
         'id_annee_selectionnee': id_annee_selectionnee,
         'page_is_not_profil' : True,
-        'profile_path': get_authenticate_profile_path(request, id_auth_model),
+        'profile_path': request.session.get('profile_path'),
         'niveau': niveau,
         'MEDIA_URL' : '/media/',
     }

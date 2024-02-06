@@ -24,6 +24,8 @@ load_dotenv()
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv('SECRET_KEY')
 
+X_FRAME_OPTIONS = 'SAMEORIGIN'
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
@@ -97,6 +99,13 @@ WSGI_APPLICATION = 'projet_ifnti.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.sqlite3",
+#         "NAME": "db.sqlite3",
+#     }
+# }
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -111,12 +120,15 @@ DATABASES = {
     }
 }
 
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.sqlite3",
-#         "NAME": "db.sqlite3",
-#     }
-# }
+# Email configuration
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp-mail.outlook.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+RECIPIENT_ADDRESS = EMAIL_HOST_USER
 
 # Database bacup
 
@@ -128,6 +140,10 @@ DBBACKUP_STORAGE_OPTIONS = {'location': BASE_DIR / 'backup'}
 CRONJOBS = [
     ('*/30- * * * *', 'projet_ifnti.cron.backup') , # Backup database evry 5 minute
 ]
+
+# Celery settings
+CELERY_BROKER_URL = "redis://localhost:6379"
+CELERY_RESULT_BACKEND = "redis://localhost:6379"
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators

@@ -148,8 +148,8 @@ class Utilisateur(models.Model):
 
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, editable=False)
-    photo_passport = models.ImageField(
-        null=True, blank=True, verbose_name="Photo passport")
+    profil = models.ImageField(
+        null=True, blank=True, verbose_name="Profil")
 
     """
         Photo passeport de l'utilisateur
@@ -433,8 +433,8 @@ class Etudiant(Utilisateur):
         **Valeur par défaut:** Décision du conseil
     """
 
-    profil = models.ImageField(
-        null=True, blank=True, verbose_name="Photo de profil")
+    photo_passport = models.ImageField(
+        null=True, blank=True, verbose_name="Photo passport")
 
     """
         Photo de profil
@@ -511,7 +511,7 @@ class Etudiant(Utilisateur):
             group_etudiant = Group.objects.get(name="etudiant")
             self.user.groups.add(group_etudiant)
 
-        self.email = self.generate_email()
+        # self.email = self.generate_email()
         super().save()
 
     def get_semestre_courant(self):
@@ -1189,6 +1189,9 @@ class Enseignant(Personnel):
 
         return list(niveaux)
 
+    def matieres(self, semestres):
+        return Matiere.objects.filter(enseignant=self, ue__programme__semmestre__in=semestres)
+
     def __str__(self):
         return f'{super().__str__()}'
         # return f'{self.user.username}'
@@ -1341,7 +1344,7 @@ class Ue(models.Model):
 
         **Type:** string
     """
-    nbreCredits = models.IntegerField(verbose_name="Nombre de crédit")
+    nbreCredits = models.IntegerField(verbose_name="Nombre de crédit", validators=[MinValueValidator(1)])
     """
         Nombre de crédits de l'UE
 

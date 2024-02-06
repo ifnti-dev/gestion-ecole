@@ -5,6 +5,11 @@
     <img src="{% static '/assets/media/logo.png' %}" alt="" width="50px">                
     <h1 class="mt-4">Se connecter</h1>
     <div>
+        
+        {% if error %}
+            <span class="text-danger">{{ error }}</span>
+        {% endif %}
+            
         <form action="" method="post">
             {% csrf_token %}
             <div class="d-flex flex-column mt-4">
@@ -33,13 +38,13 @@
                 <button class="btn btn-primary w-100">Se connecter</button>
             </div>
         </form>
-        <hr class="">
-        <div>
+        {% comment %} <div>
+            <hr class="">
             <a href="">
                 <span></span>
-                <button class="btn border">google</button>
+                <button class="btn border">Outlook</button>
             </a>
-        </div>
+        </div> {% endcomment %}
     </div>
 </div>
 {% endblock content %}

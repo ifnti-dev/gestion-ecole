@@ -9,29 +9,24 @@
             <div class="block-header">
                 <h3 class="block-title"> Afficher une maquette</h3>
             </div>
-            <form method="POST" action="">
+            <form method="POST" action="" id="form">
                 {% csrf_token %}
                 <div class="block-content row">
-                    <div class="form-group col-lg-2">
+                    <div class="form-group col-lg-4">
                         {{ form.parcours.label_tag }}
                         {{ form.parcours }}
                     </div>
-                    <div class="form-group col-lg-2">
-                        {{ form.semestre.label_tag }}
-                        {{ form.semestre }}
+                    <div class="form-group col-lg-4">
+                        {{ form.semestres.label_tag }}
+                        {{ form.semestres }}
                     </div>
-                    <div class="form-group col-lg-3">
+                    <div class="form-group col-lg-4">
                         {{ form.type_maquette.label_tag }}
                         {{ form.type_maquette }}
                     </div>
-                    <div class="form-group col-lg-3">
-                        <button type="submit" class="btn btn-outline-primary" style="margin-top: 30px;">
-                            <i class="fa fa-search"></i> Rechercher
-                        </button>
-                    </div>
                 </div>
             </form>
-            <div class="d-flex flex-column align-items-center p-3">
+            {% comment %} <div class="d-flex flex-column align-items-center p-3">
                 <h3>IFNTI : Maquette {{ maquette_semestres.titre }} </h3>
                 <div class="mx-3">
                     <div class="form-group col-lg-3">
@@ -93,13 +88,11 @@
                         </tbody>
                     </table>
                 </div>
+            </div> {% endcomment %}
+            <div class="p-3">
+                <embed src="/media/pdf/maquette.pdf" width="100%" height="800">
             </div>
         </div>
     </div>
 </div>
 {% endblock content %}
-{% block scripts %}
-    <script type="text/javascript">
-        
-    </script>
-{% endblock scripts %}
