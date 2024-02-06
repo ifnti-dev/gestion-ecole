@@ -4,7 +4,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from main.pdfMaker import generate_pdf
 from main.models import AnneeUniversitaire, CorrespondanceMaquette, Matiere, Programme, Semestre, Ue, Domaine, Parcours
 from maquette.custom_permission_required import data_permission
-from scripts.utils import load_maquette, load_matieres_by_year, load_notes_from_ue_file, pre_load_note_ues_template_data, pre_load_ue_matiere_template_data_by_year
+from scripts.utils import load_maquette, load_matieres_by_year, load_notes_from_ue_file, pre_load_maquette, pre_load_note_ues_template_data, pre_load_ue_matiere_template_data_by_year
 from .forms import CorrespondanceMaquetteForm, GenerateMaquetteForm, ProgrammeForm, DomaineForm, ParcoursForm
 import os
 from django.contrib import messages
@@ -110,58 +110,92 @@ def delete_correspondance(request, id):
     return redirect('maquette:correspondances')
 
 @login_required(login_url=settings.LOGIN_URL)
-def generate_maquette(request, id_annee_selectionnee):
+def generate_maquette(request):
     data = {}
+    id_annee_selectionnee = request.session.get('id_annee_selectionnee')
     annee_accademique = get_object_or_404(AnneeUniversitaire, pk=id_annee_selectionnee)
     parcours = Parcours.objects.all().first()
+    template_path = "maquette_generique_template"
 
     if request.method == "POST":
         form = GenerateMaquetteForm(request.POST)
         if form.is_valid():
             cleaned_data = form.clean()
-            semestre = cleaned_data.get('semestre')
+            semestres = cleaned_data.get('semestres')
+            parcours = cleaned_data.get('parcours')
+            type_maquette = cleaned_data.get('type_maquette')
+            if type_maquette=='1':
+                template_path = "maquette_specifique_template"
+                
             data['form'] = form
-            data['maquette_semestres'] = generateDictFromProgrammeData(semestre, parcours, annee_accademique)
-            generate_maquette_pdf(data['maquette_semestres'])
+            data['maquette_semestres'] = generateDictFromProgrammeData(semestres, parcours, annee_accademique)
+            generate_maquette_pdf(data['maquette_semestres'], template_path)
             data['pdf_file'] = "/media/pdf/maquette/maquette.pdf"
         else:
             data['form'] = form
     else:
         data['maquette_semestres'] = generateDictFromProgrammeData(None, parcours, annee_accademique)
-        generate_maquette_pdf(data['maquette_semestres'])
+        generate_maquette_pdf(data['maquette_semestres'], template_path)
         data['pdf_file'] = "/media/pdf/maquette.pdf"
-        data['form'] = GenerateMaquetteForm(initial={'semestre': Semestre.objects.all()})
+        data['form'] = GenerateMaquetteForm()
         
     return render(request, "maquette/generate_maquette.html", data)
 
-def generateDictFromProgrammeData(semestre, parcours, annee_accademique):
-    if semestre:
-        semestres = [semestre]
-        titre = f' semestre {semestre.libelle} {semestre.annee_universitaire}'
+def generateDictFromProgrammeData(semestres, parcours, annee_accademique):
+    if semestres:
+        if semestres.count() > 1:
+            titre = "des semestre"
+        else:
+            titre = "semestre"
+        
+        titre += " "+",".join([ str(semestre) for semestre in semestres ])
+            
     else:
         semestres = annee_accademique.semestre_set.all()
-        titre = ""
+        titre = annee_accademique
     programmes = Programme.objects.filter(parcours=parcours, semestre__in=semestres, semestre__annee_universitaire=annee_accademique).prefetch_related('ues')
     semestres_data = []
+    
     for programme in programmes:
         ues = programme.ues.all().prefetch_related('matiere_set')
+        
+        total_credit = 0
+        total_horair = 0
+        total_row = 0
+        for ue in ues:
+            total_credit += ue.nbreCredits
+            total_horair += ue.heures
+            total_row += ue.matiere_set.count()+3
+        
         semestre_data = {
             "semsetre" : programme.semestre,
             "ues" : ues,
-            "ues_length" : ues.count(),
+            "total_credit" : total_credit,
+            "total_horair" : total_horair,
+            "total_row" : total_row,
         }
         
         semestres_data.append(semestre_data)
     
+    total_credit = 0
+    total_horair = 0
+    total_row = 0
+    for semestre_data in semestres_data:
+        total_credit += semestre_data["total_credit"] 
+        total_horair += semestre_data["total_horair"] 
+        total_row += semestre_data["total_row"]+3
+    
     data={
         "titre" : titre,
-        "semestres_data" : semestres_data
+        "semestres_data" : semestres_data,
+        "total_credit" : total_credit,
+        "total_horair" : total_horair,
+        "total_row" : total_row-6,
     }
     return data
 
-def generate_maquette_pdf(context):
-    latex_input = 'maquette_generique_template'
-    latex_ouput = 'maquette_generique'
+def generate_maquette_pdf(context, latex_input):
+    latex_ouput = 'maquette'
     pdf_file = 'maquette'
 
     generate_pdf(context, latex_input, latex_ouput, pdf_file)
@@ -320,7 +354,8 @@ def upload_maquette(request):
                             load_maquette(file_cache_tmp, annee_selectionnee)
                         except ValueError as ve:
                             messages.error(request, str(ve))
-            
+                        except Exception as e:
+                            messages.error(request, str(e))
             message_array = message.split(';')
             if len(message_array) == 2:
                 message = f"La maquette de l'année {message_array[0]}  a été chargé !"
@@ -334,8 +369,8 @@ def upload_maquette(request):
     
     annee_universitaire = request.GET.get("annee_universitaire")
     annee_universitaire = get_object_or_404(AnneeUniversitaire, pk=annee_universitaire)
-    file_name = 'maquette_general_[annee].xlsx'
-    file_path = 'media/excel_templates/'+file_name
+    file_name = pre_load_maquette('media/excel_templates/maquette_general_[annee].xlsx', annee_universitaire)
+    file_path = file_name
     file_name = f'maquette_general_{annee_universitaire}.xlsx'
     with open(file_path, 'rb') as file:
         response = HttpResponse(file.read(), content_type="application/force-download")
@@ -363,6 +398,7 @@ def upload_matieres(request):
                     return redirect('maquette:data')
                 except Exception as e:
                     print(e)
+                    messages.error(request, str(e))
                     return redirect('maquette:data')
                     
             message = f"{annee}; "
@@ -385,3 +421,5 @@ def upload_matieres(request):
         response = HttpResponse(file.read(), content_type="application/force-download")
         response['Content-Disposition'] = 'attachment; filename="{}"'.format(os.path.basename(file_name))
         return response
+
+

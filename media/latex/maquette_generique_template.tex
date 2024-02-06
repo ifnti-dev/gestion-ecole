@@ -1,56 +1,69 @@
-\documentclass[12pt,a4paper,landscape]{article}
+\documentclass[10pt,a4paper,landscape]{article}
 \usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
 \usepackage{amsmath}
 \usepackage{amsfonts}
 \usepackage{amssymb}
 \usepackage{graphicx}
+\usepackage{lscape}
+\usepackage{multirow}
+\usepackage{array}
+\usepackage[OT1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[none]{hyphenat}
+\usepackage{fancyhdr}
+\usepackage{eso-pic, graphicx}
 \usepackage{multirow}
 \usepackage{longtable}
 \usepackage[left=0.3cm,right=0.3cm,top=2cm,bottom=2cm]{geometry}
+\usepackage[french]{babel}
+
+\graphicspath{ {\VAR{image_path}} }
+\newcommand\BackgroundPic{
+\put(-4,0){
+\parbox[b][\paperheight]{\paperwidth}{
+\includegraphics[width=\paperwidth,height=\paperheight]{CharteGraphiquePresentationCorps}
+}}}
+
+
+
+
 \begin{document}
+
+
+\AddToShipoutPicture*{\BackgroundPic}
+
+
+
 \begin{center}
-% Définition du titre
+
 \begin{LARGE}
-IFNTI : Maquette semestre S3 2022-2023
+.\vspace{1cm}
 \end{LARGE}
-\end{center}
-\begin{center}
 
-\setlength{\tabcolsep}{0pt}
-\renewcommand{\arraystretch}{1}
+\begin{LARGE}
+IFNTI : Maquette \VAR{titre}
+\end{LARGE}
 
-\begin{longtable}{|c|c|c|c|c|c|c|c|}
+\begin{longtable}{|c|c|c|c|c|c|c|}
 \hline
-Semestre & Intitulé UE & Type UE & Matières & Crédit UE & Volume Horaire (H) & Enseignant principal & Enseignant secondaire  \\ 
+Semestre & Intitulé UE & Type UE & Crédit UE & Volume Horaire (H) & Enseignant principal \\ 
 \hline
-
 \BLOCK{ for semestre_data in semestres_data }
-
-\multicolumn{1}{|c|}{\multirow{\VAR{semestre_data.ues|length}}{*}{\VAR{semestre_data.semsetre.libelle}}}
-	\BLOCK{ for ue in semestre_data.ues}
-     & \multicolumn{1}{c|}{\multirow{\VAR{ue.matiere_set.all().count()}}{*}{\VAR{ue.libelle}}} 
-     & \multicolumn{1}{c|}{\multirow{\VAR{ue.matiere_set.all().count()}}{*}{\VAR{ue.type}}} 
-     & Python & \multicolumn{1}{c|}{\VAR{ue.matiere_set.all().count()}}{*}{\VAR{ue.nbreCredit}}} 
-     & 16.1 & sgallagher & sgallagher \\
-
-     \cline{4-3} \cline{6-3} \cline{7-3} \cline{8-3}
-
-	 \BLOCK{ for matiere in ue.matiere_set.all() }     
-     
-	 \multicolumn{1}{|c|}{}
-	 & & & \VAR{ue.type} & & 49.0 & sgallagher & sgallagher\\ 
-	 
-	 \cline{4-3} \cline{6-3} \cline{7-3} \cline{8-3}
-	 
-	 \BLOCK{ endfor }
-	 
-	 \cline{2-8}
-	 \BLOCK{ endfor }
-	 
+\BLOCK{set len_ue = semestre_data.ues|length}
+\BLOCK{if len_ue > 0}
+\multicolumn{1}{|c|}{\multirow{\VAR{len_ue}}{*}{\VAR{semestre_data.semsetre.libelle}}}
+	 \BLOCK{ for ue in semestre_data.ues}
+     & \multicolumn{1}{c|}{\multirow{1}{*}{\VAR{ue.libelle}}} 
+     & \VAR{ue.type} & \VAR{ue.nbreCredits} & \VAR{ue.heures} & \VAR{ue.enseignant} \\
+	 \BLOCK{if not loop.last}     
+     	\cline{2-7}
+     \BLOCK{ endif }
+     \BLOCK{ endfor }
 \hline
+\BLOCK{ endif }
 \BLOCK{ endfor }
-
-Total &  &  &  & 8 & 422.6 &  &  \\ 
+Total &  & & \VAR{total_credit} & \VAR{total_horair} & \\ 
 \hline 
 \end{longtable}
 

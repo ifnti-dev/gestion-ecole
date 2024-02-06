@@ -19,24 +19,28 @@
                 <tr>
                     <th class="text-center">Matiere</th>
                     <th scope="col" class="" style="width: 15%;"> Moyenne </th> 
-                    <th scope="col" class="" style="width: 15%;"> Validé </th> 
                 </tr>
             </thead>
             <tbody>
                 {% for matiere in matieres %}
                 <tr>
-                    <td class="text-center font-size-sm">{{matiere.matiere}} </td>
-                    <td class="text-center font-size-sm"> {{ matiere.moyenne }} </td>
-                    <td class="text-center font-size-sm"> 
-                        {% if matiere.a_valider %}
-                            <span class="text-success">Oui</span>
-                        {% else %}
-                            <span class="text-danger">Non</span>
-                            <span class="text-danger">
-                                <i class="fa fa-skull-crossbones"></i>
+                    <td class="d-flex justify-content-between font-size-sm">
+                        <div>
+                            {{matiere.matiere}} 
+                        </div>
+                        <div>
+                            {% if matiere.a_valider %}
+                            <span class="text-success">
+                                <i class="fa fa-check"></i>
                             </span>
-                        {% endif %}
+                            {% else %}
+                                <span class="text-danger">
+                                    <i class="fa fa-skull-crossbones"></i>
+                                </span>
+                            {% endif %}
+                        </div>
                     </td>
+                    <td class="text-left font-size-sm"> {{ matiere.moyenne }} </td>
                 </tr>
                 {% endfor%}
             </tbody>
@@ -44,11 +48,3 @@
     </div>
 </div>
 {% endblock %}
-{% comment %} {% block scripts %}
-    <script type="text/javascript">
-        form_tag = $('#form-semestre');
-        $('#semestre').on('change', function() {
-            form_tag.submit();
-        });
-    </script>
-{% endblock scripts %} {% endcomment %}

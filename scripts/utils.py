@@ -2,7 +2,7 @@ import os
 import openpyxl
 import shutil 
 import re
-
+from openpyxl.worksheet.datavalidation import DataValidation
 from main.models import Etudiant, Note, Semestre, Ue, Evaluation, Parcours, AnneeUniversitaire, Programme, Matiere
 from django.db import DataError, IntegrityError, transaction
 from datetime import datetime, timedelta
@@ -15,6 +15,9 @@ def trim_str(string):
     string = re.sub(r'=', '', string)
     print(string)
     return string
+
+def is_naturel(string):
+    return string.isdecimal() and int(string) > 0
 
 def convert_serial_temporel_number_to_date(numero_serie_temporelle):
     # Date de référence d'Excel
@@ -299,40 +302,111 @@ def load_notes_from_evaluation(path, matiere=None, semestre=None):
         else:
             raise ValueError(f"Erreur de pondération pour l'évaluation : {evaluation_name} ")
 
+
+@transaction.atomic
+def pre_load_maquette(path, annee):
+    
+    result_path = "media/excel_templates/maquette_general_tmp.xlsx"
+    if os.path.exists(result_path):
+        os.remove(result_path)
+    
+    wb = openpyxl.load_workbook(path)
+    semestres = annee.semestre_set.all().prefetch_related('programme_set')
+    for sheet in wb:
+        semestre = sheet.title
+        semestre = semestres.filter(libelle=semestre).first()
+        programmes = semestre.programme_set.all()
+        
+        valeurs_possibles_type = [ value[1] for value in Ue.TYPES ]
+        valiation_type = DataValidation(type="list", formula1='"'+ ','.join(map(str, valeurs_possibles_type))+'"', allow_blank=True)
+        valeurs_possibles_niveau = [ value[1] for value in Ue.TYPES_NIVEAU ]
+        valiation_niveau = DataValidation(type="list", formula1='"'+ ','.join(map(str, valeurs_possibles_niveau))+'"', allow_blank=True)
+        
+        sheet.add_data_validation(valiation_type)
+        sheet.add_data_validation(valiation_niveau)
+        count = 3
+        if programmes:
+            programme = programmes.first()
+            for ue  in programme.ues.all():
+                cell_a = sheet[f'A{count}']
+                cell_a.value = ue.libelle
+                cell_b = sheet[f'B{count}']
+                cell_b.value = valeurs_possibles_type[0]
+                valiation_type.add(cell_b)
+                
+                cell_c = sheet[f'C{count}']
+                cell_c.value = valeurs_possibles_niveau[0]
+                valiation_niveau.add(cell_c)
+                
+                cell_d = sheet[f'D{count}']
+                cell_d.value = ue.nbreCredits
+                cell_e = sheet[f'E{count}']
+                cell_e.value = ue.heures
+                count += 1
+                
+        start = count
+        end = 21
+        for i in range(start, end):
+            cell_a = sheet[f'A{i}']
+            cell_a.value = ""
+            cell_b = sheet[f'B{i}']
+            cell_b.value = valeurs_possibles_type[0]
+            valiation_type.add(cell_b)
+            
+            cell_c = sheet[f'C{i}']
+            cell_c.value = valeurs_possibles_niveau[0]
+            valiation_niveau.add(cell_c)
+            
+        wb.save(result_path)
+    
+    return result_path
+
 @transaction.atomic         
 def load_maquette(path, annee):
     Ue.objects.filter(programme__semestre__annee_universitaire=annee).delete()
     Programme.objects.filter(semestre__annee_universitaire=annee).delete()
-    workbook = openpyxl.load_workbook(filename=path)
+    
+    try:
+        workbook = openpyxl.load_workbook(filename=path, read_only=True)
 
-    semestre_ue = {}
+        semestre_ue = {}
+        for sheet in workbook:
+            semestre = sheet.title.lower()
+            semestre_ue[semestre] = []
+            print(sheet.max_row)
+            for i in range(3, sheet.max_row):
+                libelle = sheet[f'A{i}'].value
+                type = sheet[f'B{i}'].value 
+                niveau = sheet[f'C{i}'].value
+                nbreCredits = sheet[f'D{i}'].value
+                heures = sheet[f'E{i}'].value
+                if libelle and type and niveau and nbreCredits and heures:
+                    libelle = libelle.strip()
+                    nbreCredits = trim_str(nbreCredits)
+                    heures = trim_str(heures)
+                    if is_naturel(nbreCredits) and is_naturel(heures):
+                        ue, _ = Ue.objects.get_or_create(libelle=libelle, type=type, niveau=niveau, nbreCredits=nbreCredits, heures=heures)
+                        semestre_ue[semestre].append(ue)
+                    else:
+                        raise ValueError("Vous avez des valeurs négatives dans votre fichier")
+                
+            print(libelle, type, niveau, nbreCredits, heures)
+        parcours = Parcours.objects.all().first()
+        semestres = annee.semestre_set.all()
 
-    for sheet in workbook:
-        semestre = sheet.title.lower()
-        semestre_ue[semestre] = []
-
-        for row in sheet.iter_rows(values_only=True):
-            if row[0] and row[0] != "libelle":
-                try:
-                    libelle = row[0].strip()
-                    libelle = libelle.replace("  ", " ")
-                    type = row[1]
-                    niveau=row[2].split("=")[1] if "=" in row[2] else row[2]
-                    nbreCredits = row[3].split("=")[1] if "=" in row[3] else row[3]
-                    heures = row[4].split("=")[1] if "=" in row[4] else row[4]
-                    ue, _ = Ue.objects.get_or_create(libelle=libelle, type=type, niveau=niveau, nbreCredits=nbreCredits, heures=heures)
-                    semestre_ue[semestre].append(ue)
-                except Exception as e:
-                    raise ValueError("Le fichier n'est pas dans le bon format ! ")
-
-    parcours = Parcours.objects.all().first()
-    semestres = annee.semestre_set.all()
-
-    for semestre in semestres:
-        programme = Programme.objects.create(
-            semestre=semestre, parcours=parcours)
-        programme.ues.set(semestre_ue[semestre.libelle.lower()])
-
+        for semestre in semestres:
+            programme = Programme.objects.create(
+                semestre=semestre, parcours=parcours)
+            programme.ues.set(semestre_ue[semestre.libelle.lower()])
+    except ValueError as e:
+        raise e
+    except Exception as e:
+        print(e)
+        raise ValueError("Le fichier n'est pas dans le bon format")
+    finally:
+        if "workbook" in locals():
+            workbook.close()
+            
 @transaction.atomic
 def load_notes_from_matiere(path):
     Evaluation.objects.all().delete()
@@ -392,7 +466,10 @@ def load_notes_from_matiere(path):
 def run():
     #clean_data_base()
     print("::::: Import begining :::::")
-    annee = AnneeUniversitaire.objects.filter(annee=2023).first()
-    semestres  = annee.semestre_set.all().prefetch_related('programme_set').prefetch_related('etudiant_set')
-    pre_load_note_ues_template_data(semestres)
+    pre_load_maquette("media/excel_templates/maquette_general_[annee]2.xlsx")
+    # annee = AnneeUniversitaire.objects.filter(annee=2023).first()
+    # semestres  = annee.semestre_set.all().prefetch_related('programme_set').prefetch_related('etudiant_set')
+    # pre_load_note_ues_template_data(semestres)
+
+
 

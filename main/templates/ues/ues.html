@@ -5,7 +5,7 @@
     <div class="block-header p-4">
         <h3 class="block-title">{{ titre_section }} </h3>
         <form action="" method="get" id="form-semestre" class="w-full">
-            <select name="semestre" id="semestre" class="form-control">
+            <select name="semestre" id="semestre" class="form-control" onchange="this.form.submit()">
                 <option value="">Semestres</option>
                 {% for semestre in semestres %}
                     <option value="{{ semestre.id }}" {% if selected_semestre.id == semestre.id %}selected{% endif %}>{{ semestre }}</option>
@@ -60,11 +60,3 @@
     </div>
 </div>
 {% endblock %}
-{% block scripts %}
-    <script type="text/javascript">
-        form_tag = $('#form-semestre');
-        $('#semestre').on('change', function() {
-            form_tag.submit();
-        });
-    </script>
-{% endblock scripts %}

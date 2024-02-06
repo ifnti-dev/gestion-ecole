@@ -5,32 +5,23 @@ from main.models import CorrespondanceMaquette, Domaine, Matiere, Parcours, Prog
 
 class GenerateMaquetteForm(forms.Form):
    # The code is defining two fields, `semestre` and `parcours`, for a form.
-    semestre = forms.ModelChoiceField(
+    semestres = forms.ModelMultipleChoiceField(
         queryset=Semestre.static_get_current_semestre(),
-        widget=forms.Select(attrs={'class' : 'form-control'}),
+        widget=forms.SelectMultiple(attrs={'class' : 'form-control js-select2', 'onchange': 'this.form.submit()'}),
         required=False
     )
-    # parcours = forms.ModelChoiceField(
-    #     queryset=Parcours.objects.all(),
-    #     widget=forms.Select(attrs={'class' : 'form-control'})
-    # )
+    
+    parcours = forms.ModelChoiceField(
+        queryset=Parcours.objects.all(),
+        widget=forms.Select(attrs={'class' : 'form-control', 'onchange': 'this.form.submit()'}),
+        initial=Parcours.objects.first()
+    )
     type_maquette = forms.CharField(
         widget=forms.Select(
-            attrs={'class' : 'form-control'}, 
-            choices=[('', 'Séléctionner'), (0, 'generique'), (1, 'spécifique')]
+            attrs={'class' : 'form-control', 'onchange': 'this.form.submit()'}, 
+            choices=[(0, 'generique'), (1, 'spécifique')]
             )
     )
-    
-    def clean(self):
-        cleaned_data = super(GenerateMaquetteForm, self).clean()
-        # domaine = cleaned_data.get('domaine')
-        parcours = cleaned_data.get('parcours')
-        type_maquette = cleaned_data.get('semestre')
-        
-        if type_maquette == "":
-            self._errors['type_maquette'] = "Type_maquette invalide"
-        
-        return cleaned_data
 
 class CorrespondanceMaquetteForm(forms.ModelForm):
     error = forms.CharField(max_length=255, required=False) 

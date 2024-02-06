@@ -7,17 +7,18 @@ from main.resources import EtudiantResource
 from tablib import Dataset
 from django.shortcuts import render, HttpResponse
 from tablib import Dataset
-
+from django.contrib import messages
 
 # Cette vue permet d'importer les données etudiants via un fichier xlsx
 def importer_data(request):
     if request.method == 'POST':
-        if 'myfile' not in request.FILES:
-            return render(request, 'etudiants/message_erreur.html', {'message': "Aucun fichier sélectionné."})
+        if 'file' not in request.FILES:
+            messages.error(request, "Vous devez selectionner un fichier")
+            return redirect('import_data:importer_les_donnees')
         # Assurez-vous d'importer votre ressource EtudiantResource
         etudiants_resource = EtudiantResource()
         dataset = Dataset()
-        etudiant = request.FILES['myfile']
+        etudiant = request.FILES['file']
 
         # try:
         imported_data = dataset.load(etudiant.read(), format='xlsx')
