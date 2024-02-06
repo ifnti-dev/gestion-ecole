@@ -5,6 +5,7 @@
 
 
 
+
     <div class="content content-boxed">
 
         <div class="row">
@@ -13,13 +14,11 @@
                 <!-- Subscribe -->
                 <div class="block block-rounded">
                     <div class="block-content">
-                        <a class="btn btn-block btn-rounded btn-success mb-2" href="javascript:void(0)">Enregistrer la seance dans le cahier de texte</a>
+                        {% if not seance.valider and user.is_authenticated and is_etudiant %} 
+                        <a class="btn btn-block btn-rounded btn-success mb-2" href="javascript:void(0)" data-toggle="modal" data-target="#seanceModal">Enregistrer la séance dans le cahier de texte</a>
                         <p class="font-size-sm text-center">
-                           
                         </p>
-                        <a class="btn btn-block btn-primary  push" href="javascript:void(0)">
-                            <i class="fa fa-download mr-1"></i> Download
-                        </a>
+                        {% endif %} 
                     </div>
                 </div>
                 <!-- END Subscribe -->
@@ -105,6 +104,67 @@
             </div>
         </div>
     </div>
+    <script src="{% static 'assets/js/ckeditor.js'%}"></script>
+
+
+
+    <div class="modal" id="seanceModal" tabindex="-1" role="dialog" aria-labelledby="seanceModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="detailsModalLabel">Enregistrement</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form action="{% url 'cahier_de_texte:enregistrer_seance' %}"  method="post">
+                        {% csrf_token %}
+                        <input type="hidden" id="ecrit_par" name="ecrit_par" value="{{ request.etudiant.id }}">
+                        <div class="form-group " >
+                            <label for="example-text-input-alt">Intitulé</label>
+                            <input type="text" class="form-control form-control-alt" id="intitulé" name="intitulé" required="true"  placeholder="Entrez un intitulé (si vous ne saisissez rien, le libellé de la matiere sera utiliser)">
+                        </div>
+                        <div class="form-group">
+                            <label for="eleves-absents">Élèves absents</label>
+                            <select  class="js-select2 form-control" id="eleves-absent" name="eleves-absent" style="width: 100%;" data-placeholder="Choisissez les.." multiple>
+                                <option></option><!-- Required for data-placeholder attribute to work with Select2 plugin -->
+                                {% for etudiant in etudiants %}
+                                <option value="{{ etudiant.id }}">{{ etudiant.nom }} {{ etudiant.prenom }}</option>
+                                {% endfor %}
+                            </select>
+                               
+                        </div>
+                        <div class="form-group">
+                            <div id="js-ckeditor5-classic" name="js-ckeditor5-classic">Resumé</div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+                      
+                
+        ClassicEditor
+            .create(document.querySelector('#js-ckeditor5-classic'), {
+            })
+            .then(editor => {
+                editor.model.document.on('change:data', () => {
+                    const content = editor.getData();
+                    document.querySelector('#description').value = content;
+                    console.log(content)
+                });
+            })
+            .catch(error => {
+                console.error(error);
+            });
+        </script>
+
+
     <!-- END Page Content -->
 
    

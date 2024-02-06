@@ -18,10 +18,12 @@ from datetime import timedelta
 
 from collections import defaultdict
 
+from django.conf import settings
 
 
 
 
+@login_required(login_url=settings.LOGIN_URL)
 def index(request):
     all_plannings = Planning.objects.all()
     semestres=Semestre.objects.filter(courant=True)
@@ -37,7 +39,7 @@ def index(request):
 
 
 
-
+@login_required(login_url=settings.LOGIN_URL)
 def verifier(request):
     if request.method == 'POST':
         data = json.loads(request.body.decode('utf-8'))
@@ -51,7 +53,7 @@ def verifier(request):
         return JsonResponse({"datedebut": str(plan.datedebut),"datefin": str(plan.datefin),"semaine": str(plan.semaine),"semestre": str(plan.semestre)})
         
 
-
+@login_required(login_url=settings.LOGIN_URL)
 def nouveau_planning(request):
     if request.method == 'POST':
         semestreId=request.POST.get("semestre")
@@ -107,13 +109,14 @@ def nouveau_planning(request):
         return render(request, 'generer_planning.html', {'planification_json': planification_json,'semestre':semestre,'semaine':semaine,'datedebut':datedebut,'datefin':datefin,'intervalle':intervalle,'ues':ues})
 
 
-
+@login_required(login_url=settings.LOGIN_URL)
 def datetime_serializer(obj):
     if isinstance(obj, datetime.datetime):
         return obj.strftime('%Y-%m-%dT%H:%M:%S')
     raise TypeError("Type not serializable")
 
 import datetime
+@login_required(login_url=settings.LOGIN_URL)
 def details(request,planningId):
     planning = Planning.objects.filter(id=planningId).first()
     seances=SeancePlannifier.objects.filter(planning=planning)
@@ -123,7 +126,7 @@ def details(request,planningId):
             
     return render(request, 'planning.html', {'event_data': event_data,'planning':planning})
 
-
+@login_required(login_url=settings.LOGIN_URL)
 def getMatieresEtudiant(etudiant):
     annee=AnneeUniversitaire.static_get_current_annee_universitaire().annee
     semestre=etudiant.semestres.filter(courant=True,pk__contains=annee)
@@ -133,7 +136,7 @@ def getMatieresEtudiant(etudiant):
         matieres.update(ue.matiere_set.all())         
     return matieres
 
-
+@login_required(login_url=settings.LOGIN_URL)
 def sauvegarder(request):
     if request.method == 'POST':
         # Retrieve all the events from the calendar
@@ -183,7 +186,8 @@ def sauvegarder(request):
         
         return JsonResponse({'status':"reussite"})
 
-from django.db.models import Count    
+from django.db.models import Count
+@login_required(login_url=settings.LOGIN_URL)    
 def resume(request,semestreId):
     semestre=Semestre.objects.filter(id=semestreId).first()
     liste_absence={}
@@ -291,7 +295,7 @@ def resume(request,semestreId):
      
     return render(request,'semestre_recap.html',context)
         
-
+@login_required(login_url=settings.LOGIN_URL)
 def modifier(request):
     if request.method == 'POST':
         # Retrieve all the events from the calendar
@@ -333,7 +337,7 @@ def modifier(request):
     
 
 
-
+@login_required(login_url=settings.LOGIN_URL)
 def ajouter_cours(request,planningId):
     planningg = Planning.objects.filter(id=planningId).first()
     seances=SeancePlannifier.objects.filter(planning=planningg)
@@ -368,20 +372,56 @@ def ajouter_cours(request,planningId):
     return render(request, 'update_planning.html', {'planification_json': planification_json,'event_data': event_data,'planning':planningg,'ues':ues})
 
 
-
+@login_required(login_url=settings.LOGIN_URL)
 def seance(request,seanceId):
+    if request.method == "POST":
+        intitule = request.POST.get("intitulé")
+        description = request.POST.get("description")
+        eleves_absents = request.POST.getlist("eleves-absent")
+        etudiant_id = request.POST('ecrit_par')
+        user_connecte=get_object_or_404(get_user_model(),id=request.user.id)
+        auteur_obj=get_object_or_404(Etudiant,user=user_connecte)
+        seance_plan=SeancePlannifier.objects.filter(id=seanceId).first()
+        if len(intitule)<=0:
+            intitule=seance_plan.intitule
+        seance = Seance(
+            intitule=intitule,
+            semestre=seance_plan.planning.semestre,
+            description=description,
+            enseignant=seance_plan.professeur,
+            date_et_heure_debut=seance_plan.date_heure_debut,
+            date_et_heure_fin=seance_plan.date_heure_fin,
+            matiere=seance_plan.matiere,
+            auteur=auteur_obj
+        )
+        seance_plan.valider=True
+        seance_plan.save()
+        seance.save()
+
+        for etudiant_id in eleves_absents:
+            etudiant_obj = get_object_or_404(Etudiant, id=etudiant_id)
+            seance.eleves_presents.add(etudiant_obj)
+
+        
+        return redirect("/cahier_de_texte/info_seance/" + str(seance.id) + "/" )
+    
     seance=SeancePlannifier.objects.filter(id=seanceId).first()
     etudiants=seance.planning.semestre.etudiant_set.all()
-    return render(request,'details.html',{'seance':seance,'etudiants':etudiants})
+    context={'seance':seance,'etudiants':etudiants}
+    if request.user.groups.all().first().name in ['etudiant']:
+        etudiants=seance.planning.semestre.etudiant_set.exclude(user=request.user)
+        context={'seance':seance,'etudiants':etudiants}
 
+    return render(request,'details.html',context)
 
+@login_required(login_url=settings.LOGIN_URL)
 def french_day(day):
     print(day)
     french_correspondance_days = {'Monday':'Lundi','Tuesday' :'Mardi','Wednesday' :'Mercredi','Thursday' :'Jeudi','Friday' :'Vendredi','Saturday' :'Samedi'}
     return french_correspondance_days[day]
 
 
-
+@login_required(login_url=settings.LOGIN_URL)
 def imprimer(request,planningId):
     if request.user.groups.all().first().name not in ['directeur_des_etudes']:
         return render(request, 'errors_pages/403.html')
@@ -581,7 +621,7 @@ def imprimer(request,planningId):
     return HttpResponse('check')
     
 
-
+@login_required(login_url=settings.LOGIN_URL)
 def delete(request,planningId):
     planning=Planning.objects.filter(id=planningId).first()
     seance = SeancePlannifier.objects.filter(planning=planning)
@@ -591,8 +631,46 @@ def delete(request,planningId):
     planning.delete()
     return  render(request,'planning_list.html')
 
-def enregistrer_seance(request, seance_id):
-    return redirect('seance_detail', seance_id=seance_id)
+@login_required(login_url=settings.LOGIN_URL)
+def enregistrer_seance(request):
+    if request.method == "POST":
+        intitule = request.POST.get("intitulé")
+        description = request.POST.get("description")
+        date=request.POST.get("dateseance")
+        heure_debut = request.POST.get("heuredebut")
+        heure_fin = request.POST.get("heurefin")
+        date_et_heure_debut = date + ' '+heure_debut
+        date_et_heure_fin = date + ' '+heure_fin
+        eleves_absents = request.POST.getlist("eleves-absent")
+        matiere_id = request.POST.get("matiere")
+        etudiant_id = request.POST['ecrit_par']
+        matiere_obj=get_object_or_404(Matiere, pk=matiere_id)
+        user_connecte=get_object_or_404(get_user_model(),id=request.user.id)
+        auteur_obj=get_object_or_404(Etudiant,user=user_connecte)
+        annee=AnneeUniversitaire.static_get_current_annee_universitaire().annee
+        semestreEtudiant=auteur_obj.semestres.filter(courant=True,pk__contains=annee).first()
 
+        seance = Seance(
+            intitule=intitule,
+            semestre=semestreEtudiant,
+            description=description,
+            enseignant=matiere_obj.enseignant,
+            date_et_heure_debut=date_et_heure_debut,
+            date_et_heure_fin=date_et_heure_fin,
+            matiere=matiere_obj,
+            auteur=auteur_obj
+        )
+        seance.save()
+        for etudiant_id in eleves_absents:
+            etudiant_obj = get_object_or_404(Etudiant, id=etudiant_id)
+            seance.eleves_presents.add(etudiant_obj)
+
+        
+        return redirect("/cahier_de_texte/info_seance/" + str(seance.id) + "/" )
+
+
+@login_required(login_url=settings.LOGIN_URL)
 def retirer_seance(request, seance_id):
     return redirect('seance_detail', seance_id=seance_id)
+
+
