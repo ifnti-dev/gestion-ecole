@@ -3278,7 +3278,7 @@ class Conge(models.Model):
 
     """
     personnel = models.ForeignKey(
-        'Personnel', on_delete=models.CASCADE, verbose_name="Personnel")
+        'Personnel', on_delete=models.CASCADE, verbose_name="Personnel", null=True)
     """
         Identifiant de l'employé partant en congés
 

@@ -67,7 +67,6 @@ urlpatterns = [
     path('enregistrer_fiche_de_prise_en_charge/', views.enregistrer_fiche_de_prise_en_charge, name='enregistrer_fiche_de_prise_en_charge'),
     path('modifier_fiche_de_prise_en_charge/<int:id>/', views.enregistrer_fiche_de_prise_en_charge, name='modifier_fiche_de_prise_en_charge'),
     path('fiche_de_charge/<int:id>/', views.fiche_de_charge, name='fiche_de_charge'),
-    path('delete_fiches_de_paie/', views.delete_fiches_de_paie, name='delete_fiches_de_paie'),
 
     
 

@@ -23,7 +23,7 @@
             <tbody>
                 {% for conge in conges %}
                 <tr>
-                    <td class="text-center font-size-sm">Du {{ conge.date_et_heure_debut }} au {{ conge.date_et_heure_fin }}</td>
+                    <td class="text-center font-size-sm">Du {{ date_debut_formatted }} au {{ date_fin_formatted }}</td>
 
                     <td class="text-center font-size-sm">{{conge.nombre_de_jours_de_conge }} Jours</td>
                     <td class="text-center font-size-sm">
@@ -71,7 +71,7 @@
                         </button>
                         {% endif %}
 
-                        {% if conge.valider == "Inactif" or conge.valider == "Actif" %}
+                        {% if conge.valider == "Actif" or conge.valider == "Inactif" %}
                         <button type="button" class="update-book btn btn-sm btn-warning">
                             <a style="color: blanchedalmond;"
                                 href="{% url 'conges:formulaire_de_demande_de_conges' conge.id %}">
@@ -79,14 +79,13 @@
                             </a>
                         </button>
                         {% endif %}
-                    </td>
-                    <!--td style="text-align: center;">
-                        <button type="button" class="update-book btn btn-sm btn-warning">
-                            <a style="color: blanchedalmond;" href="{% url 'conges:modifier_demande_conge' conge.id %}">
+
+                        <!--button type="button" class="update-book btn btn-sm btn-success">
+                            <a style="color: blanchedalmond;" href="#">
                                 <span><i class="far fa-edit"></i></span> 
                             </a>
-                        </button>
-                    </td-->
+                        </button-->
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>

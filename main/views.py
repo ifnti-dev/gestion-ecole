@@ -43,7 +43,7 @@ def dashboard(request):
     annee_selectionnee = get_object_or_404(
         AnneeUniversitaire, pk=id_annee_selectionnee)
     semestres = annee_selectionnee.get_semestres()
-    if request.user.groups.all().first().name in ['directeur_des_etudes', 'secretaire']:
+    if request.user.groups.all().first().name in ['directeur_des_etudes', 'comptable','secretaire']:
         tous_les_etudiants = Etudiant.objects.all()
         etudiants = tous_les_etudiants.filter(semestres__in=semestres).distinct()
         #etudiants_sans_context = 
