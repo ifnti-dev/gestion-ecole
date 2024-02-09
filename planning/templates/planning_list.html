@@ -13,6 +13,21 @@
 
     <div class="block-header p-4">
         <h3 class="block-title">Liste des planning par semaine</h3>
+        <div class="dropdown">
+            <button type="button" class="btn btn-outline-primary" id="dropdown-default-primary" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Filtrer par semestres
+            </button>
+            <div class="dropdown-menu font-size-sm" aria-labelledby="dropdown-default-primary">
+                <form id="dropdown-form" action="{% url 'planning:planning' %}" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="semestre" id="semestre-input" value="">
+                    {% for semestre in semestres %}
+                        <a class="dropdown-item" href="#" onclick="selectNiveau('{{ semestre.id }}')">{{ semestre.libelle }} {{semestre.annee_universitaire}}</a>
+                        </option>
+                    {% endfor %}
+                </form>
+            </div>
+        </div>
         <a data-toggle="modal" data-target="#newPlanningModal" class="btn btn-outline-primary">
             <i class="fas fa-plus"></i> Nouveau planning
         </a> 
@@ -21,7 +36,6 @@
         <table class="table table-bordered table-striped table-vcenter js-dataTable-full-pagination">
             <thead>
                 <tr>
-                    <th class="text-center" style="width: 80px;">Id</th>
                     <th class="d-none d-sm-table-cell text-center">Semaine</th>
                     <th class="d-none d-sm-table-cell text-center">Semestre</th>
                     <th class="d-none d-sm-table-cell text-center">Intervalle date</th>
@@ -31,7 +45,6 @@
             <tbody>
                 {% for planning in plannings %}
                 <tr>
-                    <td class="text-center font-size-sm">{{ planning.id }}</td>
                     <td class="text-center font-w600 font-size-sm"> <a href="details/{{planning.id}}" >{{ planning.semaine }}</a></td>
                     <td class="text-center font-w600 font-size-sm">{{ planning.semestre }}</td>
                     <td class="text-center font-w600 font-size-sm">{% if not planning.intervalle %} {{ planning.datedebut }} au {{ planning.datefin }} {% else %} {{ planning.intervalle }} {% endif %}</td>
@@ -114,7 +127,11 @@
 {% block scripts %}
     <script type="text/javascript">
         
-
+        function selectNiveau(semestre) {
+            document.getElementById('semestre-input').value = semestre;
+            document.getElementById('dropdown-form').submit();
+        }
+        
        // ... Autres parties du script ...
        function validateForm() {
                 // Get the values entered by the user

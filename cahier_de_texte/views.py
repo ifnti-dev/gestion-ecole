@@ -7,7 +7,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
 from faker import Faker
 from main.pdfMaker import generate_pdf
-from main.models import Enseignant, Matiere, Etudiant ,AnneeUniversitaire, Personnel , Semestre
+from main.models import Enseignant, Matiere, Etudiant ,AnneeUniversitaire, Ue , Semestre
 from cahier_de_texte.models import Seance
 from django.contrib.auth import authenticate, login , get_user_model
 
@@ -262,7 +262,7 @@ def cahier_de_text(request):
         return render(request,"cahier_de_text/cahier_de_texte.html",{"event_data":event_data,"niveau":niveau})
 
     else:
-        semestres=Semestre.objects.all()
+        semestres=Semestre.objects.filter(annee_universitaire=annee)
         if request.method=="POST" :
             niveau =request.POST.get("niveau")
             if niveau == "L1" :
@@ -293,7 +293,8 @@ def cahier_de_text(request):
 
         event_data = [{'title': event.intitule, 'start': event.date_et_heure_debut , 'end':event.date_et_heure_fin ,'url': '/cahier_de_texte/info_seance/' + str(event.id) + '/'} for event in events]
         event_data = json.dumps(event_data, default=datetime_serializer)
-        return render(request,"cahier_de_text/cahier_de_texte.html",{"event_data":event_data,"niveau":niveau,"semestres":semestres})
+        context = {"event_data":event_data,"niveau":niveau,"semestres":semestres}
+        return render(request,"cahier_de_text/cahier_de_texte.html",context)
 
 @login_required(login_url="/main/connexion")
 def liste_seance(request):
@@ -334,40 +335,33 @@ def nuance(valeur):
 @login_required(login_url="/main/connexion")
 def imprimer(request):
     semestres = request.POST.getlist("semestres")
-    print('semestres :',semestres)
     valider = request.POST.get("imprimer_validees")
-    print('Recuperer uniquement les seances valider ? :',nuance(valider))
     commentaires = request.POST.get("imprimer_commentaires")
-    print('Recuperer les commentaires des professeurs  ? :',nuance(commentaires))
     listeAbsence = request.POST.get("eleves_absents")
-    print('Afficher la liste des absents par seances  ? :',nuance(listeAbsence))
     listeUe = request.POST.get("details_ue")
-    print('Afficher la liste des Ues du semestres   ? :',nuance(listeUe))
     listeMatiere = request.POST.get("details_matieres")
-    print('Afficher la liste des Matieres du semestres   ? :',nuance(listeMatiere))
     HeureConsomme = request.POST.get("details_heures_matieres")
-    print('Afficher le nombre d"heure consommer par matiere pendant le semestre   ? :',nuance(HeureConsomme))
     listeEtudiant = request.POST.get("details_etudiants")
-    print('Afficher la liste des etudiants du semestre   ? :',nuance(listeEtudiant))
     sousCategorisation = request.POST.get("sous_categorisation")
-    print('Afficher la liste des seances regrouper par matiere  ? :',sousCategorisation)
     pdf_paths = []
     #si on veut un affichage par matiere , ca met automatiquement la liste des matieres a true 
     for semestre_id in semestres:
         semestre = Semestre.objects.get(id=semestre_id)
         if nuance(valider) :
             seances_total = Seance.objects.filter(semestre=semestre,valider=nuance(valider)).order_by('date_et_heure_debut')
+            print(valider,nuance(valider),seances_total.count())
         else :
             seances_total = Seance.objects.filter(semestre=semestre).order_by('date_et_heure_debut')    
+            print(valider,nuance(valider),seances_total.count())
+        
         ues = semestre.get_all_ues()
         matieres_dict = {}
         matieres=[]
         etudiants=semestre.etudiant_set.all()
         for ue in ues :                   
             matieres += ue.matiere_set.all()
-        print(matieres)
+
         if sousCategorisation != 'parMatieres' :
-            print(nuance(commentaires))
             context={'etudiants':etudiants,
                      'semestre':semestre_id,
                      'listeAbsence':listeAbsence,
@@ -393,19 +387,23 @@ def imprimer(request):
             if nuance(HeureConsomme) :
                 for matiere in matieres :
                     seances_prime = seances_total.filter(matiere=matiere).order_by('date_et_heure_debut')
-                    temps=0
-                    for seance in seances_prime:
-                        temps+=(seance.date_et_heure_fin - seance.date_et_heure_debut).total_seconds()
-                    hours, remainder = divmod(temps, 3600)
-                    minutes, _ = divmod(remainder, 60)
+                    if seances_prime.count() >0:
+                        temps=0
+                        for seance in seances_prime:
+                            temps+=(seance.date_et_heure_fin - seance.date_et_heure_debut).total_seconds()
+                        hours, remainder = divmod(temps, 3600)
+                        minutes, _ = divmod(remainder, 60)
 
-                    matiere_key = matiere.libelle
-                    if matiere_key not in matieres_dict:
-                        matieres_dict[matiere_key] = {"HeureConsomme": 0, "seances": []}
+                        matiere_key = matiere.libelle
+                        if matiere_key not in matieres_dict:
+                            matieres_dict[matiere_key] = {"HeureConsomme": 0, "seances": []}
 
-                    matieres_dict[matiere_key]["HeureConsomme"] = str(hours)+'h '+str(minutes)+'min'
-                    matieres_dict[matiere_key]["seances"]=seances_prime
-                
+                        matieres_dict[matiere_key]["HeureConsomme"] = str(int(hours))+'h '+str(int(minutes))+'min'
+                        matieres_dict[matiere_key]["HeurePrevues"] = str(int(matiere.heures))+'h00min'
+                        matieres_dict[matiere_key]["UE"] = matiere.ue
+                        matieres_dict[matiere_key]["Prof"] = matiere.enseignant
+                        matieres_dict[matiere_key]["seances"]=seances_prime
+                    
                 context={'etudiants':etudiants,
                          'semestre':semestre_id,
                          'ues':ues,
@@ -427,9 +425,15 @@ def imprimer(request):
                 generate_pdf(context, latex_input, latex_ouput, pdf_file)
                 pdf_paths.append('media/pdf/' + pdf_file)
 
+    if len(pdf_paths) > 1:
+            notification = {
+                "message": "Vos fichier pdf d'impression ont été génerer avec succes", "type": "succes"}
+            context = {"notification": notification }
+            return redirect("/cahier_de_texte/" ,context)
+
     pdf_paths = [pdf_path + '.pdf' for pdf_path in pdf_paths]
     merged_pdf_content = b''.join([open(pdf_path, 'rb').read() for pdf_path in pdf_paths])
-
+    
     response = HttpResponse(merged_pdf_content, content_type='application/pdf')
     response['Content-Disposition'] = 'inline;filename=merged_pdfs.pdf'
     return response
@@ -480,7 +484,7 @@ def creer_fake_etudiant():
 def creer_seance(nombre):
     semestre1 = Semestre.objects.filter(id='S1-2023' ).first()
     semestre2 = Semestre.objects.filter(id='S3-2023' ).first()
-    
+   
     for _ in range(nombre):
         print(_)
         semestre=random.choice([semestre1,semestre2])
@@ -558,3 +562,18 @@ def creer_prof(nombre):
             )
             enseignant.save()
             print(f"Enseignant créé : {enseignant}")
+
+
+def creer_matiere(nombre):
+        for _ in range(nombre):
+            enseignant = Matiere(
+                minValue=random.randint(7,12 ),
+                libelle=fake.word(),
+                heures=random.randint(0, 30),
+                coefficient=random.randint(1, 3),
+                abbreviation=fake.word(),
+                enseignant=Enseignant.objects.order_by('?').first(),
+                ue=Ue.objects.order_by('?').first()
+            )
+            enseignant.save()
+            print(f"Matiere créé : {enseignant}")
