@@ -16,10 +16,10 @@ python-decouple
 Werkzeug
 python-dotenv
 pandas
-
 django-dbbackup
 django-crontab
-
 sphinx
 furo
 sphinx-rtd-theme
+celery
+redis

@@ -1,71 +1,73 @@
-\documentclass[12pt,a4paper,landscape]{article}
+\documentclass[10pt,a4paper,landscape]{article}
 \usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
 \usepackage{amsmath}
 \usepackage{amsfonts}
 \usepackage{amssymb}
 \usepackage{graphicx}
+\usepackage{lscape}
+\usepackage{multirow}
+\usepackage{array}
+\usepackage[OT1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[none]{hyphenat}
+\usepackage{fancyhdr}
+\usepackage{eso-pic, graphicx}
 \usepackage{multirow}
 \usepackage{longtable}
 \usepackage[left=0.3cm,right=0.3cm,top=2cm,bottom=2cm]{geometry}
-\usepackage{array}
-\usepackage{enumitem}
+\usepackage[french]{babel}
+
+\graphicspath{ {\VAR{image_path}} }
+\newcommand\BackgroundPic{
+\put(-4,0){
+\parbox[b][\paperheight]{\paperwidth}{
+\includegraphics[width=\paperwidth,height=\paperheight]{CharteGraphiquePresentationCorps}
+}}}
+
+
+
+
 \begin{document}
+
+
+\AddToShipoutPicture*{\BackgroundPic}
+
+
+
 \begin{center}
-% Définition du titre
+
+\begin{LARGE}
+.\vspace{1cm}
+\end{LARGE}
+
 \begin{LARGE}
 IFNTI : Maquette \VAR{titre}
 \end{LARGE}
-\end{center}
-\begin{center}
-% Définition du tableau
-\setlength{\tabcolsep}{0pt}
-\renewcommand{\arraystretch}{1}
 
-% Définition d'une nouvelle liste personnalisée avec un espacement nul
-\newlist{myitemize}{itemize}{1}
-\setlist[myitemize,1]{label=--,left=0pt,labelsep=0pt,topsep=0pt,partopsep=0pt,parsep=0pt,itemsep=0pt}
-
-\begin{longtable}{|m{2cm}|m{6cm}|m{3cm}|m{7cm}|m{1.5cm}|m{2cm}|m{3cm}|m{3cm}|}
+\begin{longtable}{|c|c|c|c|c|c|c|}
 \hline
-\centering Semestre & \centering Intitulé UE & \centering Type UE & \centering Matières & \centering Crédit UE & \centering Volume Horaire (H) & \centering Enseignant Responsable & \centering Enseignant principal \arraybackslash \\ 
+Semestre & Intitulé UE & Type UE & Crédit UE & Volume Horaire (H) & Enseignant principal \\ 
 \hline
 \BLOCK{ for semestre_data in semestres_data }
-\multirow{\VAR{semestre_data.ues_length}}{*}{\VAR{semestre_data.semsetre.libelle}} 
-\BLOCK{ for ue in semestre_data.ues }
- & \centering \VAR{ue.libelle} 
- & \centering \VAR{ue.type}  
- & 	\BLOCK{ if ue.matiere_set.all()  }
- 	\begin{myitemize}
-	\BLOCK{ for matiere in ue.matiere_set.all() }
-	\item[] \centering \VAR{matiere.libelle}
-	\item[] \hrulefill
-	\BLOCK{ endfor }
-	\end{myitemize}
-	\BLOCK{ endif }
- &  
-	\centering \VAR{ue.nbreCredits} 
- & 
- 	\centering \VAR{ue.heures}  
- & 
-   \BLOCK{ if ue.matiere_set.all()  }
- 	\begin{myitemize}
-	\BLOCK{ for matiere in ue.matiere_set.all() }
-	\item[] \centering \VAR{matiere.enseignant}
-	\item[] \hrulefill
-	\BLOCK{ endfor }
-	\end{myitemize}
-	\BLOCK{ endif }
- & \centering \VAR{ue.enseignant} \arraybackslash  \\
-\cline{2-4} \cline{6-8} 
+\BLOCK{set len_ue = semestre_data.ues|length}
+\BLOCK{if len_ue > 0}
+\multicolumn{1}{|c|}{\multirow{\VAR{len_ue}}{*}{\VAR{semestre_data.semsetre.libelle}}}
+	 \BLOCK{ for ue in semestre_data.ues}
+     & \multicolumn{1}{c|}{\multirow{1}{*}{\VAR{ue.libelle}}} 
+     & \VAR{ue.type} & \VAR{ue.nbreCredits} & \VAR{ue.heures} & \VAR{ue.enseignant} \\
+	 \BLOCK{if not loop.last}     
+     	\cline{2-7}
+     \BLOCK{ endif }
+     \BLOCK{ endfor }
+\hline
+\BLOCK{ endif }
 \BLOCK{ endfor }
-\cline{1-1} \cline{5-5}
-\BLOCK{ endfor }
-Total &  &  &  & 64 & 8 &  &  \\ 
+Total &  & & \VAR{total_credit} & \VAR{total_horair} & \\ 
 \hline 
 \end{longtable}
 
 \end{center}
-
 
 
 \end{document}

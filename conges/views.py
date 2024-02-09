@@ -3,7 +3,7 @@ import os
 from django import forms
 from decimal import Decimal
 from django.http import FileResponse, HttpResponse, HttpResponseBadRequest
-from conges.forms import CongeForm
+from conges.forms import CongeForm, RefusCongeForm, ModifierCongeForm
 from django.db.models import Sum
 import datetime
 from main.pdfMaker import generate_pdf
@@ -15,8 +15,7 @@ from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from django.conf import settings
-from .forms import RefusCongeForm
-
+from datetime import datetime
 
 
 @login_required(login_url=settings.LOGIN_URL)
@@ -40,10 +39,23 @@ def liste_mes_conges(request, id_annee_selectionnee):
     annee_universitaire = get_object_or_404(AnneeUniversitaire, pk=id_annee_selectionnee)    
     conges = Conge.objects.filter(annee_universitaire=annee_universitaire, personnel__user=request.user)   
     personnel = Personnel.objects.get(user=request.user)  # Récupérer l'objet Personnel associé à l'utilisateur actuel
+    
+    date_debut_formatted_list = []
+    date_fin_formatted_list = []
+    for cong in conges:
+        date_debut_formatted = cong.date_et_heure_debut.strftime("%d %B %Y")
+        date_fin_formatted = cong.date_et_heure_fin.strftime("%d %B %Y")
+        date_debut_formatted_list.append(date_debut_formatted)
+        date_fin_formatted_list.append(date_fin_formatted)
+
     context = {
         "conges": conges,
         "annee_universitaire": annee_universitaire,
-        "personnel": personnel  # Ajouter l'objet Personnel au contexte
+        "personnel": personnel,
+        'date_debut_formatted_list': date_debut_formatted_list,
+        'date_fin_formatted_list': date_fin_formatted_list,
+        "date_debut_formatted":date_debut_formatted,
+        "date_fin_formatted":date_fin_formatted,
     }
     return render(request, 'conges/liste_conges.html', context)
 
@@ -69,11 +81,16 @@ def formulaire_de_demande_de_conges(request, id):
     elif conge.valider == 'Inactif':
         conge.valider = "Congés refusé"
 
+    date_debut_formatted = datetime.strptime(str(conge.date_et_heure_debut), "%Y-%m-%d").strftime("%d %B %Y")
+    date_fin_formatted = datetime.strptime(str(conge.date_et_heure_debut), "%Y-%m-%d").strftime("%d %B %Y")
+
     context = {
         "conge": conge,
-        "role" : role
-    }
+        "role" : role,
+        "date_debut_formatted":date_debut_formatted,
+        "date_fin_formatted":date_fin_formatted,
 
+    }
     latex_input = 'formulaire_de_demande_de_conges'
     latex_ouput = 'generated_formulaire_de_demande_de_conges'
     pdf_file = 'pdf_formulaire_de_demande_de_conges'
@@ -108,25 +125,35 @@ def liste_conges(request, id_annee_selectionnee):
     puis les renvoie au template 'conges/liste_conges.html' pour l'affichage.
 
     """
-
     annee_universitaire = get_object_or_404(AnneeUniversitaire, pk=id_annee_selectionnee)
     conges = Conge.objects.filter(annee_universitaire = annee_universitaire)
+    date_debut_formatted_list = []
+    date_fin_formatted_list = []
+    for cong in conges:
+        date_debut_formatted = cong.date_et_heure_debut.strftime("%d %B %Y")
+        date_fin_formatted = cong.date_et_heure_fin.strftime("%d %B %Y")
+        date_debut_formatted_list.append(date_debut_formatted)
+        date_fin_formatted_list.append(date_fin_formatted)
+
     context = {
         "conges": conges,
         "annee_universitaire": annee_universitaire,
+        'date_debut_formatted_list': date_debut_formatted_list,
+        'date_fin_formatted_list': date_fin_formatted_list,
+        "date_debut_formatted":date_debut_formatted,
+        "date_fin_formatted":date_fin_formatted,
     }
     return render(request, 'conges/liste_conges.html', context)
 
 
+
 @login_required(login_url=settings.LOGIN_URL)
-def demander_conges(request, id=0):
+def creer_demande_conges(request):
     """
-    Enregistre ou met à jour le formulaire de demande de congés dans le système.
-    Si l’ID est fourni, elle met à jour les informations concernant la demande de congés existante avec les nouvelles données. Sinon, elle enregistre un nouveau formulaire de demande de congés.
+    Enregistre le formulaire de demande de congés dans le système.
 
     Args:
         request: L'objet HttpRequest qui représente la requête HTTP reçue.
-        id (int, optional): L'identifiant du formulaire de demande de congés à modifier (par défaut : 0).
 
     Returns:
         HttpResponse: La réponse HTTP renvoyée au client.
@@ -136,20 +163,8 @@ def demander_conges(request, id=0):
         None
 
     """
-    if request.method == "GET":
-        if id == 0:
-            form = CongeForm()
-        else:
-            conge = Conge.objects.get(pk=id)
-            form = CongeForm(instance=conge)   
-        return render(request, 'conges/demander_conges.html', {'form': form})
-    else:
-        if id == 0:
-            form = CongeForm(request.POST)
-        else:
-            conge = Conge.objects.get(pk=id)
-            form = CongeForm(request.POST, instance=conge)
-        
+    if request.method == "POST":
+        form = CongeForm(request.POST)
         if form.is_valid():
             conge = form.save(commit=False)
             personnel = Personnel.objects.get(user=request.user)
@@ -167,9 +182,46 @@ def demander_conges(request, id=0):
 
             id_annee_selectionnee = AnneeUniversitaire.static_get_current_annee_universitaire().id
             return redirect('conges:liste_mes_conges', id_annee_selectionnee=id_annee_selectionnee)
-        else:
-            print(form.errors)
-            return render(request, 'conges/demander_conges.html', {'form': form})
+    else:
+        form = CongeForm()
+    return render(request, 'conges/demander_conges.html', {'form': form, })
+
+
+
+@login_required(login_url=settings.LOGIN_URL)
+def modifier_demande_conges(request, id):
+    """
+    Met à jour le formulaire de demande de congés dans le système.
+    Si l’ID est fourni, elle met à jour les informations concernant la demande de congés existante avec les nouvelles données.
+    Args:
+        request: L'objet HttpRequest qui représente la requête HTTP reçue.
+        id (int, optional): L'identifiant du formulaire de demande de congés à modifier (par défaut : 0).
+
+    Returns:
+        HttpResponse: La réponse HTTP renvoyée au client.
+    'conges/modifier_demande_conges.html' : correspond au template qui est renvoyer.
+
+    Raises:
+        None
+
+    """
+    conge = get_object_or_404(Conge, pk=id)
+    if request.method == "POST":
+        form = CongeForm(request.POST, instance=conge)
+        if form.is_valid():
+            conge = form.save(commit=False)
+            # Ne récupérez pas l'objet Personnel si l'utilisateur n'est pas membre du personnel
+            if request.user.is_staff:
+                conge.save()
+                id_annee_selectionnee = AnneeUniversitaire.static_get_current_annee_universitaire().id
+                return redirect('conges:demandes_en_attentes', id_annee_selectionnee=id_annee_selectionnee)
+            else:
+                messages.error(request, "Vous n'êtes pas autorisé à modifier cette demande.")
+                return render(request, 'conges/modifier_demande_conges.html', {'form': form})
+    else:
+        form = CongeForm(instance=conge)
+    return render(request, 'conges/modifier_demande_conges.html', {'form': form})
+
 
 
 
@@ -193,9 +245,20 @@ def demandes_validees(request, id_annee_selectionnee):
     """
     demandes_validees = Conge.objects.filter(valider="Actif")
     annee_universitaire = get_object_or_404(AnneeUniversitaire, pk=id_annee_selectionnee)
+    date_debut_formatted_list = []
+    date_fin_formatted_list = []
+    for cong in demandes_validees:
+        date_debut_formatted = cong.date_et_heure_debut.strftime("%d %B %Y")
+        date_fin_formatted = cong.date_et_heure_fin.strftime("%d %B %Y")
+        date_debut_formatted_list.append(date_debut_formatted)
+        date_fin_formatted_list.append(date_fin_formatted)
     context = {
         "demandes_validees": demandes_validees,
         "annee_universitaire": annee_universitaire,
+        'date_debut_formatted_list': date_debut_formatted_list,
+        'date_fin_formatted_list': date_fin_formatted_list,
+        "date_debut_formatted":date_debut_formatted,
+        "date_fin_formatted":date_fin_formatted,
     }
     return render(request, 'conges/demandes_validees.html', context)
 
@@ -219,12 +282,23 @@ def demandes_en_attentes(request, id_annee_selectionnee):
     puis les renvoie au template 'conges/demandes_en_attentes.html' pour affichage.
 
     """
-
     demandes_en_attentes = Conge.objects.filter(valider="Inconnu")
     annee_universitaire = get_object_or_404(AnneeUniversitaire, pk=id_annee_selectionnee)
+    date_debut_formatted_list = []
+    date_fin_formatted_list = []
+    for cong in demandes_en_attentes:
+        date_debut_formatted = cong.date_et_heure_debut.strftime("%d %B %Y")
+        date_fin_formatted = cong.date_et_heure_fin.strftime("%d %B %Y")
+        date_debut_formatted_list.append(date_debut_formatted)
+        date_fin_formatted_list.append(date_fin_formatted)
+
     context = {
         "demandes_en_attentes": demandes_en_attentes,
         "annee_universitaire": annee_universitaire,
+        'date_debut_formatted_list': date_debut_formatted_list,
+        'date_fin_formatted_list': date_fin_formatted_list,
+        "date_debut_formatted":date_debut_formatted,
+        "date_fin_formatted":date_fin_formatted,
     }
     return render(request, 'conges/demandes_en_attentes.html', context)
 
@@ -250,9 +324,21 @@ def demandes_rejettees(request, id_annee_selectionnee):
     """
     demandes_rejettees = Conge.objects.filter(valider="Inactif")
     annee_universitaire = get_object_or_404(AnneeUniversitaire, pk=id_annee_selectionnee)
+    date_debut_formatted_list = []
+    date_fin_formatted_list = []
+    for cong in demandes_rejettees:
+        date_debut_formatted = cong.date_et_heure_debut.strftime("%d %B %Y")
+        date_fin_formatted = cong.date_et_heure_fin.strftime("%d %B %Y")
+        date_debut_formatted_list.append(date_debut_formatted)
+        date_fin_formatted_list.append(date_fin_formatted)
+
     context = {
         "demandes_rejettees": demandes_rejettees,
         "annee_universitaire": annee_universitaire,
+        'date_debut_formatted_list': date_debut_formatted_list,
+        'date_fin_formatted_list': date_fin_formatted_list,
+        "date_debut_formatted":date_debut_formatted,
+        "date_fin_formatted":date_fin_formatted,
     }
     return render(request, 'conges/demandes_rejettees.html', context)
 
@@ -273,7 +359,6 @@ def valider_conges(request, id):
         Http404: Si aucune demande de congé correspondant à l'ID spécifié n'est trouvée.
 
     """
-
     conge = get_object_or_404(Conge, id=id)
     conge.valider = "Actif"
     conge.save()

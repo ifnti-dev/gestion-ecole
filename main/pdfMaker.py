@@ -29,7 +29,6 @@ def generate_pdf(context, input_file, output_file, pdf_file) :
     
     '''APPLICATION DE L’ENVIRONNEMENT EDITE SUR LE TEMPLATE'''
 
-    
     j2_template = j2_env.from_string(template)
     
     # écriture dans le fichier en sortie

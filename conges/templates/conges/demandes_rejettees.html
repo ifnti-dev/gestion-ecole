@@ -25,7 +25,7 @@
                 {% for conge in demandes_rejettees %}
                 <tr>
                     <td class="text-center font-size-sm">{{ conge.personnel.nom }} {{ conge.personnel.prenom }}</td>
-                    <td class="text-center font-size-sm">Du {{ conge.date_et_heure_debut }} au  {{ conge.date_et_heure_fin }}</td>
+                    <td class="text-center font-size-sm">Du {{ date_debut_formatted }} au  {{ date_fin_formatted }}</td>
                     <td class="text-center font-size-sm">{{conge.nombre_de_jours_de_conge }} jours</td>
                    <td style="text-align: center;">
                       <button type="submit" class="update-book btn btn-sm btn-danger">

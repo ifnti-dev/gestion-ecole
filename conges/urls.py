@@ -8,8 +8,8 @@ urlpatterns = [
                              #### Frais ####
     path('liste_conges/<int:id_annee_selectionnee>/', views.liste_conges, name='liste_conges'),
     path('liste_mes_conges/<int:id_annee_selectionnee>/', views.liste_mes_conges, name='liste_mes_conges'),
-    path('demander_conges/', views.demander_conges, name='demander_conges'),
-    path('modifier_demande_conge/<int:id>/', views.demander_conges, name='modifier_demande_conge'),
+    path('demander_conges/', views.creer_demande_conges, name='demander_conges'),
+    path('modifier_demande_conge/<int:id>/', views.modifier_demande_conges, name='modifier_demande_conge'),
     path('formulaire_de_demande_de_conges/<int:id>/', views.formulaire_de_demande_de_conges, name='formulaire_de_demande_de_conges'),
 
     path('demandes_validees/<int:id_annee_selectionnee>', views.demandes_validees, name='demandes_validees'),

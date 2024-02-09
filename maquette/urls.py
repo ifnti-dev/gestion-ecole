@@ -4,7 +4,7 @@ from . import views
 app_name = 'maquette'
 
 urlpatterns = [
-    path('<int:id_annee_selectionnee>/', views.generate_maquette, name=''),
+    path('', views.generate_maquette, name=''),
     path('data/', views.data, name='data'),
     path('correspondances/', views.correspondances, name="correspondances"),
     path('correspondance/<int:id>/delete', views.delete_correspondance, name="correspondance_delete"),

@@ -11,198 +11,366 @@ Enregistrement d'un étudiant
 
 {% endblock %}
 {% block content %}
+
+
 <div class="d-flex justify-content-center">
-  <div class="block-content card m-4 col-md-10 col-lg-8 col-xl-6">
-    <div class="d-flex justify-content-between">
-      <h3>         
-      </h3>
-      
-        <a href="{% url 'main:importer_les_donnees' %}" class="btn btn-outline-primary">
-          <i class="fas fa-plus"></i> Importer
-        </a>
-    </div>
-    <form class="container-fluid p-3" action="#" method="POST">
-      {% csrf_token %}
-      <div class="form-row mb-3">
-        <div class="col-md-6">
-          {{ form.nom.label_tag }}
-          {{ form.nom }}
-          <span class="text-danger">{{ form.nom.errors }}</span>
-        </div>
-        <div class="col-md-6">
-          {{ form.prenom.label_tag }}
-          {{ form.prenom }}
-          <span class="text-danger">{{ form.prenom.errors }}</span>
-        </div>
-      </div>
+  <div class="m-4 col-md-10 col-lg-8 col-xl-6">
+      <div class="col-md-12">
+          <!-- Progress Wizard -->
+          <div class="js-wizard-simple block block">
+              <!-- Step Tabs -->
+              <ul class="nav nav-tabs nav-tabs-block nav-justified" role="tablist">
+                  <li class="nav-item">
+                      <a class="nav-link active" href="#wizard-progress-step1" data-toggle="tab">1. Utilisateur</a>
+                  </li>
+                  <li class="nav-item">
+                      <a class="nav-link" href="#wizard-progress-step2" data-toggle="tab">2. Adresse</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="#wizard-progress-step3" data-toggle="tab">2. Parcours</a>
+                  </li>
+                  <li class="nav-item">
+                      <a class="nav-link" href="#wizard-progress-step4" data-toggle="tab">3. Notes</a>
+                  </li>
+              </ul>
+              <!-- END Step Tabs -->
 
-      <div class="form-row mb-3">
-        <div class="col-md-6">
-          {{ form.sexe.label_tag }}
-          {{ form.sexe }}
-          <span class="text-danger">{{ form.sexe.errors }}</span>
-        </div>
-        <div class="col-md-6">
-          {{ form.contact.label_tag }}
-          {{ form.contact }}
-          <span class="text-danger">{{ form.contact.errors }}</span>
-        </div>
-      </div>
+              <!-- Form -->
+              <form method="POST" id="form" onsubmit="showLoading()">
+                  {% csrf_token %}
+                  <!-- Wizard Progress Bar -->
+                  <div class="block-content block-content-sm">
+                      <div class="progress" data-wizard="progress" style="height: 8px;">
+                          <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary" role="progressbar" style="width: 30%;" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100"></div>
+                      </div>
+                  </div>
+                  <!-- END Wizard Progress Bar -->
 
-      <div class="form-row mb-3">        
-        <div class="col-md-6">
-          {{ form.adresse.label_tag }}
-          {{ form.adresse }}
-          <span class="text-danger">{{ form.adresse.errors }}</span>
-        </div>
-        <div class="col-md-6">
-          {{ form.prefecture.label_tag }}
-          {{ form.prefecture }}
-          <span class="text-danger">{{ form.prefecture.errors }}</span>
-        </div>
-      </div>
+                  <!-- Steps Content -->
+                  <div class="block-content block-content-full tab-content px-md-5" style="min-height: 300px;">
+                      <!-- Step 1 -->
+                      <div class="tab-pane active" id="wizard-progress-step1" role="tabpanel">
+                        <div class="d-flex justify-content-end">
+                          {% comment %} <a href="{% url 'main:importer_les_donnees' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-plus"></i> Importer
+                          </a> {% endcomment %}
+                          <a href="#" class="btn btn-outline-primary" data-toggle="modal" data-target="#etudiant">
+                            <i class="fas fa-plus"></i> Importer
+                          </a>
+                        </div>
+                        <div class="form-row mb-3 m-3">
+                          <div class="bg-body-light col-sm-12 p-3" style="width: 200px">
+                            <div class="fv-row">
+                                <div class="dropzone dz-clickable">
+                                    <div class="dz-message needsclick">
+                                        <i class="ki-duotone ki-file-up fs-3x text-primary">
+                                            <span class="d-flex flex-column">
+                                                <img id="preview" src="{% if thumbnail %} /media/{{ form.thumbnail.value }} {% endif %}" alt="Aperçu de l'image" height="100%" />
+                                            </span>
+                                        </i>
+                                        <button id="deleteBtn" class="btn btn-danger" style="{% if not thumbnail %} display: none; {% endif %}">Supprimer</button>
+                                        <div class="ms-4">
+                                            <span class="fs-7 fw-semibold text-gray-400">cliquer pour charger un fihier</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                              {{ form.profil }}
+                          </div>
+                        </div>
+                        <div class="form-row mb-3">
+                          <div class="col-md-6">
+                            {{ form.nom.label_tag }}
+                            {{ form.nom }}
+                            <span class="text-danger">{{ form.nom.errors }}</span>
+                          </div>
+                          <div class="col-md-6">
+                            {{ form.prenom.label_tag }}
+                            {{ form.prenom }}
+                            <span class="text-danger">{{ form.prenom.errors }}</span>
+                          </div>
+                        </div>
+                        <div class="form-row mb-3">
+                          <div class="col-md-4">
+                            {{ form.sexe.label_tag }}
+                            {{ form.sexe }}
+                            <span class="text-danger">{{ form.sexe.errors }}</span>
+                          </div>
+                          <div class="col-md-8">
+                            {{ form.contact.label_tag }}
+                            {{ form.contact }}
+                            <span class="text-danger">{{ form.contact.errors }}</span>
+                          </div>
+                        </div>
+                        <div class="form-row mb-3">
+                          <div class="col-md-12">
+                            {{ form.semestres.label_tag }}
+                            <div class="d-flex align-items-start">
+                              {{ form.semestres }}
+                            </div>
+                            <span class="text-danger">{{ form.semestres.errors }}</span>
+                          </div>
+                        </div>
+                        <div class="form-row mb-3">
+                          <div class="col-md-12">
+                            {{ form.photo_passport.label_tag }}
+                            {{ form.photo_passport }}
+                            <span class="text-danger">{{ form.photo_passport.errors }}</span>
+                          </div>
+                        </div>
+                        <div class="d-flex justify-content-end">
+                          <div class="form-check">
+                            <label class="form-check-label form-check-toggle">
+                              <input name="is_active" id="id_is_active" class="form-check-input" type="checkbox"  {% if form.is_active.value %} checked {% endif %}>
+                              <span>  Activer </span>    
+                            </label>
+                            <span class="text-danger">{{ form.is_active.errors }}</span>
+                          </div>
+                        </div>
+                      </div>
+                      <!-- END Step 1 -->
+                      <!-- Step 2 -->
+                      <div class="tab-pane" id="wizard-progress-step2" role="tabpanel">
+                        <div class="form-row mb-3">        
+                          <div class="col-md-12 mb-3">
+                            {{ form.adresse.label_tag }}
+                            {{ form.adresse }}
+                            <span class="text-danger">{{ form.adresse.errors }}</span>
+                          </div>
+                          <div class="col-md-12">
+                            {{ form.prefecture.label_tag }}
+                            {{ form.prefecture }}
+                            <span class="text-danger">{{ form.prefecture.errors }}</span>
+                          </div>
+                        </div>
+                        <div class="form-row mb-3">
+                          <div class="col-md-12 mb-3">
+                            {{ form.datenaissance.label_tag }}
+                            <div class="d-flex">{{ form.datenaissance }}</div>
+                            <span class="text-danger">{{ form.datenaissance.errors }}</span>
+                          </div>
+                          <div class="col-md-12">
+                            {{ form.lieunaissance.label_tag }}
+                            {{ form.lieunaissance }}
+                            <span class="text-danger">{{ form.lieunaissance.errors }}</span>
+                          </div>
+                        </div>
+                      </div>
+                      <!-- END Step 2 -->
+                      <!-- Step 3 -->
+                      <div class="tab-pane" id="wizard-progress-step3" role="tabpanel">
+                        <div class="form-row mb-3">
+                          <div class="col-md-6">
+                            {{ form.seriebac1.label_tag }}
+                            {{ form.seriebac1 }}
+                            <span class="text-danger">{{ form.seriebac1.errors }}</span>
+                          </div>
+                          <div class="col-md-6">
+                            {{ form.seriebac2.label_tag }}
+                            {{ form.seriebac2 }}
+                            <span class="text-danger">{{ form.seriebac2.errors }}</span>
+                          </div>
+                        </div>
+                  
+                        <div class="form-row mb-3">
+                          <div class="col-md-6">
+                            {{ form.anneebac1.label_tag }}
+                            {{ form.anneebac1 }}
+                            <span class="text-danger">{{ form.anneebac1.errors }}</span>
+                          </div>
+                          <div class="col-md-6">
+                            {{ form.anneebac2.label_tag }}
+                            {{ form.anneebac2 }}
+                            <span class="text-danger">{{ form.anneebac2.errors }}</span>
+                          </div>
+                        </div>
+                  
+                        <div class="form-row mb-3">
+                          <div class="col-md-6">
+                            {{ form.etablissementSeconde.label_tag }}
+                            {{ form.etablissementSeconde }}
+                            <span class="text-danger">{{ form.etablissementSeconde.errors }}</span>
+                          </div>
+                          <div class="col-md-6">
+                            {{ form.etablissementPremiere.label_tag }}
+                            {{ form.etablissementPremiere }}
+                            <span class="text-danger">{{ form.etablissementPremiere.errors }}</span>
+                          </div>
+                        </div>
+                  
+                        <div class="form-row mb-3">
+                          <div class="col-md-12">
+                            {{ form.etablissementTerminale.label_tag }}
+                            {{ form.etablissementTerminale }}
+                            <span class="text-danger">{{ form.etablissementTerminale.errors }}</span>
+                          </div>
+                        </div>
+                  
+                        <div class="form-row mb-3">
+                          <div class="col-md-6">
+                            {{ form.francaisSeconde.label_tag }}
+                            {{ form.francaisSeconde }}
+                            <span class="text-danger">{{ form.francaisSeconde.errors }}</span>
+                          </div>
+                          <div class="col-md-6">
+                            {{ form.francaisPremiere.label_tag }}
+                            {{ form.francaisPremiere }}
+                            <span class="text-danger">{{ form.francaisPremiere.errors }}</span>
+                          </div>
+                        </div>
+                      </div>
+                      <!-- END Step 3 -->
+                      <div class="tab-pane" id="wizard-progress-step4" role="tabpanel">
+                        <div class="form-row mb-3">
+                          <div class="col-md-6">
+                            {{ form.francaisTerminale.label_tag }}
+                            {{ form.francaisTerminale }}
+                            <span class="text-danger">{{ form.francaisTerminale.errors }}</span>
+                          </div>
+                          <div class="col-md-6">
+                            {{ form.anglaisSeconde.label_tag }}
+                            {{ form.anglaisSeconde }}
+                            <span class="text-danger">{{ form.anglaisSeconde.errors }}</span>
+                          </div>
+                        </div>
+                  
+                        <div class="form-row mb-3">
+                          <div class="col-md-6">
+                            {{ form.anglaisPremiere.label_tag }}
+                            {{ form.anglaisPremiere }}
+                            <span class="text-danger">{{ form.anglaisPremiere.errors }}</span>
+                          </div>
+                          <div class="col-md-6">
+                            {{ form.anglaisTerminale.label_tag }}
+                            {{ form.anglaisTerminale }}
+                            <span class="text-danger">{{ form.anglaisTerminale.errors }}</span>
+                          </div>
+                        </div>
+                  
+                        <div class="form-row mb-3">
+                          <div class="col-md-6">
+                            {{ form.mathematiqueSeconde.label_tag }}
+                            {{ form.mathematiqueSeconde }}
+                            <span class="text-danger">{{ form.mathematiqueSeconde.errors }}</span>
+                          </div>
+                          <div class="col-md-6">
+                            {{ form.mathematiquePremiere.label_tag }}
+                            {{ form.mathematiquePremiere }}
+                            <span class="text-danger">{{ form.mathematiquePremiere.errors }}</span>
+                          </div>
+                        </div>
+                  
+                        <div class="form-row mb-3">
+                          <div class="col-md-12">
+                            {{ form.mathematiqueTerminale.label_tag }}
+                            {{ form.mathematiqueTerminale }}
+                            <span class="text-danger">{{ form.mathematiqueTerminale.errors }}</span>
+                          </div>
+                        </div>
+                      </div>
+                  </div>
+                  <!-- END Steps Content -->
 
-      <div class="form-row mb-3">
-        <div class="col-md-6">
-          {{ form.datenaissance.label_tag }}
-          <div class="d-flex">{{ form.datenaissance }}</div>
-          <span class="text-danger">{{ form.datenaissance.errors }}</span>
-        </div>
-        <div class="col-md-6">
-          {{ form.lieunaissance.label_tag }}
-          {{ form.lieunaissance }}
-          <span class="text-danger">{{ form.lieunaissance.errors }}</span>
-        </div>
-      </div>
-
-      <div class="form-row mb-3">
-        <div class="col-md-6">
-          {{ form.seriebac1.label_tag }}
-          {{ form.seriebac1 }}
-          <span class="text-danger">{{ form.seriebac1.errors }}</span>
-        </div>
-        <div class="col-md-6">
-          {{ form.seriebac2.label_tag }}
-          {{ form.seriebac2 }}
-          <span class="text-danger">{{ form.seriebac2.errors }}</span>
-        </div>
-      </div>
-
-      <div class="form-row mb-3">
-        <div class="col-md-6">
-          {{ form.anneebac1.label_tag }}
-          {{ form.anneebac1 }}
-          <span class="text-danger">{{ form.anneebac1.errors }}</span>
-        </div>
-        <div class="col-md-6">
-          {{ form.anneebac2.label_tag }}
-          {{ form.anneebac2 }}
-          <span class="text-danger">{{ form.anneebac2.errors }}</span>
-        </div>
-      </div>
-
-      <div class="form-row mb-3">
-        <div class="col-md-6">
-          {{ form.etablissementSeconde.label_tag }}
-          {{ form.etablissementSeconde }}
-          <span class="text-danger">{{ form.etablissementSeconde.errors }}</span>
-        </div>
-        <div class="col-md-6">
-          {{ form.etablissementPremiere.label_tag }}
-          {{ form.etablissementPremiere }}
-          <span class="text-danger">{{ form.etablissementPremiere.errors }}</span>
-        </div>
-      </div>
-
-      <div class="form-row mb-3">
-        <div class="col-md-12">
-          {{ form.etablissementTerminale.label_tag }}
-          {{ form.etablissementTerminale }}
-          <span class="text-danger">{{ form.etablissementTerminale.errors }}</span>
-        </div>
-      </div>
-
-      <div class="form-row mb-3">
-        <div class="col-md-6">
-          {{ form.francaisSeconde.label_tag }}
-          {{ form.francaisSeconde }}
-          <span class="text-danger">{{ form.francaisSeconde.errors }}</span>
-        </div>
-        <div class="col-md-6">
-          {{ form.francaisPremiere.label_tag }}
-          {{ form.francaisPremiere }}
-          <span class="text-danger">{{ form.francaisPremiere.errors }}</span>
-        </div>
-      </div>
-
-      <div class="form-row mb-3">
-        <div class="col-md-6">
-          {{ form.francaisTerminale.label_tag }}
-          {{ form.francaisTerminale }}
-          <span class="text-danger">{{ form.francaisTerminale.errors }}</span>
-        </div>
-        <div class="col-md-6">
-          {{ form.anglaisSeconde.label_tag }}
-          {{ form.anglaisSeconde }}
-          <span class="text-danger">{{ form.anglaisSeconde.errors }}</span>
-        </div>
-      </div>
-
-      <div class="form-row mb-3">
-        <div class="col-md-6">
-          {{ form.anglaisPremiere.label_tag }}
-          {{ form.anglaisPremiere }}
-          <span class="text-danger">{{ form.anglaisPremiere.errors }}</span>
-        </div>
-        <div class="col-md-6">
-          {{ form.anglaisTerminale.label_tag }}
-          {{ form.anglaisTerminale }}
-          <span class="text-danger">{{ form.anglaisTerminale.errors }}</span>
-        </div>
-      </div>
-
-      <div class="form-row mb-3">
-        <div class="col-md-6">
-          {{ form.mathematiqueSeconde.label_tag }}
-          {{ form.mathematiqueSeconde }}
-          <span class="text-danger">{{ form.mathematiqueSeconde.errors }}</span>
-        </div>
-        <div class="col-md-6">
-          {{ form.mathematiquePremiere.label_tag }}
-          {{ form.mathematiquePremiere }}
-          <span class="text-danger">{{ form.mathematiquePremiere.errors }}</span>
-        </div>
-      </div>
-
-      <div class="form-row mb-3">
-        <div class="col-md-12">
-          {{ form.mathematiqueTerminale.label_tag }}
-          {{ form.mathematiqueTerminale }}
-          <span class="text-danger">{{ form.mathematiqueTerminale.errors }}</span>
-        </div>
-      </div>
-      <div class="form-row mb-3">
-        <div class="col-md-6">
-          {{ form.is_active.label_tag }}
-          <div class="d-flex align-items-start">
-            {{ form.is_active }}
+                  <!-- Steps Navigation -->
+                  <div class="block-content block-content-sm block-content-full bg-body-light rounded-bottom">
+                      <div class="row">
+                          <div class="col-6">
+                              <button type="button" class="btn btn-alt-primary" data-wizard="prev">
+                                  <i class="fa fa-angle-left mr-1"></i> Précédent
+                              </button>
+                          </div>
+                          <div class="col-6 text-right">
+                              <button type="button" class="btn btn-alt-primary" data-wizard="next" hidden>
+                                Suivant <i class="fa fa-angle-right ml-1"></i>
+                              </button>
+                              <button type="button" class="btn btn-alt-primary" data="fakenext">
+                                Suivant <i class="fa fa-angle-right ml-1"></i>
+                              </button>
+                              
+                              <button type="submit" class="btn btn-primary d-none" data-wizard="finish">
+                                  <i class="fa fa-check mr-1"></i> Enregistrer
+                              </button>
+                          </div>
+                      </div>
+                  </div>
+                  <!-- END Steps Navigation -->
+              </form>
           </div>
-          <span class="text-danger">{{ form.is_active.errors }}</span>
-        </div>
-
-        <div class="col-md-6 row">
-        <div>
-          {{ form.semestres.label_tag }}
-            <div class="d-flex align-items-start">
-            {{ form.semestres }}
-          </div>
-        </div>
-
-        </div>
-
       </div>
-      <button class="btn btn-primary btn-block" type="submit"><i class="fas fa-database"></i> Enrégistrer &nbsp;&nbsp;&nbsp;<span></span></button>
-    </form> 
   </div>
 </div>
+
+{% include 'components/modal_import_etudiants.html' with title="Importer la liste des etudiants" modal_id="etudiant" url="/main/importer_les_donnees/" %}
+
+
 {% endblock %}
+{% block scripts %}
+<script>
+
+    $(".dropzone").on('click', function(){
+        $("#id_profil").trigger('click');
+    });
+    $("#id_profil").on('change', function(e){
+        var file = e.target.files[0];
+        if (file) {
+          var reader = new FileReader();
+          reader.onload = function(e) {
+            $("#preview").attr("src", e.target.result);
+            $("#preview").show();
+            $("#deleteBtn").show();
+          };
+          reader.readAsDataURL(file);
+        }
+    });
+    
+    $("#deleteBtn").click(function() {
+        $("#id_profil").val(""); // Réinitialise la valeur de l'input file
+        $("#preview").attr("src", "").hide(); // Réinitialise l'aperçu de l'image
+        $(this).hide(); // Masque le bouton de suppression
+        event.stopPropagation();
+        event.preventDefault();
+    });
+      
+</script>
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+      let fakeNextButton = document.querySelector('[data="fakenext"]');
+      let nextButton = document.querySelector('[data-wizard="next"]');
+      let prevButton = document.querySelector('[data-wizard="prev"]');
+      let finishButton = document.querySelector('[data-wizard="finish"]');
+    
+      prevButton.addEventListener("click", function(e){
+        fakeNextButton.hidden = false;
+      });
+
+      fakeNextButton.addEventListener("click", function(e) {
+
+          let requiredFields = document.querySelectorAll('.tab-pane.active [required]');
+  
+          let isValid = true;
+  
+          Array.from(requiredFields).forEach(function(field) {
+              if (field.value.trim() === '') {
+                  isValid = false;
+                  if (field.id==="id_semestres"){
+                    field = document.getElementsByClassName("select2-selection--multiple")[0];
+                    //console.log(field);
+                  } 
+                  field.classList.add('border-danger');
+              } else {
+                field.classList.remove('border-danger');
+              }
+          });
+          if (isValid) {
+            nextButton.click();
+            if (! finishButton.classList.contains('d-none')){
+              fakeNextButton.hidden = true;
+            } 
+          }
+
+      });
+  });
+  </script>
+  
+{% endblock scripts %}
+  

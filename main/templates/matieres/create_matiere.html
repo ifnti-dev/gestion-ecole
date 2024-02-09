@@ -13,11 +13,6 @@
     <div class="d-flex justify-content-center">
         <div class="block-content card m-4 col-md-10 col-lg-8 col-xl-6">
             <div class="d-flex justify-content-between">
-            <h3>         
-            </h3>
-                <a href="{% url 'main:importer_les_donnees' %}" class="btn btn-outline-primary">
-                <i class="fas fa-plus"></i> Importer
-                </a>
             </div>
             <form class="container-fluid p-3" action="#" method="POST">
                 {% csrf_token %}
@@ -50,6 +45,13 @@
                         {{ form.minValue.label_tag }}
                         {{ form.minValue }}
                         <span class="text-danger">{{ form.minValue.errors }}</span>
+                    </div>
+                </div>
+                <div class="form-row mb-3">
+                    <div class="col-md-12">
+                        {{ form.heures.label_tag }}
+                        {{ form.heures }}
+                        <span class="text-danger">{{ form.heures.errors }}</span>
                     </div>
                 </div>
                 <div class="form-row mb-3">

@@ -1,4 +1,12 @@
 {% extends '../index.html' %}
+{% block content_title %}
+Détails de l'étudiant <span class="text-primary">{{etudiant.nom}} {{etudiant.prenom}}</span>
+<h1>
+    <a href="{% url 'main:etudiants' %}" class="btn btn-outline-warning">
+        <i class="fas fa-chevron-left fa-lg"></i> Retour
+    </a>
+</h1>
+{% endblock %}
 {% block content %}
 
 <style>
@@ -22,14 +30,9 @@
     }
 </style>
 <div class="block block-rounded m-5">
-    <div class="block-header p-4">
-        <h3 class="block-title">Détails de l'étudiant {{etudiant.nom}} {{etudiant.prenom}}</h3>
-        <a class="btn btn-sm btn-success"  href="{% url 'main:etudiants' %}" style="padding: 8px; float: right; background-color: blue; color: white;"><i class="fas fa-chevron-left fa-lg"></i>
-            Retour</a>
-    </div>
     <div class="block-content block-content-full">
         <table id="etudiant">
-            <thead class="thead-dark">
+            <thead class="">
                 <tr>
                     <th class="text-center" style="width: 80px;">Sexe</th>
                     <th class="text-center" style="width: 15%;">Email</th>
@@ -92,7 +95,7 @@
         <br>
         <br>
 
-        <table id="etudiant">:
+        <table id="etudiant">
             <thead class="thead-dark">
                 <tr>
                     <th class="table-secondary" style="width: 15%;">Français Seconde</th>
