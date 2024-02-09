@@ -128,26 +128,26 @@ document.addEventListener('DOMContentLoaded', function() {
                                                     <div class="form-group col-md-6">
                                                         <label>Options d'Impression :</label>
                                                         <div class="custom-control custom-checkbox">
-                                                            <input type="checkbox" class="custom-control-input" id="imprimer_commentaires" name="imprimer_commentaires">
+                                                            <input type="checkbox" class="custom-control-input" id="imprimer_commentaires" data-toggle="tooltip" data-placement="left" title="Vous verrez les differents commentaires laisser par les enseignants pour les séances en attentes de validations." name="imprimer_commentaires">
                                                             <label class="custom-control-label" for="imprimer_commentaires">Commentaires des Enseignants</label>
                                                         </div>
                                                         <div class="custom-control custom-checkbox">
-                                                            <input type="checkbox" class="custom-control-input" id="imprimer_validees" name="imprimer_non_validees">
+                                                            <input type="checkbox" class="custom-control-input" id="imprimer_validees" data-toggle="tooltip" data-placement="left" title="Vous ne verrez que les séances validé par les enseignants ." name="imprimer_validees">
                                                             <label class="custom-control-label" for="imprimer_validees">Uniquement Séances Validées</label>
                                                         </div>
                                                         <div class="custom-control custom-checkbox">
-                                                            <input type="checkbox" class="custom-control-input" id="eleves_absents" name="eleves_absents">
+                                                            <input type="checkbox" class="custom-control-input" id="eleves_absents" data-toggle="tooltip" data-placement="left" title="Pour chaque seance, vous verrez la liste des éleves absents, si il y en a." name="eleves_absents">
                                                             <label class="custom-control-label" for="eleves_absents">Élèves Absents</label>
                                                         </div>
                                                     </div>
                                                     <div class="form-group col-md-6">
                                                         <label>Sous-catégorisation des Séances:</label>
                                                         <div class="custom-control custom-radio">
-                                                            <input type="radio" class="custom-control-input" id="chronologie_horaire" name="sous_categorisation" value="chronologieHoraire" checked>
+                                                            <input type="radio" class="custom-control-input" id="chronologie_horaire" name="sous_categorisation" data-toggle="tooltip" data-placement="right" title="Le seul ordre dans l'affichage des differentes séances sera la date et l'heures." value="chronologieHoraire" >
                                                             <label class="custom-control-label" for="chronologie_horaire">Chronologie Horaire</label>
                                                         </div>
                                                         <div class="custom-control custom-radio">
-                                                            <input type="radio" class="custom-control-input" id="categoris_matieres" name="sous_categorisation" value="parMatieres">
+                                                            <input type="radio" class="custom-control-input" id="categoris_matieres" name="sous_categorisation" value="parMatieres" data-toggle="tooltip" data-placement="right" title="Les séances seront regroupées par matière et ensuite afficher , ordonnées par la date et l'heure." checked>
                                                             <label class="custom-control-label" for="categoris_matieres">Par Matières</label>
                                                         </div>
                                                       
@@ -157,26 +157,27 @@ document.addEventListener('DOMContentLoaded', function() {
                                                 <div>
                                                     <label>Détails par Semestre : </label>
                                                     <div class="custom-control custom-checkbox">
-                                                        <input type="checkbox" class="custom-control-input" id="details_ue" name="details_ue">
+                                                        <input type="checkbox" class="custom-control-input" id="details_ue" data-toggle="tooltip" data-placement="left" title="Vous verrez la liste complete des Ues pour chacun des semestres que vous souhaitez imprimer" name="details_ue">
                                                         <label class="custom-control-label" for="details_ue">Listes des UEs</label>
                                                     </div>
                                                     <div class="custom-control custom-checkbox">
-                                                        <input type="checkbox" class="custom-control-input" id="details_etudiants" name="details_etudiants">
+                                                        <input type="checkbox" class="custom-control-input" id="details_etudiants" data-toggle="tooltip" data-placement="left" title="Vous verrez la liste complete des Etudiants pour chacun des semestres que vous souhaitez imprimer" name="details_etudiants">
                                                         <label class="custom-control-label" for="details_etudiants">Listes des Étudiants</label>
                                                     </div>
                                                     <div class="custom-control custom-checkbox">
-                                                        <input type="checkbox" class="custom-control-input" id="details_matieres" name="details_matieres">
+                                                        <input type="checkbox" class="custom-control-input" id="details_matieres" data-toggle="tooltip" data-placement="left" title="Vous verrez la liste complete des Matieres pour chacun des semestres que vous souhaitez imprimer" name="details_matieres">
                                                         <label class="custom-control-label" for="details_matieres">Listes des Matières</label>
                                                     </div>
                                                     <div class="custom-control custom-checkbox">
-                                                        <input type="checkbox" class="custom-control-input" id="details_heures_matieres" name="details_heures_matieres">
+                                                        <input type="checkbox" class="custom-control-input" id="details_heures_matieres" data-toggle="tooltip" data-placement="left" title="Vous verrez pour chacune des matieres ayant des seances , le total d'heures que représente ces seances" name="details_heures_matieres">
                                                         <label class="custom-control-label" for="details_heures_matieres">Heures Consommées par Matières</label>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>                                       
                                     </div>
-                            
+
+
                                     <div class="block-content block-content-full text-right border-top mt-3">
                                         <button type="button" class="btn btn-alt-secondary mr-1" data-dismiss="modal">Fermer</button>
                                         <button type="submit" class="btn btn-alt-success">Valider</button>
@@ -211,7 +212,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         // Si "Heures consommées par matière" est coché, cocher automatiquement "Liste des matières"
                         if (detailsHeuresMatieresCheckbox.checked) {
                             detailsMatieresCheckbox.checked = true;
-                        }
+                        
                     }
             
                     function updateDetailsEtudiants() {
@@ -248,6 +249,18 @@ document.addEventListener('DOMContentLoaded', function() {
                             detailsEtudiantsCheckbox.checked = false;
                         }
                     }
+                    // Fonction pour gérer le clic sur le bouton "Valider"
+                    function validerForm() {
+                        // Masquer le contenu du modal
+                        $('#modal-block-vcenter .modal-content').hide();
+                        $('#modal-block-vcenter .modal-content').html('<div class="col-6 col-md-12"><i class="fa fa-4x fa-asterisk fa-spin text-success"></i></div>');
+                        $('#modal-block-vcenter .modal-content').show();
+                    }
+
+                    $('#modal-block-vcenter form').submit(function(event) {
+                        validerForm(); 
+                    });
+
                 });
             </script>
             

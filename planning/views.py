@@ -25,17 +25,18 @@ from django.conf import settings
 
 @login_required(login_url=settings.LOGIN_URL)
 def index(request):
-    all_plannings = Planning.objects.all()
-    semestres=Semestre.objects.filter(courant=True)
-    plannings_by_semester = {}
-    for planning in all_plannings:
-        semestre = planning.semestre
-        if semestre in plannings_by_semester:
-            plannings_by_semester[semestre].append(planning)
-        else:
-            plannings_by_semester[semestre] = [planning]
+    id_annee=request.session.get("id_annee_selectionnee")
+    annee=AnneeUniversitaire.objects.filter(id=id_annee).first()
+    semestres=Semestre.objects.filter(annee_universitaire=annee)
+    if request.method=="POST" :
+            semestreId =request.POST.get("semestre")
+            plannings = Planning.objects.filter(semestre__id=semestreId)
+    else :
+        plannings = Planning.objects.all()
 
-    return render(request, 'planning_list.html', {'plannings_by_semester': plannings_by_semester,'semestres':semestres,'plannings':all_plannings})
+    context= {'semestres':semestres,'plannings':plannings}
+
+    return render(request, 'planning_list.html',context)
 
 
 
@@ -88,7 +89,7 @@ def nouveau_planning(request):
                     temps+=(seance.date_et_heure_fin - seance.date_et_heure_debut).total_seconds()
                 hours, remainder = divmod(temps, 3600)
                 minutes, _ = divmod(remainder, 60)
-                matiere['temps_effectuer']=str(hours)+'h '+str(minutes)+'min' 
+                matiere['temps_effectuer']=str(int(hours))+'h '+str(int(minutes))+'min' 
                 
                 planning=Planning.objects.filter(semestre=semestre)
                 for plan in planning :
@@ -99,7 +100,7 @@ def nouveau_planning(request):
                         temps_x+=(planning.date_heure_fin - planning.date_heure_debut).total_seconds()
                     hours_x, remainder = divmod(temps_x, 3600)
                     minutes_x, _ = divmod(remainder, 60)
-                    matiere['temps_plannifier']=str(hours_x)+'h '+str(minutes_x)+'min'                       
+                    matiere['temps_plannifier']=str(int(hours_x))+'h '+str(int(minutes_x))+'min'                       
 
             planification[str(ue)].append({'matieres': matieres})
             print('plan : ',planification)
@@ -109,7 +110,6 @@ def nouveau_planning(request):
         return render(request, 'generer_planning.html', {'planification_json': planification_json,'semestre':semestre,'semaine':semaine,'datedebut':datedebut,'datefin':datefin,'intervalle':intervalle,'ues':ues})
 
 
-@login_required(login_url=settings.LOGIN_URL)
 def datetime_serializer(obj):
     if isinstance(obj, datetime.datetime):
         return obj.strftime('%Y-%m-%dT%H:%M:%S')
