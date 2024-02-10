@@ -14,7 +14,6 @@ class GenerateMaquetteForm(forms.Form):
     parcours = forms.ModelChoiceField(
         queryset=Parcours.objects.all(),
         widget=forms.Select(attrs={'class' : 'form-control', 'onchange': 'this.form.submit()'}),
-        initial=Parcours.objects.first()
     )
     type_maquette = forms.CharField(
         widget=forms.Select(
