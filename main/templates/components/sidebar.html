@@ -219,42 +219,37 @@
                     </a>
                 </li>
                 {% endif %}
+                {% if is_etudiant or is_enseignant or is_comptable or is_directeur_des_etudes %}
                 <li class="nav-main-heading text-white">Emploie du Temps</li>
                 <li class="nav-main-item">
                     <a class="nav-main-link" href="{% url 'cahier_de_texte:cahier_de_text' %}">
                         <i class="nav-main-link-icon si si-energy"></i>
                         <span class="nav-main-link-name text-capitalize">Cahier de texte</span>
                     </a>
-                    <a class="nav-main-link"
-                        href="{% url 'planning:planning' %}">
-                    <i class="nav-main-link-icon si si-energy"></i>
-                    <span class="nav-main-link-name text-capitalize"
-                        >Planning</span
-                    >
-                </a>
-
-                </li>
-                {% if is_etudiant %}
-                <li class="nav-main-item">
+                    {% if is_directeur_des_etudes %}
+                    <a class="nav-main-link" href="{% url 'planning:planning' %}">
+                        <i class="nav-main-link-icon si si-energy"></i>
+                        <span class="nav-main-link-name text-capitalize">Planning</span>
+                    </a>
+                    {% elif is_etudiant %}
                     <a class="nav-main-link" href="{% url 'cahier_de_texte:enregistrer_seance' %}">
                         <i class="nav-main-link-icon si si-energy"></i>
                         <span class="nav-main-link-name text-capitalize">Enregistrer une séance</span>
                     </a>
-                </li>
-                <li class="nav-main-item">
                     <a class="nav-main-link" href="{% url 'cahier_de_texte:liste_seance_etudiant' %}">
                         <i class="nav-main-link-icon si si-energy"></i>
                         <span class="nav-main-link-name text-capitalize">Séances enregistrées</span>
                     </a>
-                </li>
-                {% elif is_enseignant %}
-                <li class="nav-main-item">
+                    {% elif is_enseignant %}
                     <a class="nav-main-link" href="{% url 'cahier_de_texte:liste_seance' %}">
                         <i class="nav-main-link-icon si si-energy"></i>
                         <span class="nav-main-link-name text-capitalize">Séances</span>
                     </a>
+                    {% endif %}
                 </li>
+                {% endif %}
 
+                {% if is_enseignant %}
                 <li class="nav-main-heading text-white">Congés</li>
                 <li class="nav-main-item">
                     <a class="nav-main-link" href="{% url 'conges:liste_mes_conges' id_annee_selectionnee %}">
@@ -263,6 +258,7 @@
                     </a>
                 </li>
                 {% endif %}
+               
                 <li class="nav-main-heading text-white">Programmes</li>
                 <li class="nav-main-item">
                     <a class="nav-main-link" href="{% url 'maquette:' %}">
