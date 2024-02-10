@@ -10,10 +10,11 @@ def run():
     users = User.objects.exclude(username__in=["malia", "amk", "walid", 'kaiser'])
     for user in users:
         user.delete()
-    
+        
+    create_groups_if_exist()
     clean_data_base()
     #create_groups_if_exist(request)
-    create_groups_if_exist()
+    
 
 def clean_data_base():
     models = [AnneeUniversitaire, Programme, Seance, Personnel, Enseignant, Etudiant, Comptable, Tuteur, Ue, Matiere, Evaluation, Competence, Semestre, Domaine, Note]
