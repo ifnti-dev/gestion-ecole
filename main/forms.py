@@ -149,28 +149,28 @@ class EtudiantForm(forms.ModelForm):
         if adresse and contains_special_caractere(adresse):
             self._errors['adresse'] = 'L\'adresse ne doit pas contenir des caractères spéciaux'
 
-        if contains_special_caractere(lieunaissance):
+        if lieunaissance and contains_special_caractere(lieunaissance):
             self._errors['lieunaissance'] = 'Le lieu de naissance ne doit pas contenir des caractères spéciaux'
 
-        if contains_special_caractere(prefecture):
+        if prefecture and contains_special_caractere(prefecture):
             self._errors['prefecture'] = 'La préfecture ne doit pas contenir des caractères spéciaux'
 
-        if contains_special_caractere(etablissementPremiere):
+        if etablissementPremiere and contains_special_caractere(etablissementPremiere):
             self._errors['etablissementSeconde'] = "Le nom de l'établissement ne doit pas contenir des caractères spéciaux"
 
-        if contains_special_caractere(etablissementSeconde):
+        if etablissementSeconde and contains_special_caractere(etablissementSeconde):
             self._errors['etablissementSeconde'] = "Le nom de l'établissement ne doit pas contenir des chiffres"
 
-        if contains_special_caractere(etablissementPremiere):
+        if etablissementPremiere and contains_special_caractere(etablissementPremiere):
             self._errors['etablissementPremiere'] = "Le nom de l'établissement ne doit pas contenir des caractères spéciaux"
 
-        if contains_numerique(etablissementPremiere):
+        if etablissementPremiere and contains_numerique(etablissementPremiere):
             self._errors['etablissementPremiere'] = "Le nom de l'établissement ne doit pas contenir des chiffres"
 
-        if contains_special_caractere(etablissementTerminale):
+        if etablissementTerminale and contains_special_caractere(etablissementTerminale):
             self._errors['etablissementTerminale'] = "Le nom de l'établissement ne doit pas contenir des caractères spéciaux"
 
-        if contains_numerique(etablissementTerminale):
+        if etablissementTerminale and contains_numerique(etablissementTerminale):
             self._errors['etablissementTerminale'] = "Le nom de l'établissement ne doit pas contenir des chiffres"
 
 

@@ -11,9 +11,8 @@ def run():
     for user in users:
         user.delete()
     
-    clean_data_base()
-    #create_groups_if_exist(request)
     create_groups_if_exist()
+    clean_data_base()
 
 def clean_data_base():
     models = [AnneeUniversitaire, Programme, Seance, Personnel, Enseignant, Etudiant, Comptable, Tuteur, Ue, Matiere, Evaluation, Competence, Semestre, Domaine, Note]
@@ -58,7 +57,7 @@ def clean_data_base():
     if response.lower() in ['o', 'oui', 'y', 'yes']:
         fake = Faker()
         s1 = AnneeUniversitaire.objects.last().semestre_set.first()
-        for _ in range(10):
+        for _ in range(1):
             etudiant = Etudiant(
                 nom=fake.last_name(),
                 prenom=fake.first_name(),
@@ -71,7 +70,7 @@ def clean_data_base():
                 prefecture=fake.city(),
                 carte_identity=fake.random_number(digits=10),
                 nationalite='Togolaise',
-                anneeentree = fake.random_int(min=2010, max=2023),
+                anneeentree = 2023,
                 seriebac1 = random.choice(['A', 'C', 'D', 'E', 'F1', 'F2', 'F3', 'F4', 'G2']),
                 seriebac2 = random.choice(['A', 'C', 'D', 'E', 'F1', 'F2', 'F3', 'F4', 'G2']),
                 anneebac1 = fake.random_int(min=2000, max=2022),
@@ -92,10 +91,10 @@ def clean_data_base():
             
             #etudiant.semestre.add(Semestre.objects.all()[0])
             etudiant.save()
-            etudiant.semestres.add(s1)
+            # etudiant.semestres.add(s1)
             print(f"Etudiant créé : {etudiant.user.username}")
-    
-        for _ in range(10):
+        
+        for _ in range(2):
             # Génération des données aléatoires
             nom = fake.last_name()
             prenom = fake.first_name()
@@ -132,12 +131,7 @@ def clean_data_base():
 
             print(f"Personnel créé : {personnel}")
 
-        personnels = Personnel.objects.all()
-        for _ in range(10):
-            nom = fake.last_name()
-            prenom = fake.first_name()
-            username = f"{prenom.lower()}.{nom.lower()}"
-            password = fake.password()
+        for _ in range(1):
             enseignant = Enseignant(
                 nom=fake.last_name(),
                 prenom=fake.first_name(),
@@ -159,7 +153,6 @@ def clean_data_base():
             enseignant.save()
             print(f"Enseignant créé : {enseignant}")
 
-    
 def create_groups_if_exist():
     permissions = [
         'view', 'add', 'change', 'delete', "diplome", "carte", "releve_details", "releve_synthetique",
