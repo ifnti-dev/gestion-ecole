@@ -58,7 +58,7 @@ def pre_load_ue_matiere_template_data_by_year(annees):
 @transaction.atomic
 def load_matieres_by_year(path, annee, batch_size=100):
     # Utiliser transaction.atomic pour améliorer les performances en effectuant toutes les opérations dans une seule transaction
-    Matiere.objects.filter(ue__programme__semestre__annee_universitaire=annee).delete()
+    # Matiere.objects.filter(ue__programme__semestre__annee_universitaire=annee).delete()
 
     workbook = openpyxl.load_workbook(filename=path)
 
@@ -69,59 +69,50 @@ def load_matieres_by_year(path, annee, batch_size=100):
             ue = next(ue for ue in ues if ue.codeUE == ue_sheet.title)
         except StopIteration:
             continue
-        matieres_to_create = []
+
         for i, row in enumerate(ue_sheet.iter_rows(values_only=True, min_row=3, max_col=5)):
             libelle = row[0].strip()
-            
-            matieres_to_create.append(Matiere(
-                libelle=libelle,
-                coefficient=int(trim_str(row[1])),
-                minValue=int(trim_str(row[2])),
-                heures=int(trim_str(row[3])),
-                abbreviation=trim_str(row[4]),
-                ue=ue,
-                codematiere=f"{i+1}{ue.codeUE}",
-            ))
-            
-            
-            if len(matieres_to_create) == batch_size:   
-                try:
-                    Matiere.objects.bulk_create(matieres_to_create)
-                except DataError as _:
-                    raise DataError("Vérifier les valeurs de vos champs !")
-                except IntegrityError as _:
-                    raise IntegrityError("L'abbréviation d'une matière est unique !")
-                
-                matieres_to_create = []
-
-        if matieres_to_create:
             try:
-                Matiere.objects.bulk_create(matieres_to_create)
-            except DataError as de:
+                Matiere.objects.get_or_create(
+                    libelle=libelle,
+                    coefficient=int(trim_str(row[1])),
+                    minValue=int(trim_str(row[2])),
+                    heures=int(trim_str(row[3])),
+                    abbreviation=trim_str(row[4]),
+                    ue=ue,
+                )
+            except DataError as _:
                 raise DataError("Vérifier les valeurs de vos champs !")
             except IntegrityError as _:
                 raise IntegrityError("L'abbréviation d'une matière est unique !")
 
 @transaction.atomic
 def pre_load_note_ues_template_data(semestres):
-    template_folder_base_path ='media/excel_templates/notes_templates'
+    folder_path = f"{BASE_PATH}/notes_templates"
+    template_path = f"{BASE_PATH}/ues_matieres_tmp.xlsx"
     
-    if not os.path.exists(template_folder_base_path):
-        os.mkdir(template_folder_base_path)
+    if not os.path.exists(folder_path):
+        os.mkdir(folder_path)
+    
+    template_folder_base_path ='media/excel_templates/notes_templates'
+    i=0
     
     for semestre in semestres: 
+        if i >= 1:
+            continue
+        i += 1
         try:
             programme = semestre.programme_set.all().get()
         except Exception:
-            raise Programme.DoesNotExist
+            continue
         ues = programme.ues.all()  
         etudiants = semestre.etudiant_set.all()
         base_path =f'media/excel_templates/notes_templates/{semestre.libelle}'
         
         if not os.path.exists(base_path):
             os.mkdir(base_path)
-        # path_part = f'{semestre.libelle}_{semestre.annee_universitaire}'
         for ue in ues:
+            print(ue)
             path = f'{base_path}/notes_{ue.codeUE}_{semestre.libelle}_{semestre.annee_universitaire}.xlsx'
             wb = openpyxl.load_workbook(filename=f"media/excel_templates/notes_ue_tmplt.xlsx")
             template_sheet = wb.active
@@ -139,16 +130,8 @@ def pre_load_note_ues_template_data(semestres):
                     row[1].value = etudiants[i].prenom
                     row[2].value = ""
             wb.save(path)
-            wb.close()
             
     shutil.make_archive(template_folder_base_path, 'zip', template_folder_base_path)
-    
-    for file_path in os.listdir(template_folder_base_path):
-        path = template_folder_base_path+"/"+file_path
-        for p in os.listdir(path):
-            os.remove(path+"/"+p)
-        os.rmdir(path)
-    os.rmdir(template_folder_base_path)
     
     return template_folder_base_path+".zip"
 
@@ -245,7 +228,6 @@ def pre_load_evaluation_template_data(matiere, semestre):
         i += 1
     wb.save(path)
     
-    #os.remove(path)
     return path
 
 @transaction.atomic
@@ -260,6 +242,7 @@ def load_notes_from_evaluation(path, matiere=None, semestre=None):
             'prenom_cell' : 1,
             'evaluations' : [],
         }
+        
         ws = sheet
         
         annee = str(ws['B1'].value)
@@ -302,70 +285,77 @@ def load_notes_from_evaluation(path, matiere=None, semestre=None):
         else:
             raise ValueError(f"Erreur de pondération pour l'évaluation : {evaluation_name} ")
 
-
 @transaction.atomic
-def pre_load_maquette(path, annee):
+def pre_load_maquette(annees):
+    path = 'media/excel_templates/maquette_general_[annee].xlsx'
+    folder_path = f"{BASE_PATH}/maquette_templates"
+    os.mkdir(folder_path)
+    template_path = f"{BASE_PATH}/ues_matieres_tmp.xlsx"
     
-    result_path = "media/excel_templates/maquette_general_tmp.xlsx"
-    if os.path.exists(result_path):
-        os.remove(result_path)
+    for annee in annees:
     
-    wb = openpyxl.load_workbook(path)
-    semestres = annee.semestre_set.all().prefetch_related('programme_set')
-    for sheet in wb:
-        semestre = sheet.title
-        semestre = semestres.filter(libelle=semestre).first()
-        programmes = semestre.programme_set.all()
+        result_path = f"{folder_path}/maquette_general_{annee}.xlsx"
         
-        valeurs_possibles_type = [ value[1] for value in Ue.TYPES ]
-        valiation_type = DataValidation(type="list", formula1='"'+ ','.join(map(str, valeurs_possibles_type))+'"', allow_blank=True)
-        valeurs_possibles_niveau = [ value[1] for value in Ue.TYPES_NIVEAU ]
-        valiation_niveau = DataValidation(type="list", formula1='"'+ ','.join(map(str, valeurs_possibles_niveau))+'"', allow_blank=True)
-        
-        sheet.add_data_validation(valiation_type)
-        sheet.add_data_validation(valiation_niveau)
-        count = 3
-        if programmes:
-            programme = programmes.first()
-            for ue  in programme.ues.all():
-                cell_a = sheet[f'A{count}']
-                cell_a.value = ue.libelle
-                cell_b = sheet[f'B{count}']
+        wb = openpyxl.load_workbook(path)
+        semestres = annee.semestre_set.all().prefetch_related('programme_set')
+        for sheet in wb:
+            semestre = sheet.title
+            semestre = semestres.filter(libelle=semestre).first()
+            programmes = semestre.programme_set.all()
+            
+            valeurs_possibles_type = [ value[1] for value in Ue.TYPES ]
+            valiation_type = DataValidation(type="list", formula1='"'+ ','.join(map(str, valeurs_possibles_type))+'"', allow_blank=True)
+            valeurs_possibles_niveau = [ value[1] for value in Ue.TYPES_NIVEAU ]
+            valiation_niveau = DataValidation(type="list", formula1='"'+ ','.join(map(str, valeurs_possibles_niveau))+'"', allow_blank=True)
+            
+            sheet.add_data_validation(valiation_type)
+            sheet.add_data_validation(valiation_niveau)
+            count = 3
+            if programmes:
+                programme = programmes.first()
+                for ue  in programme.ues.all():
+                    cell_a = sheet[f'A{count}']
+                    cell_a.value = ue.libelle
+                    cell_b = sheet[f'B{count}']
+                    cell_b.value = valeurs_possibles_type[0]
+                    valiation_type.add(cell_b)
+                    
+                    cell_c = sheet[f'C{count}']
+                    cell_c.value = valeurs_possibles_niveau[0]
+                    valiation_niveau.add(cell_c)
+                    
+                    cell_d = sheet[f'D{count}']
+                    cell_d.value = ue.nbreCredits
+                    cell_e = sheet[f'E{count}']
+                    cell_e.value = ue.heures
+                    count += 1
+                    
+            start = count
+            end = 21
+            for i in range(start, end):
+                cell_a = sheet[f'A{i}']
+                cell_a.value = ""
+                cell_b = sheet[f'B{i}']
                 cell_b.value = valeurs_possibles_type[0]
                 valiation_type.add(cell_b)
                 
-                cell_c = sheet[f'C{count}']
+                cell_c = sheet[f'C{i}']
                 cell_c.value = valeurs_possibles_niveau[0]
                 valiation_niveau.add(cell_c)
                 
-                cell_d = sheet[f'D{count}']
-                cell_d.value = ue.nbreCredits
-                cell_e = sheet[f'E{count}']
-                cell_e.value = ue.heures
-                count += 1
-                
-        start = count
-        end = 21
-        for i in range(start, end):
-            cell_a = sheet[f'A{i}']
-            cell_a.value = ""
-            cell_b = sheet[f'B{i}']
-            cell_b.value = valeurs_possibles_type[0]
-            valiation_type.add(cell_b)
-            
-            cell_c = sheet[f'C{i}']
-            cell_c.value = valeurs_possibles_niveau[0]
-            valiation_niveau.add(cell_c)
-            
-        wb.save(result_path)
+            wb.save(result_path)
+        
+    shutil.make_archive(folder_path, 'zip', folder_path)
     
-    return result_path
+    for file_path in os.listdir(folder_path):
+        os.remove(folder_path+"/"+file_path)
+    os.rmdir(folder_path)
+    
+    return folder_path+".zip"
+
 
 @transaction.atomic         
 def load_maquette(path, annee):
-    Ue.objects.filter(programme__semestre__annee_universitaire=annee).delete()
-    Programme.objects.filter(semestre__annee_universitaire=annee).delete()
-    
     try:
         workbook = openpyxl.load_workbook(filename=path, read_only=True)
 
@@ -395,7 +385,7 @@ def load_maquette(path, annee):
         semestres = annee.semestre_set.all()
 
         for semestre in semestres:
-            programme = Programme.objects.create(
+            programme, _ = Programme.objects.get_or_create(
                 semestre=semestre, parcours=parcours)
             programme.ues.set(semestre_ue[semestre.libelle.lower()])
     except ValueError as e:

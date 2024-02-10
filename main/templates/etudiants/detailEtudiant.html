@@ -29,100 +29,61 @@ Détails de l'étudiant <span class="text-primary">{{etudiant.nom}} {{etudiant.p
         background-color: #d6eaf8;
     }
 </style>
-<div class="block block-rounded m-5">
-    <div class="block-content block-content-full">
-        <table id="etudiant">
-            <thead class="">
-                <tr>
-                    <th class="text-center" style="width: 80px;">Sexe</th>
-                    <th class="text-center" style="width: 15%;">Email</th>
-                    <th class="text-center" style="width: 15%;">Contact</th>
-                    <th class="text-center" style="width: 15%;">Adresse</th>
-                    <th class="text-center" style="width: 15%;">Date de Naissance</th>
-                    <th class="text-center" style="width: 15%;">Lieu de Naissance</th>
-                    <th class="text-center" style="width: 15%;">Semestre</th>
-                    <th class="text-center" style="width: 15%;">État</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td class="text-center font-size-sm">{{etudiant.sexe}}</td>
-                    <td class="text-center font-size-sm">{{etudiant.email}}</td>
-                    <td class="text-center font-size-sm">{{etudiant.contact}}</td>
-                    <td class="text-center font-size-sm">{{etudiant.adresse}}</td>
-                    <td class="text-center font-size-sm">{{etudiant.datenaissance}}</td>
-                    <td class="text-center font-size-sm">{{etudiant.lieunaissance}}</td>
-                    {% for s in etudiant.semestres.all %}
-                    <td style="text-align: center;">                                       
-                        {{s.libelle}}
-                    </td>  
-                    {% endfor%}                  
-                    <td class="text-center font-size-sm">{{etudiant.is_active}}</td>
-                </tr>
-            </tbody>
-        </table>
-
-        <br>
-        <br>
-
-        <table id="etudiant">
-            <thead class="thead-dark">
-                <tr>
-                    <th class="text-center" style="width: 15%;">Annnée d'Entrée</th>
-                    <th class="text-center" style="width: 80px;">Série Bac 1</th>
-                    <th class="text-center" style="width: 80px;">Série Bac 2</th>
-                    <th class="text-center" style="width: 15%;">Annnée Bac 1</th>
-                    <th class="text-center" style="width: 15%;">Annnée Bac 2</th>
-                    <th class="text-center" style="width: 15%;">Ets Seconde</th>
-                    <th class="text-center" style="width: 15%;">Ets Première</th>
-                    <th class="text-center" style="width: 15%;">Ets Terminale</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td class="text-center font-size-sm">{{etudiant.anneeentree}}</td>
-                    <td class="text-center font-size-sm">{{etudiant.seriebac1}}</td>
-                    <td class="text-center font-size-sm">{{etudiant.seriebac2}}</td>
-                    <td class="text-center font-size-sm">{{etudiant.anneebac1}}</td>
-                    <td class="text-center font-size-sm">{{etudiant.anneebac2}}</td>
-                    <td class="text-center font-size-sm">{{etudiant.etablissementSeconde}}</td>
-                    <td class="text-center font-size-sm">{{etudiant.etablissementPremiere}}</td>
-                    <td class="text-center font-size-sm">{{etudiant.etablissementTerminale}}</td>
-                </tr>
-            </tbody>
-        </table>
-
-        <br>
-        <br>
-
-        <table id="etudiant">
-            <thead class="thead-dark">
-                <tr>
-                    <th class="table-secondary" style="width: 15%;">Français Seconde</th>
-                    <th class="table-secondary" style="width: 80px;">Français Première</th>
-                    <th class="text-center" style="width: 80px;">Français Terminale</th>
-                    <th class="text-center" style="width: 15%;">Anglais Seconde</th>
-                    <th class="text-center" style="width: 15%;">Anglais Première</th>
-                    <th class="text-center" style="width: 15%;">Anglais Terminale</th>
-                    <th class="text-center" style="width: 15%;">Mathématique Seconde</th>
-                    <th class="text-center" style="width: 15%;">Mathématique Première</th>
-                    <th class="text-center" style="width: 15%;">Mathématique Terminale</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td class="text-center font-size-sm">{{etudiant.francaisSeconde}}</td>
-                    <td class="text-center font-size-sm">{{etudiant.francaisPremiere}}</td>
-                    <td class="text-center font-size-sm">{{etudiant.francaisTerminale}}</td>
-                    <td class="text-center font-size-sm">{{etudiant.anglaisSeconde}}</td>
-                    <td class="text-center font-size-sm">{{etudiant.anglaisPremiere}}</td>
-                    <td class="text-center font-size-sm">{{etudiant.anglaisTerminale}}</td>
-                    <td class="text-center font-size-sm">{{etudiant.mathematiqueSeconde}}</td>
-                    <td class="text-center font-size-sm">{{etudiant.mathematiquePremiere}}</td>
-                    <td class="text-center font-size-sm">{{etudiant.mathematiqueTerminale}}</td>
-                </tr>
-            </tbody>
-        </table>
+<div class="d-flex justify-content-center">
+    <div class="m-4 col-md-10 col-lg-8 col-xl-6 bg-white p-3 shadow-sm">
+        <div class="row col-md-12">
+            <div class="border col-md-4" style="width: 200px; height: 200px;">
+                <img src="/{{ MEDIA_URL }}/{{ etudiant.photo_passport }}" alt="">
+            </div>
+            <div class="col-md-8">
+                <div class="col-md-12">
+                    <span class="font-weight-bold text-uppercase">Nom : </span> <span>{{ etudiant.nom }}</span>
+                </div>
+                <div class="col-md-12 mt-3">
+                    <span class="font-weight-bold text-uppercase">Prénom : </span> <span>{{ etudiant.prenom }}</span>
+                </div>
+                <div class="col-md-12 mt-3">
+                    <span class="font-weight-bold text-uppercase">Sexe : </span> <span>{{ etudiant.sexe }}</span>
+                </div>
+                <div class="col-md-12 mt-3">
+                    <span class="font-weight-bold text-uppercase">Email : </span> <span>{{ etudiant.email }}</span>
+                </div>
+                <div class="col-md-12 mt-3">
+                    <span class="font-weight-bold text-uppercase">Contact : </span> <span>{{ etudiant.contact }}</span>
+                </div>
+            </div>
+        </div>
+        <div class="row col-md-12 mt-3">
+            <div class="col-md-4">
+                <span class="font-weight-bold text-uppercase">Niveau : </span> 
+                {% if niveau == 'L1' %}
+                <span class="badge badge-info">{{niveau}}</span>
+                {% elif niveau == 'L2' %}
+                <span class="badge badge-primary">{{niveau}}</span>
+                {% elif niveau == 'L3' %}
+                <span class="badge badge-success">{{niveau}}</span>
+                {% else %}
+                <span class="badge badge-secondary">pas de niveau</span>
+                {% endif %}
+            </div>
+            <div class="col-md-4">
+                <span class="font-weight-bold text-uppercase">Date de Naissance : </span> <span>{{ etudiant.datenaissance }}</span>
+            </div>
+            <div class="col-md-4">
+                <span class="font-weight-bold text-uppercase">Adresse : </span> <span>{{ etudiant.adresse }}</span>
+            </div>
+        </div>
+        <div class="row col-md-12 mt-3">
+            <div class="col-md-4">
+                <span class="font-weight-bold text-uppercase">Lieu de Naissance : </span> <span>{{ etudiant.lieunaissance }}</span>
+            </div>
+            <div class="col-md-4">
+                <span class="font-weight-bold text-uppercase">Préfecture : </span> <span>{{ etudiant.prefecture }}</span>
+            </div>
+            <div class="col-md-4">
+                <span class="font-weight-bold text-uppercase">Nationnalité : </span> <span>{{ etudiant.nationalite }}</span>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}
