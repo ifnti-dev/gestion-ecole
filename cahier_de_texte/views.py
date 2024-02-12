@@ -252,12 +252,16 @@ def cahier_de_text(request):
     if  request.user.groups.all()[0].name == "etudiant":
         user_connecte=get_object_or_404(get_user_model(),id=request.user.id)
         etudiant=get_object_or_404(Etudiant,user=user_connecte)
-        sem=etudiant.get_semestre_courant
+        semestres=etudiant.semestres.filter(annee_universitaire_id=id_annee)
         niveau=getNiveauEtudiant(etudiant)
-        events=Seance.objects.filter(semestre=sem)
+        seances=[]
+        for sem in semestres:
+            sean =Seance.objects.filter(semestre=sem)
+            for seance in sean:
+                seances.append(seance)
         events = set()
         print("seances :",events )
-        event_data = [{'title': event.intitule, 'start': event.date_et_heure_debut , 'end':event.date_et_heure_fin ,'url': '/cahier_de_texte/info_seance/' + str(event.id) + '/'} for event in events]
+        event_data = [{'title': event.intitule, 'start': event.date_et_heure_debut , 'end':event.date_et_heure_fin ,'url': '/cahier_de_texte/info_seance/' + str(event.id) + '/'} for event in seances]
         event_data = json.dumps(event_data, default=datetime_serializer)
         return render(request,"cahier_de_text/cahier_de_texte.html",{"event_data":event_data,"niveau":niveau})
 
@@ -304,8 +308,9 @@ def liste_seance(request):
         user_connecte=get_object_or_404(get_user_model(),id=request.user.id)
         enseignant_connecte = get_object_or_404(Enseignant, user=user_connecte)
         matieres = Matiere.objects.filter(enseignant=enseignant_connecte)
-        seances_en_attente = Seance.objects.filter(matiere__in=matieres, valider=False)
-        seances_validees = Seance.objects.filter(matiere__in=matieres, valider=True)
+        semestres=Semestre.objects.filter(annee_universitaire_id=request.session.get("id_annee_selectionnee"))
+        seances_en_attente = Seance.objects.filter(matiere__in=matieres, valider=False,semestre__in=semestres)
+        seances_validees = Seance.objects.filter(matiere__in=matieres, valider=True,semestre__in=semestres)
         return render(request, "cahier_de_text/liste_seance.html", {"seances_en_attente": seances_en_attente, "seances_validees": seances_validees})
 
 @login_required(login_url="/main/connexion")
@@ -315,8 +320,9 @@ def liste_seance_etudiant(request):
             return render(request, 'errors_pages/403.html')
         user_connecte=get_object_or_404(get_user_model(),id=request.user.id)
         etudiant_connecte = get_object_or_404(Etudiant, user=user_connecte)
-        seances_en_attente = Seance.objects.filter(auteur=etudiant_connecte, valider=False)
-        seances_validees = Seance.objects.filter(auteur=etudiant_connecte,valider=True)
+        semestres=Semestre.objects.filter(annee_universitaire_id=request.session.get("id_annee_selectionnee"))
+        seances_en_attente = Seance.objects.filter(auteur=etudiant_connecte, valider=False ,semestre__in=semestres)
+        seances_validees = Seance.objects.filter(auteur=etudiant_connecte,valider=True,semestre__in=semestres)
         return render(request, "cahier_de_text/liste_seance_etudiant.html", {"seances_en_attente": seances_en_attente, "seances_validees": seances_validees})
 
 

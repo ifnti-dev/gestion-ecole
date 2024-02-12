@@ -383,38 +383,41 @@ def ajouter_cours(request,planningId):
 
 
 @login_required(login_url=settings.LOGIN_URL)
-def seance(request,seanceId):
-    if request.method == "POST":
-        intitule = request.POST.get("intitulé")
-        description = request.POST.get("description")
-        eleves_absents = request.POST.getlist("eleves-absent")
-        etudiant_id = request.POST('ecrit_par')
-        user_connecte=get_object_or_404(get_user_model(),id=request.user.id)
-        auteur_obj=get_object_or_404(Etudiant,user=user_connecte)
-        seance_plan=SeancePlannifier.objects.filter(id=seanceId).first()
-        if len(intitule)<=0:
-            intitule=seance_plan.intitule
-        seance = Seance(
-            intitule=intitule,
-            semestre=seance_plan.planning.semestre,
-            description=description,
-            enseignant=seance_plan.professeur,
-            date_et_heure_debut=seance_plan.date_heure_debut,
-            date_et_heure_fin=seance_plan.date_heure_fin,
-            matiere=seance_plan.matiere,
-            auteur=auteur_obj
-        )
-        seance_plan.valider=True
-        seance_plan.save()
-        seance.save()
+def enregistrer_seance(request):
+    print("yesssssssssss")
+    intitule = request.POST.get("intitulé")
+    description = request.POST.get("description")
+    eleves_absents = request.POST.getlist("eleves-absent")
+    etudiant_id = request.POST.get('ecrit_par')
+    seanceId = request.POST.get('seanceId')
+    user_connecte=get_object_or_404(get_user_model(),id=request.user.id)
+    auteur_obj=get_object_or_404(Etudiant,user=user_connecte)
+    seance_plan=SeancePlannifier.objects.filter(id=seanceId).first()
+    if len(intitule)<=0:
+        intitule=seance_plan.intitule
+    seance = Seance(
+        intitule=intitule,
+        semestre=seance_plan.planning.semestre,
+        description=description,
+        enseignant=seance_plan.professeur,
+        date_et_heure_debut=seance_plan.date_heure_debut,
+        date_et_heure_fin=seance_plan.date_heure_fin,
+        matiere=seance_plan.matiere,
+        auteur=auteur_obj
+    )
+    seance_plan.valider=True
+    seance_plan.save()
+    seance.save()
 
-        for etudiant_id in eleves_absents:
-            etudiant_obj = get_object_or_404(Etudiant, id=etudiant_id)
-            seance.eleves_presents.add(etudiant_obj)
+    for etudiant_id in eleves_absents:
+        etudiant_obj = get_object_or_404(Etudiant, id=etudiant_id)
+        seance.eleves_presents.add(etudiant_obj)
 
-        
-        return redirect("/cahier_de_texte/info_seance/" + str(seance.id) + "/" )
     
+    return redirect("/cahier_de_texte/info_seance/" + str(seance.id) + "/" )
+
+@login_required(login_url=settings.LOGIN_URL)
+def seance(request,seanceId):
     seance=SeancePlannifier.objects.filter(id=seanceId).first()
     seance_exe=seance.seance_set.all()
     if request.user.groups.all().first().name in ['etudiant']:
@@ -475,83 +478,33 @@ def imprimer(request,planningId):
         if timeshot not in timeslots:
             timeslots.append(timeshot)
 
-# #
-#     schedule = {}
-
-
-#     # # Populate the schedule dictionary with empty sub-dictionaries for each time slot
-#     # for time in timeslots:
-#     #     schedule[time] = {}
-
-#     # # Populate the schedule with planning information
-#     # for plan in plannings:
-#     #     time_slot = plan.timeshot  # Replace with your actual attribute for timeslot
-#     #     day = plan.day  # Replace with your actual attribute for day
-
-#     #     # Check if the time slot exists in the schedule dictionary
-#     #     if time_slot in schedule:
-#     #         # Check if the day exists in the sub-dictionary for the given time slot
-#     #         if day in schedule[time_slot]:
-#     #             # Append the planning information to the existing list for the day
-#     #             schedule[time_slot][day].append({
-#     #                 "intitule": plan.intitule,
-#     #                 "professeur": plan.professeur.nom if plan.professeur else "No Professor"
-#     #             })
-#     #         else:
-#     #             # Create a new list for the day and append the planning information
-#     #             schedule[time_slot][day] = [{
-#     #                 "intitule": plan.intitule,
-#     #                 "professeur": plan.professeur.nom if plan.professeur else "No Professor"
-#     #             }]
-#     #     else:
-#     #         # Handle the case where the time slot is not in the schedule (if needed)
-#     #         pass
-            
-    #     # Print the resulting schedule
-    # for time_slot, days_data in schedule.items():
-    #     print(f"Time Slot: {time_slot}")
-        
-    #     for day, planning_info_list in days_data.items():
-    #         print(f"  Day: {day}")
-            
-    #         for planning_info in planning_info_list:
-    #             print(f"    Intitule: {planning_info['intitule']}, Professeur: {planning_info['professeur']}")
 
     schedule = {}
 
-    # Populate the schedule dictionary with empty sub-dictionaries for each time slot
     for time in timeslots:
         schedule[time] = {}
 
-    # Populate the schedule with planning information
     for plan in plannings:
-        time_slot = plan.timeshot  # Replace with your actual attribute for timeslot
-        day = plan.day  # Replace with your actual attribute for day
+        time_slot = plan.timeshot  
+        day = plan.day  
         activity = plan.intitule
         professor = plan.professeur.nom if plan.professeur else "No Professor"
 
-        # Check if the time slot exists in the schedule dictionary
         if time_slot in schedule:
-            # Check if the day exists in the sub-dictionary for the given time slot
             if day in schedule[time_slot]:
-                # Check if the activity exists for the given day and time
                 if activity in schedule[time_slot][day]:
-                    # Update the existing activity information
                     schedule[time_slot][day][activity].append({
                         "professeur": professor
                     })
                 else:
-                    # Create a new sub-dictionary for the activity and append it to the day's list
                     schedule[time_slot][day][activity] = [{
                         "professeur": professor
                     }]
             else:
-                # Create a new dictionary for the day and add it to the time slot's sub-dictionary
                 schedule[time_slot][day] = {activity: [{
                     "professeur": professor
                 }]}
         else:
-            # Create a new dictionary for the time slot and day
             schedule[time_slot] = {day: {activity: [{
                 "professeur": professor
             }]}}
@@ -578,7 +531,6 @@ def imprimer(request,planningId):
     # génération du pdf
     generate_pdf(context, latex_input, latex_ouput, pdf_file)
 
-    # visualisation du pdf dans le navigateur
     with open('media/pdf/' + str(pdf_file) + '.pdf', 'rb') as f:
         pdf_preview = f.read()
         response = HttpResponse(pdf_preview, content_type='application/pdf')
@@ -586,52 +538,6 @@ def imprimer(request,planningId):
         return response
 
 
-
-
-
-
-
-
-
-    # days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi']
-    # schedule = [{} for _ in range(len(days))]
-    # timeslots = ['7h', '8h30', '8h45', '10h15', '10h30', '12h']
-
-    # for i, day in enumerate(days):
-    #     for time in timeslots:
-    #         schedule[i][time] = ' '  # or you can initialize with an empty string
-
-    # schedule[0]['7h'] = 'Étude'
-    # schedule[0]['8h30'] = 'Django'
-    # # fill in the rest of the schedule with the remaining information
-
-    # # print the schedule
-    # for i, day in enumerate(days):
-    #     print(day)
-    #     for time in timeslots:
-    #         print(time, schedule[i][time])
-    #     print('')
-
-
-
-    # context = {'planning': plannings}
-
-
-    # latex_input = 'planning_week'
-    # latex_ouput = 'planning_week_'+str(plan.semaine)+str(plan.semestre)
-    # pdf_file ='planning_week_'+str(plan.semaine)+str(plan.semestre)
-
-    # # génération du pdf
-    # generate_pdf(context, latex_input, latex_ouput, pdf_file)
-
-    # # visualisation du pdf dans le navigateur
-    # with open('media/pdf/' + str(pdf_file) + '.pdf', 'rb') as f:
-    #     pdf_preview = f.read()
-    #     response = HttpResponse(pdf_preview, content_type='application/pdf')
-    #     response['Content-Disposition'] = 'inline;filename=pdf_file.pdf'
-        # return response
-    return HttpResponse('check')
-    
 
 @login_required(login_url=settings.LOGIN_URL)
 def effacer(request,planningId):
@@ -645,44 +551,6 @@ def effacer(request,planningId):
     planning.delete()
     return  render(request,'planning_list.html')
 
-@login_required(login_url=settings.LOGIN_URL)
-def enregistrer_seance(request):
-    if request.user.groups.all().first().name not in ['etudiant']:
-        return render(request, 'errors_pages/403.html')
-    if request.method == "POST":
-        intitule = request.POST.get("intitulé")
-        description = request.POST.get("description")
-        date=request.POST.get("dateseance")
-        heure_debut = request.POST.get("heuredebut")
-        heure_fin = request.POST.get("heurefin")
-        date_et_heure_debut = date + ' '+heure_debut
-        date_et_heure_fin = date + ' '+heure_fin
-        eleves_absents = request.POST.getlist("eleves-absent")
-        matiere_id = request.POST.get("matiere")
-        etudiant_id = request.POST['ecrit_par']
-        matiere_obj=get_object_or_404(Matiere, pk=matiere_id)
-        user_connecte=get_object_or_404(get_user_model(),id=request.user.id)
-        auteur_obj=get_object_or_404(Etudiant,user=user_connecte)
-        annee=AnneeUniversitaire.static_get_current_annee_universitaire().annee
-        semestreEtudiant=auteur_obj.semestres.filter(courant=True,pk__contains=annee).first()
-
-        seance = Seance(
-            intitule=intitule,
-            semestre=semestreEtudiant,
-            description=description,
-            enseignant=matiere_obj.enseignant,
-            date_et_heure_debut=date_et_heure_debut,
-            date_et_heure_fin=date_et_heure_fin,
-            matiere=matiere_obj,
-            auteur=auteur_obj
-        )
-        seance.save()
-        for etudiant_id in eleves_absents:
-            etudiant_obj = get_object_or_404(Etudiant, id=etudiant_id)
-            seance.eleves_presents.add(etudiant_obj)
-
-        
-        return redirect("/cahier_de_texte/info_seance/" + str(seance.id) + "/" )
 
 
 @login_required(login_url=settings.LOGIN_URL)

@@ -57,10 +57,10 @@
 								<input type="text" class="js-flatpickr form-control bg-white" id="heurefin" required name="heurefin" data-enable-time="true" data-no-calendar="true" placeholder="Finir" data-date-format="H:i" data-time_24hr="true" value="{{ seance.date_et_heure_fin|time:"H:i" }}">
 							</div>
 					</div>
-					<input type="hidden" id="description" name="description" value="{{seance.description}}">
-					<div class="form-group">
-						<div id="js-ckeditor5-classic" name="js-ckeditor5-classic">{{seance.description | safe}}</div>
-					  </div>
+                    <div class="form-group">
+                        <textarea class="js-maxlength form-control" id="description" name="description" rows="5"  placeholder="It even works on textareas.." data-always-show="true"></textarea>
+                    </div>
+            
                     <div class="form-row">
                         <!-- Add form fields for modification here -->
                     </div>
@@ -72,19 +72,6 @@
 </main>
 <script>
                 
-    ClassicEditor
-        .create(document.querySelector('#js-ckeditor5-classic'), {
-        })
-        .then(editor => {
-            editor.model.document.on('change:data', () => {
-                const content = editor.getData();
-                document.querySelector('#description').value = content;
-                console.log(content)
-            });
-        })
-        .catch(error => {
-            console.error(error);
-        });
 
     
     function validateForm() {
@@ -92,6 +79,8 @@
         const heureFinInput = document.getElementById("heurefin");
         const dateInput = document.getElementById("dateseance");
         const date = dateInput.value
+        const intitule = document.getElementById("intitulé");
+                        const intituler = intitule.value
         const startTime = heureDebutInput.value;
         const endTime = heureFinInput.value;
         if (!startTime || !endTime) {
@@ -110,6 +99,12 @@
             return false; 
             
         }
+        var regex = /^[a-zA-Z0-9\s]*$/; // Regular expression to allow only letters, numbers, and spaces
+
+if (!regex.test(intituler)) {
+    One.helpers('notify', {type: 'danger', icon: 'fa fa-info-circle mr-1', message: "L'intitulé ne doit contenir que des lettres, des chiffres et des espaces."});
+        return false;
+} 
         
         return true;
 
