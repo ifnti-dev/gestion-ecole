@@ -20,7 +20,7 @@ services:
     build: ./ifnti_app/
     restart: unless-stopped
     volumes:
-      - data:/app/ifnti/projet_ifnti/static/
+      - data:/app
     # extra_hosts:
     #   - "host_localhost:192.168.60.62"
     depends_on:
