@@ -334,6 +334,8 @@ def nuance(valeur):
 
 @login_required(login_url="/main/connexion")
 def imprimer(request):
+    if request.user.groups.all().first().name not in ['directeur_des_etudes','secretaire','comptable']:
+        return render(request, 'errors_pages/403.html')
     semestres = request.POST.getlist("semestres")
     valider = request.POST.get("imprimer_validees")
     commentaires = request.POST.get("imprimer_commentaires")

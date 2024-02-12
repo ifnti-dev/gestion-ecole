@@ -42,7 +42,7 @@
                                 <tr>
                                     <td>
                                         <i class="fa fa-fw fa-tags mr-1"></i>
-                                        <a class="badge badge-primary" href="javascript:void(0)">{{ seance.semestre }}</a>
+                                        <a class="badge badge-primary" href="{% url 'planning:resume' seance.semestre.id %}">{{ seance.semestre }}</a>
                                     </td>
                                 </tr>
                             </tbody>
@@ -50,7 +50,7 @@
                     </div>
                 </div>
 
-                <a class="block block-rounded block-link-shadow" href="javascript:void(0)">
+                <a class="block block-rounded block-link-shadow" href="{% url 'main:detail_etudiant' seance.auteur.id %}">
                     <div class="block-header block-header-default text-center">
                         <h3 class="block-title">Auteur</h3>
                     </div>
@@ -131,7 +131,7 @@
                                 {% for etudiant in seance.eleves_presents.all %}
                                     <tr>
                                         <td>
-                                            <i class="fa fa-fw fa-user mr-1"></i> {{ etudiant.nom }} {{ etudiant.prenom }}
+                                            <i class="fa fa-fw fa-user mr-1"></i> <a class="badge " href="{% url 'main:detail_etudiant' etudiant.id %}">{{ etudiant.nom }} {{ etudiant.prenom }}</a>
                                         </td>
                                     </tr>
                                 {% empty %}
@@ -147,7 +147,7 @@
                     </div>
                 </div>
 
-                <a class="block block-rounded block-link-shadow" href="javascript:void(0)">
+                <a class="block block-rounded block-link-shadow" href="{% url 'main:enseignant_detail' seance.enseignant.id %}">
                     <div class="block-header block-header-default text-center">
                         <h3 class="block-title">Enseignant</h3>
                     </div>
@@ -155,7 +155,7 @@
                         <div class="push">
                             <img class="img-avatar" src="{% static 'assets/media/avatars/avatar12.jpg'%} " alt="">
                         </div>
-                        <div class="font-w600 mb-1">{{ seance.matiere.enseignant.prenom }} {{ seance.matiere.enseignant.nom }}</div>
+                        <div class="font-w600 mb-1">{{ seance.enseignant.prenom }} {{ seance.enseignant.nom }}</div>
                         <div class="font-size-sm text-muted">{{ seance.matiere }}</div>
                     </div>
                 </a>

@@ -25,6 +25,8 @@ from django.conf import settings
 
 @login_required(login_url=settings.LOGIN_URL)
 def index(request):
+    if request.user.groups.all().first().name not in ['directeur_des_etudes','comptable','secretaire']:
+            return render(request, 'errors_pages/403.html')
     id_annee=request.session.get("id_annee_selectionnee")
     annee=AnneeUniversitaire.objects.filter(id=id_annee).first()
     semestres=Semestre.objects.filter(annee_universitaire=annee)
@@ -56,6 +58,8 @@ def verifier(request):
 
 @login_required(login_url=settings.LOGIN_URL)
 def nouveau_planning(request):
+    if request.user.groups.all().first().name not in ['directeur_des_etudes','secretaire']:
+        return render(request, 'errors_pages/403.html')
     if request.method == 'POST':
         semestreId=request.POST.get("semestre")
         semaine=request.POST.get("semaine")
@@ -189,6 +193,8 @@ def sauvegarder(request):
 from django.db.models import Count
 @login_required(login_url=settings.LOGIN_URL)    
 def resume(request,semestreId):
+    if request.user.groups.all().first().name not in ['directeur_des_etudes','secretaire']:
+        return render(request, 'errors_pages/403.html')
     semestre=Semestre.objects.filter(id=semestreId).first()
     liste_absence={}
     etudiants=semestre.etudiant_set.all()
@@ -297,6 +303,8 @@ def resume(request,semestreId):
         
 @login_required(login_url=settings.LOGIN_URL)
 def modifier(request):
+    if request.user.groups.all().first().name not in ['directeur_des_etudes','secretaire']:
+        return render(request, 'errors_pages/403.html')
     if request.method == 'POST':
         # Retrieve all the events from the calendar
         data = json.loads(request.body.decode('utf-8'))
@@ -339,6 +347,8 @@ def modifier(request):
 
 @login_required(login_url=settings.LOGIN_URL)
 def ajouter_cours(request,planningId):
+    if request.user.groups.all().first().name not in ['directeur_des_etudes','secretaire']:
+        return render(request, 'errors_pages/403.html')
     planningg = Planning.objects.filter(id=planningId).first()
     seances=SeancePlannifier.objects.filter(planning=planningg)
     event_data = [{'title': seance.intitule, 'start': seance.date_heure_debut , 'end':seance.date_heure_fin ,'url': '/planning/seance/' + str(seance.id) + ''} for seance in seances]
@@ -406,15 +416,17 @@ def seance(request,seanceId):
         return redirect("/cahier_de_texte/info_seance/" + str(seance.id) + "/" )
     
     seance=SeancePlannifier.objects.filter(id=seanceId).first()
-    etudiants=seance.planning.semestre.etudiant_set.all()
-    context={'seance':seance,'etudiants':etudiants}
+    seance_exe=seance.seance_set.all()
     if request.user.groups.all().first().name in ['etudiant']:
         etudiants=seance.planning.semestre.etudiant_set.exclude(user=request.user)
-        context={'seance':seance,'etudiants':etudiants}
+        context={'seance':seance,'etudiants':etudiants,'cdt':seance_exe}
+    else :
+        etudiants=seance.planning.semestre.etudiant_set.all()
+        context={'seance':seance,'etudiants':etudiants,'cdt':seance_exe}
 
     return render(request,'details.html',context)
 
-@login_required(login_url=settings.LOGIN_URL)
+
 def french_day(day):
     print(day)
     french_correspondance_days = {'Monday':'Lundi','Tuesday' :'Mardi','Wednesday' :'Mercredi','Thursday' :'Jeudi','Friday' :'Vendredi','Saturday' :'Samedi'}
@@ -423,11 +435,11 @@ def french_day(day):
 
 @login_required(login_url=settings.LOGIN_URL)
 def imprimer(request,planningId):
-    if request.user.groups.all().first().name not in ['directeur_des_etudes']:
+    if request.user.groups.all().first().name not in ['directeur_des_etudes','secretaire']:
         return render(request, 'errors_pages/403.html')
     
     planns = Planning.objects.filter(id=planningId).first()
-    days =[]
+    days = []
     timeslots=['']
     tenues=[ 'Veste', 'Tricot' , 'Veste' , 'Tricot' ,'Bigarré' , 'Bigarré']
     if planns.semestre.libelle == 'S1' or 'S2' :
@@ -622,7 +634,9 @@ def imprimer(request,planningId):
     
 
 @login_required(login_url=settings.LOGIN_URL)
-def delete(request,planningId):
+def effacer(request,planningId):
+    if request.user.groups.all().first().name not in ['directeur_des_etudes','secretaire']:
+        return render(request, 'errors_pages/403.html')
     planning=Planning.objects.filter(id=planningId).first()
     seance = SeancePlannifier.objects.filter(planning=planning)
     for se in seance :
@@ -633,6 +647,8 @@ def delete(request,planningId):
 
 @login_required(login_url=settings.LOGIN_URL)
 def enregistrer_seance(request):
+    if request.user.groups.all().first().name not in ['etudiant']:
+        return render(request, 'errors_pages/403.html')
     if request.method == "POST":
         intitule = request.POST.get("intitulé")
         description = request.POST.get("description")
@@ -671,6 +687,28 @@ def enregistrer_seance(request):
 
 @login_required(login_url=settings.LOGIN_URL)
 def retirer_seance(request, seance_id):
-    return redirect('seance_detail', seance_id=seance_id)
+    if request.user.groups.all().first().name not in ['directeur_des_etudes','secretaire']:
+        return render(request, 'errors_pages/403.html')
+    seance=SeancePlannifier.objects.filter(id=seance_id)
+    seance.delete()
+    return redirect('planning:planning')
 
+
+@login_required(login_url=settings.LOGIN_URL)
+def valider_seance(request, seance_id):
+    if request.user.groups.all().first().name not in ['directeur_des_etudes','secretaire']:
+        return render(request, 'errors_pages/403.html')
+    seance=SeancePlannifier.objects.filter(id=seance_id).get()
+    seance.valider=True
+    seance.save()
+    return redirect('planning:details',seance.id)
+
+@login_required(login_url=settings.LOGIN_URL)
+def invalider_seance(request, seance_id):
+    if request.user.groups.all().first().name not in ['directeur_des_etudes','secretaire']:
+        return render(request, 'errors_pages/403.html')
+    seance=SeancePlannifier.objects.filter(id=seance_id).get()
+    seance.valider=False
+    seance.save()
+    return redirect('planning:details',seance.id)
 
