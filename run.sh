@@ -1,1 +1,0 @@
-/home/enseignant/malik/.venv/bin/python3 /home/enseignant/malik/gestion-ecole/manage.py runserver 0.0.0.0:7000

@@ -11,15 +11,20 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
 from pathlib import Path, os
+from dotenv import load_dotenv
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+load_dotenv()
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-y7o2lc)eq4=b@awtr9-8rx2ivxbyg3*17-p2-jqs7nti-%bmpv'
+SECRET_KEY = os.getenv('SECRET_KEY')
+
+X_FRAME_OPTIONS = 'SAMEORIGIN'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -35,10 +40,11 @@ CSRF_TRUSTED_ORIGINS = [
 
 LOGIN_URL = "/main/connexion"
 
+#DATE_INPUT_FORMATS = ['%d-%m-%Y']
+USE_L10N = False
 # Application definition
 
 INSTALLED_APPS = [
-    'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -49,12 +55,15 @@ INSTALLED_APPS = [
     'main.apps.MainConfig',
     'maquette.apps.MaquetteConfig',
     'paiement.apps.PaiementConfig',
+    'conges',
     'import_data.apps.ImportDataConfig',
     'import_export',
     'django_extensions',
+    'dbbackup',
+    'django_crontab',
     'solo',
-    'conges',
-  #  'chat',
+    'planning',
+    'cahier_de_texte',
 ]
 
 
@@ -69,7 +78,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'projet_ifnti.middleware.AuthUserMiddleware',
 ]
-
+USE_ETAGS = True
 ROOT_URLCONF = 'projet_ifnti.urls'
 
 TEMPLATES = [
@@ -90,29 +99,50 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'projet_ifnti.wsgi.application'
-ASGI_APPLICATION = 'projet_ifnti.asgi.application'
 
-CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels.layers.InMemoryChannelLayer"
-    }
-}
+
 
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
+
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'ifnti',
-        'USER': 'ifnti',
-        'PASSWORD': 'ifnti',
-        'HOST': '127.0.0.1',
-        'HOST': '192.168.60.62',
-        'PORT': '5432',
+        'NAME': os.getenv('DATABASE'),
+        'USER': os.getenv('DB_USER'),
+        'PASSWORD': os.getenv('DB_PASSWORD'),
+        'HOST': os.getenv('DB_FIRST_HOST'),
+        'HOST': os.getenv('DB_SECOND_HOST'),
+        'PORT': os.getenv('DB_PORT'),
+
     }
 }
 
+# Email configuration
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp-mail.outlook.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+RECIPIENT_ADDRESS = EMAIL_HOST_USER
+
+# Database bacup
+
+DBBACKUP_STORAGE = 'django.core.files.storage.FileSystemStorage'
+DBBACKUP_STORAGE_OPTIONS = {'location': BASE_DIR / 'backup'}
+
+# Cron Jobs for run process on background 
+
+CRONJOBS = [
+    ('*/30- * * * *', 'projet_ifnti.cron.backup') , # Backup database evry 5 minute
+]
+
+# Celery settings
+CELERY_BROKER_URL = "redis://localhost:6379"
+CELERY_RESULT_BACKEND = "redis://localhost:6379"
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
@@ -155,9 +185,8 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'projet_ifnti/static'),
 )
+
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-
-
 
 MEDIA_URL = '/media/'
 
@@ -168,3 +197,4 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+

@@ -19,6 +19,19 @@ from num2words import num2words
 from decimal import Decimal, ROUND_DOWN
 import math
 
+def create_auth_user(nom, prenom, email):
+    username = (prenom + nom).lower()
+    year = date.today().year
+    password = 'ifnti' + str(year) + '!'
+    user = User.objects.create_user(username=username, password=password, email=email, last_name=nom, first_name=prenom, is_staff=False)
+    return user
+
+def get_str_id_order(compteur):
+    str_valeur_compteur = "0"
+    if compteur < 10:
+        str_valeur_compteur += f"{compteur}"
+    elif compteur < 100:
+        str_valeur_compteur = f"{compteur}"
 
 class Utilisateur(models.Model):
     """
@@ -124,8 +137,7 @@ class Utilisateur(models.Model):
         **Valeur par défaut:** true
     """
 
-    carte_identity = models.CharField(
-        max_length=50, null=True,  verbose_name="Carte d'identité")
+    carte_identity = models.CharField(max_length=50, null=True,  verbose_name="Carte d'identité")
 
     """
         Carte d'identitée de l'utilisateur    
@@ -148,8 +160,7 @@ class Utilisateur(models.Model):
 
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, editable=False)
-    profil = models.ImageField(
-        null=True, blank=True, verbose_name="Profil")
+    profil = models.ImageField(storage="user_profils", null=True, blank=True, verbose_name="Profil")
 
     """
         Photo passeport de l'utilisateur
@@ -433,8 +444,7 @@ class Etudiant(Utilisateur):
         **Valeur par défaut:** Décision du conseil
     """
 
-    photo_passport = models.ImageField(
-        null=True, blank=True, verbose_name="Photo passport")
+    photo_passport = models.ImageField(storage="photo_passport", null=True, blank=True, verbose_name="Photo passport")
 
     """
         Photo de profil
@@ -478,41 +488,23 @@ class Etudiant(Utilisateur):
 
     def save(self, force_insert=False, force_update=False, using=None):
         """
-        Méthode pour sauvegarder un étudiant"""
+        Méthode pour sauvegarder un étudiant
+        """
+        self.email = self.generate_email()
         if not self.id:
-            list_etudiants = Etudiant.objects.filter(
-                anneeentree=self.anneeentree)
+            list_etudiants = Etudiant.objects.filter(anneeentree=self.anneeentree)
             if list_etudiants:
-                n = 1
-                rang = "0" + str(len(list_etudiants) + n) if len(
-                    list_etudiants) + n < 10 else str(
-                    len(list_etudiants) + n)
-                val_id = self.nom[0] + self.prenom[0] + \
-                    str(self.anneeentree) + rang
-                for i in [etud.id for etud in list_etudiants]:
-                    if val_id == i:
-                        n = n + 1
-                        rang = "0" + str(len(list_etudiants) + n) if len(
-                            list_etudiants + n) < 10 else str(
-                            len(list_etudiants) + n)
-                        val_id = self.nom[0] + self.prenom[0] + \
-                            str(self.anneeentree) + rang
-                self.id = val_id
+                compteur = list_etudiants.count()+1
+                str_valeur_compteur = get_str_id_order(compteur)
+                            
+                self.id = f"{self.nom[0]}{self.prenom[0]}{self.anneeentree}{str_valeur_compteur}"
             else:
-                self.id = self.nom[0] + self.prenom[0] + \
-                    str(self.anneeentree) + "0" + str(1)
-            # Création de l'utilisateur associé à l'instance de l'étudiant
-            username = (self.prenom + self.nom).lower()
-            year = date.today().year
-            password = 'ifnti' + str(year) + '!'
-            user = User.objects.create_user(username=username, password=password,
-                                            email=self.email, last_name=self.nom, first_name=self.prenom, is_staff=False)
-            self.user = user  # association de l'utilisateur à l'instance de l'étudiant
+                self.id = f"{self.nom[0]}{self.prenom[0]}{self.anneeentree}01"
+            
+            self.user = create_auth_user(self.prenom, self.nom, self.email)  
             group_etudiant = Group.objects.get(name="etudiant")
             self.user.groups.add(group_etudiant)
-
-        # self.email = self.generate_email()
-        super().save()
+            super().save()
 
     def get_semestre_courant(self):
         """
@@ -920,14 +912,6 @@ class Personnel(Utilisateur):
     """
         Classe Personnel, représentant les membres du personnel. Elle hérite de la classe Utilisateur
     """
-
-    id = models.CharField(primary_key=True, blank=True,
-                          max_length=12, editable=False)
-    """
-        Identifiant de l'employé
-
-        **Type**:    string
-    """
     numero_cnss = models.CharField(
         max_length=30, verbose_name="Numéro CNSS", default=0)
     """
@@ -999,14 +983,8 @@ class Personnel(Utilisateur):
 
         """
         print(f'----{self.id}----')
-        if self.id == "" or self.id == None:
-            username = (self.prenom + self.nom).lower()
-            year = date.today().year
-            password = 'ifnti' + str(year) + '!'
-            user = User.objects.create_user(
-                username=username, password=password)
-            self.user = user
-
+        if not self.id:
+            self.user = create_auth_user(self.prenom, self.nom, self.email)  
         super().save()
 
     def update_conge_counts(self):
@@ -1073,6 +1051,83 @@ class Personnel(Utilisateur):
         return int(total_deductions_cnss)
 
 
+class Enseignant(Personnel):
+    """
+    Cette classe hérite de la classe Personnel, elle représente les enseignants.
+    """
+    
+    id_order = models.CharField(primary_key=True, blank=True, max_length=12, editable=False)
+    
+    """
+        Définit le numéro d'ordre
+
+        **Type:** string
+
+        **Nullable:** False
+    """
+    
+    CHOIX_TYPE = (('Vacataire', 'Vacataire'), ('Permanent', 'Permanent'))
+
+    type = models.CharField(null=True, blank=True,
+                            max_length=9, choices=CHOIX_TYPE)
+    """
+        Définit le type d'enseignant qu'est l'employé: Vacataire ou Permanent
+
+        **Type:** string
+
+        **Nullable:** true
+    """
+    specialite = models.CharField(
+        max_length=300, verbose_name="Spécialité", blank=True, null=True)
+
+    """
+        Définit la spécialitée de l'enseignant
+
+        **Type:** string
+
+        **Nullable:** true
+    """
+
+    def save(self, *args, force_insert=False, force_update=False, using=None):
+        if not self.id:
+            enseignants = Enseignant.objects.all()
+            if enseignants:
+                compteur = enseignants.count()+1
+                self.id_order = get_str_id_order(compteur)
+            else:
+                self.id_order = self.nom[0] + self.prenom[0] + "01"
+            
+            super().save()  
+            group = Group.objects.get(name="enseignant")
+            self.user.groups.add(group)
+        else:
+            super().save()
+
+
+    def niveaux(self):
+        """
+        Cette fonction donne l'ensemble des semestre au cours desquels l'enseignant intervient
+        :return: Liste de chaine de caractères contenant les libellé des semestres dans lesquels il intervient
+        :retype: list[string]
+        """
+        matieres = self.matiere_set.all()
+        niveaux = set()
+        for matiere in matieres:
+            result = matiere.ue.programme_set.values('semestre')
+            temp_semstres_libelles = [AnneeUniversitaire.getNiveau(
+                elt['semestre'][:2]) for elt in result]
+            niveaux.update(temp_semstres_libelles)
+
+        return list(niveaux)
+
+    def matieres(self, semestres):
+        return Matiere.objects.filter(enseignant=self, ue__programme__semmestre__in=semestres)
+
+    def __str__(self):
+        return f'{super().__str__()}'
+        # return f'{self.user.username}'
+
+
 class DirecteurDesEtudes(Personnel):
     """
         Cette classe hérite de la classe Personnel, elle correspont au Directeur des Études.
@@ -1101,101 +1156,6 @@ class DirecteurDesEtudes(Personnel):
                 pk=self.pk).update(is_active=False)
 
         return super().save(*args, **kwargs)
-
-    def delete(self, *args, **kwargs):
-        if self.actif:
-            raise ValidationError(
-                "Le directeur des études actif ne peut pas être supprimé.")
-        return super().delete(*args, **kwargs)
-
-    def __str__(self):
-        return self.prenom + " " + self.nom
-
-    class Meta:
-        verbose_name = "Directeur des études"
-        verbose_name_plural = "Directeurs des études"
-
-
-class Enseignant(Personnel):
-    """
-    Cette classe hérite de la classe Personnel, elle représente les enseignants.
-    """
-    CHOIX_TYPE = (('Vacataire', 'Vacataire'), ('Permanent', 'Permanent'))
-
-    type = models.CharField(null=True, blank=True,
-                            max_length=9, choices=CHOIX_TYPE)
-    """
-        Définit le type d'enseignant qu'est l'employé: Vacataire ou Permanent
-
-        **Type:** string
-
-        **Nullable:** true
-    """
-    specialite = models.CharField(
-        max_length=300, verbose_name="Spécialité", blank=True, null=True)
-
-    """
-        Définit la spécialitée de l'enseignant
-
-        **Type:** string
-
-        **Nullable:** true
-    """
-
-    def save(self, force_insert=False, force_update=False, using=None):
-        if not self.id:
-            enseignants = Enseignant.objects.all()
-            if enseignants:
-                n = 1
-                rang = "0" + str(len(enseignants) + n) if len(enseignants) + \
-                    n < 10 else str(len(enseignants) + n)
-                val_id = self.nom[0] + self.prenom[0] + rang
-                for i in [ens.id for ens in enseignants]:
-                    if val_id == i:
-                        n = n + 1
-                        rang = "0" + \
-                            str(len(enseignants) + n) if len(enseignants +
-                                                             n) < 10 else str(len(enseignants) + n)
-                        val_id = self.nom[0] + self.prenom[0] + rang
-                self.id = val_id
-            else:
-                self.id = self.nom[0] + self.prenom[0] + "0" + str(1)
-
-            username = (self.prenom + self.nom).lower()
-            year = date.today().year
-            password = 'ifnti' + str(year) + '!'
-            user = User.objects.create_user(username=username, password=password,
-                                            email=self.email, last_name=self.nom, first_name=self.prenom, is_staff=False)
-            self.user = user
-            group_enseignant = Group.objects.get(name="enseignant")
-            self.user.groups.add(group_enseignant)
-        super().save()
-
-    def niveaux(self):
-        """
-        Cette fonction donne l'ensemble des semestre au cours desquels l'enseignant intervient
-
-        :return: Liste de chaine de caractères contenant les libellé des semestres dans lesquels il intervient
-        :retype: list[string]
-
-        """
-        matieres = self.matiere_set.all()
-        niveaux = set()
-        for matiere in matieres:
-            result = matiere.ue.programme_set.values('semestre')
-            temp_semstres_libelles = [AnneeUniversitaire.getNiveau(
-                elt['semestre'][:2]) for elt in result]
-            niveaux.update(temp_semstres_libelles)
-
-        return list(niveaux)
-
-    def matieres(self, semestres):
-        return Matiere.objects.filter(enseignant=self, ue__programme__semmestre__in=semestres)
-
-    def __str__(self):
-        return f'{super().__str__()}'
-        # return f'{self.user.username}'
-
 
 class Comptable(Personnel):
     """
@@ -1326,6 +1286,7 @@ class Ue(models.Model):
         ("Communication", "Communication"),
         ("Anglais", "Anglais"),
         ("Maths", "Maths"),
+        ("Organisation", "Organisation"),
     ]
     TYPES_NIVEAU = [
         ("1", "Licence"),
@@ -1961,7 +1922,6 @@ class Semestre(models.Model):
     def __str__(self):
         return f'{self.libelle} -{self.annee_universitaire}'
 
-
 class Domaine(models.Model):
     """
         Classe correspondant aux domaines
@@ -1994,7 +1954,6 @@ class Domaine(models.Model):
     def __str__(self):
         return self.generate_code()
 
-
 class Parcours(models.Model):
     """
         Classe correspondant à un parcours
@@ -2026,7 +1985,6 @@ class Parcours(models.Model):
 
     def __str__(self):
         return self.nom
-
 
 class Programme(models.Model):
     """
@@ -2088,7 +2046,7 @@ class Programme(models.Model):
         unique_together = ["parcours", "semestre"]
 
 class Settings(models.Model):
-    pass
+    data_is_load = models.BooleanField(default=False)
 
 class CorrespondanceMaquette(models.Model):
     """
@@ -2155,7 +2113,6 @@ class CorrespondanceMaquette(models.Model):
             :retype: UE ou Matiere
         """
         return Ue.objects.get(id=self.nouvelle) if self.nature.lower() == 'u' else Matiere.objects.get(id=self.nouvelle)
-
 
 class Note(models.Model):
     """
