@@ -12,11 +12,15 @@ RUN apk update \
 
 WORKDIR /app/ifnti
 
+# RUN addgroup -r www-data && adduser -r -g www-data www-data \
+#     && chown -R www-data:www-data /app/ifnti/staticfiles \
+#     && chmod o+rx -R /app/ifnti/staticfiles
+
 COPY settings.py projet_ifnti/settings.py
-COPY .env .env
+COPY .env .
 COPY init_db.sh .
 
 EXPOSE 8000
 
-ENTRYPOINT ["gunicorn", "--workers=1", "--bind", "unix:/app/ifnti/projet_ifnti/static/gunicorn.sock", "projet_ifnti.wsgi:application"]
+ENTRYPOINT ["gunicorn", "--workers=1", "--bind", "unix:/app/gunicorn.sock", "projet_ifnti.wsgi:application"]
 
