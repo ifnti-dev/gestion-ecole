@@ -12,9 +12,9 @@ RUN apk update \
 
 WORKDIR /app/ifnti
 
-# RUN addgroup -r www-data && adduser -r -g www-data www-data \
+#RUN addgroup -r www-data && adduser -r -g www-data www-data 
 #     && chown -R www-data:www-data /app/ifnti/staticfiles \
-#     && chmod o+rx -R /app/ifnti/staticfiles
+RUN chmod o+rx -R /app/ifnti/staticfiles
 
 COPY settings.py projet_ifnti/settings.py
 COPY .env .
