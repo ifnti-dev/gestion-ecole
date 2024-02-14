@@ -26,18 +26,18 @@ def getMatieresEtudiant(etudiant):
 
 
 
-def getNiveauEtudiant(etudiant):
-    annee=AnneeUniversitaire.static_get_current_annee_universitaire().annee
-    semestre=etudiant.semestres.filter(courant=True,pk__contains=annee)
-    if semestre:
-        if semestre[0].libelle =="S1" or semestre[0].libelle =="S2":
-            return "L1"
-        if semestre[0].libelle =="S3" or semestre[0].libelle =="S4":
-            return "L2"
-        elif semestre[0].libelle =="S5" or semestre[0].libelle =="S6":
-            return "L3"
-    else :
-        return "RR"
+def getNiveauEtudiant(request,etudiant):
+    id_annee=request.session.get("id_annee_selectionnee")
+    semestres=etudiant.semestres.filter(annee_universitaire_id=id_annee)
+    for semestre in semestres:
+        if semestre:
+            if semestre.libelle =="S1" or semestre.libelle =="S2":
+                return "L1"
+            if semestre.libelle =="S3" or semestre.libelle =="S4":
+                return "L2"
+            elif semestre.libelle =="S5" or semestre.libelle =="S6":
+                return "L3"
+
             
 
 @login_required(login_url="/main/connexion")
@@ -177,16 +177,16 @@ def changer_delegue(request):
 @login_required(login_url="/main/connexion")
 def gestion_classe(request):
     students = Etudiant.objects.all()
-    print(students)
+    
     license1_students = set()
     license2_students = set()
     license3_students = set()
     for etudiant in students:
-        if getNiveauEtudiant(etudiant) == "L3":
+        if getNiveauEtudiant(request,etudiant) == "L3":
             license3_students.add(etudiant)
-        elif getNiveauEtudiant(etudiant) == "L2":
+        elif getNiveauEtudiant(request,etudiant) == "L2":
             license2_students.add(etudiant)
-        elif getNiveauEtudiant(etudiant) == "L1":
+        elif getNiveauEtudiant(request,etudiant) == "L1":
             license1_students.add(etudiant)
 
     context = {
@@ -485,7 +485,8 @@ def creer_fake_etudiant():
     )
     semestre1 = Semestre.objects.filter(id='S1-2023' ).first()
     semestre2 = Semestre.objects.filter(id='S3-2023' ).first()
-    semestres = [random.choice([semestre1,semestre2])]
+    semestre3 = Semestre.objects.filter(id='S5-2023' ).first()
+    semestres = [random.choice([semestre1,semestre2,semestre3])]
     etudiant.semestres.set(semestres)
     return etudiant
 
