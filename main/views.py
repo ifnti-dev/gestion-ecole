@@ -267,7 +267,6 @@ def create_etudiant(request, id=0):
             # Modification d'un étudiant existant, préremplir le formulaire avec les données existantes
             etudiant = Etudiant.objects.get(pk=id)
             form = EtudiantForm(instance=etudiant)
-
         return render(request, 'etudiants/create_etudiant.html', {'form': form})
     else:
         # Gestion de la requête POST
@@ -283,7 +282,7 @@ def create_etudiant(request, id=0):
             # Sauvegarde de l'étudiant pour générer un ID
             etudiant = form.save(commit=False)
             etudiant.save()
-
+            print(etudiant.nom)
             # Trouver l'année universitaire en cours
             annee_universitaire_courante = AnneeUniversitaire.objects.get(
                 annee_courante=True)
