@@ -9,9 +9,10 @@
             <select name="etat" id="etat" class="form-control mr-3">
                 <option value="__all__" {% if selected_etat.id == '__all__' %}selected{% endif %}>Tous</option>
                 {% for etat in etats %}
-                    <option value="{{ etat.id }}" {% if selected_etat.id == etat.id %}selected{% endif %}>{{ etat.value }}</option>
+                <option value="{{ etat.id }}" {% if selected_etat.id == etat.id %}selected{% endif %}>{{ etat.value }}
+                </option>
                 {% endfor %}
-            </select>  
+            </select>
             {% endif %}
             <select name="semestre" id="semestre" class="form-control">
                 <option value="">Semestres</option>
@@ -41,19 +42,22 @@
                 <a class="nav-main-link nav-main-link-submenu" data-toggle="submenu" aria-haspopup="true"
                     aria-expanded="false" href="#">
                     <i class="fa fa-file mr-1" aria-hidden="true"></i>
-                    <span class="nav-main-link-name documents-link" style="color: #1c72d6;">Relevés de notes du semestre</span>
+                    <span class="nav-main-link-name documents-link" style="color: #1c72d6;">Relevés de notes du
+                        semestre</span>
                 </a>
                 <ul class="nav-main-submenu">
                     <li class="nav-main-item">
                         <a class="nav-main-link nav-main-link-submenu" data-toggle="submenu" aria-haspopup="true"
                             aria-expanded="false" href="#">
-                            <span class="nav-main-link-name documents-link" style="color: #1c72d6;">Relevé synthétique</span>
+                            <span class="nav-main-link-name documents-link" style="color: #1c72d6;">Relevé
+                                synthétique</span>
                         </a>
                         <ul class="nav-main-submenu">
 
                             <li class="nav-main-item">
                                 <a class="nav-main-link" href="{% url 'main:releve_notes'  selected_semestre.id %}">
-                                    <span class="nav-main-link-name documents-link" style="color: #1c72d6;">{{selected_semestre.libelle}}</span>
+                                    <span class="nav-main-link-name documents-link"
+                                        style="color: #1c72d6;">{{selected_semestre.libelle}}</span>
                                 </a>
                             </li>
                         </ul>
@@ -68,7 +72,8 @@
                             <li class="nav-main-item">
                                 <a class="nav-main-link"
                                     href="{% url 'main:releve_notes_detail' selected_semestre.id %}">
-                                    <span class="nav-main-link-name documents-link" style="color: #1c72d6;">{{selected_semestre.libelle}}</span>
+                                    <span class="nav-main-link-name documents-link"
+                                        style="color: #1c72d6;">{{selected_semestre.libelle}}</span>
                                 </a>
                             </li>
 
@@ -85,7 +90,8 @@
                 <a class="nav-main-link nav-main-link-name" data-toggle="" aria-haspopup="true" aria-expanded="false"
                     href="{% url 'main:carte_etudiant' selected_semestre.id %}">
                     <i class="fa fa-id-card mr-1" aria-hidden="true"></i>
-                    <span class="nav-main-link-name documents-link" style="color: #1c72d6;">Cartes étudiants {{niveau}}</span>
+                    <span class="nav-main-link-name documents-link" style="color: #1c72d6;">Cartes étudiants
+                        {{niveau}}</span>
                 </a>
             </li>
             {% endif %}
@@ -126,8 +132,10 @@
                 </thead>
                 <tbody>
                     {% for etudiant in etudiants %}
-                    <tr class=" {% if etudiant in etudiants_insuffisants %} bg-danger text-white {% endif %} {% if not etudiant.etudiant.is_active %} text-danger {% endif %}" >
-                        <td class="text-center font-size-sm">{{etudiant.etudiant.nom}} {{etudiant.etudiant.prenom}} </td>
+                    <tr
+                        class=" {% if etudiant in etudiants_insuffisants %} bg-danger text-white {% endif %} {% if not etudiant.etudiant.is_active %} text-danger {% endif %}">
+                        <td class="text-center font-size-sm">{{etudiant.etudiant.nom}} {{etudiant.etudiant.prenom}}
+                        </td>
                         <td class="text-center d-sm-table-cell">
                             {% if etudiant.niveau == 'L1' %}
                             <span class="badge badge-info">{{etudiant.niveau}}</span>
@@ -202,7 +210,8 @@
                                         <li class="nav-main-item">
                                             <a class="nav-main-link nav-main-link-submenu" data-toggle="submenu"
                                                 aria-haspopup="true" aria-expanded="false" href="#">
-                                                <span class="nav-main-link-name documents-link" style="color: #1c72d6;">Relevé synthétique</span>
+                                                <span class="nav-main-link-name documents-link"
+                                                    style="color: #1c72d6;">Relevé synthétique</span>
                                             </a>
                                             <ul class="nav-main-submenu">
                                                 <li class="nav-main-item">
@@ -210,14 +219,14 @@
                                                     {% if is_etudiant %}
                                                     <a class="nav-main-link"
                                                         href="{% url 'main:releve_notes' etudiant.etudiant.id selected_semestre.id %}">e
-                                                        <span
-                                                            class="nav-main-link-name documents-link" style="color: #1c72d6;">{{selected_semestre.libelle}}</span>
+                                                        <span class="nav-main-link-name documents-link"
+                                                            style="color: #1c72d6;">{{selected_semestre.libelle}}</span>
                                                     </a>
                                                     {% else %}
                                                     <a class="nav-main-link"
                                                         href="{% url 'main:releve_notes' etudiant.etudiant.id selected_semestre.id %}">
-                                                        <span
-                                                            class="nav-main-link-name documents-link" style="color: #1c72d6;">{{selected_semestre.libelle}}</span>
+                                                        <span class="nav-main-link-name documents-link"
+                                                            style="color: #1c72d6;">{{selected_semestre.libelle}}</span>
                                                     </a>
                                                     {% endif %}
 
@@ -229,21 +238,22 @@
                                         <li class="nav-main-item">
                                             <a class="nav-main-link nav-main-link-submenu" data-toggle="submenu"
                                                 aria-haspopup="true" aria-expanded="false" href="#">
-                                                <span class="nav-main-link-name" style="color: #1c72d6;">Relevé détaillé</span>
+                                                <span class="nav-main-link-name" style="color: #1c72d6;">Relevé
+                                                    détaillé</span>
                                             </a>
                                             <ul class="nav-main-submenu">
                                                 <li class="nav-main-item">
                                                     {% if is_etudiant %}
                                                     <a class="nav-main-link"
                                                         href="{% url 'main:releve_notes_detail' etudiant.etudiant.id selected_semestre.id %}">
-                                                        <span
-                                                            class="nav-main-link-name documents-link" style="color: #1c72d6;">{{selected_semestre.libelle}}</span>
+                                                        <span class="nav-main-link-name documents-link"
+                                                            style="color: #1c72d6;">{{selected_semestre.libelle}}</span>
                                                     </a>
                                                     {% else %}
                                                     <a class="nav-main-link"
                                                         href="{% url 'main:releve_notes_detail' etudiant.etudiant.id selected_semestre.id %}">
-                                                        <span
-                                                            class="nav-main-link-name documents-link" style="color: #1c72d6;">{{selected_semestre.libelle}}</span>
+                                                        <span class="nav-main-link-name documents-link"
+                                                            style="color: #1c72d6;">{{selected_semestre.libelle}}</span>
                                                     </a>
                                                     {% endif %}
                                                 </li>
@@ -262,7 +272,8 @@
                                         aria-expanded="false"
                                         href="{% url 'main:carte_etudiant' etudiant.etudiant.id etudiant.niveau %}">
                                         <i class="fa fa-id-card mr-1" aria-hidden="true"></i>
-                                        <span class="nav-main-link-name documents-link" style="color: #1c72d6;">Carte étudiant</span>
+                                        <span class="nav-main-link-name documents-link">Carte
+                                            étudiant</span>
                                     </a>
                                 </li>
                                 {% comment %} Fin génération carte étudiant {% endcomment %}
@@ -270,13 +281,14 @@
 
 
 
-                                {% if is_directeur %}
+                                {% if is_directeur_des_etudes and etudiant.niveau == 'L3' %}
                                 <li class="nav-main-item">
                                     <a class="nav-main-link nav-main-link-name" data-toggle="" aria-haspopup="true"
                                         aria-expanded="false"
                                         href="{% url 'main:diplome_etudiant' etudiant.etudiant.id %}">
                                         <i class="fa fa-certificate mr-1" aria-hidden="true"></i>
-                                        <span class="nav-main-link-name documents-link" style="color: #1c72d6;">Diplome étudiant</span>
+                                        <span class="nav-main-link-name documents-link">Diplome
+                                            étudiant</span>
                                     </a>
                                 </li>
                                 {% endif %}

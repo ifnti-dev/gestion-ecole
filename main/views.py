@@ -897,6 +897,7 @@ def carte_etudiant_all(request, niveau):
     id_annee_selectionnee = request.session["id_annee_selectionnee"]
     annee_universitaire = get_object_or_404(
         AnneeUniversitaire, pk=id_annee_selectionnee)
+    annee_suiv = int(annee_universitaire.annee) + 1
 
     semestre = Semestre.objects.filter(id=niveau)
     if semestre:
@@ -912,14 +913,29 @@ def carte_etudiant_all(request, niveau):
         date_formatee = datetime.strptime(
             str(etudiant.datenaissance), in_format).strftime(out_format)
         etudiant.datenaissance = date_formatee
+    
+    nbre_pages = len(etudiants) // 9
+
 
     # ajout des étudiants dans le dictionnaire
     context = {'etudiants': etudiants, 'annee': str(
-        annee_universitaire.annee) + '-' + str(annee_universitaire.annee + 1), 'niveau': "niveau"}
+        annee_universitaire.annee) + '-' + str(annee_universitaire.annee + 1), 'niveau': "niveau",  'nbre_pages': nbre_pages}
 
-    latex_input = 'carte_etudiant_all'
-    latex_ouput = 'generated_carte_etudiant_all'
-    pdf_file = 'pdf_carte_etudiant_all'
+
+
+    for etudiant in etudiants:
+        latex_input = 'carte_etudiant'
+        latex_ouput = 'generated_carte_etudiant'
+        pdf_file = 'carte_etudiant_' + str(etudiant.id)
+
+        temp_context = {'etudiant': etudiant, 'niveau': niveau, 'annee': str(annee_universitaire.annee) + '-' + str(annee_suiv)}
+
+        # génération du pdf
+        generate_pdf(temp_context, latex_input, latex_ouput, pdf_file)
+
+    latex_input = 'cartes_rassemblees'
+    latex_ouput = 'generated_cartes_rassemblees'
+    pdf_file = 'pdf_carte_etudiant_rassemblees'
 
     # génération du pdf
     generate_pdf(context, latex_input, latex_ouput, pdf_file)
@@ -946,6 +962,11 @@ def diplome_etudiant(request, id):
         return render(request, 'errors_pages/403.html')
 
     etudiant = get_object_or_404(Etudiant, id=id)
+    in_format = "%Y-%m-%d"
+    out_format = "%d-%m-%Y"
+    date_formatee = datetime.strptime(
+        str(etudiant.datenaissance), in_format).strftime(out_format)
+    etudiant.datenaissance = date_formatee
 
     id_annee_selectionnee = request.session["id_annee_selectionnee"]
     annee_universitaire = get_object_or_404(
@@ -989,6 +1010,12 @@ def diplome_etudiant_all(request):
     for semestre in semestres:
         for etudiant in semestre.etudiant_set.all():
             # ajout de tout les étudiant du semestre dans un tableau temporaire
+            etudiant.niveau, _ = etudiant.get_niveau_annee(annee_universitaire)
+            in_format = "%Y-%m-%d"
+            out_format = "%d-%m-%Y"
+            date_formatee = datetime.strptime(
+                str(etudiant.datenaissance), in_format).strftime(out_format)
+            etudiant.datenaissance = date_formatee
             temp.append(etudiant)
 
     # ajout des étudiants dans le dictionnaire
