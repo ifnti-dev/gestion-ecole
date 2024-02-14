@@ -43,6 +43,16 @@ def pre_load_ue_matiere_template_data_by_year(annees):
             new_sheet = wb.copy_worksheet(template_sheet)
             new_sheet.title = ue.codeUE
             new_sheet['A1'] = ue.libelle
+            matieres = ue.matiere_set.all()
+            if matieres:
+                print(matieres)
+                for count, matiere in enumerate(matieres):
+                    new_sheet[f'A{count+3}'] = matiere.libelle
+                    new_sheet[f'B{count+3}'] = matiere.coefficient
+                    new_sheet[f'C{count+3}'] = matiere.minValue
+                    new_sheet[f'D{count+3}'] = matiere.heures
+                    new_sheet[f'E{count+3}'] = matiere.abbreviation
+                    
             new_sheets.append(new_sheets)
         wb.save(result_name)   
         wb.close()
@@ -95,12 +105,8 @@ def pre_load_note_ues_template_data(semestres):
         os.mkdir(folder_path)
     
     template_folder_base_path ='media/excel_templates/notes_templates'
-    i=0
     
     for semestre in semestres: 
-        if i >= 1:
-            continue
-        i += 1
         try:
             programme = semestre.programme_set.all().get()
         except Exception:
@@ -353,7 +359,6 @@ def pre_load_maquette(annees):
     
     return folder_path+".zip"
 
-
 @transaction.atomic         
 def load_maquette(path, annee):
     try:
@@ -374,13 +379,14 @@ def load_maquette(path, annee):
                     libelle = libelle.strip()
                     nbreCredits = trim_str(nbreCredits)
                     heures = trim_str(heures)
+                    niveau = trim_str(niveau)
+                    #print("libelle", libelle, " type" , type, " niveau", niveau, " nbreCredits", nbreCredits, " heures", heures)
                     if is_naturel(nbreCredits) and is_naturel(heures):
                         ue, _ = Ue.objects.get_or_create(libelle=libelle, type=type, niveau=niveau, nbreCredits=nbreCredits, heures=heures)
                         semestre_ue[semestre].append(ue)
                     else:
                         raise ValueError("Vous avez des valeurs négatives dans votre fichier")
                 
-            print(libelle, type, niveau, nbreCredits, heures)
         parcours = Parcours.objects.all().first()
         semestres = annee.semestre_set.all()
 

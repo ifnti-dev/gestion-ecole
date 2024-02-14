@@ -1942,7 +1942,7 @@ def login_view(request):
                     has_model = True
                 except Exception as e:
                     pass
-                
+            print(has_model)
             if has_model or (user.is_superuser and is_directeur_des_etudes):  
                 login(request, user)
                 return redirect('/')
@@ -2018,7 +2018,6 @@ def create_enseignant(request, id=0):
             form = EnseignantForm(request.POST, instance=enseignant)
         if form.is_valid():
             form.save()
-
             # id_annee_selectionnee = AnneeUniversitaire.static_get_current_annee_universitaire().id
             return redirect('main:enseignants')
 

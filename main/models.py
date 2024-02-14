@@ -27,11 +27,7 @@ def create_auth_user(nom, prenom, email):
     return user
 
 def get_str_id_order(compteur):
-    str_valeur_compteur = "0"
-    if compteur < 10:
-        str_valeur_compteur += f"{compteur}"
-    elif compteur < 100:
-        str_valeur_compteur = f"{compteur}"
+    return str(compteur).zfill(2)
 
 class Utilisateur(models.Model):
     """
@@ -1056,7 +1052,7 @@ class Enseignant(Personnel):
     Cette classe hérite de la classe Personnel, elle représente les enseignants.
     """
     
-    id_order = models.CharField(primary_key=True, blank=True, max_length=12, editable=False)
+    id_order = models.CharField(unique=True, blank=True, max_length=12, editable=False)
     
     """
         Définit le numéro d'ordre
@@ -1161,37 +1157,15 @@ class Comptable(Personnel):
     """
     Cette classe hérite de la classe Personnel, elle représente les comptables.
     """
+    
     pass
 
     def save(self, force_insert=False, force_update=False, using=None):
         if not self.id:
-            Comptables = Comptable.objects.all()
-            if Comptables:
-                n = 1
-                rang = "0" + str(len(Comptables) + n) if len(Comptables) + \
-                    n < 10 else str(len(Comptables) + n)
-                val_id = self.nom[0] + self.prenom[0] + rang
-                for i in [comp.id for comp in Comptables]:
-                    if val_id == i:
-                        n = n + 1
-                        rang = "0" + \
-                            str(len(Comptables) + n) if len(Comptables +
-                                                            n) < 10 else str(len(Comptables) + n)
-                        val_id = self.nom[0] + self.prenom[0] + rang
-                self.id = val_id
-            else:
-                self.id = self.nom[0] + self.prenom[0] + "0" + str(1)
-
-            username = (self.prenom + self.nom).lower()
-            year = date.today().year
-            password = 'ifnti' + str(year) + '!'
-            user = User.objects.create_user(username=username, password=password,
-                                            email=self.email, last_name=self.nom, first_name=self.prenom, is_staff=False)
-            self.user = user
+            self.user = create_auth_user(self.prenom, self.nom, self.email)  
             group_comptable = Group.objects.get(name="comptable")
             self.user.groups.add(group_comptable)
         super().save()
-
 
 class Tuteur(models.Model):
     """
@@ -1366,7 +1340,6 @@ def generate_ue_code(sender, instance, created, **kwargs):
 
         # Déconnectez le signal post_save temporairement
         post_save.disconnect(generate_ue_code, sender=Ue)
-
         instance.codeUE = f"{type_abbr}{instance.niveau}{semestre}{ue_count_str}"
         instance.save()
 
