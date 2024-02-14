@@ -904,7 +904,7 @@ def create_compte_etudiant(sender, instance, created, **kwargs):
 
 
 class Personnel(Utilisateur):   
-    id = models.CharField(primary_key=True, blank=True, max_length=30)
+    # id = models.CharField(primary_key=True, blank=True, max_length=30)
     """
         Classe Personnel, représentant les membres du personnel. Elle hérite de la classe Utilisateur
     """
@@ -1080,14 +1080,13 @@ class Enseignant(Personnel):
         **Nullable:** true
     """
 
-    def save(self, *args, force_insert=False, force_update=False, using=None):
+    def save(self, *args, **kwargs):
         if not self.id:
-            super().save()  
+            super().save(*args, **kwargs)  
             group = Group.objects.get(name="enseignant")
             self.user.groups.add(group)
         else:
-            super().save()
-
+            super().save(*args, **kwargs)
 
     def niveaux(self):
         """
