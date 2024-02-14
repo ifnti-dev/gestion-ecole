@@ -29,6 +29,7 @@ def index(request):
             return render(request, 'errors_pages/403.html')
     id_annee=request.session.get("id_annee_selectionnee")
     annee=AnneeUniversitaire.objects.filter(id=id_annee).first()
+    semsestre_courant=Semestre.objects.filter(courant=True,annee_universitaire=annee)
     semestres=Semestre.objects.filter(annee_universitaire=annee)
     if request.method=="POST" :
             semestreId =request.POST.get("semestre")
@@ -36,7 +37,7 @@ def index(request):
     else :
         plannings = Planning.objects.all()
 
-    context= {'semestres':semestres,'plannings':plannings}
+    context= {'semestres':semestres,'semestre_courant':semsestre_courant,'plannings':plannings}
 
     return render(request, 'planning_list.html',context)
 
