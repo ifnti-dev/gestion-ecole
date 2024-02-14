@@ -904,7 +904,7 @@ def create_compte_etudiant(sender, instance, created, **kwargs):
 
 
 class Personnel(Utilisateur):   
-    id = models.CharField(primary_key=True, blank=True, max_length=30)
+    # id = models.CharField(primary_key=True, blank=True, max_length=30)
     """
         Classe Personnel, représentant les membres du personnel. Elle hérite de la classe Utilisateur
     """
@@ -1080,14 +1080,13 @@ class Enseignant(Personnel):
         **Nullable:** true
     """
 
-    def save(self, *args, force_insert=False, force_update=False, using=None):
+    def save(self, *args, **kwargs):
         if not self.id:
-            super().save()  
+            super().save(*args, **kwargs)  
             group = Group.objects.get(name="enseignant")
             self.user.groups.add(group)
         else:
-            super().save()
-
+            super().save(*args, **kwargs)
 
     def niveaux(self):
         """
@@ -1120,21 +1119,12 @@ class DirecteurDesEtudes(Personnel):
 
     def save(self, *args, **kwargs):
         if not self.id:
-            directeurs = DirecteurDesEtudes.objects.all()
-            if directeurs:
-                raise ValidationError(
-                    "Il ne peut y avoir qu'un seul directeur des études.")
-
-            self.id = self.nom[0] + self.prenom[0] + "0" + str(1)
-            username = (self.prenom[0] + self.nom).lower()
-            password = "ifnti2023!"  # Définir le mot de passe souhaité
-            user = User.objects.create_user(username=username, password=password,
-                                            email=self.email, last_name=self.nom, first_name=self.prenom, is_staff=True)
-            self.user = user
-            # association de l'utilisateur à l'instance de l'étudiant
-            group_directeur = Group.objects.get(name="directeur_des_etudes")
-            self.user.groups.add(group_directeur)
-
+            super().save(*args, **kwargs) 
+            group_comptable = Group.objects.get(name="comptable")
+            self.user.groups.add(group_comptable)
+        else:
+            super().save(*args, **kwargs)
+            
         if self.is_active:
             # Désactiver les autres directeurs des études
             DirecteurDesEtudes.objects.exclude(
@@ -1149,12 +1139,14 @@ class Comptable(Personnel):
     
     pass
 
-    def save(self, force_insert=False, force_update=False, using=None):
+    def save(self, *args, **kwargs):
         if not self.id:
-            self.user = create_auth_user(self.prenom, self.nom, self.email)  
+            super().save(*args, **kwargs) 
             group_comptable = Group.objects.get(name="comptable")
             self.user.groups.add(group_comptable)
-        super().save()
+        else:
+            super().save(*args, **kwargs)
+        
 
 class Tuteur(models.Model):
     """
