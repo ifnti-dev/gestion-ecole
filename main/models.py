@@ -27,11 +27,7 @@ def create_auth_user(nom, prenom, email):
     return user
 
 def get_str_id_order(compteur):
-    str_valeur_compteur = "0"
-    if compteur < 10:
-        str_valeur_compteur += f"{compteur}"
-    elif compteur < 100:
-        str_valeur_compteur = f"{compteur}"
+    return str(compteur).zfill(2)
 
 class Utilisateur(models.Model):
     """
@@ -504,7 +500,7 @@ class Etudiant(Utilisateur):
             self.user = create_auth_user(self.prenom, self.nom, self.email)  
             group_etudiant = Group.objects.get(name="etudiant")
             self.user.groups.add(group_etudiant)
-            super().save()
+        super().save()
 
     def get_semestre_courant(self):
         """
@@ -907,8 +903,8 @@ def create_compte_etudiant(sender, instance, created, **kwargs):
         instance.create_compte_etudiant()
 
 
-class Personnel(Utilisateur):
-
+class Personnel(Utilisateur):   
+    id = models.CharField(primary_key=True, blank=True, max_length=30)
     """
         Classe Personnel, représentant les membres du personnel. Elle hérite de la classe Utilisateur
     """
@@ -916,7 +912,7 @@ class Personnel(Utilisateur):
         max_length=30, verbose_name="Numéro CNSS", default=0)
     """
         Numéro CNSS (Caisse Nationale de Sécurité Sociale)
-
+        
         **Type:** string
 
         **Valeur par défaut:** "0"
@@ -1050,14 +1046,10 @@ class Personnel(Utilisateur):
 
         return int(total_deductions_cnss)
 
-
 class Enseignant(Personnel):
     """
     Cette classe hérite de la classe Personnel, elle représente les enseignants.
-    """
-    
-    id_order = models.CharField(primary_key=True, blank=True, max_length=12, editable=False)
-    
+    """    
     """
         Définit le numéro d'ordre
 
@@ -1090,13 +1082,6 @@ class Enseignant(Personnel):
 
     def save(self, *args, force_insert=False, force_update=False, using=None):
         if not self.id:
-            enseignants = Enseignant.objects.all()
-            if enseignants:
-                compteur = enseignants.count()+1
-                self.id_order = get_str_id_order(compteur)
-            else:
-                self.id_order = self.nom[0] + self.prenom[0] + "01"
-            
             super().save()  
             group = Group.objects.get(name="enseignant")
             self.user.groups.add(group)
@@ -1161,37 +1146,15 @@ class Comptable(Personnel):
     """
     Cette classe hérite de la classe Personnel, elle représente les comptables.
     """
+    
     pass
 
     def save(self, force_insert=False, force_update=False, using=None):
         if not self.id:
-            Comptables = Comptable.objects.all()
-            if Comptables:
-                n = 1
-                rang = "0" + str(len(Comptables) + n) if len(Comptables) + \
-                    n < 10 else str(len(Comptables) + n)
-                val_id = self.nom[0] + self.prenom[0] + rang
-                for i in [comp.id for comp in Comptables]:
-                    if val_id == i:
-                        n = n + 1
-                        rang = "0" + \
-                            str(len(Comptables) + n) if len(Comptables +
-                                                            n) < 10 else str(len(Comptables) + n)
-                        val_id = self.nom[0] + self.prenom[0] + rang
-                self.id = val_id
-            else:
-                self.id = self.nom[0] + self.prenom[0] + "0" + str(1)
-
-            username = (self.prenom + self.nom).lower()
-            year = date.today().year
-            password = 'ifnti' + str(year) + '!'
-            user = User.objects.create_user(username=username, password=password,
-                                            email=self.email, last_name=self.nom, first_name=self.prenom, is_staff=False)
-            self.user = user
+            self.user = create_auth_user(self.prenom, self.nom, self.email)  
             group_comptable = Group.objects.get(name="comptable")
             self.user.groups.add(group_comptable)
         super().save()
-
 
 class Tuteur(models.Model):
     """
@@ -1366,7 +1329,6 @@ def generate_ue_code(sender, instance, created, **kwargs):
 
         # Déconnectez le signal post_save temporairement
         post_save.disconnect(generate_ue_code, sender=Ue)
-
         instance.codeUE = f"{type_abbr}{instance.niveau}{semestre}{ue_count_str}"
         instance.save()
 
@@ -1422,8 +1384,7 @@ class Matiere(models.Model):
 
         **Unique:** true
     """
-    enseignant = models.ForeignKey(Enseignant, blank=True, null=True,
-                                   verbose_name="Enseignants responsable", on_delete=models.CASCADE)
+    enseignant = models.ForeignKey(Enseignant, blank=True, null=True, verbose_name="Enseignants responsable", on_delete=models.CASCADE)
     """
         Identifiant de l'enseignant responsable de la matière
 
@@ -1448,15 +1409,13 @@ class Matiere(models.Model):
     """
 
     def save(self, *args, **kwargs):
-        print("Save Matière")
         if not self.codematiere and len(self.codematiere) == 0:
             # Calculer le préfixe numérique en fonction de l'ordre des matières dans l'UE
             ordre_matiere = Matiere.objects.filter(ue=self.ue).count() + 1
-
             # Construire le code de la matière en utilisant le code de l'UE et le préfixe numérique
             self.codematiere = f"{ordre_matiere}{self.ue.codeUE}"
 
-        super(Matiere, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
     def count_evaluations(self, annee, semestres):
         """

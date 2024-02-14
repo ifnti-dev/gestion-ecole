@@ -100,25 +100,26 @@ WSGI_APPLICATION = 'projet_ifnti.wsgi.application'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
 # DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.sqlite3",
-#         "NAME": "db.sqlite3",
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+
+#         'NAME': os.getenv('DATABASE'),
+#         'USER': os.getenv('DB_USER'),
+#         'PASSWORD': os.getenv('DB_PASSWORD'),
+#         'HOST': os.getenv('DB_FIRST_HOST'),
+#         'HOST': os.getenv('DB_SECOND_HOST'),
+#         'PORT': os.getenv('DB_PORT'),
+
 #     }
 # }
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-
-        'NAME': os.getenv('DATABASE'),
-        'USER': os.getenv('DB_USER'),
-        'PASSWORD': os.getenv('DB_PASSWORD'),
-        'HOST': os.getenv('DB_FIRST_HOST'),
-        'HOST': os.getenv('DB_SECOND_HOST'),
-        'PORT': os.getenv('DB_PORT'),
-
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": "db.sqlite3",
     }
 }
+
 
 # Email configuration
 
