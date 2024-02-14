@@ -70,19 +70,22 @@ def dashboard(request):
         return render(request, 'dashboard.html', context=data)
     
     elif request.user.groups.all().first().name =='etudiant' :
-        semestre=get_authenticate_user_model(request).semestres.filter(courant=True,pk__contains=annee_selectionnee).first()
-        planning = Planning.objects.filter(semestre=semestre)
+        semestres=request.user.etudiant.semestres.filter(annee_universitaire=annee_selectionnee)
+        print(request.user.etudiant.semestres.all())
         event_data=[]
-        for plan in planning :
-            seances=SeancePlannifier.objects.filter(planning=plan)
-            event_data = [{'title': seance.intitule, 'start': seance.date_heure_debut , 'end':seance.date_heure_fin ,'url': '/planning/seance/' + str(seance.id) + ''} for seance in seances]
-            event_data = json.dumps(event_data, default=datetime_serializer)
+        for semestre in semestres:
+            planning = Planning.objects.filter(semestre=semestre)
+            
+            for plan in planning :
+                seances=SeancePlannifier.objects.filter(planning=plan)
+                event_data = [{'title': seance.intitule, 'start': seance.date_heure_debut , 'end':seance.date_heure_fin ,'url': '/planning/seance/' + str(seance.id) + ''} for seance in seances]
+                event_data = json.dumps(event_data, default=datetime_serializer)
 
         context={'event_data':event_data}
         return render(request, 'dashboard.html', context)
 
     elif request.user.groups.all().first().name =='enseignant' :
-        seances=SeancePlannifier.objects.filter(professeur=get_authenticate_user_model(request))
+        seances=SeancePlannifier.objects.filter(professeur=request.user.enseignant)
         event_data = [{'title': seance.intitule, 'start': seance.date_heure_debut , 'end':seance.date_heure_fin ,'url': '/planning/seance/' + str(seance.id) + ''} for seance in seances]
         event_data = json.dumps(event_data, default=datetime_serializer)
         context={'event_data':event_data}
@@ -1961,14 +1964,17 @@ def login_view(request):
                 try:
                     personnel = user.personnel
                     id_auth_model = personnel.id
+                    
                     if is_enseignant:
+                        print(id_auth_model)
                         id_auth_model = user.enseignant.id
+                        
                         request.session['profile_path'] = f'main/detail_etudiant/{id_auth_model}/'
                     request.session['id_auth_model'] = id_auth_model
                     has_model = True
                 except Exception as e:
                     pass
-            print(has_model)
+
             if has_model or (user.is_superuser and is_directeur_des_etudes):  
                 login(request, user)
                 return redirect('/')

@@ -26,18 +26,18 @@ def getMatieresEtudiant(etudiant):
 
 
 
-def getNiveauEtudiant(etudiant):
-    annee=AnneeUniversitaire.static_get_current_annee_universitaire().annee
-    semestre=etudiant.semestres.filter(courant=True,pk__contains=annee)
-    if semestre:
-        if semestre[0].libelle =="S1" or semestre[0].libelle =="S2":
-            return "L1"
-        if semestre[0].libelle =="S3" or semestre[0].libelle =="S4":
-            return "L2"
-        elif semestre[0].libelle =="S5" or semestre[0].libelle =="S6":
-            return "L3"
-    else :
-        return "RR"
+def getNiveauEtudiant(request,etudiant):
+    id_annee=request.session.get("id_annee_selectionnee")
+    semestres=etudiant.semestres.filter(annee_universitaire_id=id_annee)
+    for semestre in semestres:
+        if semestre:
+            if semestre.libelle =="S1" or semestre.libelle =="S2":
+                return "L1"
+            if semestre.libelle =="S3" or semestre.libelle =="S4":
+                return "L2"
+            elif semestre.libelle =="S5" or semestre.libelle =="S6":
+                return "L3"
+
             
 
 @login_required(login_url="/main/connexion")
@@ -177,16 +177,16 @@ def changer_delegue(request):
 @login_required(login_url="/main/connexion")
 def gestion_classe(request):
     students = Etudiant.objects.all()
-    print(students)
+    
     license1_students = set()
     license2_students = set()
     license3_students = set()
     for etudiant in students:
-        if getNiveauEtudiant(etudiant) == "L3":
+        if getNiveauEtudiant(request,etudiant) == "L3":
             license3_students.add(etudiant)
-        elif getNiveauEtudiant(etudiant) == "L2":
+        elif getNiveauEtudiant(request,etudiant) == "L2":
             license2_students.add(etudiant)
-        elif getNiveauEtudiant(etudiant) == "L1":
+        elif getNiveauEtudiant(request,etudiant) == "L1":
             license1_students.add(etudiant)
 
     context = {
@@ -252,12 +252,16 @@ def cahier_de_text(request):
     if  request.user.groups.all()[0].name == "etudiant":
         user_connecte=get_object_or_404(get_user_model(),id=request.user.id)
         etudiant=get_object_or_404(Etudiant,user=user_connecte)
-        sem=etudiant.get_semestre_courant
+        semestres=etudiant.semestres.filter(annee_universitaire_id=id_annee)
         niveau=getNiveauEtudiant(etudiant)
-        events=Seance.objects.filter(semestre=sem)
+        seances=[]
+        for sem in semestres:
+            sean =Seance.objects.filter(semestre=sem)
+            for seance in sean:
+                seances.append(seance)
         events = set()
         print("seances :",events )
-        event_data = [{'title': event.intitule, 'start': event.date_et_heure_debut , 'end':event.date_et_heure_fin ,'url': '/cahier_de_texte/info_seance/' + str(event.id) + '/'} for event in events]
+        event_data = [{'title': event.intitule, 'start': event.date_et_heure_debut , 'end':event.date_et_heure_fin ,'url': '/cahier_de_texte/info_seance/' + str(event.id) + '/'} for event in seances]
         event_data = json.dumps(event_data, default=datetime_serializer)
         return render(request,"cahier_de_text/cahier_de_texte.html",{"event_data":event_data,"niveau":niveau})
 
@@ -304,8 +308,9 @@ def liste_seance(request):
         user_connecte=get_object_or_404(get_user_model(),id=request.user.id)
         enseignant_connecte = get_object_or_404(Enseignant, user=user_connecte)
         matieres = Matiere.objects.filter(enseignant=enseignant_connecte)
-        seances_en_attente = Seance.objects.filter(matiere__in=matieres, valider=False)
-        seances_validees = Seance.objects.filter(matiere__in=matieres, valider=True)
+        semestres=Semestre.objects.filter(annee_universitaire_id=request.session.get("id_annee_selectionnee"))
+        seances_en_attente = Seance.objects.filter(matiere__in=matieres, valider=False,semestre__in=semestres)
+        seances_validees = Seance.objects.filter(matiere__in=matieres, valider=True,semestre__in=semestres)
         return render(request, "cahier_de_text/liste_seance.html", {"seances_en_attente": seances_en_attente, "seances_validees": seances_validees})
 
 @login_required(login_url="/main/connexion")
@@ -315,8 +320,9 @@ def liste_seance_etudiant(request):
             return render(request, 'errors_pages/403.html')
         user_connecte=get_object_or_404(get_user_model(),id=request.user.id)
         etudiant_connecte = get_object_or_404(Etudiant, user=user_connecte)
-        seances_en_attente = Seance.objects.filter(auteur=etudiant_connecte, valider=False)
-        seances_validees = Seance.objects.filter(auteur=etudiant_connecte,valider=True)
+        semestres=Semestre.objects.filter(annee_universitaire_id=request.session.get("id_annee_selectionnee"))
+        seances_en_attente = Seance.objects.filter(auteur=etudiant_connecte, valider=False ,semestre__in=semestres)
+        seances_validees = Seance.objects.filter(auteur=etudiant_connecte,valider=True,semestre__in=semestres)
         return render(request, "cahier_de_text/liste_seance_etudiant.html", {"seances_en_attente": seances_en_attente, "seances_validees": seances_validees})
 
 
@@ -479,7 +485,8 @@ def creer_fake_etudiant():
     )
     semestre1 = Semestre.objects.filter(id='S1-2023' ).first()
     semestre2 = Semestre.objects.filter(id='S3-2023' ).first()
-    semestres = [random.choice([semestre1,semestre2])]
+    semestre3 = Semestre.objects.filter(id='S5-2023' ).first()
+    semestres = [random.choice([semestre1,semestre2,semestre3])]
     etudiant.semestres.set(semestres)
     return etudiant
 

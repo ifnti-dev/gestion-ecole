@@ -2,7 +2,7 @@
 {% block content_title %}Seance Plannifier {{seance.id}} || du {{seance.planning}}  {% endblock content_title %}
 {% load static %}
 {% block content %}
-
+<script src="{% static 'assets/js/ckeditor.js'%}"></script>
 
 
 
@@ -120,9 +120,10 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form action="{% url 'cahier_de_texte:enregistrer_seance' %}"  method="post">
+                    <form action="{% url 'planning:enregistrer_seance' %}" onsubmit="return validateForm();" method="post">
                         {% csrf_token %}
-                        <input type="hidden" id="ecrit_par" name="ecrit_par" value="{{ request.etudiant.id }}">
+                        <input type="hidden" id="ecrit_par" name="ecrit_par" value="{{ request.user.etudiant.id }}">
+                        <input type="hidden" id="seance" name="seanceId" value="{{ seance.id }}">
                         <div class="form-group " >
                             <label for="example-text-input-alt">Intitulé</label>
                             <input type="text" class="form-control form-control-alt" id="intitulé" name="intitulé" required="true"  placeholder="Entrez un intitulé (si vous ne saisissez rien, le libellé de la matiere sera utiliser)">
@@ -138,33 +139,37 @@
                                
                         </div>
                         <div class="form-group">
-                            <div id="js-ckeditor5-classic" name="js-ckeditor5-classic">Resumé</div>
+                            <textarea class="js-maxlength form-control" id="description" name="description" rows="5"  placeholder="It even works on textareas.." data-always-show="true"></textarea>
                         </div>
-                    </form>
+                
+                    
                 </div>
                 <div class="modal-footer">
+                    <button type="submit" id="submit" class="btn btn-outline-primary">Enregistrer</button>
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
                 </div>
+            </form>
             </div>
         </div>
     </div>
     <script>
                       
                 
-        ClassicEditor
-            .create(document.querySelector('#js-ckeditor5-classic'), {
-            })
-            .then(editor => {
-                editor.model.document.on('change:data', () => {
-                    const content = editor.getData();
-                    document.querySelector('#description').value = content;
-                    console.log(content)
-                });
-            })
-            .catch(error => {
-                console.error(error);
-            });
-        </script>
+                      function validateForm() {
+                      
+                        const intitule = document.getElementById("intitulé");
+                        const intituler = intitule.value
+                      
+                        var regex = /^[a-zA-Z0-9\s]*$/; // Regular expression to allow only letters, numbers, and spaces
+
+                        if (!regex.test(intituler)) {
+                            One.helpers('notify', {type: 'danger', icon: 'fa fa-info-circle mr-1', message: "L'intitulé ne doit contenir que des lettres, des chiffres et des espaces."});
+                                return false;
+                        } 
+                        return true;
+
+                    }
+    </script>
 
 
     <!-- END Page Content -->

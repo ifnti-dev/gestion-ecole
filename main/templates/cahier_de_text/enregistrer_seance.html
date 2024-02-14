@@ -81,12 +81,13 @@
                                                     <input type="text" class="js-flatpickr form-control bg-white" id="heurefin" required="true" name="heurefin" data-enable-time="true" data-no-calendar="true" placeholder="Finir" data-date-format="H:i" data-time_24hr="true" value="{{ currentTime }}">
                                                 </div>
                                         </div>
-                                        <input type="hidden" id="description" name="description" value="Resumé">
-   
-                                        <div class="form-group">
-                                            <div id="js-ckeditor5-classic" name="js-ckeditor5-classic">Resumé</div>
-                                          </div>
-                                        
+                                 
+                                       
+                                            <div class="form-group">
+                                                <textarea class="js-maxlength form-control" id="description" name="description" rows="5"  placeholder="It even works on textareas.." data-always-show="true"></textarea>
+                                            </div>
+                                    
+
                                          
                                         <button type="submit" id="submit" class="btn btn-outline-primary">Enregistrer</button>
                           
@@ -98,25 +99,14 @@
             <script>
                       
                 
-                    ClassicEditor
-                        .create(document.querySelector('#js-ckeditor5-classic'), {
-                        })
-                        .then(editor => {
-                            editor.model.document.on('change:data', () => {
-                                const content = editor.getData();
-                                document.querySelector('#description').value = content;
-                                console.log(content)
-                            });
-                        })
-                        .catch(error => {
-                            console.error(error);
-                        });
-
+                   
                     
                     function validateForm() {
                         const heureDebutInput = document.getElementById("heuredebut");
                         const heureFinInput = document.getElementById("heurefin");
                         const dateInput = document.getElementById("dateseance");
+                        const intitule = document.getElementById("intitulé");
+                        const intituler = intitule.value
                         const date = dateInput.value
                         const startTime = heureDebutInput.value;
                         const endTime = heureFinInput.value;
@@ -134,7 +124,12 @@
                             return false; 
                             
                         }
-                        
+                        var regex = /^[a-zA-Z0-9\s]*$/; // Regular expression to allow only letters, numbers, and spaces
+
+                        if (!regex.test(intituler)) {
+                            One.helpers('notify', {type: 'danger', icon: 'fa fa-info-circle mr-1', message: "L'intitulé ne doit contenir que des lettres, des chiffres et des espaces."});
+                                return false;
+                        } 
                         return true;
 
                     }
