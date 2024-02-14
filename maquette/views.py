@@ -11,7 +11,7 @@ from django.contrib import messages
 from django.db import DataError, IntegrityError
 from django.conf import settings
 from django.contrib.auth.decorators import login_required, permission_required
-
+from .custom_permission_required import data_permission
 
 @login_required(login_url=settings.LOGIN_URL)
 def programmes(request):
@@ -39,6 +39,7 @@ def programmes(request):
     return render(request, 'maquette/programmes.html', context=data)
 
 @login_required(login_url=settings.LOGIN_URL)
+@data_permission('maquette.add_programme')
 def add_programme(request):
     data = {}
     id_annee_selectionnee = request.session.get('id_annee_selectionnee')
@@ -55,6 +56,7 @@ def add_programme(request):
     return render(request, 'maquette/create_or_edit.html', context=data)
 
 @login_required(login_url=settings.LOGIN_URL)
+@data_permission('maquette.edit_programme')
 def edit_programme(request, id):
     data = {}
     id_annee_selectionnee = request.session.get('id_annee_selectionnee')
@@ -72,6 +74,7 @@ def edit_programme(request, id):
     return render(request, 'maquette/create_or_edit.html', context=data)
 
 @login_required(login_url=settings.LOGIN_URL)
+@data_permission('maquette.delete_programme')
 def delete_programme(request, id):
     id_annee_selectionnee = request.session.get('id_annee_selectionnee')
     programme = get_object_or_404(Programme, pk=id)
@@ -137,7 +140,7 @@ def generate_maquette(request):
         data['maquette_semestres'] = generateDictFromProgrammeData(None, parcours, annee_accademique)
         generate_maquette_pdf(data['maquette_semestres'], template_path)
         data['pdf_file'] = "/media/pdf/maquette.pdf"
-        data['form'] = GenerateMaquetteForm()
+        data['form'] = GenerateMaquetteForm(initial={"parcours": Parcours.objects.first()})
         
     return render(request, "maquette/generate_maquette.html", data)
 
@@ -304,6 +307,7 @@ def data(request):
     return render(request, 'data/index.html')
 
 @login_required(login_url=settings.LOGIN_URL)
+@data_permission('maquette.upload_note')
 def upload_note(request):
     if request.POST:
         if 'file' in request.FILES :
@@ -336,6 +340,7 @@ def upload_note(request):
         return response
 
 @login_required(login_url=settings.LOGIN_URL)
+@data_permission('maquette.upload_maquette')
 def upload_maquette(request):
     if request.method == "POST":
         if 'file' in request.FILES :
@@ -367,17 +372,17 @@ def upload_maquette(request):
             messages.info(request, "Vous devez séléctionner un fichier ! ")
         return redirect('maquette:data')
     
-    annee_universitaire = request.GET.get("annee_universitaire")
-    annee_universitaire = get_object_or_404(AnneeUniversitaire, pk=annee_universitaire)
-    file_name = pre_load_maquette('media/excel_templates/maquette_general_[annee].xlsx', annee_universitaire)
-    file_path = file_name
-    file_name = f'maquette_general_{annee_universitaire}.xlsx'
-    with open(file_path, 'rb') as file:
+    annee_universitaires = request.GET.getlist("annee_universitaires")
+    annee_universitaires = AnneeUniversitaire.objects.filter(pk__in=annee_universitaires)
+    file_name = pre_load_maquette(annee_universitaires)
+
+    with open(file_name, 'rb') as file:
         response = HttpResponse(file.read(), content_type="application/force-download")
         response['Content-Disposition'] = 'attachment; filename="{}"'.format(os.path.basename(file_name))
         return response
 
 @login_required(login_url=settings.LOGIN_URL)
+@data_permission('maquette.upload_matieres')
 def upload_matieres(request):
     if request.method == "POST":
         if 'file' in request.FILES :
@@ -414,8 +419,10 @@ def upload_matieres(request):
         
         return redirect('maquette:data')
         
-    annees = AnneeUniversitaire.objects.all()
-    file_name = pre_load_ue_matiere_template_data_by_year(annees)
+    annee_universitaires = request.GET.getlist("annee_universitaires")
+    annee_universitaires = AnneeUniversitaire.objects.filter(pk__in=annee_universitaires)
+    
+    file_name = pre_load_ue_matiere_template_data_by_year(annee_universitaires)
     file_path = 'media/excel_templates/'+file_name
     with open(file_name, 'rb') as file:
         response = HttpResponse(file.read(), content_type="application/force-download")
