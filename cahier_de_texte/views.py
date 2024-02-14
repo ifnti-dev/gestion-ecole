@@ -253,7 +253,7 @@ def cahier_de_text(request):
         user_connecte=get_object_or_404(get_user_model(),id=request.user.id)
         etudiant=get_object_or_404(Etudiant,user=user_connecte)
         semestres=etudiant.semestres.filter(annee_universitaire_id=id_annee)
-        niveau=getNiveauEtudiant(etudiant)
+        niveau=getNiveauEtudiant(request,etudiant)
         seances=[]
         for sem in semestres:
             sean =Seance.objects.filter(semestre=sem)
