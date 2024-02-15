@@ -1923,7 +1923,7 @@ def login_view(request):
             has_model = False
             if is_etudiant:
                 try:
-                    etudiant = user.etudiant
+                    etudiant = Etudiant.objects.get(user=user).id
                     id_auth_model = etudiant.id
                     request.session['id_auth_model'] = id_auth_model
                     request.session['profile_path'] = f'main/detail_etudiant/{id_auth_model}/'
@@ -1935,7 +1935,7 @@ def login_view(request):
                     personnel = user.personnel
                     id_auth_model = personnel.id
                     if is_enseignant:
-                        id_auth_model = user.enseignant.id
+                        id_auth_model = Enseignant.objects.get(user=user).id
                         request.session['profile_path'] = f'main/detail_etudiant/{id_auth_model}/'
                     request.session['id_auth_model'] = id_auth_model
                     has_model = True
