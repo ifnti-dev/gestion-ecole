@@ -3,78 +3,6 @@
 {% block content_title_description %}{% endblock content_title_description %}
 {% block content %}
 <div class="p-6 row">
-    {% comment %} <div class="block-header"></div>
-    <div class="block-content block-content-full">
-        <form action="" method="POST" enctype="multipart/form-data">
-            {% csrf_token %}
-            <p>
-                <strong class="text-danger">Attention :</strong> <br>
-                <span>
-                    Avant de charger les données assurez vous d'avoir déjà fait un backup car 
-                    car cette action risque de <strong class="text-danger">supprimer</strong> les données actuelle de votre base de données
-                    pour en inserer de nouvelles.
-                </span>
-            </p>
-            <div class="d-flex flex-column mt-3">
-                {{ form.maquette_excel_file.label_tag }}
-                <div class="d-flex justify-content-between">
-                    {{ form.maquette_excel_file }}
-                    <div class="mx-3 d-flex align-items-center">
-                        <a href="{{ MEDIA_URL }}/excel_templates/ues_matiere.xlsx" download="excel" class="ml-3">Template</a>
-                    </div>
-                </div>
-                {{ form.maquette_excel_file.errors }}
-            </div>
-            <div class="d-flex flex-column mt-3">
-                {{ form.matieres_excel_file.label_tag }}
-                <div class="d-flex justify-content-between">
-                    {{ form.matieres_excel_file }}
-                    <div class="mx-3 d-flex align-items-center">
-                        <a href="{% url 'maquette:matiere_template' %}" download="excel" class="ml-3">Template</a>
-                    </div>
-                </div>
-                {{ form.matieres_excel_file.errors }}
-            </div>
-            <div class="d-flex flex-column mt-3">
-                {{ form.notes_excel_file.label_tag }}
-                <div class="d-flex justify-content-between">
-                    {{ form.notes_excel_file }}
-                    <div class="mx-3 d-flex align-items-center">
-                        <a href="{{ MEDIA_URL }}/excel_templates/notes_matiere.xlsx" download="excel" class="ml-3">Template</a>
-                    </div>
-                </div>
-                {{ form.notes_excel_file.errors }}
-            </div>
-            <div class="mt-3 d-flex justify-content-end">
-                <input type="submit" class="btn btn-primary ml-3" value="Mettre à jour">
-            </div>
-        </form>
-        <div class="d-flex flex-column mt-3">
-            {{ form.maquette_excel_file.label_tag }}
-            <div class="d-flex justify-content-between">
-                <input type="file" name="maquette_excel_file" id="" multiple>
-                <div class="mx-3 d-flex align-items-center">
-                    <a href="{% url 'maquette:maquette_template' %}">
-                        <button type="submit" class="btn btn-primary">Template</button>
-                    </a>
-                </div>
-            </div>
-            {{ form.maquette_excel_file.errors }}
-        </div>
-        <div class="d-flex flex-column mt-3">
-            {{ form.notes_excel_file.label_tag }}
-            <div class="d-flex justify-content-between">
-                {{ form.notes_excel_file }}
-                <form action="{% url 'maquette:note_template' %}" method="post">
-                    {% csrf_token %}
-                    <div class="mx-3 d-flex align-items-center">
-                        <button type="submit" class="btn btn-primary">Template</button>
-                    </div>
-                </form>
-            </div>
-            {{ form.notes_excel_file.errors }}
-        </div>
-    </div> {% endcomment %}
     {% include 'components/application_card.html' with title="Maquette" modal_id="maquette" icon_bg_color="bg-success" icon_class_names="far fa-2x fa-file-excel" %}
     {% include 'components/application_card.html' with title="Matières" modal_id="matiere" icon_bg_color="bg-info" icon_class_names="far fa-2x fa-file-excel" %}
     {% include 'components/application_card.html' with title="Notes" modal_id="note" icon_bg_color="bg-danger" icon_class_names="far fa-2x fa-file-excel" %}
@@ -82,7 +10,7 @@
 </div>
 {% include 'components/modal_import_data.html' with title="Importer la maquette" modal_id="maquette" url="/maquette/upload/maquette/" %}
 {% include 'components/modal_import_data.html' with title="Importer les matières" modal_id="matiere" url="/maquette/upload/matieres/" %}
-{% include 'components/modal_import_data.html' with title="Importer les notes" modal_id="note" url="/maquette/upload/notes/" %}
+{% include 'components/modal_import_note_data.html' with title="Importer les notes" modal_id="note" url="/maquette/upload/notes/" %}
 
 {% endblock content %}
     

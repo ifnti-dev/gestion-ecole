@@ -270,7 +270,6 @@ def create_etudiant(request, id=0):
             # Modification d'un étudiant existant, préremplir le formulaire avec les données existantes
             etudiant = Etudiant.objects.get(pk=id)
             form = EtudiantForm(instance=etudiant)
-
         return render(request, 'etudiants/create_etudiant.html', {'form': form})
     else:
         # Gestion de la requête POST
@@ -286,7 +285,7 @@ def create_etudiant(request, id=0):
             # Sauvegarde de l'étudiant pour générer un ID
             etudiant = form.save(commit=False)
             etudiant.save()
-
+            print(etudiant.nom)
             # Trouver l'année universitaire en cours
             annee_universitaire_courante = AnneeUniversitaire.objects.get(
                 annee_courante=True)
@@ -1968,15 +1967,14 @@ def login_view(request):
                     
                     if is_enseignant:
                         print(id_auth_model)
-                        #id_auth_model = user.enseignant.id
+                        id_auth_model = user.enseignant.id
                         
                         request.session['profile_path'] = f'main/detail_etudiant/{id_auth_model}/'
                     request.session['id_auth_model'] = id_auth_model
                     has_model = True
                 except Exception as e:
                     pass
-            print(is_enseignant)
-            print(has_model)
+
             if has_model or (user.is_superuser and is_directeur_des_etudes):  
                 login(request, user)
                 return redirect('/')
@@ -2052,7 +2050,6 @@ def create_enseignant(request, id=0):
             form = EnseignantForm(request.POST, instance=enseignant)
         if form.is_valid():
             form.save()
-
             # id_annee_selectionnee = AnneeUniversitaire.static_get_current_annee_universitaire().id
             return redirect('main:enseignants')
 

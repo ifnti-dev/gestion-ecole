@@ -263,12 +263,12 @@ class EnseignantForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super(EnseignantForm, self).clean()
-        nom = cleaned_data.get('nom')
-        prenom = cleaned_data.get('prenom')
-        contact = cleaned_data.get('contact')
-        email = cleaned_data.get('email')
-        adresse = cleaned_data.get('adresse')
-        sexe = cleaned_data.get('sexe')
+        nom = cleaned_data.get('nom', '')
+        prenom = cleaned_data.get('prenom', '')
+        contact = cleaned_data.get('contact', '')
+        email = cleaned_data.get('email', '')
+        adresse = cleaned_data.get('adresse', '')
+        sexe = cleaned_data.get('sexe', '')
 
         if nom.find(';') != -1 or nom.find('/') != -1 or nom.find('.') != -1 or nom.find(',') != -1 or nom.find(':') != -1 or nom.find('!') != -1 or nom.find('?') != -1 or nom.find('*') != -1 or nom.find('+') != -1 or nom.find('=') != -1 or nom.find('@') != -1 or nom.find('#') != -1 or nom.find('$') != -1 or nom.find('%') != -1 or nom.find('&') != -1 or nom.find('(') != -1 or nom.find(')') != -1 or nom.find('_') != -1 or nom.find('<') != -1 or nom.find('>') != -1 or nom.find('|') != -1 or nom.find('~') != -1 or nom.find('^') != -1 or nom.find('{') != -1 or nom.find('}') != -1 or nom.find('[') != -1 or nom.find(']') != -1 or nom.find('"') != -1 or nom.find('\\') != -1 or nom.find('`') != -1:
             #forms.nom.errors = "Le nom ne doit pas contenir des caractères spéciaux"
@@ -276,7 +276,6 @@ class EnseignantForm(forms.ModelForm):
             if not 'nom' in self._errors:
                 self._errors['nom'] = ErrorDict()
             self._errors['nom'] = 'Le nom ne doit pas contenir des caractères spéciaux'
-
 
         if nom.find('0') != -1 or nom.find('1') != -1 or nom.find('2') != -1 or nom.find('3') != -1 or nom.find('4') != -1 or nom.find('5') != -1 or nom.find('6') != -1 or nom.find('7') != -1 or nom.find('8') != -1 or nom.find('9') != -1:
             if not 'nom' in self._errors:
@@ -322,7 +321,6 @@ class EnseignantForm(forms.ModelForm):
             if not 'sexe' in self._errors:
                 self._errors['sexe'] = ErrorDict()
             self._errors['sexe'] = 'Le sexe ne doit pas contenir des chiffres'
-
 
 
 class InformationForm(forms.ModelForm):
