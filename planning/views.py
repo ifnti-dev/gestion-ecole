@@ -548,9 +548,8 @@ def effacer(request,planningId):
     seance = SeancePlannifier.objects.filter(planning=planning)
     for se in seance :
         se.delete()
-
     planning.delete()
-    return  render(request,'planning_list.html')
+    return redirect('planning:planning')
 
 
 
