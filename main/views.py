@@ -1966,15 +1966,13 @@ def login_view(request):
                     id_auth_model = personnel.id
                     
                     if is_enseignant:
-                        print(id_auth_model)
-                        id_auth_model = user.enseignant.id
-                        
+                        #id_auth_model = user.enseignant.id
                         request.session['profile_path'] = f'main/detail_etudiant/{id_auth_model}/'
                     request.session['id_auth_model'] = id_auth_model
                     has_model = True
                 except Exception as e:
                     pass
-
+           
             if has_model or (user.is_superuser and is_directeur_des_etudes):  
                 login(request, user)
                 return redirect('/')
