@@ -97,7 +97,7 @@
                         <label for="semestre">Semestre : </label>
                         <select class="js-select2 form-control" id="semestre" name="semestre" style="width: 100%;" data-placeholder="Choose one..">
                             <option></option>
-                            {% for semestre in semestres %}
+                            {% for semestre in semestre_courant %}
                                 <option value="{{semestre.id}}">{{semestre.libelle}} - {{semestre.annee_universitaire}}</option>
                             {% endfor %}
                            

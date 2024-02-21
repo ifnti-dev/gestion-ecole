@@ -2,307 +2,321 @@
 {% load django_browser_reload %}
 <!DOCTYPE html>
 <html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link rel="shortcut icon" href="{% static '/assets/media/logo.jpeg' %}">
-    <link rel="icon" type="image/png" sizes="192x192" href="{% static '/assets/media/logo.jpeg' %}">
-    <link rel="apple-touch-icon" sizes="180x180" href="{% static '/assets/media/logo.jpeg' %}">
-    <!-- END Icons -->
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- Stylesheets -->
-    <!-- Page JS Plugins CSS -->
-    <link rel="stylesheet" href="{% static 'assets/js/plugins/datatables/dataTables.bootstrap4.css' %}">
-    <link rel="stylesheet" href="{% static 'assets/js/plugins/datatables/buttons-bs4/buttons.bootstrap4.min.css' %}">
+        <link rel="shortcut icon" href="{% static '/assets/media/logo.jpeg' %}">
+        <link rel="icon" type="image/png" sizes="192x192" href="{% static '/assets/media/logo.jpeg' %}">
+        <link rel="apple-touch-icon" sizes="180x180" href="{% static '/assets/media/logo.jpeg' %}">
+        <!-- END Icons -->
 
-    <!-- Fonts and OneUI framework -->
-    
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+        <!-- Stylesheets -->
+        <!-- Page JS Plugins CSS -->
+        <link rel="stylesheet" href="{% static 'assets/js/plugins/datatables/dataTables.bootstrap4.css' %}">
+        <link rel="stylesheet"
+            href="{% static 'assets/js/plugins/datatables/buttons-bs4/buttons.bootstrap4.min.css' %}">
 
-    <link rel="stylesheet" href="{% static 'assets/js/plugins/bootstrap-datepicker/css/bootstrap-datepicker3.min.css' %}">
-    <link rel="stylesheet" href="{% static 'assets/js/plugins/bootstrap-colorpicker/css/bootstrap-colorpicker.min.css' %}">
-    <link rel="stylesheet" href="{% static 'assets/css/select2.css' %}">
-    <link rel="stylesheet" href="{% static 'assets/js/plugins/ion-rangeslider/css/ion.rangeSlider.css' %}">
-    <link rel="stylesheet" href="{% static 'assets/js/plugins/flatpickr/flatpickr.min.css' %}">
-    <link rel="stylesheet" href="{% static 'assets/js/plugins/fullcalendar/main.min.css' %}">
+        <!-- Fonts and OneUI framework -->
 
+        <link rel="stylesheet"
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
 
-
-    <link rel="stylesheet" href="{% static 'assets/css/ifnti.css' %}">
-    <link rel="stylesheet" id="css-main" href="{% static 'assets/css/oneui.css' %}">  
-    <title>GESTION IFNTI</title>
-    <style>
-        .scrolling-wrapper{
-            overflow-x: auto;
-        }
-        
-
-        .upload_dropZone {
-            color: #0f3c4b;
-            background-color: var(--colorPrimaryPale, #c8dadf);
-            outline: 2px dashed var(--colorPrimaryHalf, #c1ddef);
-            outline-offset: -12px;
-            transition:
-              outline-offset 0.2s ease-out,
-              outline-color 0.3s ease-in-out,
-              background-color 0.2s ease-out;
-          }
-          .upload_dropZone.highlight {
-            outline-offset: -4px;
-            outline-color: var(--colorPrimaryNormal, #0576bd);
-            background-color: var(--colorPrimaryEighth, #c8dadf);
-          }
-          .upload_svg {
-            fill: var(--colorPrimaryNormal, #0576bd);
-          }
-          .btn-upload {
-            color: #fff;
-            background-color: var(--colorPrimaryNormal);
-          }
-          .btn-upload:hover,
-          .btn-upload:focus {
-            color: #fff;
-            background-color: var(--colorPrimaryGlare);
-          }
-          .upload_img {
-            width: calc(33.333% - (2rem / 3));
-            object-fit: contain;
-          }
+        <link rel="stylesheet"
+            href="{% static 'assets/js/plugins/bootstrap-datepicker/css/bootstrap-datepicker3.min.css' %}">
+        <link rel="stylesheet"
+            href="{% static 'assets/js/plugins/bootstrap-colorpicker/css/bootstrap-colorpicker.min.css' %}">
+        <link rel="stylesheet" href="{% static 'assets/css/select2.css' %}">
+        <link rel="stylesheet" href="{% static 'assets/js/plugins/ion-rangeslider/css/ion.rangeSlider.css' %}">
+        <link rel="stylesheet" href="{% static 'assets/js/plugins/flatpickr/flatpickr.min.css' %}">
+        <link rel="stylesheet" href="{% static 'assets/js/plugins/fullcalendar/main.min.css' %}">
 
 
-          .form-check {
-            position: relative;
-            display: block;
-            margin-bottom: 0.75rem;
-        }
-        
-        .form-check-toggle {
-            position: relative;
-            padding-left: 0;
-            line-height: 30px;
-        
-            input {
-                display: block;
-                position: absolute;
-                top: 0;
-                right: 0;
-                bottom: 0;
-                left: 0;
-                width: 0%;
-                height: 0%;
-                margin: 0;
-                cursor: pointer;
-                opacity: 0;
-                filter: alpha(opacity=0);
+
+        <link rel="stylesheet" href="{% static 'assets/css/ifnti.css' %}">
+        <link rel="stylesheet" id="css-main" href="{% static 'assets/css/oneui.css' %}">
+        <title>GESTION IFNTI</title>
+        <style>
+            .scrolling-wrapper {
+                overflow-x: auto;
             }
-        
-            input + span {
-                cursor: pointer;
-                user-select: none;
-                height: 30px;
-                margin-left: 70px;
+
+
+            .upload_dropZone {
+                color: #0f3c4b;
+                background-color: var(--colorPrimaryPale, #c8dadf);
+                outline: 2px dashed var(--colorPrimaryHalf, #c1ddef);
+                outline-offset: -12px;
+                transition:
+                    outline-offset 0.2s ease-out,
+                    outline-color 0.3s ease-in-out,
+                    background-color 0.2s ease-out;
+            }
+
+            .upload_dropZone.highlight {
+                outline-offset: -4px;
+                outline-color: var(--colorPrimaryNormal, #0576bd);
+                background-color: var(--colorPrimaryEighth, #c8dadf);
+            }
+
+            .upload_svg {
+                fill: var(--colorPrimaryNormal, #0576bd);
+            }
+
+            .btn-upload {
+                color: #fff;
+                background-color: var(--colorPrimaryNormal);
+            }
+
+            .btn-upload:hover,
+            .btn-upload:focus {
+                color: #fff;
+                background-color: var(--colorPrimaryGlare);
+            }
+
+            .upload_img {
+                width: calc(33.333% - (2rem / 3));
+                object-fit: contain;
+            }
+
+
+            .form-check {
+                position: relative;
                 display: block;
-        
-                &:before {
-                    content: '';
-                    position: absolute;
-                    left: 0;
-                    display: inline-block;
-                    height: 30px;
-                    width: 50px;
-                    background: #FFF;
-                    border: solid 1px #eff2f3;
-                    //box-shadow: inset 0 0 5px $engie-gray-10;
-                    transition: background 0.3s ease-in-out, border-color 0.3s ease-in-out;
-                    border-radius: 15px;
-                }
-        
-                &:after {
-                    width: 28px;
-                    height: 28px;
-                    margin-top: 1px;
-                    margin-left: 1px;
-                    border-radius: 50%;
-                    position: absolute;
-                    left: 0;
-                    top: 0;
+                margin-bottom: 0.75rem;
+            }
+
+            .form-check-toggle {
+                position: relative;
+                padding-left: 0;
+                line-height: 30px;
+
+                input {
                     display: block;
-                    background: #FFF;
-                    transition: margin-left 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-                    text-align: center;
-                    font-weight: bold;
-                    content: '';
-                    //border: solid $engie-black-01 0.05rem;
-                    box-shadow: 0 0 2px rgba(0, 0, 0, 0.2), 0 0 5px rgba(0, 0, 0, 0.05);
+                    position: absolute;
+                    top: 0;
+                    right: 0;
+                    bottom: 0;
+                    left: 0;
+                    width: 0%;
+                    height: 0%;
+                    margin: 0;
+                    cursor: pointer;
+                    opacity: 0;
+                    filter: alpha(opacity=0);
                 }
-            }
-        
-            input {
-                &:checked + span {
-                    &:after {
-                        content: '';
-                        margin-left: 21px;
-                        box-shadow: none;
-                    }
-        
+
+                input+span {
+                    cursor: pointer;
+                    user-select: none;
+                    height: 30px;
+                    margin-left: 70px;
+                    display: block;
+
                     &:before {
-                        background-color: #86be4e;
-                        border-color: #86be4e;
+                        content: '';
+                        position: absolute;
+                        left: 0;
+                        display: inline-block;
+                        height: 30px;
+                        width: 50px;
+                        background: #FFF;
+                        border: solid 1px #eff2f3;
+                        //box-shadow: inset 0 0 5px $engie-gray-10;
                         transition: background 0.3s ease-in-out, border-color 0.3s ease-in-out;
+                        border-radius: 15px;
+                    }
+
+                    &:after {
+                        width: 28px;
+                        height: 28px;
+                        margin-top: 1px;
+                        margin-left: 1px;
+                        border-radius: 50%;
+                        position: absolute;
+                        left: 0;
+                        top: 0;
+                        display: block;
+                        background: #FFF;
+                        transition: margin-left 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+                        text-align: center;
+                        font-weight: bold;
+                        content: '';
+                        //border: solid $engie-black-01 0.05rem;
+                        box-shadow: 0 0 2px rgba(0, 0, 0, 0.2), 0 0 5px rgba(0, 0, 0, 0.05);
+                    }
+                }
+
+                input {
+                    &:checked+span {
+                        &:after {
+                            content: '';
+                            margin-left: 21px;
+                            box-shadow: none;
+                        }
+
+                        &:before {
+                            background-color: #86be4e;
+                            border-color: #86be4e;
+                            transition: background 0.3s ease-in-out, border-color 0.3s ease-in-out;
+                        }
                     }
                 }
             }
-        }
+        </style>
+    </head>
 
-    </style>
-</head>
-<body>
-    <div id="page-loader" class="show"></div>
-    <div id="page-container" class="sidebar-o bg-sidebar-light enable-page-overlay side-scroll page-header-fixed main-content-narrow">
-        {% include 'components/sidebar.html' %}
+    <body>
+        <div id="page-loader" class="show"></div>
+        <div id="page-container"
+            class="sidebar-o bg-sidebar-light enable-page-overlay side-scroll page-header-fixed main-content-narrow">
+            {% include 'components/sidebar.html' %}
 
-        {% include 'components/header.html' %}
+            {% include 'components/header.html' %}
 
-        <main id="main-container">
-            <!-- Bannier -->
-            {% if page_is_not_profil %}
+            <main id="main-container">
+                <!-- Bannier -->
+                {% if page_is_not_profil %}
                 <div class="bg-body-light">
                     <div class="content content-full">
                         <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center">
                             <h1 class="flex-sm-fill h3 my-2">
-                                {% block content_title %} {% endblock content_title %}<small class="d-block d-sm-inline-block mt-2 mt-sm-0 font-size-base font-w400 text-muted">{% block content_title_description %} {% endblock content_title_description %}</small>
+                                {% block content_title %} {% endblock content_title %}<small
+                                    class="d-block d-sm-inline-block mt-2 mt-sm-0 font-size-base font-w400 text-muted">{% block content_title_description %}
+                                    {% endblock content_title_description %}</small>
                             </h1>
-                            <div>  
-                                {% block backURl %} {% endblock backURl %}  
+                            <div>
+                                {% block backURl %} {% endblock backURl %}
                             </div>
                         </div>
                     </div>
                 </div>
-            {% endif %}
-                
-
-            {% if notification %}
-                {% if notification.type == "erreur" %}
-                    <div class="alert alert-danger alert-dismissable" role="alert">
-                {% elif notification.type == "succes" %}
-                    <div class="alert alert-success alert-dismissable" role="alert">
-                {% else %}
-                    <div class="alert alert-primary alert-dismissable" role="alert">
                 {% endif %}
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                    <p class="mb-0">{{notification.message}}</p>
-                </div>
-            {% endif %}
-            {% block content %} {% endblock content %}
-        </main>
 
 
-        {% include 'components/footer.html'  %}
-    </div>
-</body>
+                {% if notification %}
+                {% if notification.type == "erreur" %}
+                <div class="alert alert-danger alert-dismissable" role="alert">
+                    {% elif notification.type == "succes" %}
+                    <div class="alert alert-success alert-dismissable" role="alert">
+                        {% else %}
+                        <div class="alert alert-primary alert-dismissable" role="alert">
+                            {% endif %}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            <p class="mb-0">{{notification.message}}</p>
+                        </div>
+                        {% endif %}
+                        {% block content %} {% endblock content %}
+            </main>
 
 
-{% django_browser_reload_script %}
+            {% include 'components/footer.html'  %}
+        </div>
+    </body>
 
-<script src="{% static 'assets/js/jquery-3.7.1.min.js'%}"></script>
-<script src="{% static 'assets/js/oneui.core.min.js' %}"></script>
-<script src="{% static 'assets/js/oneui.app.min.js' %}"></script>
-<script src="{% static 'assets/js/plugins/datatables/jquery.dataTables.min.js' %}"></script>
-<script src="{% static 'assets/js/plugins/datatables/dataTables.bootstrap4.min.js' %}"></script>
-<script src="{% static 'assets/js/plugins/datatables/buttons/dataTables.buttons.min.js' %}"></script>
-<script src="{% static 'assets/js/plugins/datatables/buttons/buttons.print.min.js' %}"></script>
-<script src="{% static 'assets/js/plugins/datatables/buttons/buttons.html5.min.js' %}"></script>
-<script src="{% static 'assets/js/plugins/datatables/buttons/buttons.flash.min.js' %}"></script>
-<script src="{% static 'assets/js/plugins/datatables/buttons/buttons.colVis.min.js' %}"></script>
-<script src="{% static 'assets/js/pages/be_tables_datatables.min.js' %}"></script>
-<script src="{% static 'assets/js/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js' %}"></script>
-<script src="{% static 'assets/js/plugins/bootstrap-colorpicker/js/bootstrap-colorpicker.min.js' %}"></script>
-<script src="{% static 'assets/js/plugins/bootstrap-maxlength/bootstrap-maxlength.min.js' %}"></script>
-<script src="{% static 'assets/js/plugins/select2/js/select2.full.min.js' %}"></script>
-<script src="{% static 'assets/js/plugins/jquery.maskedinput/jquery.maskedinput.min.js' %}"></script>
-<script src="{% static 'assets/js/plugins/ion-rangeslider/js/ion.rangeSlider.min.js' %}"></script>
-<script src="{% static 'assets/js/plugins/flatpickr/flatpickr.min.js' %}"></script>
-<script src="{% static 'assets/js/plugins/bootstrap-notify/bootstrap-notify.min.js' %}"></script>
-<script src="{% static 'assets/js/sweetalert2.js' %}"></script>
-<script src="{% static 'assets/js/plugins/jquery-bootstrap-wizard/bs4/jquery.bootstrap.wizard.min.js' %}"></script>
-<script src="{% static 'assets/js/pages/be_forms_wizard.min.js' %}"></script>
-<script src="{% static 'assets/js/plugins/jquery-validation/jquery.validate.min.js' %}"></script>
-<script src="{% static 'assets/js/plugins/dropzone/dropzone.min.js' %}"></script>
 
-<script>jQuery(function () { One.helpers('notify'); });</script>
-<!-- Page JS Helpers (Flatpickr + BS Datepicker + BS Colorpicker + BS Maxlength + Select2 + Masked Inputs + Ion Range Slider plugins) -->
-<script>jQuery(function () { One.helpers(['flatpickr', 'datepicker', 'colorpicker', 'maxlength', 'select2', 'masked-inputs', 'rangeslider']);  });</script>
-<script type="text/javascript">
-    form_tag_annee = $('#form-annee-universitaire');
-    $('#annee-universitaire').on('change', function() {
-        console.log(form_tag_annee);
-        form_tag_annee.submit();
-    });
+    {% django_browser_reload_script %}
 
-    window.onload(()=>{
-        One.loader('show');
-    });
-    function showLoading(){
-        One.loader('show');
-    }
-</script>
-{% if messages %}
-{% for message in messages  %}
-<li {% if message.tags %} class="{{ message.tags }}" {% endif %}>
-    
-    {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
-    <script type="text/javascript"> 
-        let icon = "error";
-        let title = "erreur";
+    <script src="{% static 'assets/js/jquery-3.7.1.min.js'%}"></script>
+    <script src="{% static 'assets/js/oneui.core.min.js' %}"></script>
+    <script src="{% static 'assets/js/oneui.app.min.js' %}"></script>
+    <script src="{% static 'assets/js/plugins/datatables/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'assets/js/plugins/datatables/dataTables.bootstrap4.min.js' %}"></script>
+    <script src="{% static 'assets/js/plugins/datatables/buttons/dataTables.buttons.min.js' %}"></script>
+    <script src="{% static 'assets/js/plugins/datatables/buttons/buttons.print.min.js' %}"></script>
+    <script src="{% static 'assets/js/plugins/datatables/buttons/buttons.html5.min.js' %}"></script>
+    <script src="{% static 'assets/js/plugins/datatables/buttons/buttons.flash.min.js' %}"></script>
+    <script src="{% static 'assets/js/plugins/datatables/buttons/buttons.colVis.min.js' %}"></script>
+    <script src="{% static 'assets/js/pages/be_tables_datatables.min.js' %}"></script>
+    <script src="{% static 'assets/js/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js' %}"></script>
+    <script src="{% static 'assets/js/plugins/bootstrap-colorpicker/js/bootstrap-colorpicker.min.js' %}"></script>
+    <script src="{% static 'assets/js/plugins/bootstrap-maxlength/bootstrap-maxlength.min.js' %}"></script>
+    <script src="{% static 'assets/js/plugins/select2/js/select2.full.min.js' %}"></script>
+    <script src="{% static 'assets/js/plugins/jquery.maskedinput/jquery.maskedinput.min.js' %}"></script>
+    <script src="{% static 'assets/js/plugins/ion-rangeslider/js/ion.rangeSlider.min.js' %}"></script>
+    <script src="{% static 'assets/js/plugins/flatpickr/flatpickr.min.js' %}"></script>
+    <script src="{% static 'assets/js/plugins/bootstrap-notify/bootstrap-notify.min.js' %}"></script>
+    <script src="{% static 'assets/js/sweetalert2.js' %}"></script>
+    <script src="{% static 'assets/js/plugins/jquery-bootstrap-wizard/bs4/jquery.bootstrap.wizard.min.js' %}"></script>
+    <script src="{% static 'assets/js/pages/be_forms_wizard.min.js' %}"></script>
+    <script src="{% static 'assets/js/plugins/jquery-validation/jquery.validate.min.js' %}"></script>
+    <script src="{% static 'assets/js/plugins/dropzone/dropzone.min.js' %}"></script>
+
+    <script>jQuery(function () { One.helpers('notify'); });</script>
+    <!-- Page JS Helpers (Flatpickr + BS Datepicker + BS Colorpicker + BS Maxlength + Select2 + Masked Inputs + Ion Range Slider plugins) -->
+    <script>jQuery(function () { One.helpers(['flatpickr', 'datepicker', 'colorpicker', 'maxlength', 'select2', 'masked-inputs', 'rangeslider']); });</script>
+    <script type="text/javascript">
+        form_tag_annee = $('#form-annee-universitaire');
+        $('#annee-universitaire').on('change', function () {
+            console.log(form_tag_annee);
+            form_tag_annee.submit();
+        });
+
+        window.onload(() => {
+            One.loader('show');
+        });
+        function showLoading() {
+            One.loader('show');
+        }
     </script>
-    {% elif message.level == DEFAULT_MESSAGE_LEVELS.INFO %}
-    <script type="text/javascript"> 
-        let icon = "info";
-        let title = "Info";
-    </script>
-    {% elif message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}
-    <script type="text/javascript"> 
-        let icon = "success";
-        let title = "success";
-    </script>
+    {% if messages %}
+    {% for message in messages  %}
+    <li {% if message.tags %} class="{{ message.tags }}" {% endif %}>
+
+        {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
+        <script type="text/javascript">
+            let icon = "error";
+            let title = "erreur";
+        </script>
+        {% elif message.level == DEFAULT_MESSAGE_LEVELS.INFO %}
+        <script type="text/javascript">
+            let icon = "info";
+            let title = "Info";
+        </script>
+        {% elif message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}
+        <script type="text/javascript">
+            let icon = "success";
+            let title = "success";
+        </script>
+        {% endif %}
+        <script type="text/javascript">
+            let message = {% autoescape off %} "{{ message }}" {% endautoescape %};
+            Swal.fire({
+                icon: icon,
+                title: title.toUpperCase(),
+                text: message,
+                confirmButtonColor: "#5179d6",
+            });
+        </script>
+    </li>
+    {% endfor %}
     {% endif %}
-    <script type="text/javascript"> 
-        let message = {% autoescape off %} "{{ message }}" {% endautoescape %};
-        Swal.fire({
-            icon: icon,
-            title: title.toUpperCase(),
-            text: message,
-            confirmButtonColor: "#5179d6",
-        });
+    <script type="text/javascript">
+        function delete_object(delete_url, object) {
+            let title = "Êtes vous sur !";
+            let message = "Vous voulez supprimer " + object;
+            Swal.fire({
+                icon: "warning",
+                title: title,
+                text: message,
+                showConfirmButton: true,
+                showCancelButton: true,
+                focusConfirm: false,
+                confirmButtonColor: "#e56767",
+            }).then((response) => {
+                if (response.isConfirmed) {
+                    window.location.href = delete_url;
+                }
+            }).catch((error) => {
+                console.log(error);
+            });
+
+        }
     </script>
-</li>
-{% endfor %}
-{% endif %}
-<script type="text/javascript"> 
-    function delete_object(delete_url, object) {
-        let title = "Êtes vous sur !";
-        let message = "Vous voulez supprimer "+object;
-        Swal.fire({
-            icon: "warning",
-            title: title,
-            text: message,
-            showConfirmButton: true,
-            showCancelButton: true,
-            focusConfirm: false,
-            confirmButtonColor: "#e56767",
-        }).then((response) => {
-            if (response.isConfirmed) {
-                window.location.href = delete_url;
-            }
-        }).catch((error) => {
-            console.log(error);
-        });
-        
-    }
-</script>
-{% block scripts %}{% endblock scripts %}
+    {% block scripts %}{% endblock scripts %}
+
 </html>
