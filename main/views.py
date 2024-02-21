@@ -1953,7 +1953,7 @@ def login_view(request):
             has_model = False
             if is_etudiant:
                 try:
-                    etudiant = user.etudiant
+                    etudiant = Etudiant.objects.get(user=user).id
                     id_auth_model = etudiant.id
                     request.session['id_auth_model'] = id_auth_model
                     request.session['profile_path'] = f'main/detail_etudiant/{id_auth_model}/'
@@ -1966,7 +1966,7 @@ def login_view(request):
                     id_auth_model = personnel.id
                     
                     if is_enseignant:
-                        #id_auth_model = user.enseignant.id
+                        id_auth_model = Enseignant.objects.get(user=user).id
                         request.session['profile_path'] = f'main/detail_etudiant/{id_auth_model}/'
                     request.session['id_auth_model'] = id_auth_model
                     has_model = True
@@ -1976,8 +1976,7 @@ def login_view(request):
             if has_model or (user.is_superuser and is_directeur_des_etudes):  
                 login(request, user)
                 return redirect('/')
-            else:
-                return render(request, "connexion/login.html", {'error': 'Identifiants invalides'})
+            return render(request, "connexion/login.html", {'error': 'Identifiants invalides'})
                 
         return render(request, "connexion/login.html", {'error': 'Identifiants invalides'})
 
