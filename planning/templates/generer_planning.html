@@ -1,49 +1,50 @@
 {% extends './index.html' %}
 
-{% block content_title %}Plannifier {{semestre.libelle}} {{semestre.annee_universitaire}} || Semaine {{semaine}} du {{intervalle}} {% endblock content_title %}
+{% block content_title %}Plannifier {{semestre.libelle}} {{semestre.annee_universitaire}} || Semaine {{semaine}} du
+{{intervalle}} {% endblock content_title %}
 
 {% load static %}
 {% block content %}
 <style>
-.my-custom-title {
-    font-size: 8px;
-}
-.my-custom-button {
-    background-color: rgb(0, 0, 0);
-}
+    .my-custom-title {
+        font-size: 8px;
+    }
 
-
+    .my-custom-button {
+        background-color: rgb(0, 0, 0);
+    }
 </style>
-        <div class="block-content">
-            <div class="row items-push">
-                <div class="col-md-8 col-lg-7 col-xl-9">
-                    <div id="js-calendar"></div>
+<div class="block-content">
+    <div class="row items-push">
+        <div class="col-md-8 col-lg-7 col-xl-9">
+            <div id="js-calendar"></div>
+        </div>
+        <div class="col-md-4 col-lg-5 col-xl-3">
+            <form class="testtest" id="myForm">
+                <h4>Creer un cour</h4>
+                <div class="form-group">
+                    <select class="js-select2 form-control" id="selectUE" name="selectUE" style="width: 100%;"
+                        data-placeholder="Choose one..">
+                        <option>Selectionnnez une UE</option>
+                        {% for ue in ues %}
+                        <option value="{{ ue }}">{{ ue.libelle }}</option>
+                        {% endfor %}
+                    </select>
                 </div>
-                <div class="col-md-4 col-lg-5 col-xl-3">
-                    <form class="testtest" id="myForm">
-                        <h4>Creer un cour</h4>
-                        <div class="form-group">
-                            <select class="js-select2 form-control" id="selectUE" name="selectUE" style="width: 100%;" data-placeholder="Choose one..">
-                                <option>Selectionnnez une UE</option>
-                                {% for ue in ues %}
-                                    <option value="{{ ue }}">{{ ue.libelle }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div  id="matieresList">
-                            
-                        </div>
-                        
-                        
+                <div id="matieresList">
 
-                        <div id="noMatiereMessage" style="display: none;">
-                            Aucune matière dans cet UE.
-                        </div>
+                </div>
 
-                        
 
-                        <button class="btn-secondary" type="submit">Ajouter un cours</button> 
-                    </form>
+
+                <div id="noMatiereMessage" style="display: none;">
+                    Aucune matière dans cet UE.
+                </div>
+
+
+
+                <button class="btn-secondary" type="submit">Ajouter un cours</button>
+            </form>
 
                     <ul id="js-events" class="list list-events">
                     </ul>
@@ -160,327 +161,472 @@
             
             
         </div>
+        <div class="col-md-4 col-lg-5 col-xl-3">
+            <form class="testtest" id="myForm">
+                <h4>Creer un cour</h4>
+                <div class="form-group">
+                    <select class="js-select2 form-control" id="selectUE" name="selectUE" style="width: 100%;"
+                        data-placeholder="Choose one..">
+                        <option>Selectionnnez une UE</option>
+                        {% for ue in ues %}
+                        <option value="{{ ue }}">{{ ue.libelle }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div id="matieresList">
 
-      
-            <script>
-                    var planification = {{ planification_json|safe }};  
-                    var semestre = '{{ semestre.id|safe}}';
-                    var semaine = '{{ semaine|safe}}';
-                    var datefin = '{{ datefin|safe}}';
-                    var datedebut = '{{ datedebut|safe}}';
-                    var intervalle = '{{ intervalle|safe}}';
+                </div>
 
-        
-                    document.addEventListener('DOMContentLoaded', function() {
-                        $('#myForm').submit(function (event) {
-                        event.preventDefault();
 
-                        var selectedRadio = $('input[name="matiereRadio"]:checked');
 
-                        if (selectedRadio.length > 0) {
-                            var selectedRadioValue = JSON.parse(selectedRadio.val());
-                            addEvent(selectedRadioValue);
-                            } 
-                        else {
-                                One.helpers('notify', {type: 'danger', icon: 'fa fa-info-circle mr-1', message: 'Aucune matière sélectionnée !'});
-                        }
-                            
+                <div id="noMatiereMessage" style="display: none;">
+                    Aucune matière dans cet UE.
+                </div>
+
+
+
+                <button class="btn-secondary" type="submit">Ajouter un cours</button>
+            </form>
+
+            <ul id="js-events" class="list list-events">
+            </ul>
+
+            <div class="text-center">
+                <p class="font-size-sm text-muted">
+                    <i class="fa fa-arrows-alt"></i> Drag and drop events on the calendar
+                </p>
+            </div>
+            <div class="form-group">
+                <a id="btnEnregistrer" class="btn btn-success">Enregistrer</a>
+            </div>
+            <!-- <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#horaireModal">
+                        Ouvrir le tableau
+                    </button> -->
+        </div>
+    </div>
+    <div class="modal fade" id="horaireModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Tableau d'horaires</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col"></th>
+                                <th scope="col">Lundi</th>
+                                <th scope="col">Mardi</th>
+                                <th scope="col">Mercredi</th>
+                                <th scope="col">Jeudi</th>
+                                <th scope="col">Vendredi</th>
+                                <th scope="col">Samedi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Lignes pour chaque jour de la semaine -->
+                            <tr>
+                                <th scope="row">7h-8h30</th>
+                                <td><input type="checkbox"></td>
+                                <td><input type="checkbox"></td>
+                                <td><input type="checkbox"></td>
+                                <td><input type="checkbox"></td>
+                                <td><input type="checkbox"></td>
+                                <td><input type="checkbox"></td>
+                            </tr>
+                            <tr>
+                                <th scope="row">8h45-10h15</th>
+                                <td><input type="checkbox"></td>
+                                <td><input type="checkbox"></td>
+                                <td><input type="checkbox"></td>
+                                <td><input type="checkbox"></td>
+                                <td><input type="checkbox"></td>
+                                <td><input type="checkbox"></td>
+                            </tr>
+                            <tr>
+                                <th scope="row">10h30-12h</th>
+                                <td><input type="checkbox"></td>
+                                <td><input type="checkbox"></td>
+                                <td><input type="checkbox"></td>
+                                <td><input type="checkbox"></td>
+                                <td><input type="checkbox"></td>
+                                <td><input type="checkbox"></td>
+                            </tr>
+                            <tr>
+                                <th scope="row">14h-15h30</th>
+                                <td><input type="checkbox"></td>
+                                <td><input type="checkbox"></td>
+                                <td><input type="checkbox"></td>
+                                <td><input type="checkbox"></td>
+                                <td><input type="checkbox"></td>
+                                <td><input type="checkbox"></td>
+                            </tr>
+                            <tr>
+                                <th scope="row">15h45-17h15</th>
+                                <td><input type="checkbox"></td>
+                                <td><input type="checkbox"></td>
+                                <td><input type="checkbox"></td>
+                                <td><input type="checkbox"></td>
+                                <td><input type="checkbox"></td>
+                                <td><input type="checkbox"></td>
+                            </tr>
+                            <tr>
+                                <th scope="row">17h15-18h</th>
+                                <td><input type="checkbox"></td>
+                                <td><input type="checkbox"></td>
+                                <td><input type="checkbox"></td>
+                                <td><input type="checkbox"></td>
+                                <td><input type="checkbox"></td>
+                                <td><input type="checkbox"></td>
+                            </tr>
+                            <tr>
+                                <th scope="row">18h-20h</th>
+                                <td><input type="checkbox"></td>
+                                <td><input type="checkbox"></td>
+                                <td><input type="checkbox"></td>
+                                <td><input type="checkbox"></td>
+                                <td><input type="checkbox"></td>
+                                <td><input type="checkbox"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+                    <button type="button" class="btn btn-primary">Enregistrer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+</div>
+
+
+<script>
+    var planification = {{ planification_json| safe }};
+    var semestre = '{{ semestre.id|safe}}';
+    var semaine = '{{ semaine|safe}}';
+    var datefin = '{{ datefin|safe}}';
+    var datedebut = '{{ datedebut|safe}}';
+    var intervalle = '{{ intervalle|safe}}';
+
+
+    document.addEventListener('DOMContentLoaded', function () {
+        $('#myForm').submit(function (event) {
+            event.preventDefault();
+
+            var selectedRadio = $('input[name="matiereRadio"]:checked');
+
+            if (selectedRadio.length > 0) {
+                var selectedRadioValue = JSON.parse(selectedRadio.val());
+                addEvent(selectedRadioValue);
+            }
+            else {
+                One.helpers('notify', { type: 'danger', icon: 'fa fa-info-circle mr-1', message: 'Aucune matière sélectionnée !' });
+            }
+
+        });
+
+
+
+
+        // Fonction pour ajouter un événement à la liste
+        function addEvent(value) {
+            var jsEvents = $("#js-events");
+            var inputValue = value.title && jQuery("<div />").text(value.title).html();
+
+            if (inputValue) {
+                // Créez un objet eventData avec le titre et d'autres informations
+                var eventData = {
+                    title: inputValue,
+                    ueId: value.ueId  // Ajoutez d'autres propriétés selon vos besoins
+                };
+
+                jsEvents.prepend('<li><div class="js-event p-2 text-white font-size-sm font-w500 bg-warning" data-event-data="' + JSON.stringify(eventData) + '">' + inputValue + "</div></li>");
+            }
+
+            // Réinitialiser la valeur du champ radio
+            $('input[name="matiereRadio"]').prop("checked", false);
+        }
+
+
+
+        // Ajouter un gestionnaire d'événements pour les changements d'état des boutons radio
+        $('#matieresList').on('change', 'input[name="matiereRadio"]', function () {
+            // Désélectionner tous les autres boutons radio dans la liste
+            $('input[name="matiereRadio"]').prop('checked', false);
+
+            // Sélectionner le bouton radio cliqué
+            $(this).prop('checked', true);
+        });
+
+
+
+        $("#selectUE").on('change', function () {
+            var selectedUEId = this.value;
+            var selectedUEMatieres = planification[selectedUEId];
+            updateMatiereList(selectedUEMatieres, selectedUEId);
+
+        });
+        function updateMatiereList(matieres, ueId) {
+            var matieresList = document.getElementById('matieresList');
+            var noMatiereMessage = document.getElementById('noMatiereMessage');
+
+            // Effacez la liste actuelle des matières
+            matieresList.innerHTML = '';
+
+            // Assurez-vous que matieres est défini
+            if (matieres && matieres.length > 0) {
+                // Accédez à la première entrée dans matieres
+                var premierObjet = matieres[0];
+
+                // Assurez-vous que premierObjet.matieres est défini
+                if (premierObjet && premierObjet.matieres && premierObjet.matieres.length > 0) {
+                    // Accédez à chaque objet à l'intérieur de premierObjet.matieres
+                    premierObjet.matieres.forEach(function (matiere) {
+                        var blockDiv = document.createElement('div');
+                        blockDiv.className = 'block block-rounded';
+
+                        // Créer l'en-tête du bloc
+                        var blockHeaderDiv = document.createElement('div');
+                        blockHeaderDiv.className = 'block-header';
+
+                        // Ajouter le titre de l'en-tête
+                        var blockTitle = document.createElement('h3');
+                        blockTitle.className = 'block-title my-custom-title';
+                        blockTitle.innerHTML = matiere.fields.libelle;
+
+                        // Ajouter les options du bloc
+                        var blockOptionsDiv = document.createElement('div');
+                        blockOptionsDiv.className = 'block-options';
+
+                        // Ajouter le bouton pour basculer le contenu du bloc
+                        var blockOptionButton = document.createElement('button');
+                        blockOptionButton.type = 'button';
+                        blockOptionButton.className = 'btn-block-option my-custom-button';
+                        blockOptionButton.setAttribute('data-toggle', 'collapse');
+                        blockOptionButton.setAttribute('data-target', '#matiereContent' + matiere.pk);
+
+                        // Ajouter le bouton à la section des options
+                        blockOptionsDiv.appendChild(blockOptionButton);
+
+                        // Ajouter l'en-tête au bloc
+                        blockHeaderDiv.appendChild(blockTitle);
+                        blockHeaderDiv.appendChild(blockOptionsDiv);
+
+                        // Ajouter l'en-tête au bloc
+                        blockDiv.appendChild(blockHeaderDiv);
+
+                        // Créer le contenu du bloc
+                        var blockContentDiv = document.createElement('div');
+                        blockContentDiv.className = 'block-content collapse';
+                        blockContentDiv.id = 'matiereContent' + matiere.pk;
+
+                        // Ajouter les détails de la matière au contenu
+                        blockContentDiv.innerHTML = 'Heures prévues : ' + matiere.fields.heures +
+                            '<br> Heures Plannifier : ' + matiere.temps_plannifier +
+                            '<br> Heures Consommées : ' + matiere.temps_effectuer +
+                            '<br> Enseignant : ' + matiere.fields.enseignant;
+
+                        // Ajouter le contenu au bloc
+                        blockDiv.appendChild(blockContentDiv);
+
+                        // Créer le bouton radio
+                        var radioInput = document.createElement('input');
+                        radioInput.type = 'radio';
+                        radioInput.name = 'matiereRadio'; // Nom du groupe de boutons radio
+                        radioInput.value = JSON.stringify({
+                            'title': matiere.fields.libelle,
+                            'ueId': ueId
+
+                        }); // La valeur du bouton radio, peut être l'ID ou toute autre information unique
+
+                        // Ajouter le bouton radio à la section des options (avant le titre)
+                        blockOptionsDiv.insertBefore(radioInput, blockOptionsDiv.firstChild);
+
+                        // Ajouter le bloc à la liste des matières
+                        matieresList.appendChild(blockDiv);
+                    });
+
+
+                    matieresList.style.display = 'block';
+                    noMatiereMessage.style.display = 'none';
+                } else {
+                    matieresList.style.display = 'none';
+                    noMatiereMessage.style.display = 'block';
+                }
+            }
+        }
+
+
+
+
+        // Déclarez calendar en dehors de toute fonction pour qu'il soit accessible globalement
+        var calendar;
+
+        (function ($) {
+            var Planning = function () {
+                // ... (autres fonctions et initialisations)
+
+                return {
+                    init: function () {
+                        this.addEvent();
+                        this.initEvents();
+                        this.initCalendar();
+                        this.getEvents();
+                    },
+                    addEvent: function () {
+                        var e = $(".js-add-event"), t = "";
+                        $(".js-form-add-event").on("submit", function (n) {
+                            return (t = e.prop("value")) && ($("#js-events").prepend('<li><div class="js-event p-2 text-white font-size-sm font-w500 bg-warning">' + $("<div />").text(t).html() + "</div></li>"), e.prop("value", "")), !1;
                         });
-
-                        
-  
-               
-                                  // Fonction pour ajouter un événement à la liste
-                        function addEvent(value) {
-                            var jsEvents = $("#js-events");
-                            var inputValue = value.title && jQuery("<div />").text(value.title).html();
-
-                            if (inputValue) {
-                                // Créez un objet eventData avec le titre et d'autres informations
-                                var eventData = {
-                                    title: inputValue,
-                                    ueId: value.ueId  // Ajoutez d'autres propriétés selon vos besoins
-                                };
-
-                                jsEvents.prepend('<li><div class="js-event p-2 text-white font-size-sm font-w500 bg-warning" data-event-data="' + JSON.stringify(eventData) + '">' + inputValue + "</div></li>");
-                            }
-
-                            // Réinitialiser la valeur du champ radio
-                            $('input[name="matiereRadio"]').prop("checked", false);
-                        }
-
-
-
-                    // Ajouter un gestionnaire d'événements pour les changements d'état des boutons radio
-                        $('#matieresList').on('change', 'input[name="matiereRadio"]', function () {
-                            // Désélectionner tous les autres boutons radio dans la liste
-                            $('input[name="matiereRadio"]').prop('checked', false);
-
-                            // Sélectionner le bouton radio cliqué
-                            $(this).prop('checked', true);
-                        });
-
-
-
-                        $("#selectUE").on('change',function (){
-                            var selectedUEId = this.value;
-                            var selectedUEMatieres = planification[selectedUEId];
-                            updateMatiereList(selectedUEMatieres,selectedUEId);
-                                    
-                        });
-                        function updateMatiereList(matieres,ueId) {
-                            var matieresList = document.getElementById('matieresList');
-                            var noMatiereMessage = document.getElementById('noMatiereMessage');
-                        
-                            // Effacez la liste actuelle des matières
-                            matieresList.innerHTML = '';
-                        
-                            // Assurez-vous que matieres est défini
-                            if (matieres && matieres.length > 0) {
-                                // Accédez à la première entrée dans matieres
-                                var premierObjet = matieres[0];
-
-                                // Assurez-vous que premierObjet.matieres est défini
-                                if (premierObjet && premierObjet.matieres && premierObjet.matieres.length > 0) {
-                                    // Accédez à chaque objet à l'intérieur de premierObjet.matieres
-                                    premierObjet.matieres.forEach(function (matiere) {
-                                        var blockDiv = document.createElement('div');
-                                        blockDiv.className = 'block block-rounded';
-
-                                        // Créer l'en-tête du bloc
-                                        var blockHeaderDiv = document.createElement('div');
-                                        blockHeaderDiv.className = 'block-header';
-
-                                        // Ajouter le titre de l'en-tête
-                                        var blockTitle = document.createElement('h3');
-                                        blockTitle.className = 'block-title my-custom-title';
-                                        blockTitle.innerHTML = matiere.fields.libelle;
-
-                                        // Ajouter les options du bloc
-                                        var blockOptionsDiv = document.createElement('div');
-                                        blockOptionsDiv.className = 'block-options';
-
-                                        // Ajouter le bouton pour basculer le contenu du bloc
-                                        var blockOptionButton = document.createElement('button');
-                                        blockOptionButton.type = 'button';
-                                        blockOptionButton.className = 'btn-block-option my-custom-button';
-                                        blockOptionButton.setAttribute('data-toggle', 'collapse');
-                                        blockOptionButton.setAttribute('data-target', '#matiereContent' + matiere.pk);
-
-                                        // Ajouter le bouton à la section des options
-                                        blockOptionsDiv.appendChild(blockOptionButton);
-
-                                        // Ajouter l'en-tête au bloc
-                                        blockHeaderDiv.appendChild(blockTitle);
-                                        blockHeaderDiv.appendChild(blockOptionsDiv);
-
-                                        // Ajouter l'en-tête au bloc
-                                        blockDiv.appendChild(blockHeaderDiv);
-
-                                        // Créer le contenu du bloc
-                                        var blockContentDiv = document.createElement('div');
-                                        blockContentDiv.className = 'block-content collapse';
-                                        blockContentDiv.id = 'matiereContent' +  matiere.pk ;
-
-                                        // Ajouter les détails de la matière au contenu
-                                        blockContentDiv.innerHTML = 'Heures prévues : ' + matiere.fields.heures +
-                                            '<br> Heures Plannifier : ' + matiere.temps_plannifier +    
-                                            '<br> Heures Consommées : ' + matiere.temps_effectuer +
-                                            '<br> Enseignant : ' + matiere.fields.enseignant;
-
-                                        // Ajouter le contenu au bloc
-                                        blockDiv.appendChild(blockContentDiv);
-
-                                        // Créer le bouton radio
-                                        var radioInput = document.createElement('input');
-                                        radioInput.type = 'radio';
-                                        radioInput.name = 'matiereRadio'; // Nom du groupe de boutons radio
-                                        radioInput.value =  JSON.stringify({
-                                            'title': matiere.fields.libelle ,
-                                            'ueId':ueId
-                                        
-                                        }); // La valeur du bouton radio, peut être l'ID ou toute autre information unique
-
-                                        // Ajouter le bouton radio à la section des options (avant le titre)
-                                        blockOptionsDiv.insertBefore(radioInput, blockOptionsDiv.firstChild);
-
-                                        // Ajouter le bloc à la liste des matières
-                                        matieresList.appendChild(blockDiv);
-                                    });
-
-
-                                    matieresList.style.display = 'block';
-                                    noMatiereMessage.style.display = 'none';
-                                } else {
-                                    matieresList.style.display = 'none';
-                                    noMatiereMessage.style.display = 'block';
-                                }
-                            }
-                        }
-
- 
-                        
-
-                        // Déclarez calendar en dehors de toute fonction pour qu'il soit accessible globalement
-                        var calendar;
-
-                        (function ($) {
-                            var Planning = function () {
-                                // ... (autres fonctions et initialisations)
-
+                    },
+                    initEvents: function () {
+                        new FullCalendar.Draggable(document.getElementById("js-events"), {
+                            itemSelector: ".js-event", eventData: function (e) {
                                 return {
-                                    init: function () {
-                                        this.addEvent();
-                                        this.initEvents();
-                                        this.initCalendar();
-                                        this.getEvents();
-                                    },
-                                    addEvent: function () {
-                                        var e = $(".js-add-event"), t = "";
-                                        $(".js-form-add-event").on("submit", function (n) {
-                                            return (t = e.prop("value")) && ($("#js-events").prepend('<li><div class="js-event p-2 text-white font-size-sm font-w500 bg-warning">' + $("<div />").text(t).html() + "</div></li>"), e.prop("value", "")), !1;
-                                        });
-                                    },
-                                    initEvents: function () {
-                                        new FullCalendar.Draggable(document.getElementById("js-events"), {
-                                                itemSelector: ".js-event", eventData: function (e) {
-                                                    return {
-                                                        title: e.innerText,
-                                                        backgroundColor: getComputedStyle(e).backgroundColor,
-                                                        borderColor: getComputedStyle(e).backgroundColor
-                                                    };
-                                                }
-                                            });
-                                    },
-                                    initCalendar: function () {
-                                        var e = new Date(), t = e.getDate(), n = e.getMonth(), r = e.getFullYear();
-                                        calendar = new FullCalendar.Calendar(document.getElementById("js-calendar"), {
-                                            contentHeight: 600,
-                                            locale: 'fr',
-                                            themeSystem: "bootstrap",
-                                            firstDay: 1,
-                                            editable: !0,
-                                            droppable: true,
-                                            selectable: true,
-                                            headerToolbar: {
-                                                left: 'prev,next today',
-                                                center:"title",
-                                                right: "dayGridMonth,timeGridWeek,timeGridDay,listWeek"
-                                            },
-                                            buttonText:{
-                                                today:    "Aujourd'hui",
-                                                month:    "Mois",
-                                                week:     'Semaine',
-                                                day:      'Jour',
-                                                list:     'Liste'
-
-                                            },
-                                            slotMinTime: "07:00:00",
-                                            slotMaxTime: "20:00:00",
-                                            slotDuration: "00:15:00",
-                                            slotLabelInterval: "01:00:00",
-                                            initialView: "timeGridWeek",
-                                            initialDate:datedebut,
-                                            hiddenDays: [0],
-                                            drop: function (e) {
-                                                e.draggedEl.parentNode.remove();
-                                            },
-                                            eventRemove: function (info) {
-                                                that.removeEvent(info.event);
-                                            },
-                                            events: [
-                                            ]
-                                        });
-
-                                        calendar.render();
-                                    },
-                                    getEvents: function () {
-                                        // Récupérer tous les événements du calendrier
-                                        var calendarEvents = calendar.getEvents();
-                                        var formattedEvents = [];
-                                        
-
-                                        // Formater les événements selon vos besoins
-                                        calendarEvents.forEach(function (event) {
-                                            formattedEvents.push({
-                                                title: event.title,
-                                                start: event.start,
-                                                end: event.end,
-                                                ue: event.eventData
-                                            });
-                                        });
-                                        return formattedEvents;
-                                        // Afficher les événements dans la console
-
-                                        // Vous pouvez maintenant envoyer formattedEvents à votre backend via AJAX
-                                    }
+                                    title: e.innerText,
+                                    backgroundColor: getComputedStyle(e).backgroundColor,
+                                    borderColor: getComputedStyle(e).backgroundColor
                                 };
-                            };
+                            }
+                        });
+                    },
+                    initCalendar: function () {
+                        var e = new Date(), t = e.getDate(), n = e.getMonth(), r = e.getFullYear();
+                        calendar = new FullCalendar.Calendar(document.getElementById("js-calendar"), {
+                            contentHeight: 600,
+                            locale: 'fr',
+                            themeSystem: "bootstrap",
+                            firstDay: 1,
+                            editable: !0,
+                            droppable: true,
+                            selectable: true,
+                            headerToolbar: {
+                                left: 'prev,next today',
+                                center: "title",
+                                right: "dayGridMonth,timeGridWeek,timeGridDay,listWeek"
+                            },
+                            buttonText: {
+                                today: "Aujourd'hui",
+                                month: "Mois",
+                                week: 'Semaine',
+                                day: 'Jour',
+                                list: 'Liste'
 
-                            var planning = Planning();
-                            $(function () {
-                                planning.init();
-                                $("#btnEnregistrer").on("click", function() {
-                                        // Récupérer la valeur de la semaine
-                                        var csrftoken = Cookies.get('csrftoken');
-                                        
-                                            // Récupérer tous les événements du calendrier à partir de l'objet planning
-                                            var events = planning.getEvents();
-                                            for (var i = 0; i < events.length; i++) {
-                                                var event = events[i];
+                            },
+                            slotMinTime: "07:00:00",
+                            slotMaxTime: "20:00:00",
+                            slotDuration: "00:15:00",
+                            slotLabelInterval: "01:00:00",
+                            initialView: "timeGridWeek",
+                            initialDate: datedebut,
+                            hiddenDays: [0],
+                            drop: function (e) {
+                                e.draggedEl.parentNode.remove();
+                            },
+                            eventRemove: function (info) {
+                                that.removeEvent(info.event);
+                            },
+                            events: [
+                            ]
+                        });
 
-                                                if (!event.end) {
-                                                    One.helpers('notify', {type: 'danger', icon: 'fa fa-info-circle mr-1', message: "L'événement " + (event.title) + " n'a pas d'heure de fin spécifiée."});
-
-                                                    return;
-                                                }
-                                            }
-                                            var data = {
-                                                semaine: semaine,
-                                                datedebut:datedebut,
-                                                datefin:datefin,
-                                                events: events,
-
-                                                intervalle:intervalle,
-                                                semestre : semestre,
-                                            };
+                        calendar.render();
+                    },
+                    getEvents: function () {
+                        // Récupérer tous les événements du calendrier
+                        var calendarEvents = calendar.getEvents();
+                        var formattedEvents = [];
 
 
-                                            // Effectuer la requête POST vers /planning/save
-                                            $.ajax({
-                                                type: 'POST',
-                                                url: '/planning/save/',
-                                                data: JSON.stringify(data),
-                                                headers: {
-                                                    'X-CSRFToken': csrftoken,
-                                                    'Content-Type': 'application/json',
-                                                },
-                                                contentType: 'application/json',
-                                                success: function(response) {
-                                                    if (response.status === 'reussite') {
-                                                        // Soumettre le formulaire initial
-                                                        window.location.href = '/planning/';
-                                                    } else {
-                                                        One.helpers('notify', {type: 'danger', icon: 'fa fa-info-circle mr-1', message: response.msg});
-                                                    }
-                                                },
-                                                error: function(error) {
-                                                    console.error('Erreur lors de l\'enregistrement:', error);
-                                                }
-                                            });
-                                      
-                                    });
+                        // Formater les événements selon vos besoins
+                        calendarEvents.forEach(function (event) {
+                            formattedEvents.push({
+                                title: event.title,
+                                start: event.start,
+                                end: event.end,
+                                ue: event.eventData
                             });
+                        });
+                        return formattedEvents;
+                        // Afficher les événements dans la console
 
-                        })(jQuery);
+                        // Vous pouvez maintenant envoyer formattedEvents à votre backend via AJAX
+                    }
+                };
+            };
 
+            var planning = Planning();
+            $(function () {
+                planning.init();
+                $("#btnEnregistrer").on("click", function () {
+                    // Récupérer la valeur de la semaine
+                    var csrftoken = Cookies.get('csrftoken');
+
+                    // Récupérer tous les événements du calendrier à partir de l'objet planning
+                    var events = planning.getEvents();
+                    for (var i = 0; i < events.length; i++) {
+                        var event = events[i];
+
+                        if (!event.end) {
+                            One.helpers('notify', { type: 'danger', icon: 'fa fa-info-circle mr-1', message: "L'événement " + (event.title) + " n'a pas d'heure de fin spécifiée." });
+
+                            return;
+                        }
+                    }
+                    var data = {
+                        semaine: semaine,
+                        datedebut: datedebut,
+                        datefin: datefin,
+                        events: events,
+
+                        intervalle: intervalle,
+                        semestre: semestre,
+                    };
+
+
+                    // Effectuer la requête POST vers /planning/save
+                    $.ajax({
+                        type: 'POST',
+                        url: '/planning/save/',
+                        data: JSON.stringify(data),
+                        headers: {
+                            'X-CSRFToken': csrftoken,
+                            'Content-Type': 'application/json',
+                        },
+                        contentType: 'application/json',
+                        success: function (response) {
+                            if (response.status === 'reussite') {
+                                // Soumettre le formulaire initial
+                                window.location.href = '/planning/';
+                            } else {
+                                One.helpers('notify', { type: 'danger', icon: 'fa fa-info-circle mr-1', message: response.msg });
+                            }
+                        },
+                        error: function (error) {
+                            console.error('Erreur lors de l\'enregistrement:', error);
+                        }
+                    });
 
                 });
-            </script>
+            });
 
-         
+        })(jQuery);
 
-        <script src="{% static 'assets/js/plugins/fullcalendar/main.min.js' %}"></script>
-        <script src="{% static 'assets/js/jquery-3.7.1.min.js' %}"></script>
+
+    });
+</script>
+
+
+
+<script src="{% static 'assets/js/plugins/fullcalendar/main.min.js' %}"></script>
+<script src="{% static 'assets/js/jquery-3.7.1.min.js' %}"></script>
 
 {% endblock %}

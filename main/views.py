@@ -1972,7 +1972,7 @@ def login_view(request):
                     has_model = True
                 except Exception as e:
                     pass
-
+           
             if has_model or (user.is_superuser and is_directeur_des_etudes):  
                 login(request, user)
                 return redirect('/')
