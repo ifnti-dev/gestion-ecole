@@ -1945,8 +1945,7 @@ def login_view(request):
             if has_model or (user.is_superuser and is_directeur_des_etudes):  
                 login(request, user)
                 return redirect('/')
-            else:
-                return render(request, "connexion/login.html", {'error': 'Identifiants invalides'})
+            return render(request, "connexion/login.html", {'error': 'Identifiants invalides'})
                 
         return render(request, "connexion/login.html", {'error': 'Identifiants invalides'})
 
