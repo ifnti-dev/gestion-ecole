@@ -21,6 +21,7 @@ import math
 
 def create_auth_user(nom, prenom, email):
     username = (prenom + nom).lower()
+    username = username.replace(" ", "")
     year = date.today().year
     password = 'ifnti' + str(year) + '!'
     user = User.objects.create_user(username=username, password=password, email=email, last_name=nom, first_name=prenom, is_staff=False)

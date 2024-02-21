@@ -1913,11 +1913,11 @@ def login_view(request):
             is_secretaire = bool(user_groups.filter(name="secretaire"))
             is_comptable = bool(user_groups.filter(name="comptable"))
             
-            request.session['is_etudiant'] = is_etudiant
             request.session['is_directeur_des_etudes'] = is_directeur_des_etudes
-            request.session['is_enseignant'] = is_enseignant
-            request.session['is_secretaire'] = is_secretaire
-            request.session['is_comptable'] = is_comptable
+            request.session['is_etudiant'] = is_etudiant
+            request.session['is_enseignant'] = False if is_directeur_des_etudes else is_enseignant
+            request.session['is_secretaire'] = False if is_directeur_des_etudes else is_secretaire
+            request.session['is_comptable'] = False if is_directeur_des_etudes else is_comptable
             
             
             has_model = False
@@ -1990,6 +1990,22 @@ def recuperation_mdp(request):
 
     return render(request, "connexion/reminder.html")
 
+@login_required(login_url=settings.LOGIN_URL)
+def change_role(request, id_role):
+    user = request.user
+    user_groups  = user.groups.all()
+    role = user_groups.get(id=id_role)
+    print(role.name)
+    is_directeur_des_etudes = role.name == "directeur_des_etudes"
+    is_enseignant = role.name == "enseignant"
+    is_secretaire = role.name == "secretaire"
+    is_comptable = role.name == "comptable"
+    
+    request.session['is_directeur_des_etudes'] = is_directeur_des_etudes
+    request.session['is_enseignant'] = False if is_directeur_des_etudes else is_enseignant
+    request.session['is_secretaire'] = False if is_directeur_des_etudes else is_secretaire
+    request.session['is_comptable'] = False if is_directeur_des_etudes else is_comptable
+    return redirect('/')
 
 @login_required(login_url=settings.LOGIN_URL)
 def logout_view(request):

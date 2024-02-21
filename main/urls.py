@@ -23,6 +23,7 @@ urlpatterns = [
 
     path('connexion', views.login_view, name='connexion'),
     path('profil', views.profil, name='profil'),
+    path('change_role/<int:id_role>', views.change_role, name='change_role'),
     path('edit_profil', views.edit_profil, name='edit_profil'),
     path('changer_mdp', views.changer_mdp, name='changer_mdp'),
     path('boite_a_suggestion', views.boite_a_suggestion, name='boite_a_suggestion'),
