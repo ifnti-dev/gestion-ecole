@@ -2105,7 +2105,7 @@ def importer_les_enseignants(request):
                     carte_identity=data[11],
                     nationalite=nationalite,
                     user=data[13],
-                    photo_passport=data[14],
+                    profil=data[14],
                     id=data[15],
                     salaireBrut=salaireBrut,
                     dernierdiplome=data[17],
@@ -2118,6 +2118,7 @@ def importer_les_enseignants(request):
             return render(request, 'etudiants/message_erreur.html', {'message': "Données importées avec succès."})
 
         except Exception as e:
+            print(e)
             return render(request, 'etudiants/message_erreur.html', {'message': "Erreur lors de l importation du fichier Excel."})
     return render(request, 'enseignants/importer.html')
 
