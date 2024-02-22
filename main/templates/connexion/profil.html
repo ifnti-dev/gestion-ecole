@@ -36,8 +36,21 @@
         </div>
     </div>
     <!-- END Stats -->
+    <div class="bg-white border-bottom">
+        <div class="content content-boxed">
+            <div class="row items-push text-center">
+                <div class="col-12">
+                    <div class="font-size-sm font-w600 text-muted text-uppercase">Changer de role</div>
+                    
+                    {% for role in request.user.groups.all %}
+                        <a href="{% url 'main:change_role' role.id %}">Utiliser le role <strong>{{ role.name }}</strong> </a> <br>
+                    {% endfor %} 
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <!-- Page Content -->
+    {% comment %} <!-- Page Content -->
     <div class="content content-boxed">
         <div class="row">
             <div class="col-md-7 col-xl-8">
@@ -374,6 +387,6 @@
             </div>
         </div>
     </div>
-    <!-- END Page Content -->
+    <!-- END Page Content --> {% endcomment %}
 {% endblock content %}
     
