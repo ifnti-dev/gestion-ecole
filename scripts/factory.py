@@ -13,6 +13,11 @@ def run():
     
     create_groups_if_exist()
     clean_data_base()
+    response = input("Veux tu créer des seeders ? (oui|non) ")
+    if response.lower() in ['o', 'oui', 'y', 'yes']:
+        create_seed()
+    else:
+        create_faker()
 
 def clean_data_base():
     models = [AnneeUniversitaire, Programme, Seance, Personnel, Enseignant, Etudiant, Comptable, Tuteur, Ue, Matiere, Evaluation, Competence, Semestre, Domaine, Note]
@@ -20,6 +25,7 @@ def clean_data_base():
         print(f"::::::::::::::::::::::: Delete Model {model.__name__} :::::::::::::::::::::::")
         model.objects.all().delete()
         
+def create_faker():      
     print("::::::::::::::::::::::: Create Faker Data :::::::::::::::::::::::")
     # Génération des fausses instances pour le modèle AnneeUniversitaire
     current = False
@@ -152,6 +158,64 @@ def clean_data_base():
             )
             enseignant.save()
             print(f"Enseignant créé : {enseignant}")
+
+def create_seed():
+    print("::::::::::::::::::::::: Create Seed Data :::::::::::::::::::::::")
+    # Génération des fausses instances pour le modèle AnneeUniversitaire
+    current = False
+    for i in range(1,11):
+        if i == 10:
+            current = True
+        annee_universitaire = AnneeUniversitaire(
+            annee=2013+i,
+            annee_courante=current
+        )
+        annee_universitaire.save()
+        print(f"::: AnneeUniversitaire créé : {annee_universitaire} :::")
+    
+    # Génération des fausses instances pour le modèle Domaine
+    domaine = Domaine(
+        nom="Siences et technologie",
+        description="Siences et technologie"
+    )
+    domaine.save()
+    print(f"::: Domaine créé : {domaine} :::")
+
+    # Génération des fausses instances pour le modèle Parcours
+    domaines = Domaine.objects.all()
+
+    parcours = Parcours(
+        nom="Licence en génie logiciel",
+        domaine=domaine,
+        description="Licence en génie logiciel"
+    )
+    
+    parcours.save()
+    print(f"::: Parcours créé : {parcours} :::")
+    enseignant = Enseignant(
+        nom="TEOURI",
+        prenom="Mohamed Sabirou",
+        sexe="M",
+        datenaissance="1966-05-03",
+        lieunaissance="Sokodé",
+        contact="90919141",
+        email="sabirou.teouri@ifnti.com",
+        adresse="Sokodé",
+        prefecture="Sokodé",
+        carte_identity=0,
+        nationalite='Togolaise',
+        salaireBrut=0,
+        dernierdiplome=None,
+        nbreJrsCongesRestant=30,
+        nbreJrsConsomme=0,
+        specialite="Base de donnée",
+    )
+    enseignant.save()
+    group = Group.objects.get(name="directeur_des_etudes")
+    enseignant.user.groups.add(group)
+    print(f"Enseignant créé : {enseignant.user.username}")
+    user = User.objects.create_user(username="ifnti", password="ifnti")
+    print(f"User directeur créé : {user}")
 
 def create_groups_if_exist():
     permissions = [
