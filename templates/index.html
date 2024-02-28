@@ -264,36 +264,36 @@
         }
     </script>
     {% if messages %}
-    {% for message in messages  %}
-    <li {% if message.tags %} class="{{ message.tags }}" {% endif %}>
+        {% for message in messages  %}
+        <li {% if message.tags %} class="{{ message.tags }}" {% endif %}>
 
-        {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
-        <script type="text/javascript">
-            let icon = "error";
-            let title = "erreur";
-        </script>
-        {% elif message.level == DEFAULT_MESSAGE_LEVELS.INFO %}
-        <script type="text/javascript">
-            let icon = "info";
-            let title = "Info";
-        </script>
-        {% elif message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}
-        <script type="text/javascript">
-            let icon = "success";
-            let title = "success";
-        </script>
-        {% endif %}
-        <script type="text/javascript">
-            let message = {% autoescape off %} "{{ message }}" {% endautoescape %};
-            Swal.fire({
-                icon: icon,
-                title: title.toUpperCase(),
-                text: message,
-                confirmButtonColor: "#5179d6",
-            });
-        </script>
-    </li>
-    {% endfor %}
+            {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
+            <script type="text/javascript">
+                let icon = "error";
+                let title = "erreur";
+            </script>
+            {% elif message.level == DEFAULT_MESSAGE_LEVELS.INFO %}
+            <script type="text/javascript">
+                let icon = "info";
+                let title = "Info";
+            </script>
+            {% elif message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}
+            <script type="text/javascript">
+                let icon = "success";
+                let title = "success";
+            </script>
+            {% endif %}
+            <script type="text/javascript">
+                let message = {% autoescape off %} "{{ message }}" {% endautoescape %};
+                Swal.fire({
+                    icon: icon,
+                    title: title.toUpperCase(),
+                    text: message,
+                    confirmButtonColor: "#5179d6",
+                });
+            </script>
+        </li>
+        {% endfor %}
     {% endif %}
     <script type="text/javascript">
         function delete_object(delete_url, object) {
