@@ -1596,7 +1596,7 @@ def createNotesByEvaluation(request, id_matiere, rattrapage, id_semestre):
         else:
             if not matiere.is_available_to_add_evaluation(semestre):
                 return redirect('main:evaluations', id_matiere=matiere.id)
-            etudiants = semestre.etudiant_set.all().order_by("nom")
+            etudiants = semestre.etudiant_set.filter(is_active=True).order_by("nom")
 
         NoteFormSet = forms.inlineformset_factory(
             parent_model=Evaluation,
@@ -1671,7 +1671,7 @@ def editeNoteByEvaluation(request, id):
         etudiants = matiere.get_etudiants_en_rattrapage()
         nouveaux_etudiants = []
     else:
-        etudiants = semestre.etudiant_set.all()
+        etudiants = semestre.etudiant_set.filter(is_active=True).order_by("nom")
         etudiants_dans_evaluation = evaluation.etudiants.all()
         nouveaux_etudiants = etudiants.difference(etudiants_dans_evaluation)
         for etudiant in nouveaux_etudiants:
