@@ -6,41 +6,7 @@ import os
 from datetime import datetime, timedelta
 import shutil 
 
-CODE_UE = {
-    'p_u_e_i_a': 'Politiques universitaires et intégrité académique', 
-    'e': 'English', 
-    'c_e_e_n': 'Communication et expression numérique', 
-    'm_i_1': 'Mathématiques I',
-    'm_i_2': 'Mathématiques II', 
-    'f_d_t_e_s_d_i': "Fondement des TI et systèmes d'exploitation I", 
-    'p_a_e_b_d_d': 'Programmation, algorithmes et bases de données', 
-    'c_e_i_e_e': 'Communication et Insertion en entreprise', 
-    'elec': 'Électronique', 
-    'c_o_o_e_b_d_d': 'Conception orientée objet et base de données', 
-    'c_e_d_d_s_w': 'Conception et développement des sites web', 
-    'i_a_d_d': "Introduction au développement d'applications", 
-    's_e_e_i_o_p_s_i_(_i': 'Stage en entreprise II OU Projets spéciaux II (Stage II)', 
-    'c_e_g_d_e': 'Communication et gestion des entreprises', 
-    'i_a_r': 'Introduction aux réseaux', 
-    'i_e_i_1': 'Informatique embarquée I', 
-    'i_e_i_2': 'Informatique embarquée II',
-    'p_o_o_e_s_d_d': 'Programmation orienté objet et structuration des données', 
-    'a_d_s_e_s_d_i': "Administration de serveur et systèmes d'exploitation II", 
-    'r_e_i_à_l_s_i': 'Réseaux et Introduction à la sécurité informatique', 
-    'c_e_d_d_a': 'Conception et développement des applications', 
-    'i_g': 'Interfaces graphiques', 
-    's_é_e_t': 'Sujets émergents en technologie', 
-    'd_é_e_r_s_d_e': 'Droit, éthique et responsabilité sociale des entreprises', 
-    'c_e_d_d_l': 'Conception et développement des logiciels', 
-    'd_e_d_d_a_w': 'Développement et déploiement des applications web', 
-    'd_e_d_d_a_m': 'Développement et déploiement des applications mobile', 
-    'c_d_c_/_c_c_1': 'Cours de concentration / Cours complémentaire 1', 
-    'c_d_c_/_c_c_2': 'Cours de concentration / Cours complémentaire 2', 
-    'c_d_c_/_c_c_3': 'Cours de concentration / Cours complémentaire 3', 
-    's_d_e_s_(_i': "Stage/Projets d'entreprise et soutenance (Stage III)"
-}
 
-CODE_UE_inverse = {v: k for k, v in CODE_UE.items()}
 
 def get_user_role(request):
     return request.user.groups.all().first()

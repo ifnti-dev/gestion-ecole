@@ -1,7 +1,7 @@
 import datetime
 import json
 from django import forms
-from django.http import HttpResponse, HttpResponseNotFound
+from django.http import HttpResponse, HttpResponseForbidden, HttpResponseNotFound
 from main.pdfMaker import generate_pdf
 from django.conf import settings
 from main.forms import EnseignantForm, EtudiantForm, EvaluationForm, InformationForm, ProgrammeForm, NoteForm, TuteurForm, UeForm, MatiereForm
@@ -1547,26 +1547,41 @@ def evaluations_etudiant(request, id_matiere, id_etudiant):
     id_annee_selectionnee = request.session["id_annee_selectionnee"]
     matiere = get_object_or_404(Matiere, pk=id_matiere)
     etudiant = get_object_or_404(Etudiant, pk=id_etudiant)
-    annee_universitaire = get_object_or_404(
+    annee_selectionnee = get_object_or_404(
         AnneeUniversitaire, pk=id_annee_selectionnee)
+    semestres_etudiants = list(etudiant.semestres.all())
+    semestres_matiere = matiere.get_semestres(annee_universitaire=annee_selectionnee, type="__all__")
+    etudiant_dans_classe = True
+    if len(semestres_etudiants) > len(semestres_matiere):
+        etudiant_dans_classe = semestres_matiere in semestres_etudiants
+    else:
+        etudiant_dans_classe = semestres_etudiants in semestres_matiere
+    
+    if not etudiant_dans_classe:
+        return HttpResponseForbidden(render(request, 'errors_pages/403.html'))
 
     if 'semestre' in request.GET and request.GET.get('semestre') != "":
         id = request.GET.get('semestre')
         semestre = get_object_or_404(Semestre, pk=id)
     else:
-        semestre = matiere.get_semestres(annee_universitaire, '__all__')[0]
+        semestre = matiere.get_semestres(annee_selectionnee, '__all__')[0]
 
     evaluations = Evaluation.objects.filter(
         matiere=matiere, semestre=semestre, rattrapage__in=[True, False])
 
     evaluations_dict = []
     for evaluation in evaluations:
+        try:
+            note = evaluation.note_set.get(etudiant=etudiant).valeurNote
+        except Exception as e:
+            note = -1
+        
         data = {
             'id': evaluation.id,
             'date': evaluation.date,
             'libelle': evaluation.libelle,
             'ponderation': evaluation.ponderation,
-            'note': evaluation.note_set.get(etudiant=etudiant).valeurNote,
+            'note': note,
         }
 
         evaluations_dict.append(data)
