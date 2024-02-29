@@ -52,10 +52,6 @@ def liste_mes_conges(request, id_annee_selectionnee):
         "conges": conges,
         "annee_universitaire": annee_universitaire,
         "personnel": personnel,
-        'date_debut_formatted_list': date_debut_formatted_list,
-        'date_fin_formatted_list': date_fin_formatted_list,
-        "date_debut_formatted":date_debut_formatted,
-        "date_fin_formatted":date_fin_formatted,
     }
     return render(request, 'conges/liste_conges.html', context)
 
@@ -255,10 +251,6 @@ def demandes_validees(request, id_annee_selectionnee):
     context = {
         "demandes_validees": demandes_validees,
         "annee_universitaire": annee_universitaire,
-        'date_debut_formatted_list': date_debut_formatted_list,
-        'date_fin_formatted_list': date_fin_formatted_list,
-        "date_debut_formatted":date_debut_formatted,
-        "date_fin_formatted":date_fin_formatted,
     }
     return render(request, 'conges/demandes_validees.html', context)
 
@@ -295,10 +287,6 @@ def demandes_en_attentes(request, id_annee_selectionnee):
     context = {
         "demandes_en_attentes": demandes_en_attentes,
         "annee_universitaire": annee_universitaire,
-        'date_debut_formatted_list': date_debut_formatted_list,
-        'date_fin_formatted_list': date_fin_formatted_list,
-        "date_debut_formatted":date_debut_formatted,
-        "date_fin_formatted":date_fin_formatted,
     }
     return render(request, 'conges/demandes_en_attentes.html', context)
 
@@ -335,10 +323,6 @@ def demandes_rejettees(request, id_annee_selectionnee):
     context = {
         "demandes_rejettees": demandes_rejettees,
         "annee_universitaire": annee_universitaire,
-        'date_debut_formatted_list': date_debut_formatted_list,
-        'date_fin_formatted_list': date_fin_formatted_list,
-        "date_debut_formatted":date_debut_formatted,
-        "date_fin_formatted":date_fin_formatted,
     }
     return render(request, 'conges/demandes_rejettees.html', context)
 
