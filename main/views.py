@@ -1596,7 +1596,7 @@ def createNotesByEvaluation(request, id_matiere, rattrapage, id_semestre):
         else:
             if not matiere.is_available_to_add_evaluation(semestre):
                 return redirect('main:evaluations', id_matiere=matiere.id)
-            etudiants = semestre.etudiant_set.all().order_by("nom")
+            etudiants = semestre.etudiant_set.filter(is_active=True).order_by("nom")
 
         NoteFormSet = forms.inlineformset_factory(
             parent_model=Evaluation,
@@ -1671,7 +1671,7 @@ def editeNoteByEvaluation(request, id):
         etudiants = matiere.get_etudiants_en_rattrapage()
         nouveaux_etudiants = []
     else:
-        etudiants = semestre.etudiant_set.all()
+        etudiants = semestre.etudiant_set.filter(is_active=True).order_by("nom")
         etudiants_dans_evaluation = evaluation.etudiants.all()
         nouveaux_etudiants = etudiants.difference(etudiants_dans_evaluation)
         for etudiant in nouveaux_etudiants:
@@ -1943,17 +1943,17 @@ def login_view(request):
             is_secretaire = bool(user_groups.filter(name="secretaire"))
             is_comptable = bool(user_groups.filter(name="comptable"))
             
-            request.session['is_etudiant'] = is_etudiant
             request.session['is_directeur_des_etudes'] = is_directeur_des_etudes
-            request.session['is_enseignant'] = is_enseignant
-            request.session['is_secretaire'] = is_secretaire
-            request.session['is_comptable'] = is_comptable
+            request.session['is_etudiant'] = is_etudiant
+            request.session['is_enseignant'] = False if is_directeur_des_etudes else is_enseignant
+            request.session['is_secretaire'] = False if is_directeur_des_etudes else is_secretaire
+            request.session['is_comptable'] = False if is_directeur_des_etudes else is_comptable
             
             
             has_model = False
             if is_etudiant:
                 try:
-                    etudiant = user.etudiant
+                    etudiant = Etudiant.objects.get(user=user).id
                     id_auth_model = etudiant.id
                     request.session['id_auth_model'] = id_auth_model
                     request.session['profile_path'] = f'main/detail_etudiant/{id_auth_model}/'
@@ -1966,20 +1966,17 @@ def login_view(request):
                     id_auth_model = personnel.id
                     
                     if is_enseignant:
-                        print(id_auth_model)
-                        id_auth_model = user.enseignant.id
-                        
+                        id_auth_model = Enseignant.objects.get(user=user).id
                         request.session['profile_path'] = f'main/detail_etudiant/{id_auth_model}/'
                     request.session['id_auth_model'] = id_auth_model
                     has_model = True
                 except Exception as e:
                     pass
-
+           
             if has_model or (user.is_superuser and is_directeur_des_etudes):  
                 login(request, user)
                 return redirect('/')
-            else:
-                return render(request, "connexion/login.html", {'error': 'Identifiants invalides'})
+            return render(request, "connexion/login.html", {'error': 'Identifiants invalides'})
                 
         return render(request, "connexion/login.html", {'error': 'Identifiants invalides'})
 
@@ -2024,6 +2021,22 @@ def recuperation_mdp(request):
 
     return render(request, "connexion/reminder.html")
 
+@login_required(login_url=settings.LOGIN_URL)
+def change_role(request, id_role):
+    user = request.user
+    user_groups  = user.groups.all()
+    role = user_groups.get(id=id_role)
+    print(role.name)
+    is_directeur_des_etudes = role.name == "directeur_des_etudes"
+    is_enseignant = role.name == "enseignant"
+    is_secretaire = role.name == "secretaire"
+    is_comptable = role.name == "comptable"
+    
+    request.session['is_directeur_des_etudes'] = is_directeur_des_etudes
+    request.session['is_enseignant'] = False if is_directeur_des_etudes else is_enseignant
+    request.session['is_secretaire'] = False if is_directeur_des_etudes else is_secretaire
+    request.session['is_comptable'] = False if is_directeur_des_etudes else is_comptable
+    return redirect('/')
 
 @login_required(login_url=settings.LOGIN_URL)
 def logout_view(request):
@@ -2092,7 +2105,7 @@ def importer_les_enseignants(request):
                     carte_identity=data[11],
                     nationalite=nationalite,
                     user=data[13],
-                    photo_passport=data[14],
+                    profil=data[14],
                     id=data[15],
                     salaireBrut=salaireBrut,
                     dernierdiplome=data[17],
@@ -2105,6 +2118,7 @@ def importer_les_enseignants(request):
             return render(request, 'etudiants/message_erreur.html', {'message': "Données importées avec succès."})
 
         except Exception as e:
+            print(e)
             return render(request, 'etudiants/message_erreur.html', {'message': "Erreur lors de l importation du fichier Excel."})
     return render(request, 'enseignants/importer.html')
 
