@@ -70,8 +70,9 @@ def dashboard(request):
         return render(request, 'dashboard.html', context=data)
     
     elif request.user.groups.all().first().name =='etudiant' :
-        semestres=request.user.etudiant.semestres.filter(annee_universitaire=annee_selectionnee)
-        print(request.user.etudiant.semestres.all())
+        etudiant = get_object_or_404(Etudiant, user=request.user)
+        semestres=etudiant.semestres.filter(annee_universitaire=annee_selectionnee)
+        print(etudiant.semestres.all())
         event_data=[]
         for semestre in semestres:
             planning = Planning.objects.filter(semestre=semestre)
@@ -85,7 +86,8 @@ def dashboard(request):
         return render(request, 'dashboard.html', context)
 
     elif request.user.groups.all().first().name =='enseignant' :
-        seances=SeancePlannifier.objects.filter(professeur=request.user.enseignant)
+        enseignant = get_object_or_404(Enseignant, user=request.user)
+        seances=SeancePlannifier.objects.filter(professeur=enseignant)
         event_data = [{'title': seance.intitule, 'start': seance.date_heure_debut , 'end':seance.date_heure_fin ,'url': '/planning/seance/' + str(seance.id) + ''} for seance in seances]
         event_data = json.dumps(event_data, default=datetime_serializer)
         context={'event_data':event_data}
