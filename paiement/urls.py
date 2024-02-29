@@ -47,6 +47,12 @@ urlpatterns = [
     path('detail_bulletin/<int:id>/', views.detail_bulletin, name='detail_bulletin'),
     path('bulletin_de_paye/<int:id>/', views.bulletin_de_paye, name='bulletin_de_paye'),
 
+            ### Pour les stagiaires de l'ANPE
+    path('bulletins_de_paye_stagiaire/<int:id_annee_selectionnee>/', views.les_bulletins_de_paye_stagiaire, name='bulletins_de_paye_stagiaire'),
+    path('enregistrer_bulletin_stagiaire/', views.enregistrer_bulletin_stagiaire, name='enregistrer_bulletin_stagiaire'),
+    path('modifier_bulletin_stagiaire/<int:id>/', views.enregistrer_bulletin_stagiaire, name='modifier_bulletin_stagiaire'),
+    path('bulletin_de_paye_stagiaire/<int:id>/', views.bulletin_de_paye_stagiaire, name='bulletin_de_paye_stagiaire'),
+    path('delete_bulletin_stagiaire/', views.delete_bulletin_stagiaire, name='delete_bulletin_stagiaire'),
 
                             #### Paiement des fournisseurs ####
     path('liste_paiements_fournisseurs/<int:id_annee_selectionnee>/', views.liste_paiements_fournisseurs, name='liste_paiements_fournisseurs'),
