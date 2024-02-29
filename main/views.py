@@ -1611,14 +1611,14 @@ def evaluations(request, id_matiere):
     """
     id_annee_selectionnee = request.session["id_annee_selectionnee"]
     matiere = Matiere.objects.get(pk=id_matiere)
-    annee_universitaire = get_object_or_404(
+    annee_selectionnee = get_object_or_404(
         AnneeUniversitaire, pk=id_annee_selectionnee)
     if 'semestre' in request.GET and request.GET.get('semestre') != "":
         id = request.GET.get('semestre')
         semestre = get_object_or_404(Semestre, pk=id)
     else:
         semestre = Semestre.objects.filter(
-            annee_universitaire=annee_universitaire, libelle="S1")
+            annee_universitaire=annee_selectionnee, libelle="S1")
         if semestre:
             semestre = semestre.get()
             
@@ -1633,7 +1633,7 @@ def evaluations(request, id_matiere):
     semestres = [semestre]
 
     evaluations = Evaluation.objects.filter(matiere=matiere, semestre__in=semestres, rattrapage__in=types_evaluations)
-    semestres = matiere.get_semestres(annee_selectionnee=annee_universitaire, type='__all__')
+    semestres = matiere.get_semestres(annee_universitaire=annee_selectionnee, type='__all__')
     url_path = "/main/evaluations/upload/" + str(matiere.id) + "/" + str(semestre.id) + "/"
 
     matiere_ids = request.session.get('matieres')
@@ -1743,12 +1743,10 @@ def editeNoteByEvaluation(request, id):
         nouveaux_etudiants = []
     else:
         etudiants = semestre.etudiant_set.filter(is_active=True)
-        print(etudiants)
         etudiants_dans_evaluation = evaluation.etudiants.all()
         nouveaux_etudiants = etudiants.difference(etudiants_dans_evaluation)
         for etudiant in nouveaux_etudiants:
             Note.objects.create(evaluation=evaluation, etudiant=etudiant)
-        print(etudiants_dans_evaluation)
     
     NoteFormSet = forms.inlineformset_factory(
         parent_model=Evaluation,
