@@ -1,7 +1,7 @@
 import datetime
 import json
 from django import forms
-from django.http import HttpResponse, HttpResponseNotFound
+from django.http import HttpResponse, HttpResponseForbidden, HttpResponseNotFound
 from main.pdfMaker import generate_pdf
 from django.conf import settings
 from main.forms import EnseignantForm, EtudiantForm, EvaluationForm, InformationForm, ProgrammeForm, NoteForm, TuteurForm, UeForm, MatiereForm
@@ -1547,26 +1547,41 @@ def evaluations_etudiant(request, id_matiere, id_etudiant):
     id_annee_selectionnee = request.session["id_annee_selectionnee"]
     matiere = get_object_or_404(Matiere, pk=id_matiere)
     etudiant = get_object_or_404(Etudiant, pk=id_etudiant)
-    annee_universitaire = get_object_or_404(
+    annee_selectionnee = get_object_or_404(
         AnneeUniversitaire, pk=id_annee_selectionnee)
+    semestres_etudiants = list(etudiant.semestres.all())
+    semestres_matiere = matiere.get_semestres(annee_universitaire=annee_selectionnee, type="__all__")
+    etudiant_dans_classe = True
+    if len(semestres_etudiants) > len(semestres_matiere):
+        etudiant_dans_classe = semestres_matiere in semestres_etudiants
+    else:
+        etudiant_dans_classe = semestres_etudiants in semestres_matiere
+    
+    if not etudiant_dans_classe:
+        return HttpResponseForbidden(render(request, 'errors_pages/403.html'))
 
     if 'semestre' in request.GET and request.GET.get('semestre') != "":
         id = request.GET.get('semestre')
         semestre = get_object_or_404(Semestre, pk=id)
     else:
-        semestre = matiere.get_semestres(annee_universitaire, '__all__')[0]
+        semestre = matiere.get_semestres(annee_selectionnee, '__all__')[0]
 
     evaluations = Evaluation.objects.filter(
         matiere=matiere, semestre=semestre, rattrapage__in=[True, False])
 
     evaluations_dict = []
     for evaluation in evaluations:
+        try:
+            note = evaluation.note_set.get(etudiant=etudiant).valeurNote
+        except Exception as e:
+            note = -1
+        
         data = {
             'id': evaluation.id,
             'date': evaluation.date,
             'libelle': evaluation.libelle,
             'ponderation': evaluation.ponderation,
-            'note': evaluation.note_set.get(etudiant=etudiant).valeurNote,
+            'note': note,
         }
 
         evaluations_dict.append(data)
@@ -1596,21 +1611,29 @@ def evaluations(request, id_matiere):
     """
     id_annee_selectionnee = request.session["id_annee_selectionnee"]
     matiere = Matiere.objects.get(pk=id_matiere)
-    annee_universitaire = get_object_or_404(
+    annee_selectionnee = get_object_or_404(
         AnneeUniversitaire, pk=id_annee_selectionnee)
     if 'semestre' in request.GET and request.GET.get('semestre') != "":
         id = request.GET.get('semestre')
         semestre = get_object_or_404(Semestre, pk=id)
     else:
         semestre = Semestre.objects.filter(
-            annee_universitaire=annee_universitaire, libelle="S1")
+            annee_universitaire=annee_selectionnee, libelle="S1")
         if semestre:
             semestre = semestre.get()
+            
+    
+    if 'type' in request.GET and request.GET.get('type') in ['0', '1']:
+        selected_type = request.GET.get('type')
+        types_evaluations = [bool(int(selected_type))]
+    else:
+        selected_type = ""
+        types_evaluations = [True, False]
+    
     semestres = [semestre]
 
-
-    evaluations = Evaluation.objects.filter(matiere=matiere, semestre__in=semestres, rattrapage__in=[True, False])
-    semestres = matiere.get_semestres(annee_selectionnee=annee_universitaire, type='__all__')
+    evaluations = Evaluation.objects.filter(matiere=matiere, semestre__in=semestres, rattrapage__in=types_evaluations)
+    semestres = matiere.get_semestres(annee_universitaire=annee_selectionnee, type='__all__')
     url_path = "/main/evaluations/upload/" + str(matiere.id) + "/" + str(semestre.id) + "/"
 
     matiere_ids = request.session.get('matieres')
@@ -1624,6 +1647,7 @@ def evaluations(request, id_matiere):
         'evaluations': evaluations,
         'semestres': semestres,
         'selected_semestre': semestre,
+        'selected_type': selected_type,
         'url_path': url_path,
     }
     return render(request, 'evaluations/index.html', data)
@@ -1703,27 +1727,27 @@ def createNotesByEvaluation(request, id_matiere, rattrapage, id_semestre):
         return render(request, 'notes/create_or_edit_note.html', context=data)
     return redirect('main:evaluations', id_matiere=matiere.id)
 
-
 @login_required(login_url=settings.LOGIN_URL)
 @evaluation_permission('main.edit_evaluation')
 def editeNoteByEvaluation(request, id):
     """
     Affiche un formulaire d'édition d'une note :model:`main.Note`.
     """
+
     evaluation = get_object_or_404(Evaluation, pk=id)
     matiere = evaluation.matiere
     semestre = evaluation.semestre
-
+    
     if evaluation.rattrapage:
         etudiants = matiere.get_etudiants_en_rattrapage()
         nouveaux_etudiants = []
     else:
-        etudiants = semestre.etudiant_set.filter(is_active=True).order_by("nom")
+        etudiants = semestre.etudiant_set.filter(is_active=True)
         etudiants_dans_evaluation = evaluation.etudiants.all()
         nouveaux_etudiants = etudiants.difference(etudiants_dans_evaluation)
         for etudiant in nouveaux_etudiants:
             Note.objects.create(evaluation=evaluation, etudiant=etudiant)
-
+    
     NoteFormSet = forms.inlineformset_factory(
         parent_model=Evaluation,
         model=Note,
@@ -1756,12 +1780,13 @@ def editeNoteByEvaluation(request, id):
         # Créer une instance de d'ensemble de formulaire selon notre queryset
         initial_etudiant_note_data = [
             {'etudiant': etudiant.id, 'etudiant_full_name': etudiant.full_name()} for etudiant in nouveaux_etudiants]
-        note_form_set = NoteFormSet(instance=evaluation)
+        notes_queryset = evaluation.note_set.all().order_by('etudiant__nom')
+        note_form_set = NoteFormSet(instance=evaluation, queryset=notes_queryset)
         for form in note_form_set:
             etudiant = Etudiant.objects.filter(
                 id=form.initial['etudiant']).get()
             form.initial['etudiant_full_name'] = etudiant.full_name()
-
+        
     data = {
         'evaluation_form': evaluation_form,
         'notes_formset': note_form_set,
@@ -2000,7 +2025,7 @@ def login_view(request):
             has_model = False
             if is_etudiant:
                 try:
-                    etudiant = Etudiant.objects.get(user=user).id
+                    etudiant = Etudiant.objects.get(user=user)
                     id_auth_model = etudiant.id
                     request.session['id_auth_model'] = id_auth_model
                     request.session['profile_path'] = f'main/detail_etudiant/{id_auth_model}/'
@@ -2019,7 +2044,6 @@ def login_view(request):
                     has_model = True
                 except Exception as e:
                     pass
-           
             if has_model or (user.is_superuser and is_directeur_des_etudes):  
                 login(request, user)
                 return redirect('/')

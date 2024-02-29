@@ -1,4 +1,4 @@
-from main.models import AnneeUniversitaire
+from main.models import AnneeUniversitaire, Etudiant
 from django.contrib.auth.models import Group, Permission
 from main.helpers import get_authenticate_profile_path, get_user_role, get_id_authenticate_user_model
 
@@ -8,8 +8,11 @@ def bootstrap(request):
     
         
     if request.session.get('is_etudiant'):
-        etudiant = request.user.etudiant
-        niveau = etudiant.get_niveau_annee(current_annee_accademique)[0]
+        try:
+            etudiant = Etudiant.objects.get(user=request.user)
+            niveau = etudiant.get_niveau_annee(current_annee_accademique)[0]
+        except Exception as e:
+            niveau = ""
     else:
         niveau = ''
         

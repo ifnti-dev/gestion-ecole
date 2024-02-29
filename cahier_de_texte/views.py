@@ -248,7 +248,6 @@ def datetime_serializer(obj):
 
 @login_required(login_url="/main/connexion")
 def cahier_de_text(request):
-    creer_plan(10)
     id_annee=request.session.get("id_annee_selectionnee")
     annee=AnneeUniversitaire.objects.filter(id=id_annee).first()
     if  request.user.groups.all()[0].name == "etudiant":
