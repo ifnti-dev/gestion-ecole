@@ -1,15 +1,15 @@
 {% extends 'auth.html' %}
 {% load static %}
 {% block content %}
-<div class="d-flex flex-column align-items-center justify-content-center">
-    <img src="{% static '/assets/media/logo.png' %}" alt="" width="50px">                
+<div class="d-flex flex-column align-items-center justify-content-center w-100 bg-white py-2" style="height: 460px;">
+    <img src="{% static '/assets/media/logo.png' %}" alt="" width="50px">
     <h1 class="mt-4">Se connecter</h1>
     <div>
-        
+
         {% if error %}
-            <span class="text-danger">{{ error }}</span>
+        <span class="text-danger">{{ error }}</span>
         {% endif %}
-            
+
         <form action="" method="post">
             {% csrf_token %}
             <div class="d-flex flex-column mt-4">
@@ -19,7 +19,8 @@
             <div class="d-flex flex-column mt-4">
                 <label for="username" class="">Mot de passe</label>
                 <div class="input-group mb-2">
-                    <input class="form-control" name="password" type="password" id="password" placeholder="Mot de passe">
+                    <input class="form-control" name="password" type="password" id="password"
+                        placeholder="Mot de passe">
                     <div class="input-group-prepend">
                         <div class="input-group-text" id="show_password">
                             <i class="fa fa-eye-slash" id="show_password_eyes"></i>
@@ -48,4 +49,3 @@
     </div>
 </div>
 {% endblock content %}
-    

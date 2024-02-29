@@ -1,5 +1,6 @@
 {% load static %}
 <html lang="en">
+
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
@@ -18,97 +19,97 @@
         <link rel="stylesheet" href="{% static 'assets/js/plugins/slick-carousel/slick-theme.css' %}">
 
         <!-- Fonts and OneUI framework -->
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+        <link rel="stylesheet"
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
         <link rel="stylesheet" id="css-main" href="{% static 'assets/css/oneui.min.css' %}">
     </head>
     <style>
-        
+
 
     </style>
-<body class="bg-danger">
-    <main class="vh-100 w-100 row flex-row-reverse">
-        <div class="col-12 col-md-6 d-flex align-items-center justify-content-center">
-            <div class="d-flex flex-column align-items-center justify-content-center">
-                <div class="">
-                    <div>
-                        <img class="" src="{% static '/assets/media/sliders/1.png' %}" alt="">
-                    </div>
-                </div>
+
+    <body class="">
+        <main class="vh-100 w-100 row flex-row-reverse m-0">
+            <div class="col-12 col-md-6 d-flex align-items-center justify-content-center p-0 ">
+
+                <img class="" style="width: 100%;  height: 460px;" src="{% static '/assets/media/sliders/1.jpeg' %}"
+                    alt="">
+
             </div>
-        </div>
-        <div class="bg-white h-100 col-12 col-md-6 d-flex align-items-center justify-content-center">
-            {% block content %}
-            {% endblock content %}
-        </div>
-    </main>
-</body>
-<script src="{% static 'assets/js/jquery-3.7.1.min.js' %}"></script>
-<script src="{% static 'assets/js/sweetalert2.js' %}"></script>
-<script type="text/javascript">
-    $("#show_password").on('click', function(){
-        if ($('#password')[0].type==='password'){
-            $('#password')[0].type='text';
-            $('#show_password_eyes').removeClass("fa-eye-slash");
-            $('#show_password_eyes').addClass("fa-eye");
-        } else {
-            $('#password')[0].type='password';
-            $('#show_password_eyes').removeClass("fa-eye");
-            $('#show_password_eyes').addClass("fa-eye-slash");
-        }
-    });
-</script>
-{% if messages %}
-{% for message in messages  %}
-<li {% if message.tags %} class="{{ message.tags }}" {% endif %}>
-    
-    {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
-    <script type="text/javascript"> 
-        let icon = "error";
-        let title = "erreur";
-    </script>
-    {% elif message.level == DEFAULT_MESSAGE_LEVELS.INFO %}
-    <script type="text/javascript"> 
-        let icon = "info";
-        let title = "Info";
-    </script>
-    {% elif message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}
-    <script type="text/javascript"> 
-        let icon = "success";
-        let title = "success";
-    </script>
-    {% endif %}
-    <script type="text/javascript"> 
-        let message = {% autoescape off %} "{{ message }}" {% endautoescape %};
-        Swal.fire({
-            icon: icon,
-            title: title.toUpperCase(),
-            text: message,
-            confirmButtonColor: "#5179d6",
-        });
-    </script>
-</li>
-{% endfor %}
-{% endif %}
-<script type="text/javascript"> 
-    function delete_object(delete_url, object) {
-        let title = "Êtes vous sur !";
-        let message = "Vous voulez supprimer "+object;
-        Swal.fire({
-            icon: "warning",
-            title: title,
-            text: message,
-            showConfirmButton: true,
-            showCancelButton: true,
-            focusConfirm: false,
-            confirmButtonColor: "#e56767",
-        }).then((response) => {
-            if (response.isConfirmed) {
-                window.location.href = delete_url;
+            <div class=" h-100 col-12 col-md-6 d-flex align-items-center justify-content-center m-0 p-0">
+                {% block content %}
+                {% endblock content %}
+            </div>
+        </main>
+    </body>
+    <script src="{% static 'assets/js/jquery-3.7.1.min.js' %}"></script>
+    <script src="{% static 'assets/js/sweetalert2.js' %}"></script>
+    <script type="text/javascript">
+        $("#show_password").on('click', function () {
+            if ($('#password')[0].type === 'password') {
+                $('#password')[0].type = 'text';
+                $('#show_password_eyes').removeClass("fa-eye-slash");
+                $('#show_password_eyes').addClass("fa-eye");
+            } else {
+                $('#password')[0].type = 'password';
+                $('#show_password_eyes').removeClass("fa-eye");
+                $('#show_password_eyes').addClass("fa-eye-slash");
             }
-        }).catch((error) => {
-            console.log(error);
         });
-        
-    }
-</script>
+    </script>
+    {% if messages %}
+    {% for message in messages  %}
+    <li {% if message.tags %} class="{{ message.tags }}" {% endif %}>
+
+        {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
+        <script type="text/javascript">
+            let icon = "error";
+            let title = "erreur";
+        </script>
+        {% elif message.level == DEFAULT_MESSAGE_LEVELS.INFO %}
+        <script type="text/javascript">
+            let icon = "info";
+            let title = "Info";
+        </script>
+        {% elif message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}
+        <script type="text/javascript">
+            let icon = "success";
+            let title = "success";
+        </script>
+        {% endif %}
+        <script type="text/javascript">
+            let message = {% autoescape off %} "{{ message }}" {% endautoescape %};
+            Swal.fire({
+                icon: icon,
+                title: title.toUpperCase(),
+                text: message,
+                confirmButtonColor: "#5179d6",
+            });
+        </script>
+    </li>
+    {% endfor %}
+    {% endif %}
+    <script type="text/javascript">
+        function delete_object(delete_url, object) {
+            let title = "Êtes vous sur !";
+            let message = "Vous voulez supprimer " + object;
+            Swal.fire({
+                icon: "warning",
+                title: title,
+                text: message,
+                showConfirmButton: true,
+                showCancelButton: true,
+                focusConfirm: false,
+                confirmButtonColor: "#e56767",
+            }).then((response) => {
+                if (response.isConfirmed) {
+                    window.location.href = delete_url;
+                }
+            }).catch((error) => {
+                console.log(error);
+            });
+
+        }
+    </script>
+
 </html>

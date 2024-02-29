@@ -86,7 +86,9 @@ def dashboard(request):
         return render(request, 'dashboard.html', context)
 
     elif request.user.groups.all().first().name =='enseignant' :
+
         enseignant = get_object_or_404(Enseignant, user=request.user)
+
         seances=SeancePlannifier.objects.filter(professeur=enseignant)
         event_data = [{'title': seance.intitule, 'start': seance.date_heure_debut , 'end':seance.date_heure_fin ,'url': '/planning/seance/' + str(seance.id) + ''} for seance in seances]
         event_data = json.dumps(event_data, default=datetime_serializer)
@@ -864,14 +866,19 @@ def carte_etudiant(request, id, niveau):
     etudiant = get_object_or_404(Etudiant, id=id)
     in_format = "%Y-%m-%d"
     out_format = "%d-%m-%Y"
-    date_formatee = datetime.strptime(
-        str(etudiant.datenaissance), in_format).strftime(out_format)
+   
+    if etudiant.datenaissance:
+        date_formatee = datetime.strptime(
+            str(etudiant.datenaissance), in_format).strftime(out_format)
+    else:
+        date_formatee = 'None'
+
     context = {'etudiant': etudiant, 'niveau': niveau, 'annee': str(
         annee_universitaire.annee) + '-' + str(annee_universitaire.annee + 1), 'date_naissance': date_formatee}
 
     latex_input = 'carte_etudiant'
     latex_ouput = 'generated_carte_etudiant'
-    pdf_file = 'pdf_carte_etudiant',
+    pdf_file = 'carte_etudiant_' + str(etudiant.id)
 
     # génération du pdf
     generate_pdf(context, latex_input, latex_ouput, pdf_file)
@@ -909,13 +916,18 @@ def carte_etudiant_all(request, niveau):
     elif niveau == "__all__":
         semestres = ['S1', 'S2', 'S3', 'S4', 'S5', 'S6']
 
-    etudiants, semestre = Etudiant.get_Ln(semestres, annee_universitaire=None)
+    etudiants = semestre.get().etudiant_set.all().order_by('nom', 'prenom')
     for etudiant in etudiants:
         etudiant.niveau, _ = etudiant.get_niveau_annee(annee_universitaire)
         in_format = "%Y-%m-%d"
         out_format = "%d-%m-%Y"
-        date_formatee = datetime.strptime(
-            str(etudiant.datenaissance), in_format).strftime(out_format)
+        
+        if etudiant.datenaissance:
+            date_formatee = datetime.strptime(
+                str(etudiant.datenaissance), in_format).strftime(out_format)
+        else:
+            date_formatee = 'None'
+
         etudiant.datenaissance = date_formatee
     
     nbre_pages = len(etudiants) // 9
@@ -962,22 +974,34 @@ def diplome_etudiant(request, id):
 
     :return: Une réponse HTTP affichant le pdf du diplome étudiant généré.
     """
+
+
     if request.user.groups.all().first().name not in ['directeur_des_etudes']:
         return render(request, 'errors_pages/403.html')
+
+
+    date_deliberation = datetime.now()
+    date_deliberation = str(date_deliberation.day) + '-' + str(date_deliberation.month) + '-' + str(date_deliberation.year)
+    
+
 
     etudiant = get_object_or_404(Etudiant, id=id)
     in_format = "%Y-%m-%d"
     out_format = "%d-%m-%Y"
-    date_formatee = datetime.strptime(
-        str(etudiant.datenaissance), in_format).strftime(out_format)
-    etudiant.datenaissance = date_formatee
+
+    if etudiant.datenaissance:
+        date_formatee = datetime.strptime(
+            str(etudiant.datenaissance), in_format).strftime(out_format)
+    else:
+        date_formatee = 'None'
+
 
     id_annee_selectionnee = request.session["id_annee_selectionnee"]
     annee_universitaire = get_object_or_404(
         AnneeUniversitaire, pk=id_annee_selectionnee)
 
     context = {'etudiant': etudiant, 'annee': str(
-        annee_universitaire.annee) + '-' + str(annee_universitaire.annee + 1), }
+        annee_universitaire.annee) + '-' + str(annee_universitaire.annee + 1), 'date_deliberation': date_deliberation}
 
     latex_input = 'diplome'
     latex_ouput = 'generated_diplome'
@@ -1010,6 +1034,12 @@ def diplome_etudiant_all(request):
         libelle="S5") | Semestre.objects.filter(libelle="S6")
     temp = []
 
+    in_format = "%Y-%m-%d"
+    out_format = "%d-%m-%Y"
+    date_deliberation = datetime.now()
+    date_deliberation = date_deliberation.day() + '-' + date_deliberation.month() + '-' + date_deliberation.year()
+    
+
     # récupération des étudiants de chaque semestres
     for semestre in semestres:
         for etudiant in semestre.etudiant_set.all():
@@ -1017,13 +1047,17 @@ def diplome_etudiant_all(request):
             etudiant.niveau, _ = etudiant.get_niveau_annee(annee_universitaire)
             in_format = "%Y-%m-%d"
             out_format = "%d-%m-%Y"
-            date_formatee = datetime.strptime(
-                str(etudiant.datenaissance), in_format).strftime(out_format)
+
+            if etudiant.datenaissance:
+                date_formatee = datetime.strptime(
+                    str(etudiant.datenaissance), in_format).strftime(out_format)
+            else:
+                date_formatee = 'None'
             etudiant.datenaissance = date_formatee
             temp.append(etudiant)
 
     # ajout des étudiants dans le dictionnaire
-    context = {'etudiants': temp}
+    context = {'etudiants': temp, 'date_deliberation': date_deliberation}
 
     latex_input = 'diplome_all'
     latex_ouput = 'generated_diplome_all'
@@ -1062,8 +1096,13 @@ def certificat_scolaire(request, id, niveau):
 
     in_format = "%Y-%m-%d"
     out_format = "%d-%m-%Y"
-    date_formatee = datetime.strptime(
-        str(etudiant.datenaissance), in_format).strftime(out_format)
+    
+    if etudiant.datenaissance:
+        date_formatee = datetime.strptime(
+            str(etudiant.datenaissance), in_format).strftime(out_format)
+    else:
+        date_formatee = 'None'
+
     context = {'etudiant': etudiant, 'niveau': niveau,
                'annee': annee_universitaire.annee, 'date_naissance': date_formatee}
 
@@ -1128,8 +1167,11 @@ def releve_notes(request, id, id_semestre):
 
     in_format = "%Y-%m-%d"
     out_format = "%d-%m-%Y"
-    date_formatee = datetime.strptime(
-        str(etudiant.datenaissance), in_format).strftime(out_format)
+    if etudiant.datenaissance:
+        date_formatee = datetime.strptime(
+            str(etudiant.datenaissance), in_format).strftime(out_format)
+    else:
+        date_formatee = 'None'
     context['date_naissance'] = date_formatee
     # if request.user.groups.all().first().name == 'directeur_des_etudes':
     #     context['directeur'] = request.user.utilisateur.nom + ' ' + request.user.prenom
@@ -1191,8 +1233,11 @@ def releve_notes_semestre(request, id_semestre):
 
         in_format = "%Y-%m-%d"
         out_format = "%d-%m-%Y"
-        date_formatee = datetime.strptime(
-            str(etudiant.datenaissance), in_format).strftime(out_format)
+        if etudiant.datenaissance:
+            date_formatee = datetime.strptime(
+                str(etudiant.datenaissance), in_format).strftime(out_format)
+        else:
+            date_formatee = 'None'
 
         releve_note['date_naissance'] = date_formatee
         releve_note['credits_obtenus'] = credits_obtenus

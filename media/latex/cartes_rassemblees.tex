@@ -8,17 +8,13 @@
 \graphicspath{ {\VAR{pdf_path}}} 
 \author{Manaar}
 \begin{document}
-%\input{/home/manaar/Documents/carte_etudiant/carte_etudiant_ADJANAYO_Eritayo_Simone.pdf}
-%\includepdf[pages={1}]{/home/manaar/Documents/carte_etudiant/carte_etudiant_ADJANAYO_Eritayo_Simone.pdf}
 
 \renewcommand{\arraystretch}{2}
 \begin{longtable}{|p{8.4cm}|p{8.4cm}|}
-%\includepdf[pages={1}]{/home/manaar/Documents/carte_etudiant/carte_etudiant_ADJANAYO_Eritayo_Simone.pdf}
-%& & \\
 
 \BLOCK{for etudiant in etudiants}
-\includegraphics[width=8.3cm]{carte_etudiant_\VAR{ etudiant.id}.pdf} & 
-\includegraphics[page=2,width=8.3cm]{carte_etudiant_\VAR{ etudiant.id }.pdf} \\
+\includegraphics[width=8.3cm]{carte_etudiant_\VAR{etudiant.id}.pdf} & 
+\includegraphics[page=2,width=8.3cm]{carte_etudiant_\VAR{etudiant.id }.pdf} \\
 \hline
 \BLOCK{endfor}
 
