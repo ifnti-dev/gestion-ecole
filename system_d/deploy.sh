@@ -63,7 +63,8 @@ cd $BASE_DIR
 echo "================================================================"
 echo "🔍 🌀 Installation des dépendances en cours..."
 echo "================================================================"
-sudo apt-get install git postgresql texmaker python3-virtualenv redis
+sudo apt update
+sudo apt install git postgresql texmaker python3-virtualenv redis texlive-lang-french
 
 # 🌐 Création de la base de données et de l'utilisateur
 echo "================================================================"

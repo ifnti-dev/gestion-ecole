@@ -1,0 +1,66 @@
+{% extends '../index.html' %}
+
+{% block content %}
+
+<div class="block block-rounded m-5">
+    <div class="block-header p-4">
+        <h3 class="block-title">Bulletins de paye des stagiaires de l'ANPE
+        </h3>
+
+        {% if is_comptable %}
+        <a href="{% url 'paiement:enregistrer_bulletin_stagiaire' %}" class="btn btn-outline-primary">
+            <i class="fas fa-plus"></i> Ajouter
+        </a>
+        {% endif %}
+    </div>
+
+    <div class="block-content block-content-full">
+        <table class="table table-bordered table-striped table-vcenter js-dataTable-full-pagination">
+            <thead>
+                <tr>
+                    <th class="text-center" style="width: 25%;">Personnel</th>
+                    <th class="text-center" style="width: 30%;">Période</th>
+                    <th class="text-center" style="width: 15%;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for bulletin in bulletins %}
+                <tr>
+                    <td class="text-center font-size-sm">{{ bulletin.personnel.nom }} {{ bulletin.personnel.prenom }}
+                    </td>
+                    <td class="text-center font-size-sm">Du {{ bulletin.date_debut}} au {{ bulletin.date_fin}}</td>
+                    <td style="text-align: center;">
+                        <button type="button" class="update-book btn btn-sm btn-success">
+                            <a style="color: blanchedalmond;" href="{% url 'paiement:bulletin_de_paye_stagiaire' bulletin.id %}">
+                                <span><i class="fas fa-file-pdf"></i></span>
+                            </a>
+                        </button>
+
+                        {% if is_comptable %}
+                        <button type="button" class="update-book btn btn-sm btn-warning">
+                            <a style="color: blanchedalmond;" href="{% url 'paiement:modifier_bulletin' bulletin.id %}">
+                                <span><i class="far fa-edit"></i></span>
+                            </a>
+                        </button>
+
+                        <button type="button" class="delete-bulletin btn btn-sm btn-danger" onclick="showDeleteConfirmation('{{ bulletin.id }}')">
+                            <span><i class="far fa-trash-alt fa-lg"></i></span>
+                        </button>
+
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    function showDeleteConfirmation(bulletinId) {
+        if (confirm("Voulez-vous vraiment supprimer ce bulletin ?")) {
+            window.location.href = "{% url 'paiement:delete_bulletin_stagiaire' %}?id=" + bulletinId;
+        }
+    }
+</script>
+{% endblock %}

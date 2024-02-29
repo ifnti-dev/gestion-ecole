@@ -1,0 +1,89 @@
+\documentclass[a4paper, 12pt]{article}
+\usepackage[french]{babel}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[none]{hyphenat}
+\usepackage{enumitem}
+\usepackage{lmodern}
+
+
+\usepackage{fancyhdr}
+\pagestyle{fancyplain}
+\cfoot{\vspace{.5cm}Institut de formation aux normes et technologies de l'informatique\\300 BP 40, Sokodé TOGO -- Tél. : +228 90 91 81 41}
+
+\usepackage{eso-pic, graphicx}
+
+\graphicspath{ {\VAR{image_path}} }
+
+\newcommand\BackgroundPic{
+\put(0,0){
+\parbox[b][\paperheight]{\paperwidth}{
+\includegraphics[width=\paperwidth,height=\paperheight]{CharteGraphiqueDocumentPageDeGardeLogo}
+}}}
+
+
+\title{\vspace{-1cm}\textbf{Bulletin de Paie}}
+\author{}
+\date{}
+
+
+\begin{document}
+
+\maketitle
+\AddToShipoutPicture*{\BackgroundPic}
+\vspace{-2cm}
+
+%\section*{Employé}
+\begin{tabular}{@{}ll}
+    Période: & Du \VAR{date_debut_formatted} au \VAR{date_fin_formatted} \\
+    Nom et Prénoms: &  \VAR{bulletin.personnel.nom}  \VAR{bulletin.personnel.prenom} \\
+    Qualification professionnelle: &  \VAR{bulletin.qualification_professionnel} \\
+    N° CNSS: &  \VAR{bulletin.personnel.numero_cnss} \\
+    N° d'identification fiscale: &  \VAR{bulletin.personnel.nif} \\
+    Nbre de personnes pris en charge : &  \VAR{bulletin.personnel.nombre_de_personnes_en_charge} \\ \\
+\end{tabular}
+
+
+\begin{tabular}{@{}l@{\hspace{1cm}}r} 
+    Salaire de base: & \VAR{salaireDeBase} FCFA \\
+    Prime d'éfficacité: & \VAR{prime_efficacite} FCFA \\
+    Prime de qualité: & \VAR{prime_qualite} FCFA \\
+    Prime d'ancienneté: & \VAR{prime_anciennete} FCFA \\
+    Travaux complémentaires: & \VAR{frais_travaux_complementaires} FCFA \\ 
+\hline
+    \textbf{Salaire brut\begin{LARGE}\end{LARGE}}: &  \textbf{\VAR{Salaire_brut} FCFA} 
+\end{tabular}
+	
+\section*{Retenues obligatoires} 
+\begin{tabular}{|c|c|c|c|c|}
+\hline 
+\textbf{ÉLÉMENTS} & \textbf{\%} & \textbf{Employeur} & \textbf{\%} & \textbf{Salarié} \\ 
+\hline 
+Risques professionnels & 2 & \VAR{frais_risques_professionnel} & 0 & 0 \\  
+\hline  
+\textbf{Totaux CNSS} &\multicolumn{2}{|c|}{\VAR{retenues_cnss_employeur}} &\multicolumn{2}{|c|}{0}\\ 
+\hline 
+\textbf{SALAIRE NET} & \multicolumn{4}{|c|}{\textbf{\VAR{salaire_net} FCFA}}\\ 
+\hline 
+\end{tabular} 
+
+\begin{flushleft}
+\begin{tabular}{@{}ll}
+Accomptes: & \VAR{acomptes} FCFA  \\
+Primes forfaitaires: & \VAR{prime_forfaitaire} FCFA  \\\\
+\end{tabular}
+
+\begin{tabular}{@{}r@{\hspace{2cm}}r}
+   {\Large \textbf{Net à payer:}} & \textbf{\VAR{bulletin.salaire_net_a_payer} FCFA} \end{tabular}
+\end{flushleft}
+
+\null\hfill Fait à Sokodé, le \today
+
+\vspace{1cm}
+
+\begin{flushright}
+Le Responsable d'établissement
+\end{flushright}
+
+
+\end{document}

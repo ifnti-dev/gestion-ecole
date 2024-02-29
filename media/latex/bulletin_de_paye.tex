@@ -1,9 +1,11 @@
 \documentclass[a4paper, 12pt]{article}
 \usepackage[french]{babel}
-\usepackage[OT1]{fontenc}
+\usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage[none]{hyphenat}
 \usepackage{enumitem}
+\usepackage{lmodern}
+
 
 \usepackage{fancyhdr}
 \pagestyle{fancyplain}
@@ -29,9 +31,8 @@
 
 \maketitle
 \AddToShipoutPicture*{\BackgroundPic}
-\vspace{-2cm}
+\vspace{-1cm}
 
-\section*{Employé}
 \begin{tabular}{@{}ll}
     Période: & Du \VAR{date_debut_formatted} au \VAR{date_fin_formatted} \\
     Nom et Prénoms: &  \VAR{bulletin.personnel.nom}  \VAR{bulletin.personnel.prenom} \\

@@ -1,0 +1,107 @@
+{% extends 'index.html' %}
+{% block content_title %}
+
+Enregistrement du bulletin d'un stagiaire de l'ANPE
+
+  <h1>
+     <a href="{% url 'paiement:bulletins_de_paye_stagiaire' id_annee_selectionnee  %}" class="btn btn-outline-warning">
+        <i class="fas fa-chevron-left fa-lg"></i> Retour
+      </a>
+  </h1>
+{% endblock %}
+{% block content_title_description %}
+
+
+{% endblock %}
+{% block content %}
+  <div class="d-flex justify-content-center">
+    <div class="block-content card m-4 col-md-10 col-lg-8 col-xl-6">
+      <div class="d-flex justify-content-between">
+        <h3>         
+        </h3>
+    </div>
+      <form class="container-fluid p-3" action="#" method="POST">
+        {% csrf_token %}
+
+      {% if form.non_field_errors %}
+        <div class="alert alert-danger">
+          {{ form.non_field_errors }}
+        </div>
+      {% endif %}
+  
+        <div class="form-row mb-3">
+          <div class="col-md-6">
+            {{ form.date_debut.label_tag }}
+            {{ form.date_debut }}
+            <span class="text-danger">{{ form.date_debut.errors }}</span>
+          </div>
+          <div class="col-md-6">
+            {{ form.date_fin.label_tag }}
+            {{ form.date_fin }}
+            <span class="text-danger">{{ form.date_fin.errors }}</span>
+          </div>
+        </div>
+
+        <div class="form-row mb-12">        
+          <div class="col-md-12">
+            {{ form.personnel.label_tag }}
+            {{ form.personnel }}
+            <span class="text-danger">{{ form.personnel.errors }}</span>
+          </div>
+        </div> 
+        <br>
+
+        <!--div class="form-row mb-3"> 
+          
+          <div class="col-md-6">
+            {{ form.tcs.label_tag }}
+            {{ form.tcs }}
+            <span class="text-danger">{{ form.tcs.errors }}</span>
+          </div>
+        </div-->
+
+        <div class="form-row mb-3">
+          <div class="col-md-6">
+            {{ form.prime_efficacite.label_tag }}
+            {{ form.prime_efficacite }}
+            <span class="text-danger">{{ form.prime_efficacite.errors }}</span>
+          </div> 
+          <div class="col-md-6">
+            {{ form.prime_qualite.label_tag }}
+            {{ form.prime_qualite }}
+            <span class="text-danger">{{ form.prime_qualite.errors }}</span>
+          </div>      
+        </div>
+
+        <div class="form-row mb-3">  
+          <div class="col-md-6">
+            {{ form.frais_travaux_complementaires.label_tag }}
+            {{ form.frais_travaux_complementaires }}
+            <span class="text-danger">{{ form.frais_travaux_complementaires.errors }}</span>
+          </div>
+          <div class="col-md-6">
+            {{ form.prime_anciennete.label_tag }}
+            {{ form.prime_anciennete }}
+            <span class="text-danger">{{ form.prime_anciennete.errors }}</span>
+          </div>      
+        </div>
+
+        
+        <div class="form-row mb-3"> 
+          <div class="col-md-6">
+            {{ form.acomptes.label_tag }}
+            {{ form.acomptes }}
+            <span class="text-danger">{{ form.acomptes.errors }}</span>
+          </div>
+          <div class="col-md-6">
+            {{ form.prime_forfaitaire.label_tag }}
+            {{ form.prime_forfaitaire }}
+            <span class="text-danger">{{ form.prime_forfaitaire.errors }}</span>
+        </div>      
+          
+        </div>
+        <button class="btn btn-primary btn-block" type="submit"><i class="fas fa-database"></i> Enrégistrer &nbsp;&nbsp;&nbsp;<span></span></button>
+      </form> 
+    </div>
+  </div>
+{% endblock %} 
