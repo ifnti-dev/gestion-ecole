@@ -31,7 +31,7 @@ class EvaluationForm(forms.ModelForm):
         fields = ['libelle', 'ponderation', 'date', 'rattrapage']
         widgets = {
             'libelle' : forms.TextInput(attrs={'class':'form-control'}),
-            'ponderation' : forms.TextInput(attrs={'class':'form-control'}),
+            'ponderation' : forms.NumberInput(attrs={'class':'form-control'}),
             'rattrapage' : forms.CheckboxInput(attrs={'class':'form-control col-md-6'}),
         }
     
