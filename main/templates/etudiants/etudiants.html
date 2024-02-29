@@ -147,7 +147,7 @@
                             <span class="badge badge-secondary">ancien</span>
                             {% endif %}
                         </td>
-                        <td class="text-center font-size-sm">{{etudiant.etudiant.datenaissance}}</td>
+                        <td class="text-center font-size-sm">{{etudiant.etudiant.email}}</td>
                         <td class="text-center font-size-sm">{{etudiant.etudiant.contact}}</td>
                         {% if is_directeur_des_etudes or is_comptable  %}
                         <td style="text-align: center;">
@@ -161,10 +161,11 @@
                         </td>
                         {% endif %}
 
-                        {% if is_directeur_des_etudes or is_secretaire or is_etudiant and user.etudiant == etudiant.etudiant %}
+
                         <td style="text-align: center;">
 
 
+                            {% if is_directeur_des_etudes or is_secretaire or is_etudiant and user.etudiant.id == etudiant.etudiant.id %}
                             <input type="text" name="decision_conseil_{{ etudiant.etudiant.id }}"
                                 style="display: none;">
                             <button type="button" class="btn btn-secondary dropdown-toggle"
@@ -183,7 +184,7 @@
                                 </li>
 
 
-                                {% if is_etudiant and user.etudiant == etudiant.etudiant or is_directeur_des_etudes or is_secretaire %}
+                                {% if is_etudiant and user.etudiant.id == etudiant.etudiant.id or is_directeur_des_etudes or is_secretaire %}
 
                                 {% if is_directeur_des_etudes or is_secretaire %}
 
@@ -218,7 +219,7 @@
 
                                                     {% if is_etudiant %}
                                                     <a class="nav-main-link"
-                                                        href="{% url 'main:releve_notes' etudiant.etudiant.id selected_semestre.id %}">e
+                                                        href="{% url 'main:releve_notes' etudiant.etudiant.id selected_semestre.id %}">
                                                         <span class="nav-main-link-name documents-link"
                                                             style="color: #1c72d6;">{{selected_semestre.libelle}}</span>
                                                     </a>
@@ -310,9 +311,9 @@
 
 
                             </div>
-
+                            {% endif %}
                         </td>
-                        {% endif %}
+
                     </tr>
                     {% endfor%}
                 </tbody>

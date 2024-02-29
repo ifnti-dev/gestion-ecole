@@ -2305,6 +2305,7 @@ class Salaire(models.Model):
         ("Directeur des études", "Directeur des études"),
         ("Gardien", "Gardien"),
         ("Agent d'entretien", "Agent d'entretien"),
+        ('Stagiaire', 'Stagiaire'),
     ]
     date_debut = models.DateField(verbose_name="Date de début", null=True)
     """

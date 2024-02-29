@@ -1,15 +1,16 @@
 {% extends 'index.html' %}
 {% block content_title %}
 
-Enregistrement du bulletin d'un employé permenant de l'IFNTI
+Enregistrement du bulletin d'un stagiaire de l'ANPE
 
   <h1>
-     <a href="{% url 'paiement:bulletins_de_paye' id_annee_selectionnee  %}" class="btn btn-outline-warning">
+     <a href="{% url 'paiement:bulletins_de_paye_stagiaire' id_annee_selectionnee  %}" class="btn btn-outline-warning">
         <i class="fas fa-chevron-left fa-lg"></i> Retour
       </a>
   </h1>
 {% endblock %}
 {% block content_title_description %}
+
 
 {% endblock %}
 {% block content %}
@@ -41,18 +42,14 @@ Enregistrement du bulletin d'un employé permenant de l'IFNTI
           </div>
         </div>
 
-        <div class="form-row mb-3">        
-          <div class="col-md-6">
+        <div class="form-row mb-12">        
+          <div class="col-md-12">
             {{ form.personnel.label_tag }}
             {{ form.personnel }}
             <span class="text-danger">{{ form.personnel.errors }}</span>
           </div>
-          <div class="col-md-6">
-            {{ form.qualification_professionnel.label_tag }}
-            {{ form.qualification_professionnel }}
-            <span class="text-danger">{{ form.qualification_professionnel.errors }}</span>
-          </div>
         </div> 
+        <br>
 
         <!--div class="form-row mb-3"> 
           

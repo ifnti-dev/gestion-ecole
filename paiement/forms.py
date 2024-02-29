@@ -182,6 +182,23 @@ class SalaireForm(forms.ModelForm):
             'prime_forfaitaire': forms.NumberInput(attrs={'class': 'form-control'}),
         }
 
+
+class StagiairesForm(forms.ModelForm):
+    class Meta:
+        model = Salaire
+        fields = ['date_debut','date_fin', 'personnel', 'prime_efficacite', 'prime_qualite', 'frais_travaux_complementaires', 'prime_anciennete', 'prime_forfaitaire', 'acomptes']
+        widgets = {
+            'date_debut': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}), 
+            'date_fin': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'personnel': forms.Select(attrs={'class': 'form-control'}),
+            'prime_efficacite': forms.NumberInput(attrs={'class': 'form-control'}),
+            'prime_qualite': forms.NumberInput(attrs={'class': 'form-control'}),
+            'frais_travaux_complementaires': forms.NumberInput(attrs={'class': 'form-control'}),
+            'prime_anciennete': forms.NumberInput(attrs={'class': 'form-control'}),
+            'acomptes': forms.NumberInput(attrs={'class': 'form-control'}),
+            'prime_forfaitaire': forms.NumberInput(attrs={'class': 'form-control'}),
+        }
+
     
 
 class FournisseurForm(forms.ModelForm):

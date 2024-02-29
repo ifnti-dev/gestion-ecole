@@ -3,7 +3,7 @@ import os
 from django import forms
 from decimal import Decimal
 from django.http import FileResponse, HttpResponse
-from paiement.forms import ComptableForm, FicheDePaieForm, PaiementForm, FournisseurForm, FraisForm, CompteBancaireForm, SalaireForm, ChargeForm
+from paiement.forms import ComptableForm, FicheDePaieForm, PaiementForm, FournisseurForm, FraisForm, CompteBancaireForm, SalaireForm, ChargeForm, StagiairesForm
 from django.db.models import Sum
 from num2words import num2words
 import datetime
@@ -656,13 +656,36 @@ def les_bulletins_de_paye(request, id_annee_selectionnee):
     puis les renvoie au template 'salaires/bulletins_de_paye.html' pour affichage.
     """
     annee_universitaire = get_object_or_404(AnneeUniversitaire, pk=id_annee_selectionnee)
-    bulletins = Salaire.objects.filter(annee_universitaire=annee_universitaire)
+    bulletins = Salaire.objects.filter(annee_universitaire=annee_universitaire, qualification_professionnel__in=['Enseignant', 'Comptable', 'Directeur des études', 'Gardien', 'Agent d\'entretien'])
     context = {
         'annee_universitaire': annee_universitaire,
         'bulletins': bulletins,
     }
     #return HttpResponse('')
     return render(request, 'salaires/bulletins_de_paye.html', context)
+
+
+@login_required(login_url=settings.LOGIN_URL)
+def les_bulletins_de_paye_stagiaire(request, id_annee_selectionnee):
+    """
+    Affiche la liste des bulletins de paie pour une année universitaire donnée.
+
+    :param request: L'objet HttpRequest utilisé pour effectuer la requête.
+    :param id_annee_selectionnee: L'ID de l'année universitaire sélectionnée.
+    :return: Un objet HttpResponse contenant le rendu de la page 'salaires/bulletins_de_paye.html'.
+    :raises: Http404 si l'année universitaire sélectionnée n'est pas trouvée.
+
+    Cette vue récupère les bulletins de paie associés à l'année universitaire spécifiée,
+    puis les renvoie au template 'salaires/bulletins_de_paye.html' pour affichage.
+    """
+    annee_universitaire = get_object_or_404(AnneeUniversitaire, pk=id_annee_selectionnee)
+    bulletins = Salaire.objects.filter(annee_universitaire=annee_universitaire, qualification_professionnel='Stagiaire')
+    context = {
+        'annee_universitaire': annee_universitaire,
+        'bulletins': bulletins,
+    }
+    return render(request, 'salaires/les_bulletins_de_paye_stagiaire.html', context)
+
 
 
 
@@ -836,7 +859,7 @@ def bulletin_de_paye(request, id):
 
     retenues_cnss_personnel = Decimal(retenues_cnss_salarie) + Decimal(tcs) + Decimal(irpp)
     salaire_net = (Decimal(Salaire_brut) - Decimal(retenues_cnss_personnel))
-    bulletin.salaire_net_a_payer = int(salaire_net - bulletin.acomptes)  # Conversion en entier
+    bulletin.salaire_net_a_payer = int(salaire_net - bulletin.acomptes) + int(bulletin.prime_forfaitaire)   # Conversion en entier
     # Convertir le montant en une chaîne de caractères
     salaire_net_str = "{:,.0f}".format(bulletin.salaire_net_a_payer)
     # Assigner la chaîne de caractères formatée à salaire_net_a_payer
@@ -1285,3 +1308,159 @@ def fiche_de_charge(request, id):
         response = HttpResponse(pdf_preview, content_type='application/pdf')
         response['Content-Disposition'] = 'inline;filename=pdf_file.pdf'
         return response
+    
+
+
+
+@login_required(login_url=settings.LOGIN_URL)
+def enregistrer_bulletin_stagiaire(request, id=0):    
+    if request.method == "GET":
+        if id == 0:
+            form = StagiairesForm()
+        else:
+            bulletin = Salaire.objects.get(pk=id)
+            form = StagiairesForm(instance=bulletin)   
+        return render(request, 'salaires/enregistrer_bulletin_stagiaire.html', {'form': form})
+    else:
+        if id == 0:
+            form = StagiairesForm(request.POST)
+        else:
+            bulletin = Salaire.objects.get(pk=id)
+            compte_universite = bulletin.compte_bancaire
+            compte_universite.solde_bancaire += bulletin.salaire_net_a_payer + (Decimal(bulletin.frais_risques_professionnel) * Decimal(bulletin.personnel.salaireBrut))
+            print(bulletin.salaire_net_a_payer + (Decimal(bulletin.frais_risques_professionnel) * Decimal(bulletin.personnel.salaireBrut)))
+            compte_universite.save()
+            form = SalaireForm(request.POST, instance=bulletin)
+        if form.is_valid():
+            bulletin = form.save(commit=False)
+            qualification_professionnelle = 'Stagiaire'
+            bulletin.qualification_professionnel = qualification_professionnelle
+            date_debut = bulletin.date_debut
+            date_fin = bulletin.date_fin
+            if date_debut and date_fin and date_debut > date_fin:
+                form.add_error('date_fin', "La date de fin ne peut pas être antérieure à la date de début.")
+                return render(request, 'salaires/enregistrer_bulletin_stagiaire.html', {'form': form})
+
+            compte_universite = CompteBancaire.objects.first()
+            if compte_universite is not None:
+                bulletin.compte_bancaire = compte_universite
+                bulletin.save()
+                deductions = Decimal(bulletin.frais_risques_professionnel) * Decimal(bulletin.personnel.salaireBrut)  
+                montant_a_prelever = bulletin.salaire_net_a_payer + deductions 
+                compte_universite.solde_bancaire -= montant_a_prelever
+                compte_universite.save()
+                
+                id_annee_selectionnee = AnneeUniversitaire.static_get_current_annee_universitaire().id
+                return redirect('paiement:bulletins_de_paye_stagiaire', id_annee_selectionnee=id_annee_selectionnee)
+            else :
+                return render(request, 'etudiants/message_erreur.html', {'message': "Le compte bancaire n\'existe pas."})
+        else:
+            print(form.errors)
+            return render(request, 'salaires/enregistrer_bulletin_stagiaire.html', {'form': form})
+
+
+
+
+@login_required(login_url=settings.LOGIN_URL)
+def bulletin_de_paye_stagiaire(request, id):
+    bulletin = get_object_or_404(Salaire, id=id)
+    salaireDeBase = int(bulletin.personnel.salaireBrut)
+    prime_efficacite = int(bulletin.prime_efficacite)
+    prime_qualite = int(bulletin.prime_qualite)
+    frais_travaux_complementaires = int(bulletin.frais_travaux_complementaires)
+    prime_anciennete = int(bulletin.prime_anciennete)
+    date_debut_formatted = datetime.strptime(str(bulletin.date_debut), "%Y-%m-%d").strftime("%d %B %Y")
+    date_fin_formatted = datetime.strptime(str(bulletin.date_fin), "%Y-%m-%d").strftime("%d %B %Y")
+
+    total_primes = int(bulletin.prime_efficacite + bulletin.prime_qualite + bulletin.frais_travaux_complementaires)
+    primes = (
+            bulletin.prime_efficacite
+            + bulletin.prime_qualite
+            + bulletin.frais_travaux_complementaires
+            + bulletin.prime_anciennete
+    )
+    Salaire_brut = int(bulletin.personnel.salaireBrut + primes)
+    
+    ## pour le salarié
+    acomptes = int(bulletin.acomptes)
+    prime_forfaitaire = int(bulletin.prime_forfaitaire)
+    salaire_net = Decimal(Salaire_brut) 
+    bulletin.salaire_net_a_payer = int(salaire_net - bulletin.acomptes) + int(bulletin.prime_forfaitaire) # Conversion en entier
+    # Convertir le montant en une chaîne de caractères
+    salaire_net_str = "{:,.0f}".format(bulletin.salaire_net_a_payer)
+    # Assigner la chaîne de caractères formatée à salaire_net_a_payer
+    bulletin.salaire_net_a_payer = salaire_net_str
+
+
+    ## pour l'employeur
+    frais_risques_professionnel = int(bulletin.frais_risques_professionnel * bulletin.personnel.salaireBrut)
+    retenues_cnss_employeur = int( frais_risques_professionnel)
+
+    # Convertir les montants en chaînes de caractères formatées avec des séparateurs de milliers
+    prime_efficacite_str = "{:,.0f}".format(prime_efficacite)
+    prime_qualite_str = "{:,.0f}".format(prime_qualite)
+    frais_travaux_complementaires_str = "{:,.0f}".format(frais_travaux_complementaires)
+    prime_anciennete_str = "{:,.0f}".format(prime_anciennete)
+    salaireDeBase_str = "{:,.0f}".format(salaireDeBase)
+    Salaire_brut_str = "{:,.0f}".format(Salaire_brut)
+    acomptes_str = "{:,.0f}".format(acomptes)
+    prime_forfaitaire_str = "{:,.0f}".format(prime_forfaitaire)
+    total_primes_str = "{:,.0f}".format(total_primes)
+    retenues_cnss_employeur_str = "{:,.0f}".format(retenues_cnss_employeur)
+    frais_risques_professionnel_str = "{:,.0f}".format(frais_risques_professionnel)
+    salaire_net_str = "{:,.0f}".format(salaire_net)
+
+    # Assigner les chaînes de caractères formatées aux variables correspondantes
+    context = {
+        'bulletin': bulletin,
+        'prime_efficacite': prime_efficacite_str,
+        'prime_qualite': prime_qualite_str,
+        'frais_travaux_complementaires': frais_travaux_complementaires_str,
+        'prime_anciennete': prime_anciennete_str,
+        'salaireDeBase': salaireDeBase_str,
+        'Salaire_brut': Salaire_brut_str,
+        'acomptes': acomptes_str,
+        'prime_forfaitaire': prime_forfaitaire_str,
+        'salaire_net': salaire_net_str,
+        'total_primes': total_primes_str,
+        'retenues_cnss_employeur': retenues_cnss_employeur_str,
+        'frais_risques_professionnel': frais_risques_professionnel_str,
+        "date_debut_formatted": date_debut_formatted,
+        "date_fin_formatted": date_fin_formatted,
+    }
+
+    latex_input = 'bulletin_de_paye_stagiaire'
+    latex_ouput = 'generated_bulletin_de_paye_stagiaire'
+    pdf_file = 'pdf_bulletin_de_paye_stagiaire'
+
+    generate_pdf(context, latex_input, latex_ouput, pdf_file)
+
+    # visualisation du pdf dans le navigateur
+    with open('media/pdf/' + str(pdf_file) + '.pdf', 'rb') as f:
+        pdf_preview = f.read()
+        response = HttpResponse(pdf_preview, content_type='application/pdf')
+        response['Content-Disposition'] = 'inline;filename=pdf_file.pdf'
+        return response
+
+
+
+
+def delete_bulletin_stagiaire(request):
+    """
+        Supprime un bulletin de paie.
+
+    :param request: L'objet HttpRequest utilisé pour effectuer la requête.
+    :return: redirect : redirige l'utilisateur vers la page affichant la liste des bulletins de paie de l'année universitaire courante.
+    
+        **Context**
+
+        ``bulletin``
+            une instance du :model:`main.Salaire`.
+    """
+    if request.method == 'GET':
+        bulletin_id = request.GET.get('id')
+        bulletin = get_object_or_404(Salaire, id=bulletin_id)
+        bulletin.delete()
+    id_annee_selectionnee = AnneeUniversitaire.static_get_current_annee_universitaire().id
+    return redirect('paiement:bulletins_de_paye_stagiaire', id_annee_selectionnee=id_annee_selectionnee)
+

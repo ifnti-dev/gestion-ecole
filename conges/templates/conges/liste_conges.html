@@ -23,8 +23,7 @@
             <tbody>
                 {% for conge in conges %}
                 <tr>
-                    <td class="text-center font-size-sm">Du {{ date_debut_formatted }} au {{ date_fin_formatted }}</td>
-
+                    <td class="text-center font-size-sm">Du {{ conge.date_et_heure_debut }} au {{ conge.date_et_heure_fin }}</td>
                     <td class="text-center font-size-sm">{{conge.nombre_de_jours_de_conge }} Jours</td>
                     <td class="text-center font-size-sm">
                         {% if conge.valider == "Actif" %}

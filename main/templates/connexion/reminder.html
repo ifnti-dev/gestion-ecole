@@ -1,15 +1,16 @@
 {% extends 'auth.html' %}
 {% load static %}
 {% block content %}
-<div class="d-flex flex-column align-items-center justify-content-center">
-    <img src="{% static '/assets/media/logo.png' %}" alt="" width="50px">                
+<div class="d-flex flex-column align-items-center justify-content-center bg-white w-100" style="height: 460px;">
+    <img src="{% static '/assets/media/logo.png' %}" alt="" width="50px">
     <h1 class="mt-4 text-center">Récupérer mon compte !</h1>
     <div class="w-100 ml-3">
-        <form action="{% url 'main:reminder' %}" method="post" >
+        <form action="{% url 'main:reminder' %}" method="post" class="d-flex flex-column  align-items-center">
             {% csrf_token %}
             <div class="mt-4">
                 <div class="mb-3">
-                    <input type="text" name="username_or_email" required class="form-control w-100" placeholder="Saisissez votre nom d'utilisateur ou votre email">
+                    <input type="text" name="username_or_email" required class="form-control"
+                        placeholder="Saisissez votre nom d'utilisateur ou votre email">
                 </div>
             </div>
             <div class="d-flex flex-column align-items-center">
