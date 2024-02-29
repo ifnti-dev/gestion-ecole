@@ -33,18 +33,18 @@
             {% endif %}
         {% endfor %}
     </div>
+
     <div class="mx-4 d-flex justify-content-between">
         <form action="" method="get" class="form-row">
             <select name="semestre" id="semestre" class="form-control col-md-5" onchange="this.form.submit()">
-                <option value="">Semestres</option>
                 {% for semestre in semestres %}
                     <option value="{{ semestre.id }}" {% if selected_semestre.id == semestre.id %}selected{% endif %}>{{ semestre.libelle }}</option>
                 {% endfor %}
             </select>
             <select name="type" id="" class="form-control col-md-6 ml-2" onchange="this.form.submit()">
                 <option value="">Types évaluation</option>
-                <option value="0">évaluation</option>
-                <option value="1">rattrapage</option>
+                <option value="0" {% if selected_type == '0' %}selected{% endif %}>évaluation</option>
+                <option value="1" {% if selected_type == '1' %}selected{% endif %}>rattrapage</option>
             </select>
         </form>
     </div>

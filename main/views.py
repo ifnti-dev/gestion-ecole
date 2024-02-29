@@ -1559,10 +1559,18 @@ def evaluations(request, id_matiere):
             annee_universitaire=annee_universitaire, libelle="S1")
         if semestre:
             semestre = semestre.get()
+            
+    
+    if 'type' in request.GET and request.GET.get('type') in ['0', '1']:
+        selected_type = request.GET.get('type')
+        types_evaluations = [bool(int(selected_type))]
+    else:
+        selected_type = ""
+        types_evaluations = [True, False]
+    
     semestres = [semestre]
 
-
-    evaluations = Evaluation.objects.filter(matiere=matiere, semestre__in=semestres, rattrapage__in=[True, False])
+    evaluations = Evaluation.objects.filter(matiere=matiere, semestre__in=semestres, rattrapage__in=types_evaluations)
     semestres = matiere.get_semestres(annee_selectionnee=annee_universitaire, type='__all__')
     url_path = "/main/evaluations/upload/" + str(matiere.id) + "/" + str(semestre.id) + "/"
 
@@ -1577,6 +1585,7 @@ def evaluations(request, id_matiere):
         'evaluations': evaluations,
         'semestres': semestres,
         'selected_semestre': semestre,
+        'selected_type': selected_type,
         'url_path': url_path,
     }
     return render(request, 'evaluations/index.html', data)
@@ -1656,27 +1665,29 @@ def createNotesByEvaluation(request, id_matiere, rattrapage, id_semestre):
         return render(request, 'notes/create_or_edit_note.html', context=data)
     return redirect('main:evaluations', id_matiere=matiere.id)
 
-
 @login_required(login_url=settings.LOGIN_URL)
 @evaluation_permission('main.edit_evaluation')
 def editeNoteByEvaluation(request, id):
     """
     Affiche un formulaire d'édition d'une note :model:`main.Note`.
     """
+
     evaluation = get_object_or_404(Evaluation, pk=id)
     matiere = evaluation.matiere
     semestre = evaluation.semestre
-
+    
     if evaluation.rattrapage:
         etudiants = matiere.get_etudiants_en_rattrapage()
         nouveaux_etudiants = []
     else:
-        etudiants = semestre.etudiant_set.filter(is_active=True).order_by("nom")
+        etudiants = semestre.etudiant_set.filter(is_active=True)
+        print(etudiants)
         etudiants_dans_evaluation = evaluation.etudiants.all()
         nouveaux_etudiants = etudiants.difference(etudiants_dans_evaluation)
         for etudiant in nouveaux_etudiants:
             Note.objects.create(evaluation=evaluation, etudiant=etudiant)
-
+        print(etudiants_dans_evaluation)
+    
     NoteFormSet = forms.inlineformset_factory(
         parent_model=Evaluation,
         model=Note,
@@ -1709,12 +1720,13 @@ def editeNoteByEvaluation(request, id):
         # Créer une instance de d'ensemble de formulaire selon notre queryset
         initial_etudiant_note_data = [
             {'etudiant': etudiant.id, 'etudiant_full_name': etudiant.full_name()} for etudiant in nouveaux_etudiants]
-        note_form_set = NoteFormSet(instance=evaluation)
+        notes_queryset = evaluation.note_set.all().order_by('etudiant__nom')
+        note_form_set = NoteFormSet(instance=evaluation, queryset=notes_queryset)
         for form in note_form_set:
             etudiant = Etudiant.objects.filter(
                 id=form.initial['etudiant']).get()
             form.initial['etudiant_full_name'] = etudiant.full_name()
-
+        
     data = {
         'evaluation_form': evaluation_form,
         'notes_formset': note_form_set,
@@ -1953,7 +1965,7 @@ def login_view(request):
             has_model = False
             if is_etudiant:
                 try:
-                    etudiant = Etudiant.objects.get(user=user).id
+                    etudiant = Etudiant.objects.get(user=user)
                     id_auth_model = etudiant.id
                     request.session['id_auth_model'] = id_auth_model
                     request.session['profile_path'] = f'main/detail_etudiant/{id_auth_model}/'
@@ -1972,7 +1984,6 @@ def login_view(request):
                     has_model = True
                 except Exception as e:
                     pass
-           
             if has_model or (user.is_superuser and is_directeur_des_etudes):  
                 login(request, user)
                 return redirect('/')
