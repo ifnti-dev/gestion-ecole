@@ -21,6 +21,7 @@ import math
 
 def create_auth_user(nom, prenom, email):
     username = (prenom + nom).lower()
+    username = username.replace(" ", "")
     year = date.today().year
     password = 'ifnti' + str(year) + '!'
     user = User.objects.create_user(username=username, password=password, email=email, last_name=nom, first_name=prenom, is_staff=False)
@@ -1503,12 +1504,12 @@ class Matiere(models.Model):
         """
         return semestre in self.get_semestres(semestre.annee_universitaire, type="__all__")
 
-    def get_semestres(self, annee_selectionnee, type):
+    def get_semestres(self, annee_universitaire, type):
         """
         Cette méthode retourne tous les semestres dans lesquels sont enseignés la matière au cours d'une année universitaire donnée.
 
-        :param annee_selectionnee: Année universitaire de recherche
-        :type annee_selectionnee: AnneeUniversitaire ou __all__
+        :param annee_universitaire: Année universitaire de recherche
+        :type annee_universitaire: AnneeUniversitaire ou __all__
 
         :param type: :;,  
         :type type: __current__ ou __all__
@@ -1523,13 +1524,13 @@ class Matiere(models.Model):
             type_semestres = [True]
         elif type == "__all__":
             type_semestres = [True, False]
-        if annee_selectionnee == '__all__':
-            annee_selectionnees = AnneeUniversitaire.objects.all()
+        if annee_universitaire == '__all__':
+            annee_universitaires = AnneeUniversitaire.objects.all()
         else:
-            annee_selectionnees = [annee_selectionnee]
+            annee_universitaires = [annee_universitaire]
 
         programmes = self.ue.programme_set.filter(
-            semestre__annee_universitaire__in=annee_selectionnees, semestre__courant__in=type_semestres)
+            semestre__annee_universitaire__in=annee_universitaires, semestre__courant__in=type_semestres)
         semestres = set()
 
         for programme in programmes:
@@ -2304,6 +2305,7 @@ class Salaire(models.Model):
         ("Directeur des études", "Directeur des études"),
         ("Gardien", "Gardien"),
         ("Agent d'entretien", "Agent d'entretien"),
+        ('Stagiaire', 'Stagiaire'),
     ]
     date_debut = models.DateField(verbose_name="Date de début", null=True)
     """

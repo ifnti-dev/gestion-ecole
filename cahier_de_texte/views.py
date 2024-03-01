@@ -9,6 +9,7 @@ from faker import Faker
 from main.pdfMaker import generate_pdf
 from main.models import Enseignant, Matiere, Etudiant ,AnneeUniversitaire, Ue , Semestre
 from cahier_de_texte.models import Seance
+from planning.models import *
 from django.contrib.auth import authenticate, login , get_user_model
 
 import datetime
@@ -253,7 +254,7 @@ def cahier_de_text(request):
         user_connecte=get_object_or_404(get_user_model(),id=request.user.id)
         etudiant=get_object_or_404(Etudiant,user=user_connecte)
         semestres=etudiant.semestres.filter(annee_universitaire_id=id_annee)
-        niveau=getNiveauEtudiant(etudiant)
+        niveau=getNiveauEtudiant(request,etudiant)
         seances=[]
         for sem in semestres:
             sean =Seance.objects.filter(semestre=sem)
@@ -465,6 +466,7 @@ def commenter(request):
 
 
 fake = Faker()
+fake_fr = Faker('FR')
 def creer_etudiant(nombre):
     for _ in range(nombre):
         etu=creer_fake_etudiant()
@@ -571,6 +573,118 @@ def creer_prof(nombre):
             )
             enseignant.save()
             print(f"Enseignant créé : {enseignant}")
+
+import datetime
+import random
+
+def generate_monday_january():
+    year = datetime.datetime.now().year  # Obtenez l'année actuelle
+    january_start = datetime.datetime(year, 1, 1)  # Début du mois de janvier
+    # Trouver le premier lundi du mois de janvier
+    first_monday = january_start + datetime.timedelta(days=(7 - january_start.weekday()) % 7)
+    # Générer aléatoirement un nombre de semaines à ajouter à partir du premier lundi
+    random_weeks = random.randint(0, (31 - first_monday.day) // 7)  # maximum de semaines en janvier
+    # Calculer la date en ajoutant le nombre de semaines aléatoires à partir du premier lundi
+    generated_date = first_monday + datetime.timedelta(weeks=random_weeks)
+    return generated_date
+
+
+
+
+def creer_plan(nombre):
+    semestre =Semestre.objects.filter(id='S2-2023' ).first()
+    date=generate_monday_january()
+    matieres=[]
+    ues = semestre.get_all_ues()
+    etudiants=semestre.etudiant_set.all()
+    for ue in ues :                   
+        matieres += ue.matiere_set.all()
+    creer_planning(nombre,semestre,date,matieres)
+    creer_plan_seance(etudiants,semestre)
+
+def creer_plan_seance(etudiants,semestre):
+    plannings=Planning.objects.filter(semestre=semestre)
+    plan_seances=SeancePlannifier.objects.filter(planning__in=plannings,valider=True)
+    for plan in plan_seances:
+    
+        absents=[etudiants.order_by('?').first(),etudiants.order_by('?').first()]
+
+        seance_instance = Seance.objects.create(
+            intitule=plan.intitule,
+            date_et_heure_debut=plan.date_heure_debut,
+            date_et_heure_fin=plan.date_heure_fin,
+            description= fake_fr.paragraph(),
+            auteur=etudiants.order_by('?').first(),
+            valider=fake.boolean(),
+            matiere=plan.matiere,
+            semestre=semestre,
+            enseignant=plan.professeur,
+            commentaire=fake_fr.paragraph(),
+            seancePlannifier=plan
+        )
+        print("les absents",absents[0])
+        for student in absents:
+            if len(student.nom) <= 12:
+                seance_instance.eleves_presents.add(student)
+
+        seance_instance.save()
+        print(seance_instance)
+        return seance_instance
+        
+
+def creer_planning(nombre,semestre,date,matieres):
+    datedd=date
+    for _ in range(nombre):
+        planning = Planning(
+            semaine=_+1,
+            semestre=semestre,
+            datedebut=datedd,
+            datefin=datedd+ datetime.timedelta(days=4),
+        )
+        
+        datedd += datetime.timedelta(days=7)
+        planning.intervalle=str(planning.datedebut.day) + '/' + str(planning.datedebut.month) + ' au ' + str(planning.datefin.day) + '/' + str(planning.datefin.month) + '/' + str(planning.datefin.year)
+        planning.save()
+        for i in range(4):
+            jour = planning.datedebut+ datetime.timedelta(days=i)
+            for j in range(4):
+                taille=len(matieres)
+                print('tata',taille)
+                print(matieres)
+                mat=random.randint(0,taille-1)
+                matiere=matieres[mat]
+                if j==1 :
+                    date_heure=jour+datetime.timedelta(minutes=480+45),
+                    date_heure2=jour+datetime.timedelta(minutes=480+45+90),
+                
+                elif j==2 :
+                    date_heure=jour+datetime.timedelta(minutes=600+15),
+                    date_heure2=jour+datetime.timedelta(minutes=600+15+90)
+                elif j==3 :
+                    date_heure=jour+datetime.timedelta(minutes=840),
+                    date_heure2=jour+datetime.timedelta(minutes=840+90),
+                elif j==4 :
+                    date_heure=jour+datetime.timedelta(minutes=900+45),
+                    date_heure2=jour+datetime.timedelta(minutes=900+45+90),
+                else :
+                    date_heure=jour+datetime.timedelta(minutes=420),
+                    date_heure2=jour+datetime.timedelta(minutes=420+90),    
+
+                
+                seance_plannifier=SeancePlannifier(
+                    intitule='Séance '+matiere.libelle,
+                    date_heure_debut=date_heure,
+                    date_heure_fin= date_heure2,
+                    matiere=matiere,
+                    precision="Aucune pour l'instant",
+                    professeur=matiere.enseignant,
+                    planning=planning,
+                    valider = fake.boolean(),  
+                )
+                seance_plannifier.save
+
+
+       
 
 
 def creer_matiere(nombre):

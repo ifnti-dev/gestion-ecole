@@ -20,12 +20,13 @@ def is_naturel(string):
     return string.isdecimal() and int(string) > 0
 
 def convert_serial_temporel_number_to_date(numero_serie_temporelle):
-    # Date de référence d'Excel
-    date_reference = datetime(1899, 12, 30)  
-    # Ajouter le nombre de jours au format de série temporelle à la date de référence
-    date_resultat = date_reference + timedelta(days=numero_serie_temporelle)
-    
-    return date_resultat
+    if str(numero_serie_temporelle).isdecimal():
+        # Date de référence d'Excel
+        date_reference = datetime(1899, 12, 30)  
+        # Ajouter le nombre de jours au format de série temporelle à la date de référence
+        date_resultat = date_reference + timedelta(days=numero_serie_temporelle)
+        return date_resultat
+    return numero_serie_temporelle
 
 @transaction.atomic
 def pre_load_ue_matiere_template_data_by_year(annees):
@@ -240,6 +241,7 @@ def pre_load_evaluation_template_data(matiere, semestre):
 def load_notes_from_evaluation(path, matiere=None, semestre=None):
     # Charger le fichier excel des différentes notes d'une matière
     wb = openpyxl.load_workbook(path)
+    wb.iso_dates = True
 
     # Parcourir les evaluations
     for sheet in wb:
@@ -261,6 +263,8 @@ def load_notes_from_evaluation(path, matiere=None, semestre=None):
             semestre = Semestre.objects.get(libelle=semestre, annee_universitaire__id=annee.id)
         
         rattrapage = str(ws['B4'].value).lower() != "oui"
+        print()
+        print(ws['B5'].value)
         evaluation_date = convert_serial_temporel_number_to_date(ws['B5'].value)
         evaluation_name = str(ws['B6'].value)
         evaluation_ponderation = int(str(ws['B7'].value))

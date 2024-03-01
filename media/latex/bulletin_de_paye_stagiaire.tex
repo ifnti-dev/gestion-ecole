@@ -31,8 +31,9 @@
 
 \maketitle
 \AddToShipoutPicture*{\BackgroundPic}
-\vspace{-1cm}
+\vspace{-2cm}
 
+%\section*{Employé}
 \begin{tabular}{@{}ll}
     Période: & Du \VAR{date_debut_formatted} au \VAR{date_fin_formatted} \\
     Nom et Prénoms: &  \VAR{bulletin.personnel.nom}  \VAR{bulletin.personnel.prenom} \\
@@ -58,19 +59,9 @@
 \hline 
 \textbf{ÉLÉMENTS} & \textbf{\%} & \textbf{Employeur} & \textbf{\%} & \textbf{Salarié} \\ 
 \hline 
-Prestations familiales et maternités & 3 & \VAR{frais_prestations_familiales} & 0 & 0 \\ 
-\hline 
-Risques professionnels & 2 & \VAR{frais_risques_professionnel} & 0 & 0 \\ 
-\hline 
-Pension vieillesse & 12,5 & \VAR{frais_pension_vieillesse_emsalaire} & 4 & \VAR{frais_prestations_familiale_salsalaire} \\ 
-\hline 
-Assurance maladie universelle & 5 & \VAR{assurance_maladie_universelle} & 5 & \VAR{assurance_maladie_universelle} \\ 
+Risques professionnels & 2 & \VAR{frais_risques_professionnel} & 0 & 0 \\  
 \hline  
-\textbf{Totaux CNSS} &\multicolumn{2}{|c|}{\VAR{retenues_cnss_employeur}} &\multicolumn{2}{|c|}{\VAR{retenues_cnss_salarie}}\\ 
-\hline 
-TCS &\multicolumn{2}{|c|}{0} &\multicolumn{2}{|c|}{\VAR{bulletin.tcs}}\\ 
-\hline 
-IRPP &\multicolumn{2}{|c|}{0} &\multicolumn{2}{|c|}{\VAR{bulletin.irpp}}\\ 
+\textbf{Totaux CNSS} &\multicolumn{2}{|c|}{\VAR{retenues_cnss_employeur}} &\multicolumn{2}{|c|}{0}\\ 
 \hline 
 \textbf{SALAIRE NET} & \multicolumn{4}{|c|}{\textbf{\VAR{salaire_net} FCFA}}\\ 
 \hline 
