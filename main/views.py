@@ -1366,55 +1366,153 @@ def releve_notes_details_all(request, id_semestre):
     semestre = get_object_or_404(Semestre, id=id_semestre)
     etudiants = semestre.etudiant_set.all()
 
-    nbre_colonnes = 2
+    # nbre_colonnes = 2
 
     colonnes = '|c|c|'
 
     semestre_ues = semestre.get_all_ues()
 
-    colonnes += 'c|' * len(semestre_ues)
+    # colonnes += 'c|' * len(semestre_ues)
 
-    nbre_colonnes += len(semestre_ues)
+    # nbre_colonnes += len(semestre_ues)
 
     nbre_ues = len(semestre_ues)
 
     # récupération du nombre de matières par ue
 
-    for ue in semestre_ues:
-        # ajout des colonnes correspondant aux matières
-        nbre_matieres = len(ue.matiere_set.all())
-        colonnes += 'c|' * nbre_matieres
-        nbre_colonnes += nbre_matieres
+    
 
-    # récupératon des données pour chaque lignes du relevé
-    lignes_releve = []
-    # boucle sur chaque étudiant piour constituer la ligne associée à l'étudiant
-    for etudiant in etudiants:
-        ligne = {}
-        ligne['etudiant'] = etudiant
-        # tableau contenant l'ensemble des UEs de l'étudiant
-        ues = []
-        # boucle sur chaque UE suivies par l'étudiant pour calculersa mmoyenne et sa moyenne dans chaque matières
-        for ue in semestre_ues:
-            # tableau contenant l'ensemble des matières suivies par l'étudiant
-            matieres = []
-            nbre_matieres = len(ue.matiere_set.all())
-            for matiere in ue.matiere_set.all():
-                # récupération des matières de l'ue et la moyenne de l'étudiant dans celles-ci
-                matieres.append({'matiere': matiere, 'moyenne_matiere': round(
+    context = {}
+    context['semestre'] = semestre
+    context['annee'] = semestre.annee_universitaire
+
+    # le tableau pouvant déborder il est divisé ici en trois parties
+    if nbre_ues > 0 and nbre_ues < 8:
+
+        # première partie
+
+        nbre_colonnes_partie_1 = 2
+
+        colonnes_partie_1 = '|c|c|'
+        colonnes_partie_1 += 'c|' * 6
+        for i in range(0,3):
+            nbre_matieres_partie_1 = len(semestre_ues[i].matiere_set.all())
+            colonnes_partie_1 += 'c|' * nbre_matieres_partie_1
+            nbre_colonnes_partie_1 += nbre_matieres_partie_1
+
+        lignes_releve_partie_1 = []
+        for etudiant in etudiants:
+            ligne = {}
+            ligne['etudiant'] = etudiant
+            ues = []
+            for i in range(0,3):
+                matieres = []
+                nbre_matieres_ue = len(semestre_ues[i].matiere_set.all())
+                for matiere in semestre_ues[i].matiere_set.all():
+                    matieres.append({'matiere': matiere, 'moyenne_matiere': round(
                     etudiant.moyenne_etudiant_matiere(matiere, semestre)[0], 2)})
-            ues.append({'ue': ue, 'moyenne': round(etudiant.moyenne_etudiant_ue(ue, semestre)[
-                       0], 2), 'matieres_ue': matieres, 'nbre_matieres': nbre_matieres + 1})
-        ligne['ues'] = ues
-        lignes_releve.append(ligne)
+                ues.append({'ue': semestre_ues[i], 'moyenne': round(etudiant.moyenne_etudiant_ue(semestre_ues[i], semestre)[0], 2), 'matieres_ue': matieres, 'nbre_matieres': nbre_matieres_ue + 2, 'a_valide': etudiant.moyenne_etudiant_ue(semestre_ues[i], semestre)[1]})
+            ligne['ues'] = ues
+            lignes_releve_partie_1.append(ligne)
 
-    context = {
-        'nbre_ues': nbre_ues,
-        'nbre_colonnes': nbre_colonnes,
-        'colonnes': colonnes,
-        'lignes': lignes_releve,
-        'nbre_lignes': len(lignes_releve)
-    }
+        context['partie_1'] = {
+            'nbre_ues': 3,
+            'nbre_colonnes': nbre_colonnes_partie_1 + 6,
+            'colonnes': colonnes_partie_1,
+            'lignes': lignes_releve_partie_1,
+            'nbre_lignes': len(lignes_releve_partie_1)
+        }
+
+
+        # deuxième partie
+
+        if nbre_ues > 3:
+
+
+            nbre_colonnes_partie_2 = 3
+
+            colonnes_partie_2 = '|c|c|c|'
+            colonnes_partie_2 += 'c|' * 2 * (nbre_ues - 3)
+            for i in range(3, nbre_ues):
+                nbre_matieres_partie_2 = len(semestre_ues[i].matiere_set.all())
+                colonnes_partie_2 += 'c|' * nbre_matieres_partie_2
+                nbre_colonnes_partie_2 += nbre_matieres_partie_2
+                print(nbre_matieres_partie_2)
+
+            lignes_releve_partie_2 = []
+            for etudiant in etudiants:
+                ligne = {}
+                ligne['etudiant'] = etudiant
+                ues = []
+                for i in range(3, nbre_ues):
+                    matieres = []
+                    nbre_matieres_ue = len(semestre_ues[i].matiere_set.all())
+                    credits_semestre = -1
+                    for matiere in semestre_ues[i].matiere_set.all():
+                        matieres.append({'matiere': matiere, 'moyenne_matiere': round(
+                        etudiant.moyenne_etudiant_matiere(matiere, semestre)[0], 2)})
+                        credits_semestre = etudiant.credits_obtenus_semestre(semestre)
+                    ues.append({'ue': semestre_ues[i], 'moyenne': round(etudiant.moyenne_etudiant_ue(semestre_ues[i], semestre)[0], 2), 'matieres_ue': matieres, 'nbre_matieres': nbre_matieres_ue + 2, 'a_valide': etudiant.moyenne_etudiant_ue(semestre_ues[i], semestre)[1], 'credits_semestre': credits_semestre})
+                ligne['ues'] = ues
+                lignes_releve_partie_2.append(ligne)
+
+            context['partie_2'] = {
+                'nbre_ues': nbre_ues - 3,
+                'nbre_colonnes': nbre_colonnes_partie_2 + (nbre_ues - 3) * 2 ,
+                'colonnes': colonnes_partie_2,
+                'lignes': lignes_releve_partie_2,
+                'nbre_lignes': len(lignes_releve_partie_2)
+            }
+        
+
+    #if nbre_ues > 6 and nbre_ues < 13:
+
+
+
+
+
+
+
+
+
+
+
+
+    # for ue in semestre_ues:
+    #     # ajout des colonnes correspondant aux matières
+    #     nbre_matieres = len(ue.matiere_set.all())
+    #     colonnes += 'c|' * nbre_matieres
+    #     nbre_colonnes += nbre_matieres
+
+    # # récupératon des données pour chaque lignes du relevé
+    # lignes_releve = []
+    # # boucle sur chaque étudiant pour constituer la ligne associée à l'étudiant
+    # for etudiant in etudiants:
+    #     ligne = {}
+    #     ligne['etudiant'] = etudiant
+    #     # tableau contenant l'ensemble des UEs de l'étudiant
+    #     ues = []
+    #     # boucle sur chaque UE suivies par l'étudiant pour calculersa mmoyenne et sa moyenne dans chaque matières
+    #     for ue in semestre_ues:
+    #         # tableau contenant l'ensemble des matières suivies par l'étudiant
+    #         matieres = []
+    #         nbre_matieres = len(ue.matiere_set.all())
+    #         for matiere in ue.matiere_set.all():
+    #             # récupération des matières de l'ue et la moyenne de l'étudiant dans celles-ci
+    #             matieres.append({'matiere': matiere, 'moyenne_matiere': round(
+    #                 etudiant.moyenne_etudiant_matiere(matiere, semestre)[0], 2)})
+    #         ues.append({'ue': ue, 'moyenne': round(etudiant.moyenne_etudiant_ue(ue, semestre)[
+    #                    0], 2), 'matieres_ue': matieres, 'nbre_matieres': nbre_matieres + 1})
+    #     ligne['ues'] = ues
+    #     lignes_releve.append(ligne)
+
+    # context = {
+    #     'nbre_ues': nbre_ues,
+    #     'nbre_colonnes': nbre_colonnes,
+    #     'colonnes': colonnes,
+    #     'lignes': lignes_releve,
+    #     'nbre_lignes': len(lignes_releve)
+    # }
 
     # nom des fichiers d'entrée et de sortie
 
