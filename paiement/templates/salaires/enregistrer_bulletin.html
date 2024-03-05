@@ -1,7 +1,7 @@
 {% extends 'index.html' %}
 {% block content_title %}
 
-Enregistrement du bulletin d'un employé permenant de l'IFNTI
+Enregistrement du bulletin d'un employé permanent de l'IFNTI
 
   <h1>
      <a href="{% url 'paiement:bulletins_de_paye' id_annee_selectionnee  %}" class="btn btn-outline-warning">
@@ -41,7 +41,7 @@ Enregistrement du bulletin d'un employé permenant de l'IFNTI
           </div>
         </div>
 
-        <div class="form-row mb-3">        
+        <div class="form-row mb-3">    
           <div class="col-md-6">
             {{ form.personnel.label_tag }}
             {{ form.personnel }}

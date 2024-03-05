@@ -7,11 +7,9 @@
         <h3 class="block-title">Bulletins de paye des employé permenant de l'IFNTI
         </h3>
         
-        {% if is_comptable %}
         <a href="{% url 'paiement:enregistrer_bulletin' %}" class="btn btn-outline-primary">
             <i class="fas fa-plus"></i> Ajouter
         </a>
-        {% endif %}
     </div>
 
     <div class="block-content block-content-full">

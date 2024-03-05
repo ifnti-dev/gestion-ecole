@@ -1,0 +1,130 @@
+{% extends 'index.html' %}
+{% block content_title %}
+Enregistrement d'un nouveau membre de personnel
+  <h1>
+     <a href="{% url 'paiement:liste_des_membres_de_personnels' %}" class="btn btn-outline-warning">
+        <i class="fas fa-chevron-left fa-lg"></i> Retour
+      </a>
+  </h1>
+{% endblock %}
+{% block content_title_description %}
+
+{% endblock %}
+{% block content %}
+  <div class="d-flex justify-content-center">
+    <div class="block-content card m-4 col-md-10 col-lg-8 col-xl-6">
+      <div class="d-flex justify-content-between">
+        <h3>         
+        </h3>
+    </div>
+      <form class="container-fluid p-3" action="#" method="POST">
+        {% csrf_token %}
+        <div class="form-row mb-3">
+          <div class="col-md-6">
+            {{ form.nom.label_tag }}
+            {{ form.nom }}
+            <span class="text-danger">{{ form.nom.errors }}</span>
+          </div>
+          <div class="col-md-6">
+            {{ form.prenom.label_tag }}
+            {{ form.prenom }}
+            <span class="text-danger">{{ form.prenom.errors }}</span>
+          </div>
+        </div>
+
+        <div class="form-row mb-3">
+          <div class="col-md-6">
+            {{ form.sexe.label_tag }}
+            {{ form.sexe }}
+            <span class="text-danger">{{ form.sexe.errors }}</span>
+          </div>
+          <div class="col-md-6">
+            {{ form.contact.label_tag }}
+            {{ form.contact }}
+            <span class="text-danger">{{ form.contact.errors }}</span>
+          </div>
+        </div>
+
+        <div class="form-row mb-3">        
+          <div class="col-md-6">
+            {{ form.adresse.label_tag }}
+            {{ form.adresse }}
+            <span class="text-danger">{{ form.adresse.errors }}</span>
+          </div>
+          <div class="col-md-6">
+            {{ form.email.label_tag }}
+            {{ form.email }}
+            <span class="text-danger">{{ form.email.errors }}</span>
+          </div>
+        </div>
+
+        <div class="form-row mb-3">
+          <div class="col-md-6">
+            {{ form.datenaissance.label_tag }}
+            <div class="d-flex">{{ form.datenaissance }}</div>
+            <span class="text-danger">{{ form.datenaissance.errors }}</span>
+          </div>
+          <div class="col-md-6">
+            {{ form.lieunaissance.label_tag }}
+            {{ form.lieunaissance }}
+            <span class="text-danger">{{ form.lieunaissance.errors }}</span>
+          </div>
+        </div>
+
+        <div class="form-row mb-3">
+          <div class="col-md-6">
+            {{ form.numero_cnss.label_tag }}
+            <div class="d-flex">{{ form.numero_cnss }}</div>
+            <span class="text-danger">{{ form.numero_cnss.errors }}</span>
+          </div>
+          <div class="col-md-6">
+            {{ form.nif.label_tag }}
+            {{ form.nif }}
+            <span class="text-danger">{{ form.nif.errors }}</span>
+          </div>
+        </div>
+
+      <div class="form-row mb-3">
+          <div class="col-md-6">
+            {{ form.salaireBrut.label_tag }}
+            <div class="d-flex">{{ form.salaireBrut }}</div>
+            <span class="text-danger">{{ form.salaireBrut.errors }}</span>
+          </div>
+          <div class="col-md-6">
+            {{ form.nombre_de_personnes_en_charge.label_tag }}
+            <div class="d-flex">{{ form.nombre_de_personnes_en_charge }}</div>
+            <span class="text-danger">{{ form.nombre_de_personnes_en_charge.errors }}</span>
+          </div>
+        </div>
+
+      <div class="form-row mb-3">
+        <div class="col-md-6">
+            {{ form.profil.label_tag }}
+            {{ form.profil }}
+            <span class="text-danger">{{ form.profil.errors }}</span>
+          </div>
+          <div class="col-md-6">
+            {{ form.dernierdiplome.label_tag }}
+            {{ form.dernierdiplome }}
+            <span class="text-danger">{{ form.dernierdiplome.errors }}</span>
+          </div>
+        </div>
+
+        <div class="form-row mb-3">
+          <div class="col-md-6">
+            {{ form.is_active.label_tag }}
+            <div class="d-flex">{{ form.is_active }}</div>
+            <span class="text-danger">{{ form.is_active.errors }}</span>
+          </div>
+          <div class="col-md-6">
+            {{ form.annee_universitaire.label_tag }}
+            {{ form.annee_universitaire }}
+            <span class="text-danger">{{ form.annee_universitaire.errors }}</span>
+          </div>
+        </div>
+
+        <button class="btn btn-primary btn-block" type="submit"><i class="fas fa-database"></i> Enrégistrer &nbsp;&nbsp;&nbsp;<span></span></button>
+      </form> 
+    </div>
+  </div>
+{% endblock %}

@@ -1,0 +1,55 @@
+{% extends '../index.html' %}
+
+{% block content %}
+
+<div class="block block-rounded m-5">
+    <div class="block-header p-4">
+        <h3 class="block-title">Liste des membres du personnel de l'IFNTI</h3>
+            <a href="{% url 'paiement:ajouter_personnel'%}" class="btn btn-outline-primary">
+                <i class="fas fa-plus"></i> Ajouter
+            </a>  
+    </div>
+
+    <div class="block-content block-content-full">
+        <table class="table table-bordered table-striped table-vcenter js-dataTable-full-pagination">
+            <thead>
+                <tr>
+                    <th class="text-center" style="width: 30%;">Nom & Prénoms</th>
+                    <th class="text-center" style="width: 80px;">Sexe</th>
+                    <th class="text-center" style="width: 15%;">Contact</th>
+                    <th class="text-center" style="width: 20%;">Email</th>
+                    <th class="text-center" style="width: 20%;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for membres_de_personnel in membres_de_personnels %}
+                <tr>
+                    <td class="text-center font-size-sm">{{membres_de_personnel.nom}} {{membres_de_personnel.prenom}}</td>
+                    <td class="text-center font-size-sm">{{membres_de_personnel.sexe}}</td>
+                    <td class="text-center font-size-sm">{{membres_de_personnel.contact}}</td>
+                    <td class="text-center font-size-sm">{{membres_de_personnel.email}}</td>
+                    <td style="text-align: center;">  
+
+                        <button type="button" class="bs-modal read-book btn btn-sm btn-primary">
+                            <a style="color: blanchedalmond;" href="{% url 'paiement:personnel_details' membres_de_personnel.id %}">
+                                <span class="fa fa-eye"></span>                
+                            </a>
+                        </button>
+                        
+                        <button type="button" class="update-book btn btn-sm btn-warning">
+                            <a  style="color: blanchedalmond;" href="{% url 'paiement:editer_personnel' membres_de_personnel.id %}">
+                                <span><i class="far fa-edit"></i></span>
+                            </a>
+                        </button>                       
+
+                    </td> 
+                </tr>
+                {% endfor%}
+            </tbody>
+        </table>
+    </div>
+
+
+</div>
+
+{% endblock %}
