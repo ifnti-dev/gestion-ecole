@@ -1,0 +1,84 @@
+{% extends '../index.html' %}
+{% block content %}
+
+<style>
+    #etudiant{
+        font-family: Arial, Helvetica, sans-serif;
+        border-collapse: collapse;
+        width: 100%;
+    }
+    #etudiant td,#etudiant th{
+        border: 1px solid #ddd;
+        padding: 8px;
+    }
+    #etudiant tr:nth-child(even){
+        background-color: #e8c1f7;
+    }
+    #etudiant th{
+        padding-top: 12px;
+        padding-bottom: 12px;
+        text-align: left;
+        background-color: #d6eaf8;
+    }
+</style>
+<div class="block block-rounded m-5">
+    <div class="block-header p-4">
+        <h3 class="block-title">Informations détaillés du membre de personnel {{personnel_details.nom}} {{personnel_details.prenom}}</h3>
+        <a class="btn btn-sm btn-success"  href="{% url 'paiement:liste_des_membres_de_personnels' %}" style="padding: 8px; float: right; background-color: blue; color: white;"><i class="fas fa-chevron-left fa-lg"></i>
+            Retour</a>
+    </div>
+    <div class="block-content block-content-full">
+        <table id="etudiant">
+            <thead class="thead-dark">
+                <tr>
+                    <th class="text-center" style="width: 80px;">Sexe</th>
+                    <th class="text-center" style="width: 15%;">Email</th>
+                    <th class="text-center" style="width: 15%;">Contact</th>
+                    <th class="text-center" style="width: 15%;">Adresse</th>
+                    <th class="text-center" style="width: 15%;">Date de Naissance</th>
+                    <th class="text-center" style="width: 15%;">Lieu de Naissance</th>
+                    <th class="text-center" style="width: 15%;">État</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="text-center font-size-sm">{{personnel_details.sexe}}</td>
+                    <td class="text-center font-size-sm">{{personnel_details.email}}</td>
+                    <td class="text-center font-size-sm">{{personnel_details.contact}}</td>
+                    <td class="text-center font-size-sm">{{personnel_details.adresse}}</td>
+                    <td class="text-center font-size-sm">{{personnel_details.datenaissance}}</td>
+                    <td class="text-center font-size-sm">{{personnel_details.lieunaissance}}</td>              
+                    <td class="text-center font-size-sm">{{personnel_details.is_active}}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <br>
+        <br>
+
+        <table id="etudiant">
+            <thead class="thead-dark">
+                <tr>
+                    <th class="text-center" style="width: 80px;">Numéro CNSS</th>
+                    <th class="text-center" style="width: 80px;">Numéro d'Identification fiscale</th>
+                    <th class="text-center" style="width: 80px;">Salaire brut</th>
+                    <th class="text-center" style="width: 80px;">Nbre de personne pris en charge</th>
+                    <th class="text-center" style="width: 80px;">Nbre jours de congés restant</th>
+                    <th class="text-center" style="width: 15%;">Nombre de jours consommé</th>  
+                </tr>
+            </thead>
+            
+            <tbody>
+                <tr>
+                    <td class="text-center font-size-sm">{{personnel_details.numero_cnss}}</td>
+                    <td class="text-center font-size-sm">{{personnel_details.nif}}</td>
+                    <td class="text-center font-size-sm">{{personnel_details.salaireBrut}} FCFA</td>
+                    <td class="text-center font-size-sm">{{personnel_details.nombre_de_personnes_en_charge}}</td>
+                    <td class="text-center font-size-sm">{{personnel_details.nbreJrsCongesRestant}}</td>
+                    <td class="text-center font-size-sm">{{personnel_details.nbreJrsConsomme}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

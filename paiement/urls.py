@@ -19,6 +19,12 @@ urlpatterns = [
     path('modifier_frais/<int:id>/', views.enregistrer_frais, name='modifier_frais'),
 
 
+                            #### Personnel ####
+    path('ajouter_personnel/', views.ajouter_personnel, name='ajouter_personnel'),
+    path('liste_des_membres_de_personnels/', views.liste_des_membres_de_personnels, name='liste_des_membres_de_personnels'),
+    path('editer_personnel/<str:id>/', views.ajouter_personnel, name='editer_personnel'),
+    path('personnel_details/<str:id>/', views.personnel_details, name='personnel_details'),
+
 
                             #### Comptable ####
     path('create_comptable/', views.create_comptable, name='create_comptable'),

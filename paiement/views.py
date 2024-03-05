@@ -2,8 +2,8 @@ from main.models import *
 import os
 from django import forms
 from decimal import Decimal
-from django.http import FileResponse, HttpResponse
-from paiement.forms import ComptableForm, FicheDePaieForm, PaiementForm, FournisseurForm, FraisForm, CompteBancaireForm, SalaireForm, ChargeForm, StagiairesForm
+from django.http import HttpResponse, JsonResponse
+from paiement.forms import ComptableForm, FicheDePaieForm, PersonnelForm, PaiementForm, FournisseurForm, FraisForm, CompteBancaireForm, SalaireForm, ChargeForm, StagiairesForm
 from django.db.models import Sum
 from num2words import num2words
 import datetime
@@ -14,9 +14,48 @@ from django.core.exceptions import ValidationError
 from decimal import Decimal, ROUND_DOWN
 from datetime import datetime
 import locale
-
 # Définir la locale en français
 locale.setlocale(locale.LC_TIME, 'fr_FR.UTF-8')
+
+
+@login_required(login_url=settings.LOGIN_URL)
+def liste_des_membres_de_personnels(request):
+    membres_de_personnels = Personnel.objects.all()
+    membres_de_personnels_data = {
+        "membres_de_personnels": membres_de_personnels,
+    }
+    #return JsonResponse(membres_de_personnels_data)
+    return render(request, 'personnels/membres_de_personnels.html', membres_de_personnels_data)
+
+
+@login_required(login_url=settings.LOGIN_URL)
+def ajouter_personnel(request, id=0):
+    if request.method == "GET":
+        if id == 0:
+            form = PersonnelForm()
+        else:
+            personnel = Personnel.objects.get(pk=id)
+            form = PersonnelForm(instance=personnel)   
+        return render(request, 'personnels/create_personnel.html', {'form': form})
+    else:
+        if id == 0:
+            form = PersonnelForm(request.POST)
+        else:
+            personnel = Personnel.objects.get(pk=id)
+            form = PersonnelForm(request.POST,instance= personnel)
+        if form.is_valid():
+            form.save()
+            return redirect('paiement:liste_des_membres_de_personnels')
+        else:
+            print(form.errors)
+            return render(request, 'personnels/create_personnel.html', {'form': form})
+
+
+@login_required(login_url=settings.LOGIN_URL)
+def personnel_details(request, id):
+    personnel_details = get_object_or_404(Personnel, id=id)
+    return render(request, 'personnels/personnel_details.html', {'personnel_details': personnel_details})
+
 
 @login_required(login_url=settings.LOGIN_URL)
 def liste_frais(request, id_annee_selectionnee):
