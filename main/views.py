@@ -1365,7 +1365,7 @@ def releve_notes_details_all(request, id_semestre):
 
     semestre = get_object_or_404(Semestre, id=id_semestre)
     etudiants = semestre.etudiant_set.all()
-
+    etudiants  = etudiants.order_by('nom')
     # nbre_colonnes = 2
 
     colonnes = '|c|c|'
@@ -1401,6 +1401,7 @@ def releve_notes_details_all(request, id_semestre):
             nbre_colonnes_partie_1 += nbre_matieres_partie_1
 
         lignes_releve_partie_1 = []
+        
         for etudiant in etudiants:
             ligne = {}
             ligne['etudiant'] = etudiant

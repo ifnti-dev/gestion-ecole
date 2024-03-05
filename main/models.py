@@ -678,18 +678,21 @@ class Etudiant(Utilisateur):
         if not matieres:
             return 0.0, False, anneeValidation
 
+        a_valide = True
         for matiere in matieres:
-            note, _, annee = self.moyenne_etudiant_matiere(matiere, semestre)
+            note, validation_matiere, annee = self.moyenne_etudiant_matiere(matiere, semestre)
             somme_note += float(note) * float(matiere.coefficient)
             somme_coef += matiere.coefficient
-            # ici on effectue une comparaison pou récupérer l'année scolaire la plus élevée
+            # ici on effectue une comparaison pour récupérer l'année scolaire la plus élevée
             # il s'agit en réalité de l'année de la validation du dernier rattrapage
             if anneeValidation < annee:
                 anneeValidation = annee
+            if validation_matiere == False:
+                a_valide = False
 
         moyenne = round(somme_note/somme_coef, 2)
-        matiere_principale = ue.matiere_principacle()
-        a_valide = moyenne >= matiere_principale.minValue
+        # matiere_principale = ue.matiere_principacle()
+        # a_valide = moyenne >= matiere_principale.minValue
         return moyenne, a_valide, anneeValidation
 
 
