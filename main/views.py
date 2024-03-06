@@ -72,7 +72,6 @@ def dashboard(request):
     elif request.user.groups.all().first().name =='etudiant' :
         etudiant = get_object_or_404(Etudiant, user=request.user)
         semestres=etudiant.semestres.filter(annee_universitaire=annee_selectionnee)
-        print(etudiant.semestres.all())
         event_data=[]
         for semestre in semestres:
             planning = Planning.objects.filter(semestre=semestre)
@@ -103,7 +102,7 @@ def change_annee_universitaire(request):
         :param request: L'objet de requête Django.
         :return: Une redirection HTTP sur l'URL précédente avec l'année scolaire selectionnée .
     """
-    print(request.POST)
+    
     if request.POST:
         request.session["id_annee_selectionnee"] = request.POST.get('annee_universitaire')
         return redirect(request.POST.get('origin_path'))
@@ -150,11 +149,10 @@ def etudiants(request):
     # Traitement des filtres d'état
     if 'etat' in request.POST:
         etat_id = request.POST.get('etat')
-        print(etat_id)
         if etat_id != "" and etat_id != "__all__":
             etat_id = int(etat_id)
             etats_selected = [bool(etat_id)]
-            print("::::::::::::", etats_selected)
+            
 
     # Logique pour filtrer les étudiants en fonction du rôle de l'utilisateur
     if role:
@@ -289,7 +287,7 @@ def create_etudiant(request, id=0):
             # Sauvegarde de l'étudiant pour générer un ID
             etudiant = form.save(commit=False)
             etudiant.save()
-            print(etudiant.nom)
+          
             # Trouver l'année universitaire en cours
             annee_universitaire_courante = AnneeUniversitaire.objects.get(
                 annee_courante=True)
@@ -572,7 +570,7 @@ def matieres(request):
     :param request: L'objet de requête Django.
     :return: Une réponse HTTP redirigeant vers la liste des tuteurs après la création ou la modification.
     """
-    print(Matiere.objects.all())
+   
     id_annee_selectionnee = request.session.get("id_annee_selectionnee")
     annee_universitaire = get_object_or_404(AnneeUniversitaire, pk=id_annee_selectionnee)
     niveau = "IFNTI"
@@ -1438,8 +1436,7 @@ def releve_notes_details_all(request, id_semestre):
                 nbre_matieres_partie_2 = len(semestre_ues[i].matiere_set.all())
                 colonnes_partie_2 += 'c|' * nbre_matieres_partie_2
                 nbre_colonnes_partie_2 += nbre_matieres_partie_2
-                print(nbre_matieres_partie_2)
-
+               
             lignes_releve_partie_2 = []
             for etudiant in etudiants:
                 ligne = {}
@@ -2156,13 +2153,13 @@ def login_view(request):
 def recuperation_mdp(request):
     if request.method == "POST":
         username_or_email = request.POST.get('username_or_email')
-        print(username_or_email)
+       
         notification = {
             "message": "Cet utilisateur n'existe pas", "type": "erreur"}
 
         users = get_user_model().objects.filter(username=username_or_email) | get_user_model().objects.filter(email=username_or_email)
 
-        print(users)
+       
         if not users:
             messages.error(request, "Votre identifiant est invalide !")
             return redirect('main:reminder')
@@ -2196,7 +2193,7 @@ def change_role(request, id_role):
     user = request.user
     user_groups  = user.groups.all()
     role = user_groups.get(id=id_role)
-    print(role.name)
+  
     is_directeur_des_etudes = role.name == "directeur_des_etudes"
     is_enseignant = role.name == "enseignant"
     is_secretaire = role.name == "secretaire"
@@ -2288,7 +2285,6 @@ def importer_les_enseignants(request):
             return render(request, 'etudiants/message_erreur.html', {'message': "Données importées avec succès."})
 
         except Exception as e:
-            print(e)
             return render(request, 'etudiants/message_erreur.html', {'message': "Erreur lors de l importation du fichier Excel."})
     return render(request, 'enseignants/importer.html')
 
@@ -2591,8 +2587,6 @@ def importer_data(request):
         all_annees = AnneeUniversitaire.objects.all().prefetch_related('semestre_set')
 
         for data in imported_data[1:112]:
-            print(data[0], data[2], data[3], data[4], data[5], data[6], data[7], data[28],
-                  data[29], data[30], data[31], data[32], data[33], data[34], data[35])
             etudiant = Etudiant(
                 anneeentree=data[0],
                 nom=data[2],
@@ -2611,7 +2605,6 @@ def importer_data(request):
             )
             try:
                 etudiant.save()
-                print(etudiant.user.username)
                 annee_universitaire = all_annees.get(
                     annee=etudiant.anneeentree)
 

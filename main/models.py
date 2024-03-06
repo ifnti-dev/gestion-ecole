@@ -693,6 +693,9 @@ class Etudiant(Utilisateur):
         moyenne = round(somme_note/somme_coef, 2)
         # matiere_principale = ue.matiere_principacle()
         # a_valide = moyenne >= matiere_principale.minValue
+        if ue.type == 'Technologie':
+            if moyenne < 12:
+                a_valide = False
         return moyenne, a_valide, anneeValidation
 
 
