@@ -696,6 +696,9 @@ class Etudiant(Utilisateur):
         if ue.type == 'Technologie':
             if moyenne < 12:
                 a_valide = False
+        else:
+            if moyenne < 10:
+                a_valide = False
         return moyenne, a_valide, anneeValidation
 
 
