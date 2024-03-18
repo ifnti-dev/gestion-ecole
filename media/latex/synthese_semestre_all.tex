@@ -54,7 +54,7 @@ Récapitulatif du semestre \VAR{semestre.libelle} - \VAR{annee}
 
 % on vient ensuite ici apres le hline , on met (Prénom & Nom & ) et on boucle ensuite pour recuperer dans l'odre des ue , les libellle de chacune des matieres des ue et on les met dans les crochet avec la proprieter centring
 \hline 
-Nom & Prenom & 
+\centering Nom & \centering Prenom & 
 \BLOCK{for ue in range(partie_1['nbre_ues'] -1)}
   \BLOCK{for matiere in partie_1['lignes'][0]['ues'][ue]['matieres_ue']}
     \rotatebox{90}{\parbox[c]{2.5cm}{\centering \VAR{matiere['matiere'].abbreviation} }}  & 

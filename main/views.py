@@ -1148,8 +1148,11 @@ def releve_notes(request, id, id_semestre):
     for ue in semestre_ues:
         moyenne, validation, anneeValidation = etudiant.moyenne_etudiant_ue(
             ue, semestre)
+        matieres_libelles = ''
+        for matiere in ue.matiere_set.all():
+            matieres_libelles += matiere.libelle + ', '
         ues.append({'ue': ue, 'moyenne': round(
-            moyenne, 2), 'validation': validation, 'anneeValidation': anneeValidation})
+            moyenne, 2), 'validation': validation, 'anneeValidation': anneeValidation, 'matieres_libelles': matieres_libelles})
 
     # calcul du nombre de crédits obtenus par l'étudiant
     credits_obtenus = 0
@@ -1221,10 +1224,14 @@ def releve_notes_semestre(request, id_semestre):
         for ue in semestre_ues:
             moyenne, validation, anneeValidation = etudiant.moyenne_etudiant_ue(
                 ue, semestre)
+            matieres_libelles = ''
+            for matiere in ue.matiere_set.all():
+                matieres_libelles += matiere.libelle + ', '
             releve_note['lignes'].append(
                 {'ue': ue, 'moyenne': round(
-                    moyenne, 2), 'validation': validation, 'anneeValidation': anneeValidation}
+                    moyenne, 2), 'validation': validation, 'anneeValidation': anneeValidation, 'matieres_libelles': matieres_libelles}
             )
+            
             # calcul de nombre de crédits obtenus
             if validation:
                 credits_obtenus += ue.nbreCredits
@@ -1391,7 +1398,7 @@ def releve_notes_details_all(request, id_semestre):
 
         nbre_colonnes_partie_1 = 2
 
-        colonnes_partie_1 = '|c|c|'
+        colonnes_partie_1 = '|l|l|'
         colonnes_partie_1 += 'c|' * 6
         for i in range(0,3):
             nbre_matieres_partie_1 = len(semestre_ues[i].matiere_set.all())
@@ -1430,7 +1437,7 @@ def releve_notes_details_all(request, id_semestre):
 
             nbre_colonnes_partie_2 = 3
 
-            colonnes_partie_2 = '|c|c|c|'
+            colonnes_partie_2 = '|l|l|c|'
             colonnes_partie_2 += 'c|' * 2 * (nbre_ues - 3)
             for i in range(3, nbre_ues):
                 nbre_matieres_partie_2 = len(semestre_ues[i].matiere_set.all())

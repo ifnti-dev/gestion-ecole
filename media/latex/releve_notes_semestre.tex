@@ -73,7 +73,6 @@
 \textbf{Nom:}   \VAR{releve_note['etudiant'].nom}  \\
 \textbf{Prénom:} \VAR{releve_note['etudiant'].prenom} \\
 \textbf{Sexe:} \VAR{releve_note['etudiant'].sexe}\\
-\textbf{Téléphone: } \VAR{releve_note['etudiant'].contact}\\
 \textbf{Date de naissance :} \VAR{releve_note['date_naissance']}\\
 \textbf{Lieu de naissance :} \VAR{releve_note['etudiant'].lieunaissance}\\
 }
@@ -93,7 +92,7 @@
 \textbf{Unité d'enseignement} & \textbf{Note} & \textbf{Crédits} & \textbf{Année d'obtention}\\
 \hline
 \BLOCK{for ligne in releve_note['lignes']}
-\VAR{ligne['ue'].libelle} & \VAR{ligne['moyenne']} & \BLOCK{if ligne['validation'] == True} \VAR{ligne['ue'].nbreCredits} \BLOCK{else} 0  \BLOCK{endif} & \VAR{ligne['anneeValidation']}\\
+\textbf{\VAR{ligne['ue'].libelle}} \\  \small \VAR{ligne['matieres_libelles']} & \VAR{ligne['moyenne']} & \BLOCK{if ligne['validation'] == True} \VAR{ligne['ue'].nbreCredits} \BLOCK{else} 0  \BLOCK{endif} & \VAR{ligne['anneeValidation']}\\
 \hline
 \BLOCK{endfor}
 
