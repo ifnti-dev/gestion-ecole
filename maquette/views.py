@@ -44,15 +44,21 @@ def add_programme(request):
     data = {}
     id_annee_selectionnee = request.session.get('id_annee_selectionnee')
     annee_universitaire = get_object_or_404(AnneeUniversitaire, pk=id_annee_selectionnee)
+    semestres = annee_universitaire.get_semestres()
     if request.POST:
         form = ProgrammeForm(request.POST)
+        form.set_semestre(semestres)
         if form.is_valid():
             form.save()
             return redirect('maquette:programmes')
         data['form'] = form
     else:
+        
         data['form'] = ProgrammeForm()
-    
+        data['form'].set_semestre(semestres)
+        # print(data['form'].initial)
+        # print(data['form'])
+
     return render(request, 'maquette/create_or_edit.html', context=data)
 
 @login_required(login_url=settings.LOGIN_URL)
@@ -62,14 +68,17 @@ def edit_programme(request, id):
     id_annee_selectionnee = request.session.get('id_annee_selectionnee')
     programme = get_object_or_404(Programme, pk=id)
     annee_universitaire = get_object_or_404(AnneeUniversitaire, pk=id_annee_selectionnee)
+    semestres = annee_universitaire.get_semestres()
     if request.POST:
         form = ProgrammeForm(request.POST, instance=programme)
+        form.set_semestre(semestres)
         if form.is_valid():
             form.save()
             return redirect('maquette:programmes')
         data['form'] = form
     else:
         data['form'] = ProgrammeForm(instance=programme)
+        data['form'].set_semestre(semestres)
     
     return render(request, 'maquette/create_or_edit.html', context=data)
 

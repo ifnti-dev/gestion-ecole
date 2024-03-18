@@ -1758,6 +1758,10 @@ class AnneeUniversitaire(models.Model):
             )
             semestre.save()
             print(f"Semestre créé : {semestre}")
+    
+    @staticmethod
+    def static_get_selected_annee_universitaire():
+        return AnneeUniversitaire.objects.get_object_or_404(annee_courante=True)
 
     @staticmethod
     def static_get_current_annee_universitaire():
