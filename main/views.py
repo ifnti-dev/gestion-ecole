@@ -661,20 +661,27 @@ def create_matiere(request, id=0):
 
     :return: Une réponse HTTP redirigeant vers le formulaire de crétion ou de modification d'une matière.
     """
+    id_annee_selectionnee = request.session.get('id_annee_selectionnee')
+    annee_universitaire = get_object_or_404(AnneeUniversitaire, pk=id_annee_selectionnee)
+    ues = Ue.objects.filter(programme__semestre__annee_universitaire=annee_universitaire)
     if request.method == "GET":
         if id == 0:
             form = MatiereForm()
+            form.set_ue(ues)
         else:
             matiere = Matiere.objects.get(pk=id)
             form = MatiereForm(instance=matiere)
+            form.set_ue(ues)
         return render(request, 'matieres/create_matiere.html', {'form': form})
     else:
         if id == 0:
             form = MatiereForm(request.POST)
+            form.set_ue(ues)
             message = "a été ajouté"
         else:
             matiere = Matiere.objects.get(pk=id)
             form = MatiereForm(request.POST, instance=matiere)
+            form.set_ue(ues)
             message = "a été mis a jour"
             
         if form.is_valid():

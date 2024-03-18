@@ -221,6 +221,13 @@ class UeForm(forms.ModelForm):
 
 class MatiereForm(forms.ModelForm):
 
+    def set_ue(self, ues):
+        self.fields['ue'] = forms.ModelChoiceField(
+        queryset=ues,
+        widget=forms.Select(attrs={'class': 'form-control  col-md-12'}
+        )
+    )
+        
     class Meta:
         model = Matiere
         fields = ['libelle', 'coefficient', 'minValue', 'ue', 'enseignant', 'abbreviation', 'heures']
@@ -228,7 +235,6 @@ class MatiereForm(forms.ModelForm):
             'libelle': forms.TextInput(attrs={'class': 'form-control col-md-12'}),
             'coefficient': forms.TextInput(attrs={'class': 'form-control col-md-12'}),
             'minValue': forms.TextInput(attrs={'class': 'form-control col-md-12'}),
-            'ue': forms.Select(attrs={'class': 'form-control js-select2 col-md-12'}),  
             'enseignant': forms.Select(attrs={'class': 'form-control col-md-12'}),  
             'abbreviation': forms.TextInput(attrs={'class': 'form-control col-md-12'}),
             'heures': forms.NumberInput(attrs={'class': 'form-control col-md-12'}),

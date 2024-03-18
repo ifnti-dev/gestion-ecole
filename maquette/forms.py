@@ -57,32 +57,27 @@ class CorrespondanceMaquetteForm(forms.ModelForm):
 class ProgrammeForm(forms.ModelForm):
 
     def set_semestre(self, semestres):
-
-    # def __init__ (self, *args, **kwargs):
-
-    #     super(ProgrammeForm, self).__init__(*args, **kwargs)
-        
         self.fields['semestre'] =  forms.ModelChoiceField(
             queryset=semestres,
             widget=forms.Select(attrs={'class' : 'form-control'}),
         )
-    # semestre = forms.ModelChoiceField(
-    #     queryset=Semestre.objects.none(),
-    #     widget=forms.Select(attrs={'class' : 'form-control'}),
-    # )
+
+    def set_ues(self, ues):
+        self.fields['ues'] = forms.ModelMultipleChoiceField(
+        queryset=ues,
+        widget=forms.SelectMultiple(attrs={'class' : 'form-control js-select2 form-control w-100'})
+    )
+
     parcours = forms.ModelChoiceField(
         queryset=Parcours.objects.all(),
         widget=forms.Select(attrs={'class' : 'form-control'})
     )
-    ues = forms.ModelMultipleChoiceField(
-        queryset=Ue.objects.all(),
-        widget=forms.SelectMultiple(attrs={'class' : 'form-control js-select2 form-control w-100'})
-    )
+   
     
     class Meta:
         model = Programme
         fields = ('semestre', 'ues','parcours')
-        widgets = {'semestre': forms.Select(attrs={'class' : 'form-control'})}
+        #widgets = {'semestre': forms.Select(attrs={'class' : 'form-control'})}
     
     def clean(self):
         cleanned_data = super(ProgrammeForm, self).clean()   
