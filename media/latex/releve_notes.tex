@@ -13,6 +13,7 @@
 \usepackage{graphicx}
 \usepackage{eso-pic}
 \usepackage{ulem}
+\usepackage{multirow}
 \usepackage[french]{babel}
 
 
@@ -64,7 +65,6 @@
 \textbf{Matricule:} \VAR{etudiant.id}\\
 \textbf{Nom:}   \VAR{etudiant.nom}  \\
 \textbf{Prénom:} \VAR{etudiant.prenom} \\
-\textbf{Téléphone: } \VAR{etudiant.contact}\\
 \textbf{Date de naissance :} \VAR{date_naissance}\\
 \textbf{Lieu de naissance :} \VAR{etudiant.lieunaissance}
 }
@@ -84,7 +84,7 @@
 	\textbf{Unité d'enseignement} & \textbf{Note} & \textbf{Crédits} & \textbf{Année d'obtention}\\
 	\hline
 \BLOCK{for ue in ues}
-\VAR{ue['ue'].libelle} & \VAR{ue['moyenne']} & \BLOCK{if ue['validation'] == True} \VAR{ue['ue'].nbreCredits} \BLOCK{else} 0  \BLOCK{endif} & \VAR{ue['anneeValidation']}\\
+ \textbf{\VAR{ue['ue'].libelle}} \\ \small \VAR{ue['matieres_libelles']} & \VAR{ue['moyenne']} & \BLOCK{if ue['validation'] == True} \VAR{ue['ue'].nbreCredits} \BLOCK{else} 0  \BLOCK{endif} & \VAR{ue['anneeValidation']}\\
 \hline
 \BLOCK{endfor}
 

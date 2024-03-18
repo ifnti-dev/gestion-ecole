@@ -1,19 +1,21 @@
 from typing import Any
 from django import forms
 
-from main.models import CorrespondanceMaquette, Domaine, Matiere, Parcours, Programme, Semestre, Ue
+from main.models import CorrespondanceMaquette, Domaine, Matiere, Parcours, Programme, Semestre, Ue, AnneeUniversitaire
 
 class GenerateMaquetteForm(forms.Form):
+    annee_courante = AnneeUniversitaire.static_get_current_annee_universitaire()
+    print(annee_courante)
    # The code is defining two fields, `semestre` and `parcours`, for a form.
     semestres = forms.ModelMultipleChoiceField(
-        queryset=Semestre.static_get_current_semestre(),
+        queryset=annee_courante.get_semestres(),
         widget=forms.SelectMultiple(attrs={'class' : 'form-control js-select2', 'onchange': 'this.form.submit()'}),
         required=False
     )
     
     parcours = forms.ModelChoiceField(
         queryset=Parcours.objects.all(),
-        widget=forms.Select(attrs={'class' : 'form-control', 'onchange': 'this.form.submit()'}),
+        widget=forms.Select(attrs={'cannee_courantelass' : 'form-control', 'onchange': 'this.form.submit()'}),
     )
     type_maquette = forms.CharField(
         widget=forms.Select(
@@ -53,10 +55,21 @@ class CorrespondanceMaquetteForm(forms.ModelForm):
 
 
 class ProgrammeForm(forms.ModelForm):
-    semestre = forms.ModelChoiceField(
-        queryset=Semestre.static_get_current_semestre(),
-        widget=forms.Select(attrs={'class' : 'form-control'}),
-    )
+
+    def set_semestre(self, semestres):
+
+    # def __init__ (self, *args, **kwargs):
+
+    #     super(ProgrammeForm, self).__init__(*args, **kwargs)
+        
+        self.fields['semestre'] =  forms.ModelChoiceField(
+            queryset=semestres,
+            widget=forms.Select(attrs={'class' : 'form-control'}),
+        )
+    # semestre = forms.ModelChoiceField(
+    #     queryset=Semestre.objects.none(),
+    #     widget=forms.Select(attrs={'class' : 'form-control'}),
+    # )
     parcours = forms.ModelChoiceField(
         queryset=Parcours.objects.all(),
         widget=forms.Select(attrs={'class' : 'form-control'})
@@ -69,6 +82,7 @@ class ProgrammeForm(forms.ModelForm):
     class Meta:
         model = Programme
         fields = ('semestre', 'ues','parcours')
+        widgets = {'semestre': forms.Select(attrs={'class' : 'form-control'})}
     
     def clean(self):
         cleanned_data = super(ProgrammeForm, self).clean()   
