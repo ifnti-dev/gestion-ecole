@@ -23,7 +23,7 @@
 
 \pagestyle{fancyplain}
 	
-\cfoot{\vspace{-.5cm}Institut de formation aux normes et technologies de l'informatique\\300 BP 40, Sokodé TOGO -- Tél. : +228 90 91 81 41\\Agrément N\textdegree2019/064/MESR/SG/DES}
+\cfoot{\vspace{-.5cm}Institut de formation aux normes et technologies de l'informatique\\300 BP 40, Sokodé TOGO -- Tél. : +228 90 91 81 41\\Agrément N\textdegree2023/097/MESR/SG/DES}
 \renewcommand{\headrulewidth}{0pt}
 
 
@@ -61,8 +61,6 @@
 	\begin{center}
 	REPUBLIQUE TOGOLAISE \\
 	Travail-Liberté-Patrie \\
-	\vspace{0.5cm}
-	MINISTÉRE DE l'ENSEIGNEMENT \\ SUPÉRIEUR ET DE LA RECHERCHE
 	\end{center}
 \end{minipage}
 
@@ -93,7 +91,7 @@
 \textbf{Unité d'enseignement} & \textbf{Note} & \textbf{Crédits} & \textbf{Année d'obtention}\\
 \hline
 \BLOCK{for ligne in releve_note['lignes']}
-\textbf{\VAR{ligne['ue'].libelle}} \\  \small \VAR{ligne['matieres_libelles']} & \VAR{ligne['moyenne']} & \BLOCK{if ligne['validation'] == True} \VAR{ligne['ue'].nbreCredits} \BLOCK{else} 0  \BLOCK{endif} & \VAR{ligne['anneeValidation']}\\
+\textbf{\VAR{ligne['ue'].libelle}} \\  \small \VAR{ligne['matieres_libelles']} & \VAR{ligne['moyenne']} & \BLOCK{if ligne['validation'] == True} \VAR{ligne['ue'].nbreCredits} \BLOCK{else} 0  \BLOCK{endif} & \VAR{ligne['anneeValidation']} - \VAR{ligne['anneeValidation'] + 1}\\
 \hline
 \BLOCK{endfor}
 
