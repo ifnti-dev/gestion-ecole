@@ -22,7 +22,7 @@ load_dotenv()
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('SECRET_KEY')
+SECRET_KEY = 'ghbfrhgkjssk'
 
 X_FRAME_OPTIONS = 'SAMEORIGIN'
 
@@ -102,13 +102,12 @@ WSGI_APPLICATION = 'projet_ifnti.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-
-        'NAME': os.getenv('DATABASE'),
-        'USER': os.getenv('DB_USER'),
-        'PASSWORD': os.getenv('DB_PASSWORD'),
-        'HOST': os.getenv('DB_FIRST_HOST'),
-        'HOST': os.getenv('DB_SECOND_HOST'),
-        'PORT': os.getenv('DB_PORT'),
+        'NAME': 'ifnti',
+        'USER': 'cherifa',
+        'PASSWORD': '1234',
+        'HOST': '127.0.0.1',
+        'HOST': '127.0.0.1',
+        'PORT': '5432',
 
     }
 }
