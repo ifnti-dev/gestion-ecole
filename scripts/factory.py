@@ -214,7 +214,8 @@ def create_seed():
     group = Group.objects.get(name="directeur_des_etudes")
     enseignant.user.groups.add(group)
     print(f"Enseignant créé : {enseignant.user.username}")
-    user = User.objects.create_user(username="ifnti", password="ifnti")
+    user = User.objects.create_user(username="ifnti", password="ifnti", is_superuser=True)
+    user.groups.add(group)
     print(f"User directeur créé : {user}")
 
 def create_groups_if_exist():
