@@ -27,7 +27,7 @@ SECRET_KEY=_mot_clé au choix
 
 3.  Exécuter le fichier requirements.txt
 
-```python
+```shell
 pip install -r requirements.txt
 ```
 
@@ -41,7 +41,7 @@ path('main/', include('main.urls')),
 ]
 ```
 
-6.  Pour la créer des migrations,  de l'utilisateur , lancé le fichier :  'init_db.sh'
+6.  Pour la créer des migrations,  de l'utilisateur , lancé le fichier : `init_db.sh`
 
 ```txt
 Pour ce faire il faut : 
@@ -57,7 +57,7 @@ python3 manage.py runserver
 ```
 
 
-Ensuite l'application est accessible à l'adresse: http://localhost:8000/main
+Ensuite l'application est accessible à l'adresse: `http://localhost:8000/main`
 
 ### Identifiant de connexion
 
