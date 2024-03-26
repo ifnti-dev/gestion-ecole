@@ -50,7 +50,14 @@ _donner les permissions sur le ficher : sudo chmod 777 init_db.sh
 _lancer la commande a la racine du projet : ./init_db.sh
 ```
 
-7.  Maintenant lancer le projet
+**Pour lancer un script** (Script de  création du user `ifnti` avec le mot de passe `ifnti`)
+
+```python
+python3 manage.py runscript factory
+```
+
+
+8.  Maintenant lancer le projet
 
 ```python
 python3 manage.py runserver
