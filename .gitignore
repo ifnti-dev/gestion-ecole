@@ -148,6 +148,7 @@ GitHub.sublime-settings
 !.vscode/launch.json 
 !.vscode/extensions.json 
 .history
+.obsidian
 
 
 # ignore generated PDF from application
