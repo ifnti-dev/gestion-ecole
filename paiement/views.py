@@ -1503,3 +1503,23 @@ def delete_bulletin_stagiaire(request):
     id_annee_selectionnee = AnneeUniversitaire.static_get_current_annee_universitaire().id
     return redirect('paiement:bulletins_de_paye_stagiaire', id_annee_selectionnee=id_annee_selectionnee)
 
+
+
+
+
+#---------------------------------Option de filtrage lors de l'impression-----------------------------
+def option_impression_frais_scolarite_par_semestre(request):
+    """
+        Affiche la page d'option d'impression des frais de scolarité par semestre
+    """
+    semestres = Semestre.objects.filter(annee_universitaire=AnneeUniversitaire.static_get_current_annee_universitaire())
+
+    recuperation_montant_frais_scolarite = request.GET.get('item-name')
+
+    if recuperation_montant_frais_scolarite is not None:
+        if recuperation_montant_frais_scolarite < 0 or recuperation_montant_frais_scolarite > 590000:
+            return render(request, "", {'message': "Le montant doit être compris entre 0 et 590000."})
+        else:
+            montant_frais_scolarite = CompteEtudiant.objects.filter(montant__icontains=recuperation_montant_frais_scolarite)
+            return render(request, "", {'semestres': semestres, 'montant_frais_scolarite': montant_frais_scolarite})
+            

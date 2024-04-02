@@ -2575,7 +2575,13 @@ class Salaire(models.Model):
     def calculer_semi_net(self):
         G41 = self.calculer_total_C()
         G42 = self.calculer_total_D()
-        semi_net = G41 - G42
+        
+        try:
+            semi_net = float(G41) - float(G42)
+            semi_net = float(format(1.25555, '.2f') )
+        except Exception as e:
+            semi_net = float(format(1.25555, '.2f') )
+
         return semi_net
 
     def calculer_charges_de_familles(self):

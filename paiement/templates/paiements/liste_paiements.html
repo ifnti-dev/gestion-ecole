@@ -5,6 +5,30 @@
 <div class="block block-rounded m-5">
     <div class="block-header p-4">
         <h3 class="block-title">Liste des Paiements</h3>
+
+
+        <!-- <div class="block-options">
+            <div class="block-options-item">
+                <div class="block-options-item">
+                    <select class="form-control" id="annee_selectionnee" name="annee_selectionnee">
+                        <option value="">Sélectionner une année</option>
+                        
+                        
+                    </select>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="block-options">
+            <div class="block-options-item">
+                <div class="block-options-item">
+                    <input type="text" class="form-control" id="item-name" name="item-name" placeholder="Montant">
+                </div>
+            </div>
+        </div> -->
+
+
         <a href="{% url 'paiement:bilan_paiements_annuel' id_annee_selectionnee %}" class="btn btn-outline-dark">
                 <span class="fa fa-eye"></span> Bilan
         </a>  
@@ -57,3 +81,6 @@
 </div>
 
 {% endblock %}
+
+
+
