@@ -2207,7 +2207,7 @@ class Paiement(models.Model):
 
         **Type:** Decimal
 
-        **Valeur par défaut:** 0.0
+        **Valeur par défaut:** 0.0Frais
 
     """
     dateversement = models.DateField(
@@ -2266,6 +2266,7 @@ class Paiement(models.Model):
     def __str__(self):
         return str(self.dateversement) + " : " + str(self.etudiant.nom) + "  " + str(self.etudiant.prenom) + "  " + str(self.montant)
 
+    
 
 class CompteBancaire(models.Model):
     """
