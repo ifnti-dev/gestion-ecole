@@ -293,13 +293,15 @@ class FicheDePaieForm(forms.ModelForm):
 class ChargeForm(forms.ModelForm):
     class Meta:
         model = Charge
-        fields = ['dateDebut', 'dateFin',  'personnel', 'frais_de_vie', 'frais_nourriture']   
+        fields = ['dateDebut', 'dateFin',  'personnel', 'frais_de_vie', 'frais_nourriture', 'frais_de_vie_dcc', 'frais_nourriture_dcc']   
         widgets = {
             'dateDebut': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
             'dateFin': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
             'personnel': forms.Select(attrs={'class': 'form-control'}),
             'frais_de_vie': forms.NumberInput(attrs={'class': 'form-control'}),
             'frais_nourriture': forms.NumberInput(attrs={'class': 'form-control'}),
+            'frais_de_vie_dcc': forms.NumberInput(attrs={'class': 'form-control'}),
+            'frais_nourriture_dcc': forms.NumberInput(attrs={'class': 'form-control'}),
         }
 
-     
+
