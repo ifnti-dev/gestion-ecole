@@ -5,7 +5,9 @@ app_name = 'paiement'
 
 urlpatterns = [
 
-
+                #### delete_frais_scolarite
+                path('delete_frais_scolarite/<int:id>/',views.delete_frais_scolarite,name="delete_frais_scolarite"),
+                
 
                         #### Compte bancaire ####
     path('etat_compte_bancaire/<int:id_annee_selectionnee>/<int:compte_bancaire_id>/', views.etat_compte_bancaire, name='etat_compte_bancaire'),

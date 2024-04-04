@@ -49,6 +49,7 @@ Enregistrement d'un paiement
           <div class="col-md-6">
             {{ form.montant.label_tag }}
             {{ form.montant }}
+            
             <span class="text-danger">{{ form.montant.errors }}</span>
           </div>
           <div class="col-md-6">
@@ -68,6 +69,7 @@ Enregistrement d'un paiement
             {{ form.annee_universitaire.label_tag }}
             {{ form.annee_universitaire }}
             <span class="text-danger">{{ form.annee_universitaire.errors }}</span>
+            
           </div>
         </div>
         <button class="btn btn-primary btn-block" type="submit"><i class="fas fa-database"></i> Enrégistrer &nbsp;&nbsp;&nbsp;<span></span></button>
@@ -75,3 +77,20 @@ Enregistrement d'un paiement
     </div>
   </div>
 {% endblock %} 
+{% block scripts %}
+<script>
+  console.log("hello");
+  // frais_inscription est une variable défini depuis la vue et on l'utilise ici
+  let valeur= {% autoescape off %} {{frais_inscription}}{% endautoescape %};
+  
+  $('#id_type').on("change",function(){
+   // console.log( $('#id_type').val())
+    if($('#id_type').val()=="Frais d'inscription"){
+      $('#id_montant').val(valeur);
+    } else {
+      $('#id_montant').val(0);
+    }
+  });
+
+</script>
+{% endblock scripts %}

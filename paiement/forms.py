@@ -41,9 +41,9 @@ class PersonnelForm(forms.ModelForm):
 class FraisForm(forms.ModelForm):
     class Meta:
         model = Frais
-        fields = ['annee_universitaire', 'montant_inscription', 'montant_scolarite' ]
+        fields = ['montant_inscription', 'montant_scolarite' ]
         widgets = {
-            'annee_universitaire': forms.Select(attrs={'class': 'form-control'}),       
+            #'annee_universitaire': forms.Select(attrs={'class': 'form-control'}),       
             'montant_inscription': forms.NumberInput(attrs={'class': 'form-control'}),
             'montant_scolarite': forms.NumberInput(attrs={'class': 'form-control'}),
         }
@@ -60,6 +60,7 @@ class CompteBancaireForm(forms.ModelForm):
 
 
 class PaiementForm(forms.ModelForm):
+    montant=forms.IntegerField(initial=None,widget=forms.NumberInput(attrs={'class': 'form-control','placeholder':0},))
     class Meta:
         model = Paiement
         fields = ['type','etudiant', 'montant', 'dateversement', 'numerobordereau', 'annee_universitaire']
@@ -67,7 +68,6 @@ class PaiementForm(forms.ModelForm):
         widgets = {
             'type': forms.Select(attrs={'class': 'form-control'}),
             'dateversement': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
-            'montant': forms.NumberInput(attrs={'class': 'form-control'}),
             'etudiant': forms.Select(attrs={'class': 'form-control'}),
             'numerobordereau': forms.TextInput(attrs={'class': 'form-control'}),
             'annee_universitaire': forms.Select(attrs={'class': 'form-control'}),
@@ -78,18 +78,23 @@ class PaiementForm(forms.ModelForm):
         etudiant = cleaned_data.get('etudiant')
         montant = cleaned_data.get('montant')
         annee_universitaire = cleaned_data.get('annee_universitaire')
+        
+        #
+        if montant > 590000:
+            raise forms.ValidationError("Montant ne doit pas depassé 590.000")
+        else:  
+            
+            if etudiant and annee_universitaire :
+                total_versements = Paiement.objects.filter(etudiant=etudiant, annee_universitaire=annee_universitaire).aggregate(Sum('montant'))['montant__sum'] or 0
+                frais = Frais.objects.filter(annee_universitaire=annee_universitaire).first()
 
-        if etudiant and annee_universitaire:
-            total_versements = Paiement.objects.filter(etudiant=etudiant, annee_universitaire=annee_universitaire).aggregate(Sum('montant'))['montant__sum'] or 0
-            frais = Frais.objects.filter(annee_universitaire=annee_universitaire).first()
+                if frais:
+                    total_frais = frais.montant_inscription + frais.montant_scolarite
 
-            if frais:
-                total_frais = frais.montant_inscription + frais.montant_scolarite
-
-                if montant and montant + total_versements > total_frais:
-                    raise forms.ValidationError("L'étudiant a déjà versé le montant total des frais. Aucun versement supplémentaire n'est autorisé.")
-            else:
-                raise forms.ValidationError("Les frais ne sont pas définis pour l'année universitaire sélectionnée.")
+                    if montant and montant + total_versements > total_frais:
+                        raise forms.ValidationError("L'étudiant a déjà versé le montant total des frais. Aucun versement supplémentaire n'est autorisé.")
+                else:
+                    raise forms.ValidationError("Les frais ne sont pas définis pour l'année universitaire sélectionnée.")
 
         return cleaned_data
 
