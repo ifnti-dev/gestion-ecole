@@ -102,12 +102,13 @@ WSGI_APPLICATION = 'projet_ifnti.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'ifnti',
-        'USER': 'cherifa',
-        'PASSWORD': '1234',
-        'HOST': '127.0.0.1',
-        'HOST': '127.0.0.1',
-        'PORT': '5432',
+        'NAME': os.getenv('DATABASE'),
+        'USER': os.getenv('DB_USER'),
+        'PASSWORD': os.getenv('DB_PASSWORD'),
+        'HOST': os.getenv('DB_FIRST_HOST'),
+        'HOST': os.getenv('DB_SECOND_HOST'),
+        'PORT': os.getenv('DB_PORT'),
+       
 
     }
 }
