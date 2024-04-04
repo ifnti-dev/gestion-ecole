@@ -25,10 +25,15 @@
 
 \begin{document}
 
-\begin{center}
-    \underline{\textbf{BILAN ANNUEL DES PAIEMENTS}}
-\end{center}
+\VAR{etudiant_filtrer_par_montant}
 
+
+
+
+
+
+\BLOCK{ for seme in recupsemestre }
+  \VAR{seme.libelle} 
 
 \begin{center}
 \newcolumntype{D}[1]{>{}p{#1}}
@@ -52,4 +57,7 @@
 
 \end{center}
 
+
+  
+\BLOCK{endfor}
 \end{document}

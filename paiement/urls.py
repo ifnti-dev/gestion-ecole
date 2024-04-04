@@ -80,6 +80,8 @@ urlpatterns = [
     path('modifier_fiche_de_prise_en_charge/<int:id>/', views.enregistrer_fiche_de_prise_en_charge, name='modifier_fiche_de_prise_en_charge'),
     path('fiche_de_charge/<int:id>/', views.fiche_de_charge, name='fiche_de_charge'),
 
-    
+                        ### Fiche d'impression par semestre###
+
+    path('option_impression_frais_scolarite_par_semestre/', views.option_impression_frais_scolarite_par_semestre, name='option_impression_frais_scolarite_par_semestre'),
 
 ]

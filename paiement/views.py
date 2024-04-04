@@ -231,10 +231,17 @@ def liste_paiements(request, id_annee_selectionnee):
     Cette vue récupère les versements de frais de scolarité  associés à l'année universitaire spécifiée,
     puis les renvoie au template 'paiements/liste_paiements.html' pour affichage.
     """
+    id_annee_selectionnee = request.session["id_annee_selectionnee"]
     annee_universitaire = get_object_or_404(AnneeUniversitaire, pk=id_annee_selectionnee)
     paiements = Paiement.objects.filter(annee_universitaire=annee_universitaire)
+
+    
+    semestres = annee_universitaire.get_semestres()
+    
+    
+
     context = {
-        'annee_universitaire': annee_universitaire,
+        'semestres' : semestres,
         'paiements': paiements,
     }
     return render(request, 'paiements/liste_paiements.html', context)
@@ -596,8 +603,12 @@ def liste_etudiants(request, id_annee_selectionnee):
     """
         Créer un contexte contenant les données nécessaires pour le template
     """
+
+
+   
+
+
     context = {
-        'id_annee_selectionnee': id_annee_selectionnee,
         'etudiants_avec_montant_total': etudiants_avec_montant_total,
         'total_frais_courante': total_frais_courante,
     }
@@ -1510,16 +1521,49 @@ def delete_bulletin_stagiaire(request):
 #---------------------------------Option de filtrage lors de l'impression-----------------------------
 def option_impression_frais_scolarite_par_semestre(request):
     """
-        Affiche la page d'option d'impression des frais de scolarité par semestre
+        Reperer l'id de l'année universitaire courante
+        Récuperer le montant des frais de scolarité par semestre
+        visualisation du pdf dans le navigateur
     """
-    semestres = Semestre.objects.filter(annee_universitaire=AnneeUniversitaire.static_get_current_annee_universitaire())
 
-    recuperation_montant_frais_scolarite = request.GET.get('item-name')
+    recupmax = request.POST.get('max')
+    recupmin = request.POST.get('min')
+    recupsemestre = request.POST.getlist('semestres')
 
-    if recuperation_montant_frais_scolarite is not None:
-        if recuperation_montant_frais_scolarite < 0 or recuperation_montant_frais_scolarite > 590000:
-            return render(request, "", {'message': "Le montant doit être compris entre 0 et 590000."})
-        else:
-            montant_frais_scolarite = CompteEtudiant.objects.filter(montant__icontains=recuperation_montant_frais_scolarite)
-            return render(request, "", {'semestres': semestres, 'montant_frais_scolarite': montant_frais_scolarite})
-            
+    semestres = []
+    for sem in recupsemestre:
+        semestre = Semestre.objects.filter(id = sem).get()
+        semestres.append(semestre)
+        print(semestre.libelle)
+
+    recuperation_montant_frais_scolarite_min, recuperation_montant_frais_scolarite_max = recupmin,recupmax
+    montant_frais_scolarite = CompteEtudiant.objects.filter(solde__gte=recuperation_montant_frais_scolarite_min, solde__lte=recuperation_montant_frais_scolarite_max,)
+    
+    etudiant_filtrer_par_montant = []
+    for impression in montant_frais_scolarite:
+        etudiant_filtrer_par_montant.append(impression)
+
+
+    print(etudiant_filtrer_par_montant)
+
+
+
+    context = {
+        'recupsemestre': semestres,
+        'montant_frais_scolarite': montant_frais_scolarite,
+        'etudiant_filtrer_par_montant' : etudiant_filtrer_par_montant
+    }
+    
+    latex_input = 'frais_scolarite_par_semestre'
+    latex_input = 'bilan_paiements_annuel'
+    latex_ouput = 'generated_bilan_paiements_annuel'
+    pdf_file = 'pdf_bilan_paiements_annuel'
+
+    generate_pdf(context, latex_input, latex_ouput, pdf_file)
+
+    # visualisation du pdf dans le navigateur
+    with open('media/pdf/' + str(pdf_file) + '.pdf', 'rb') as f:
+        pdf_preview = f.read()
+        response = HttpResponse(pdf_preview, content_type='application/pdf')
+        response['Content-Disposition'] = 'inline;filename=pdf_frais.pdf'
+        return response
