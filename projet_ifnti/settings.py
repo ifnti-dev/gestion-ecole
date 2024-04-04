@@ -22,7 +22,8 @@ load_dotenv()
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'ghbfrhgkjssk'
+SECRET_KEY = os.getenv('SECRET_KEY')
+#SECRET_KEY = 'ghbfrhgkjssk'
 
 X_FRAME_OPTIONS = 'SAMEORIGIN'
 
