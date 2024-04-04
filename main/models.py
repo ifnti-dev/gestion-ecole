@@ -3071,9 +3071,9 @@ class Charge(models.Model):
         **Type:** string
 
     """
-    frais_de_vie = models.IntegerField(verbose_name="Frais de vie", default=0)
+    frais_de_vie = models.IntegerField(verbose_name="Frais de vie", default=20000)
     """
-        Frais de vie de l'employé
+        Contribution des Frais de vie de l'employé par l'IFNTI
 
         **Type:** integer
 
@@ -3081,9 +3081,28 @@ class Charge(models.Model):
 
     """
     frais_nourriture = models.IntegerField(
-        verbose_name="Frais de nourriture", default=0)
+        verbose_name="Frais de nourriture", default=70000)
     """
-        Frais de nourriture de l'employé
+        Contribution des Frais de nourriture de l'employé par l'IFNTI
+
+        **Type:** integer
+
+        **Valeur par défaut:** 0
+
+    """
+    frais_de_vie_dcc = models.IntegerField(verbose_name="Frais de vie DCC", default=0)
+    """
+        Contribution des Frais de vie de l'employé pas la DCC 
+
+        **Type:** integer
+
+        **Valeur par défaut:** 0
+
+    """
+    frais_nourriture_dcc = models.IntegerField(
+        verbose_name="Frais de nourriture DCC", default=0)
+    """
+        Contribution des Frais de nourriture de l'employé pas la DCC 
 
         **Type:** integer
 
@@ -3143,7 +3162,7 @@ class Charge(models.Model):
         if not self.annee_universitaire:
             self.annee_universitaire = AnneeUniversitaire.static_get_current_annee_universitaire()
 
-        total = self.frais_de_vie + self.frais_nourriture
+        total = self.frais_de_vie + self.frais_nourriture + self.frais_de_vie_dcc + self.frais_nourriture_dcc
         self.montant = total
         self.montantEnLettre = num2words(total, lang='fr')
         super(Charge, self).save(*args, **kwargs)
