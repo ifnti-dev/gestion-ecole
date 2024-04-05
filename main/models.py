@@ -2010,7 +2010,7 @@ class Programme(models.Model):
     class Meta:
         unique_together = ["parcours", "semestre"]
 
-class Settings(models.Model):
+class Parametre(models.Model):
     data_is_load = models.BooleanField(default=False)
 
 class CorrespondanceMaquette(models.Model):
