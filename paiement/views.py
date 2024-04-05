@@ -251,10 +251,17 @@ def liste_paiements(request, id_annee_selectionnee):
     Cette vue récupère les versements de frais de scolarité  associés à l'année universitaire spécifiée,
     puis les renvoie au template 'paiements/liste_paiements.html' pour affichage.
     """
+    id_annee_selectionnee = request.session["id_annee_selectionnee"]
     annee_universitaire = get_object_or_404(AnneeUniversitaire, pk=id_annee_selectionnee)
     paiements = Paiement.objects.filter(annee_universitaire=annee_universitaire)
+
+    
+    semestres = annee_universitaire.get_semestres()
+    
+    
+
     context = {
-        'annee_universitaire': annee_universitaire,
+        'semestres' : semestres,
         'paiements': paiements,
     }
     return render(request, 'paiements/liste_paiements.html', context)
@@ -624,8 +631,12 @@ def liste_etudiants(request, id_annee_selectionnee):
     """
         Créer un contexte contenant les données nécessaires pour le template
     """
+
+
+   
+
+
     context = {
-        'id_annee_selectionnee': id_annee_selectionnee,
         'etudiants_avec_montant_total': etudiants_avec_montant_total,
         'total_frais_courante': total_frais_courante,
     }
@@ -1531,3 +1542,58 @@ def delete_bulletin_stagiaire(request):
     id_annee_selectionnee = AnneeUniversitaire.static_get_current_annee_universitaire().id
     return redirect('paiement:bulletins_de_paye_stagiaire', id_annee_selectionnee=id_annee_selectionnee)
 
+
+
+
+
+#---------------------------------Option de filtrage lors de l'impression-----------------------------
+def option_impression_frais_scolarite_par_semestre(request):
+    """
+        Reperer l'id de l'année universitaire courante
+        Récuperer le montant des frais de scolarité par semestre
+        visualisation du pdf dans le navigateur
+    """
+
+    recupmax = request.POST.get('max')
+    recupmin = request.POST.get('min')
+    recupsemestre = request.POST.getlist('semestres')
+
+    recuperation_montant_frais_scolarite_min, recuperation_montant_frais_scolarite_max = recupmin,recupmax
+    montant_frais_scolarites = CompteEtudiant.objects.filter(solde__gte=recuperation_montant_frais_scolarite_min, solde__lte=recuperation_montant_frais_scolarite_max,)
+
+    buildcontext = {}
+
+
+    # montant_frais_scolarites.filter(etudiant__semestres = semestre)
+    id_annee_selectionnee = request.session["id_annee_selectionnee"]
+
+    semestres = []
+    for sem in recupsemestre:
+        semestre = Semestre.objects.filter(id = sem).get()
+        data = []
+        for compteEtudiant in montant_frais_scolarites:
+            if compteEtudiant.etudiant.semestres.filter(id = sem, annee_universitaire__id = id_annee_selectionnee).exists():
+                data.append(compteEtudiant)
+        buildcontext[semestre.__str__()] = data
+        
+    
+    context ={
+        'buildcontext' : buildcontext,
+        'recupmin' : recupmin,
+        'recupmax' : recupmax,
+    }
+    print(context)
+    
+    latex_input = 'frais_scolarite_par_semestre'
+    latex_input = 'bilan_paiements_annuel'
+    latex_ouput = 'generated_bilan_paiements_annuel'
+    pdf_file = 'pdf_bilan_paiements_annuel'
+
+    generate_pdf(context, latex_input, latex_ouput, pdf_file)
+
+    # visualisation du pdf dans le navigateur
+    with open('media/pdf/' + str(pdf_file) + '.pdf', 'rb') as f:
+        pdf_preview = f.read()
+        response = HttpResponse(pdf_preview, content_type='application/pdf')
+        response['Content-Disposition'] = 'inline;filename=pdf_frais.pdf'
+        return response
