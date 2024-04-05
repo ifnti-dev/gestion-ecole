@@ -6,6 +6,7 @@
 \usepackage{amssymb}
 \usepackage{makeidx}
 \usepackage{graphicx}
+\usepackage[dvipsnames]{xcolor}
 \usepackage[left=2cm, top=3cm,bottom=2cm, right=2cm]{geometry}
 \usepackage{multirow}
 \usepackage{lmodern}
@@ -25,15 +26,13 @@
 
 \begin{document}
 
-\VAR{etudiant_filtrer_par_montant}
+\begin{center}
+  \underline{\textbf{LISTES ETUDIANT EYANT VERSÉ ENTRE :  \textbf{\color{blue}{\VAR{recupmin}}} à \textbf{\color{blue}{\VAR{recupmax}}}}} 
+\end{center}
 
 
-
-
-
-
-\BLOCK{ for seme in recupsemestre }
-  \VAR{seme.libelle} 
+\BLOCK{ for seme in buildcontext }
+  \VAR{seme} 
 
 \begin{center}
 \newcolumntype{D}[1]{>{}p{#1}}
@@ -41,13 +40,13 @@
 \begin{tabular}{|D{3cm}|D{1.8cm}|D{1.8cm}|D{1.8cm}|D{1.8cm}|D{1.8cm}|D{1.8cm}|D{1.8cm}|}
 
 \hline
-\textbf{ÉTUDIANT}  & \textbf{ARRIÉRÉS} & \textbf{FRAIS INSCRIPTION} & \textbf{FRAIS SCOLARITÉ} & \textbf{TOTAL FRAIS} & \textbf{SOMME VERSÉE} & \textbf{SOMME RESTANTE}
+\textbf{NOM} & \textbf{PRENOM} & \textbf{FRAIS SCOLARITÉ} & \textbf{TOTAL FRAIS} & \textbf{SOMME VERSÉE} & \textbf{ARRIÉRÉS}
 \tabularnewline
 
-\BLOCK{ for item in etudiants_avec_montant_total }
+\BLOCK{ for item in buildcontext[seme] }
 \hline
 
-\VAR{item.etudiant.nom} \VAR{item.etudiant.prenom} &  \VAR{item.arrierees} &  \VAR{frais_etudiant.montant_inscription} & \VAR{frais_etudiant.montant_scolarite} &  \VAR{total_frais_courante} & \VAR{item.montant_total} & \VAR{item.somme_restante}
+\VAR{item.etudiant.nom} & \VAR{item.etudiant.prenom} &  \VAR{item.solde} 
 
 \tabularnewline\hline
 

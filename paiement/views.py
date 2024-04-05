@@ -1530,29 +1530,31 @@ def option_impression_frais_scolarite_par_semestre(request):
     recupmin = request.POST.get('min')
     recupsemestre = request.POST.getlist('semestres')
 
+    recuperation_montant_frais_scolarite_min, recuperation_montant_frais_scolarite_max = recupmin,recupmax
+    montant_frais_scolarites = CompteEtudiant.objects.filter(solde__gte=recuperation_montant_frais_scolarite_min, solde__lte=recuperation_montant_frais_scolarite_max,)
+
+    buildcontext = {}
+
+
+    # montant_frais_scolarites.filter(etudiant__semestres = semestre)
+    id_annee_selectionnee = request.session["id_annee_selectionnee"]
+
     semestres = []
     for sem in recupsemestre:
         semestre = Semestre.objects.filter(id = sem).get()
-        semestres.append(semestre)
-        print(semestre.libelle)
-
-    recuperation_montant_frais_scolarite_min, recuperation_montant_frais_scolarite_max = recupmin,recupmax
-    montant_frais_scolarite = CompteEtudiant.objects.filter(solde__gte=recuperation_montant_frais_scolarite_min, solde__lte=recuperation_montant_frais_scolarite_max,)
+        data = []
+        for compteEtudiant in montant_frais_scolarites:
+            if compteEtudiant.etudiant.semestres.filter(id = sem, annee_universitaire__id = id_annee_selectionnee).exists():
+                data.append(compteEtudiant)
+        buildcontext[semestre.__str__()] = data
+        
     
-    etudiant_filtrer_par_montant = []
-    for impression in montant_frais_scolarite:
-        etudiant_filtrer_par_montant.append(impression)
-
-
-    print(etudiant_filtrer_par_montant)
-
-
-
-    context = {
-        'recupsemestre': semestres,
-        'montant_frais_scolarite': montant_frais_scolarite,
-        'etudiant_filtrer_par_montant' : etudiant_filtrer_par_montant
+    context ={
+        'buildcontext' : buildcontext,
+        'recupmin' : recupmin,
+        'recupmax' : recupmax,
     }
+    print(context)
     
     latex_input = 'frais_scolarite_par_semestre'
     latex_input = 'bilan_paiements_annuel'
