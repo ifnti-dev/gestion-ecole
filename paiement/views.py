@@ -1074,7 +1074,7 @@ def enregistrer_paiement_fournisseur(request, id=0):
         return render(request, 'fournisseurs/enregistrer_paiement_fournisseur.html', {'form': form}) 
     else:
         if id == 0:
-            form = FournisseurForm(request.POST)
+            form = FournisseurForm(request.POST,request.FILES)
         else:
             paiement_fournisseur = Fournisseur.objects.get(pk=id)
             compte_universite = paiement_fournisseur.compte_bancaire
@@ -1085,6 +1085,7 @@ def enregistrer_paiement_fournisseur(request, id=0):
             paiement_fournisseur = form.save(commit=False)
             compte_universite = CompteBancaire.objects.first()
             paiement_fournisseur.compte_bancaire = compte_universite
+            
             paiement_fournisseur.save()
 
             compte_universite.solde_bancaire -= paiement_fournisseur.montant

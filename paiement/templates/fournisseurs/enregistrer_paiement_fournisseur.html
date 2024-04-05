@@ -4,7 +4,7 @@
 Enregistrement du paiement d'un fournisseur
 
   <h1>
-     <a href="{% url 'paiement:liste_paiements_fournisseurs' id_annee_selectionnee  %}" class="btn btn-outline-warning">
+    <a href="{% url 'paiement:liste_paiements_fournisseurs' id_annee_selectionnee  %}" class="btn btn-outline-warning">
         <i class="fas fa-chevron-left fa-lg"></i> Retour
       </a>
   </h1>
@@ -20,7 +20,7 @@ Enregistrement du paiement d'un fournisseur
         <h3>         
         </h3>
     </div>
-      <form class="container-fluid p-3" action="#" method="POST">
+      <form class="container-fluid p-3" action="#" method="POST" enctype="multipart/form-data">
         {% csrf_token %}
 
       {% if form.non_field_errors %}
@@ -36,7 +36,7 @@ Enregistrement du paiement d'un fournisseur
             {{ form.type }}
             <span class="text-danger">{{ form.type.errors }}</span>
           </div>
-           <div class="col-md-6">
+          <div class="col-md-6">
             {{ form.montant.label_tag }}
             {{ form.montant }}
             <span class="text-danger">{{ form.montant.errors }}</span>
@@ -55,9 +55,16 @@ Enregistrement du paiement d'un fournisseur
             <span class="text-danger">{{ form.le_mois.errors }}</span>
           </div>
         </div>
-
+        <div class="bg-body-light col-sm-12 p-3" >
+            {{ form.facture_pdf.label_tag }}
+            {{ form.facture_pdf }}
+        </div>
         <button class="btn btn-primary btn-block" type="submit"><i class="fas fa-database"></i> Enrégistrer &nbsp;&nbsp;&nbsp;<span></span></button>
       </form> 
     </div>
   </div>
+  {% block scripts %}
+    <script>
+    </script>
+  {% endblock %}
 {% endblock %} 

@@ -232,12 +232,13 @@ class StagiairesForm(forms.ModelForm):
 class FournisseurForm(forms.ModelForm):
     class Meta:
         model = Fournisseur
-        fields = ['type', 'montant', 'dateversement', 'le_mois']      
+        fields = ['type', 'montant', 'dateversement', 'le_mois','facture_pdf']      
         widgets = {
             'type': forms.Select(attrs={'class': 'form-control'}),
             'montant': forms.NumberInput(attrs={'class': 'form-control'}),
             'dateversement': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'le_mois': forms.Select(attrs={'class': 'form-control'}),
+            'facture_pdf': forms.FileInput(attrs={'class': 'form-control'}),
         }
 
 

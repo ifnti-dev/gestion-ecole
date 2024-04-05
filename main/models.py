@@ -2770,7 +2770,15 @@ class Fournisseur(models.Model):
         **Nullable:** true
 
     """
+    facture_pdf = models.FileField(upload_to="pdf/facture_pdf", null=True, blank=True, verbose_name="Pdf de la Facture")
+    """
+        Pdf du reçu de la facture
 
+        **Type:** Url image
+
+        **Nullable:** true
+
+    """
     def save(self, *args, **kwargs):
         if not self.annee_universitaire:
             self.annee_universitaire = AnneeUniversitaire.static_get_current_annee_universitaire()
