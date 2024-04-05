@@ -14,8 +14,33 @@ from django.core.exceptions import ValidationError
 from decimal import Decimal, ROUND_DOWN
 from datetime import datetime
 import locale
+from django.contrib import messages
 # Définir la locale en français
 locale.setlocale(locale.LC_TIME, 'fr_FR.UTF-8')
+
+
+###############
+@login_required(login_url=settings.LOGIN_URL)
+def delete_frais_scolarite(request,id):
+    """
+   Supprime un frais soclaire .
+
+    :param request: L'objet HttpRequest utilisé pour effectuer la requête.
+    :param id: L'ID du paiment à supprimer.
+    :return: rediriger vers l'url  'paiement/liste_paiements' qui affiche la liste des paiements.
+   
+
+    Cette vue récupère un frais soclaire associé à l'Id spécifié et la supprime,
+    puis redirige vers l'url 'paiement/liste_paiements' pour affichage de la liste des paiements.
+    """
+    
+    paiement=get_object_or_404(Paiement,pk=id)
+    paiement.delete()
+    id_annee_selectionnee = request.session.get('id_annee_selectionnee')
+    texte=f"Le paiement {paiement.type}  a été supprimé avec sucèss"
+    messages.success(request, texte)
+    return redirect("paiement:liste_paiements",id_annee_selectionnee=id_annee_selectionnee)
+
 
 
 @login_required(login_url=settings.LOGIN_URL)
@@ -112,7 +137,14 @@ def enregistrer_frais(request, id=0):
             frais = Frais.objects.get(pk=id)
             form = FraisForm(request.POST,instance = frais)
         if form.is_valid():
-            form.save()
+            ###retarder la sauvegarde pour recuperer annee_selectionnee avant de sauvegarder
+            frais=form.save(commit=False)
+            id_annee_selectionnee = request.session.get('id_annee_selectionnee')
+            annee_selectionnee = get_object_or_404( AnneeUniversitaire, pk=id_annee_selectionnee)
+            frais.annee_universitaire =annee_selectionnee
+            frais.save()
+
+            
             id_annee_selectionnee = AnneeUniversitaire.static_get_current_annee_universitaire().id
             return redirect('paiement:liste_frais', id_annee_selectionnee=id_annee_selectionnee)
         else:
@@ -270,8 +302,16 @@ def enregistrer_paiement(request, id=0):
             form = PaiementForm()
         else:
             paiement = Paiement.objects.get(pk=id)
-            form = PaiementForm(instance=paiement)   
-        return render(request, 'paiements/enregistrer_paiement.html', {'form': form}) 
+            form = PaiementForm(instance=paiement) 
+            
+        
+        #recuperons l'annee courante
+        id_annee_selectionnee = request.session.get('id_annee_selectionnee')
+        annee_selectionnee = get_object_or_404( AnneeUniversitaire, pk=id_annee_selectionnee)
+        #recuperons le montant d'inscription qui sera injecté dans le script js de template une fois accessible
+        frais_scolaire=Frais.objects.get(annee_universitaire=annee_selectionnee)
+        frais_inscription=frais_scolaire.montant_inscription  
+        return render(request, 'paiements/enregistrer_paiement.html', {'form': form,'frais_inscription':frais_inscription}) 
     else:
         if id == 0:
             form = PaiementForm(request.POST)
