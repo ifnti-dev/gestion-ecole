@@ -79,24 +79,23 @@ class PaiementForm(forms.ModelForm):
         montant = cleaned_data.get('montant')
         annee_universitaire = cleaned_data.get('annee_universitaire')
         
-        #
-        if montant > 590000:
-            raise forms.ValidationError("Montant ne doit pas depassé 590.000")
-        else:  
-            
-            if etudiant and annee_universitaire :
-                total_versements = Paiement.objects.filter(etudiant=etudiant, annee_universitaire=annee_universitaire).aggregate(Sum('montant'))['montant__sum'] or 0
-                frais = Frais.objects.filter(annee_universitaire=annee_universitaire).first()
+        if etudiant and annee_universitaire :
+            total_versements = Paiement.objects.filter(etudiant=etudiant, annee_universitaire=annee_universitaire).aggregate(Sum('montant'))['montant__sum'] or 0
+            frais = Frais.objects.filter(annee_universitaire=annee_universitaire).first()
 
-                if frais:
-                    total_frais = frais.montant_inscription + frais.montant_scolarite
+            if frais:
+                total_frais = frais.montant_inscription + frais.montant_scolarite
 
+                if  montant < frais.montant_scolarite :
                     if montant and montant + total_versements > total_frais:
-                        raise forms.ValidationError("L'étudiant a déjà versé le montant total des frais. Aucun versement supplémentaire n'est autorisé.")
+                        raise forms.ValidationError(f"L'étudiant a déjà versé une somme de : {total_versements} FCFA .Il lui reste {total_frais-total_versements} FCFA")
                 else:
-                    raise forms.ValidationError("Les frais ne sont pas définis pour l'année universitaire sélectionnée.")
+                    raise forms.ValidationError(f"Le Montant du frais de scolarité ne doit pas depassé {frais.montant_scolarite}")
 
-        return cleaned_data
+            else:
+                raise forms.ValidationError("Les frais ne sont pas définis pour l'année universitaire sélectionnée.")
+
+            return cleaned_data
 
         
 
