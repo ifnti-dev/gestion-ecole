@@ -27,7 +27,7 @@ SECRET_KEY=_mot_clé au choix
 
 3.  Exécuter le fichier requirements.txt
 
-```python
+```shell
 pip install -r requirements.txt
 ```
 
@@ -41,7 +41,7 @@ path('main/', include('main.urls')),
 ]
 ```
 
-6.  Pour la créer des migrations,  de l'utilisateur , lancé le fichier :  'init_db.sh'
+6.  Pour la créer des migrations,  de l'utilisateur , lancé le fichier : `init_db.sh`
 
 ```txt
 Pour ce faire il faut : 
@@ -50,14 +50,21 @@ _donner les permissions sur le ficher : sudo chmod 777 init_db.sh
 _lancer la commande a la racine du projet : ./init_db.sh
 ```
 
-7.  Maintenant lancer le projet
+**Pour lancer un script** (Script de  création du user `ifnti` avec le mot de passe `ifnti`)
+
+```python
+python3 manage.py runscript factory
+```
+
+
+8.  Maintenant lancer le projet
 
 ```python
 python3 manage.py runserver
 ```
 
 
-Ensuite l'application est accessible à l'adresse: http://localhost:8000/main
+Ensuite l'application est accessible à l'adresse: `http://localhost:8000/main`
 
 ### Identifiant de connexion
 

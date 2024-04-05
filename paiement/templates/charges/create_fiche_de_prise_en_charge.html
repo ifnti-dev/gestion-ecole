@@ -43,6 +43,7 @@ Enregistrement d'une fiche de prise en charge
           </div>
         </div>
 <br>
+        <h4 class="block-title">Pour l'IFNTI</h4> <br>
         <div class="form-row mb-3">
           <div class="col-md-6">
             {{ form.frais_de_vie.label_tag }}
@@ -52,6 +53,19 @@ Enregistrement d'une fiche de prise en charge
           <div class="col-md-6">
             {{ form.frais_nourriture.label_tag }}
             {{ form.frais_nourriture }}
+            <span class="text-danger">{{ form.frais_nourriture.errors }}</span>
+          </div>      
+        </div>
+        <h4 class="block-title">Pour la DCC</h4><br>
+        <div class="form-row mb-3">
+          <div class="col-md-6">
+            {{ form.frais_de_vie.label_tag }}
+            {{ form.frais_de_vie_dcc }}
+            <span class="text-danger">{{ form.frais_de_vie.errors }}</span>
+          </div> 
+          <div class="col-md-6">
+            {{ form.frais_nourriture.label_tag }}
+            {{ form.frais_nourriture_dcc }}
             <span class="text-danger">{{ form.frais_nourriture.errors }}</span>
           </div>      
         </div>
