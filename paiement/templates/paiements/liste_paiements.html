@@ -20,7 +20,7 @@
                     <div class="block-options-item">
                         <div class="block-options-item">
                             <select class="form-control" id="annee_selectionnee" name="semestres" multiple>
-                                <option>Sélectionner semestres</option>
+                                <option disabled>Sélectionner semestres</option>
                                 {% for semestre in semestres %}
                                     <option value="{{ semestre.id }}">{{ semestre.libelle }}</option>
                                 {% endfor %}
@@ -32,10 +32,10 @@
                 <div class="block-options">
                     <div class="block-options-item">
                         <div class="block-options-item">
-                            <input type="text" class="form-control" id="item-name" name="min" placeholder="Montant">
+                            <input type="number" class="form-control" id="item-name" name="min" placeholder="Montant" min="0">
                         </div>
                         <div class="block-options-item">
-                            <input type="text" class="form-control" id="item-name" name="max" placeholder="Montant">
+                            <input type="number" class="form-control" id="item-name" name="max" placeholder="Montant" min="0">
                         </div>
                     </div>
                 </div>
