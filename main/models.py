@@ -2011,7 +2011,15 @@ class Programme(models.Model):
         unique_together = ["parcours", "semestre"]
 
 class Parametre(models.Model):
+
     data_is_load = models.BooleanField(default=False)
+    
+    numero_compte = models.CharField(max_length=255, default="05037-206828-001-01-15")
+    nom_institut = models.CharField(max_length=255, null=True, blank=True)
+    logo_institut = models.ImageField(upload_to='logo_institut', null=True, blank=True)
+    directeur_des_etudes = models.CharField(max_length=255, null=True, blank=True)
+
+
 
 class CorrespondanceMaquette(models.Model):
     """
