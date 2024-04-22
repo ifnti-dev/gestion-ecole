@@ -63,14 +63,14 @@ class PaiementForm(forms.ModelForm):
     montant=forms.IntegerField(initial=None,widget=forms.NumberInput(attrs={'class': 'form-control','placeholder':0},))
     class Meta:
         model = Paiement
-        fields = ['type','etudiant', 'montant', 'dateversement', 'numerobordereau', 'annee_universitaire']
+        fields = ['type','etudiant', 'montant', 'dateversement', 'numerobordereau']
         
         widgets = {
             'type': forms.Select(attrs={'class': 'form-control'}),
             'dateversement': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'etudiant': forms.Select(attrs={'class': 'form-control'}),
             'numerobordereau': forms.TextInput(attrs={'class': 'form-control'}),
-            'annee_universitaire': forms.Select(attrs={'class': 'form-control'}),
+          
         }
 
     def clean(self):
@@ -85,7 +85,7 @@ class PaiementForm(forms.ModelForm):
 
             if frais:
                 total_frais = frais.montant_inscription + frais.montant_scolarite
-
+                #cherifa# modifier la validation
                 if  montant < frais.montant_scolarite :
                     if montant and montant + total_versements > total_frais:
                         raise forms.ValidationError(f"L'étudiant a déjà versé une somme de : {total_versements} FCFA .Il lui reste {total_frais-total_versements} FCFA")
