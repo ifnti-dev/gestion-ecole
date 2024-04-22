@@ -44,7 +44,6 @@ def evaluation_upload_permission(permission_name):
         return _wrapped_view
     return decorator
 
-
 def show_recapitulatif_note_permission(permission_name):
     def decorator(view_func):
         @wraps(view_func)

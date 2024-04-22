@@ -1,0 +1,174 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{makeidx}
+\usepackage{graphicx}
+\usepackage[left=2cm, top=3cm,bottom=2cm, right=2cm]{geometry}
+\usepackage{multirow}
+\usepackage{lmodern}
+\usepackage{fmtcount}
+\usepackage{tcolorbox}
+\usepackage{fancybox}
+\usepackage{french}
+\usepackage{tabularx}
+\usepackage{color}
+\usepackage[autolanguage,np]{numprint}
+\usepackage{longtable}
+\usepackage{phonenumbers}
+\usepackage{telprint}
+\graphicspath{ {\VAR{image_path}} }
+\usepackage{datetime}
+\usepackage{eso-pic, graphicx}
+
+\begin{document}
+
+\begin{center}
+    \underline{\textbf{BILAN ANNUEL DES PAIEMENTS}}
+\end{center}
+
+s1
+\begin{center}
+\newcolumntype{D}[1]{>{}p{#1}}
+
+\begin{tabular}{|D{3cm}|D{1.8cm}|D{1.8cm}|D{1.8cm}|D{1.8cm}|D{1.8cm}|D{1.8cm}|D{1.8cm}|}
+
+\hline
+\textbf{ÉTUDIANT}  & \textbf{ARRIÉRÉS} & \textbf{FRAIS INSCRIPTION} & \textbf{FRAIS SCOLARITÉ} & \textbf{TOTAL FRAIS} & \textbf{SOMME VERSÉE} & \textbf{SOMME RESTANTE}
+\tabularnewline
+
+\BLOCK{ for item in etudiants_avec_montant_total }
+\hline
+
+\VAR{item.etudiant.nom} \VAR{item.etudiant.prenom} &  \VAR{item.arrierees} &  \VAR{frais_etudiant.montant_inscription} & \VAR{frais_etudiant.montant_scolarite} &  \VAR{total_frais_courante} & \VAR{item.montant_total} & \VAR{item.somme_restante}
+
+\tabularnewline\hline
+
+\BLOCK{endfor}
+
+\end{tabular}
+
+\end{center}
+
+
+
+
+S2
+\begin{center}
+
+    \newcolumntype{D}[1]{>{}p{#1}}
+    
+    \begin{tabular}{|D{3cm}|D{1.8cm}|D{1.8cm}|D{1.8cm}|D{1.8cm}|D{1.8cm}|D{1.8cm}|D{1.8cm}|}
+    
+    \hline
+    \textbf{ÉTUDIANT}  & \textbf{ARRIÉRÉS} & \textbf{FRAIS INSCRIPTION} & \textbf{FRAIS SCOLARITÉ} & \textbf{TOTAL FRAIS} & \textbf{SOMME VERSÉE} & \textbf{SOMME RESTANTE}
+    \tabularnewline
+    
+    \BLOCK{ for item in etudiants_avec_montant_total }
+    \hline
+    
+    \VAR{item.etudiant.nom} \VAR{item.etudiant.prenom} &  \VAR{item.arrierees} &  \VAR{frais_etudiant.montant_inscription} & \VAR{frais_etudiant.montant_scolarite} &  \VAR{total_frais_courante} & \VAR{item.montant_total} & \VAR{item.somme_restante}
+    
+    \tabularnewline\hline
+    
+    \BLOCK{endfor}
+    
+    \end{tabular}
+    
+\end{center}
+
+S3
+\begin{center}
+    \newcolumntype{D}[1]{>{}p{#1}}
+    
+    \begin{tabular}{|D{3cm}|D{1.8cm}|D{1.8cm}|D{1.8cm}|D{1.8cm}|D{1.8cm}|D{1.8cm}|D{1.8cm}|}
+    
+    \hline
+    \textbf{ÉTUDIANT}  & \textbf{ARRIÉRÉS} & \textbf{FRAIS INSCRIPTION} & \textbf{FRAIS SCOLARITÉ} & \textbf{TOTAL FRAIS} & \textbf{SOMME VERSÉE} & \textbf{SOMME RESTANTE}
+    \tabularnewline
+    
+    \BLOCK{ for item in etudiants_avec_montant_total }
+    \hline
+    
+    \VAR{item.etudiant.nom} \VAR{item.etudiant.prenom} &  \VAR{item.arrierees} &  \VAR{frais_etudiant.montant_inscription} & \VAR{frais_etudiant.montant_scolarite} &  \VAR{total_frais_courante} & \VAR{item.montant_total} & \VAR{item.somme_restante}
+    
+    \tabularnewline\hline
+    
+    \BLOCK{endfor}
+    
+    \end{tabular}
+    
+\end{center}
+
+s4
+\begin{center}
+    \newcolumntype{D}[1]{>{}p{#1}}
+    
+    \begin{tabular}{|D{3cm}|D{1.8cm}|D{1.8cm}|D{1.8cm}|D{1.8cm}|D{1.8cm}|D{1.8cm}|D{1.8cm}|}
+    
+    \hline
+    \textbf{ÉTUDIANT}  & \textbf{ARRIÉRÉS} & \textbf{FRAIS INSCRIPTION} & \textbf{FRAIS SCOLARITÉ} & \textbf{TOTAL FRAIS} & \textbf{SOMME VERSÉE} & \textbf{SOMME RESTANTE}
+    \tabularnewline
+    
+    \BLOCK{ for item in etudiants_avec_montant_total }
+    \hline
+    
+    \VAR{item.etudiant.nom} \VAR{item.etudiant.prenom} &  \VAR{item.arrierees} &  \VAR{frais_etudiant.montant_inscription} & \VAR{frais_etudiant.montant_scolarite} &  \VAR{total_frais_courante} & \VAR{item.montant_total} & \VAR{item.somme_restante}
+    
+    \tabularnewline\hline
+    
+    \BLOCK{endfor}
+    
+    \end{tabular}
+    
+\end{center}
+
+s5
+\begin{center}
+    \newcolumntype{D}[1]{>{}p{#1}}
+    
+    \begin{tabular}{|D{3cm}|D{1.8cm}|D{1.8cm}|D{1.8cm}|D{1.8cm}|D{1.8cm}|D{1.8cm}|D{1.8cm}|}
+    
+    \hline
+    \textbf{ÉTUDIANT}  & \textbf{ARRIÉRÉS} & \textbf{FRAIS INSCRIPTION} & \textbf{FRAIS SCOLARITÉ} & \textbf{TOTAL FRAIS} & \textbf{SOMME VERSÉE} & \textbf{SOMME RESTANTE}
+    \tabularnewline
+    
+    \BLOCK{ for item in etudiants_avec_montant_total }
+    \hline
+    
+    \VAR{item.etudiant.nom} \VAR{item.etudiant.prenom} &  \VAR{item.arrierees} &  \VAR{frais_etudiant.montant_inscription} & \VAR{frais_etudiant.montant_scolarite} &  \VAR{total_frais_courante} & \VAR{item.montant_total} & \VAR{item.somme_restante}
+    
+    \tabularnewline\hline
+    
+    \BLOCK{endfor}
+    
+    \end{tabular}
+    
+\end{center}
+
+s6
+\begin{center}
+    \newcolumntype{D}[1]{>{}p{#1}}
+    
+    \begin{tabular}{|D{3cm}|D{1.8cm}|D{1.8cm}|D{1.8cm}|D{1.8cm}|D{1.8cm}|D{1.8cm}|D{1.8cm}|}
+    
+    \hline
+    \textbf{ÉTUDIANT}  & \textbf{ARRIÉRÉS} & \textbf{FRAIS INSCRIPTION} & \textbf{FRAIS SCOLARITÉ} & \textbf{TOTAL FRAIS} & \textbf{SOMME VERSÉE} & \textbf{SOMME RESTANTE}
+    \tabularnewline
+    
+    \BLOCK{ for item in etudiants_avec_montant_total }
+    \hline
+    
+    \VAR{item.etudiant.nom} \VAR{item.etudiant.prenom} &  \VAR{item.arrierees} &  \VAR{frais_etudiant.montant_inscription} & \VAR{frais_etudiant.montant_scolarite} &  \VAR{total_frais_courante} & \VAR{item.montant_total} & \VAR{item.somme_restante}
+    
+    \tabularnewline\hline
+    
+    \BLOCK{endfor}
+    
+    \end{tabular}
+    
+\end{center}
+
+\end{document}

@@ -2010,8 +2010,16 @@ class Programme(models.Model):
     class Meta:
         unique_together = ["parcours", "semestre"]
 
-class Settings(models.Model):
+class Parametre(models.Model):
+
     data_is_load = models.BooleanField(default=False)
+    
+    numero_compte = models.CharField(max_length=255, default="05037-206828-001-01-15")
+    nom_institut = models.CharField(max_length=255, null=True, blank=True)
+    logo_institut = models.ImageField(upload_to='logo_institut', null=True, blank=True)
+    directeur_des_etudes = models.CharField(max_length=255, null=True, blank=True)
+
+
 
 class CorrespondanceMaquette(models.Model):
     """
@@ -2577,7 +2585,13 @@ class Salaire(models.Model):
     def calculer_semi_net(self):
         G41 = self.calculer_total_C()
         G42 = self.calculer_total_D()
-        semi_net = G41 - G42
+        
+        try:
+            semi_net = float(G41) - float(G42)
+            semi_net = float(format(1.25555, '.2f') )
+        except Exception as e:
+            semi_net = float(format(1.25555, '.2f') )
+
         return semi_net
 
     def calculer_charges_de_familles(self):
@@ -2764,7 +2778,15 @@ class Fournisseur(models.Model):
         **Nullable:** true
 
     """
+    facture_pdf = models.FileField(upload_to="pdf/facture_pdf", null=True, blank=True, verbose_name="Pdf de la Facture")
+    """
+        Pdf du reçu de la facture
 
+        **Type:** Url image
+
+        **Nullable:** true
+
+    """
     def save(self, *args, **kwargs):
         if not self.annee_universitaire:
             self.annee_universitaire = AnneeUniversitaire.static_get_current_annee_universitaire()
@@ -3073,9 +3095,9 @@ class Charge(models.Model):
         **Type:** string
 
     """
-    frais_de_vie = models.IntegerField(verbose_name="Frais de vie", default=0)
+    frais_de_vie = models.IntegerField(verbose_name="Frais de vie", default=20000)
     """
-        Frais de vie de l'employé
+        Contribution des Frais de vie de l'employé par l'IFNTI
 
         **Type:** integer
 
@@ -3083,9 +3105,28 @@ class Charge(models.Model):
 
     """
     frais_nourriture = models.IntegerField(
-        verbose_name="Frais de nourriture", default=0)
+        verbose_name="Frais de nourriture", default=70000)
     """
-        Frais de nourriture de l'employé
+        Contribution des Frais de nourriture de l'employé par l'IFNTI
+
+        **Type:** integer
+
+        **Valeur par défaut:** 0
+
+    """
+    frais_de_vie_dcc = models.IntegerField(verbose_name="Frais de vie DCC", default=0)
+    """
+        Contribution des Frais de vie de l'employé pas la DCC 
+
+        **Type:** integer
+
+        **Valeur par défaut:** 0
+
+    """
+    frais_nourriture_dcc = models.IntegerField(
+        verbose_name="Frais de nourriture DCC", default=0)
+    """
+        Contribution des Frais de nourriture de l'employé pas la DCC 
 
         **Type:** integer
 
@@ -3145,7 +3186,7 @@ class Charge(models.Model):
         if not self.annee_universitaire:
             self.annee_universitaire = AnneeUniversitaire.static_get_current_annee_universitaire()
 
-        total = self.frais_de_vie + self.frais_nourriture
+        total = self.frais_de_vie + self.frais_nourriture + self.frais_de_vie_dcc + self.frais_nourriture_dcc
         self.montant = total
         self.montantEnLettre = num2words(total, lang='fr')
         super(Charge, self).save(*args, **kwargs)

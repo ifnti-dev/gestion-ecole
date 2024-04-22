@@ -5,14 +5,55 @@
 <div class="block block-rounded m-5">
     <div class="block-header p-4">
         <h3 class="block-title">Liste des Paiements</h3>
-        <a href="{% url 'paiement:bilan_paiements_annuel' id_annee_selectionnee %}" class="btn btn-outline-dark">
-                <span class="fa fa-eye"></span> Bilan
-        </a>  
 
-         {% if is_comptable %}
-        <a href="{% url 'paiement:enregistrer_paiement'%}" class="btn btn-outline-primary">
-                <i class="fas fa-plus"></i> Ajouter
-        </a>
+        <button class="btn btn-dark" id="btnimprimer">
+            billan
+        </button>
+
+
+        <div class="" id="printable">
+            <form action="{% url 'paiement:option_impression_frais_scolarite_par_semestre' %}" method="POST">
+
+                {% csrf_token %}
+
+                <div class="block-options">
+                    <div class="block-options-item">
+                        <div class="block-options-item">
+                            <select class="form-control" id="annee_selectionnee" name="semestres" multiple>
+                                <option disabled>Sélectionner semestres</option>
+                                {% for semestre in semestres %}
+                                    <option value="{{ semestre.id }}">{{ semestre.libelle }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="block-options">
+                    <div class="block-options-item">
+                        <div class="block-options-item">
+                            <input type="number" class="form-control" id="item-name" name="min" placeholder="Montant" min="0">
+                        </div>
+                        <div class="block-options-item">
+                            <input type="number" class="form-control" id="item-name" name="max" placeholder="Montant" min="0">
+                        </div>
+                    </div>
+                </div>
+    
+                <div class="block-options">
+                    <button type="submit">Envoyer</button>
+                </div>
+            </form>
+        </div>
+
+
+
+
+
+        {% if is_comptable %}
+            <a href="{% url 'paiement:enregistrer_paiement'%}" class="btn btn-outline-primary">
+                    <i class="fas fa-plus"></i> Ajouter
+            </a>
         {% endif %}
     </div>
 
@@ -70,5 +111,17 @@
         </table>
     </div>
 </div>
+
+
+<script>
+    $(document).ready(function() {
+        $('#printable').hide()
+        $('#btnimprimer').click(function(){
+            $('#printable').slideToggle()
+        })
+    })
+</script>
+<!-- {% block scripts %}
+{% endblock scripts %} -->
 
 {% endblock %}

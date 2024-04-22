@@ -232,12 +232,13 @@ class StagiairesForm(forms.ModelForm):
 class FournisseurForm(forms.ModelForm):
     class Meta:
         model = Fournisseur
-        fields = ['type', 'montant', 'dateversement', 'le_mois']      
+        fields = ['type', 'montant', 'dateversement', 'le_mois','facture_pdf']      
         widgets = {
             'type': forms.Select(attrs={'class': 'form-control'}),
             'montant': forms.NumberInput(attrs={'class': 'form-control'}),
             'dateversement': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'le_mois': forms.Select(attrs={'class': 'form-control'}),
+            'facture_pdf': forms.FileInput(attrs={'class': 'form-control'}),
         }
 
 
@@ -297,13 +298,15 @@ class FicheDePaieForm(forms.ModelForm):
 class ChargeForm(forms.ModelForm):
     class Meta:
         model = Charge
-        fields = ['dateDebut', 'dateFin',  'personnel', 'frais_de_vie', 'frais_nourriture']   
+        fields = ['dateDebut', 'dateFin',  'personnel', 'frais_de_vie', 'frais_nourriture', 'frais_de_vie_dcc', 'frais_nourriture_dcc']   
         widgets = {
             'dateDebut': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
             'dateFin': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
             'personnel': forms.Select(attrs={'class': 'form-control'}),
             'frais_de_vie': forms.NumberInput(attrs={'class': 'form-control'}),
             'frais_nourriture': forms.NumberInput(attrs={'class': 'form-control'}),
+            'frais_de_vie_dcc': forms.NumberInput(attrs={'class': 'form-control'}),
+            'frais_nourriture_dcc': forms.NumberInput(attrs={'class': 'form-control'}),
         }
 
-     
+
