@@ -297,6 +297,9 @@ def enregistrer_paiement(request, id=0):
     Raises:
         None
     """
+    #recuperons l'annee courante
+    id_annee_selectionnee = request.session.get('id_annee_selectionnee')
+    annee_selectionnee = get_object_or_404( AnneeUniversitaire, pk=id_annee_selectionnee)
     if request.method == "GET":
         if id == 0:
             form = PaiementForm()
@@ -304,10 +307,6 @@ def enregistrer_paiement(request, id=0):
             paiement = Paiement.objects.get(pk=id)
             form = PaiementForm(instance=paiement) 
             
-        
-        #recuperons l'annee courante
-        id_annee_selectionnee = request.session.get('id_annee_selectionnee')
-        annee_selectionnee = get_object_or_404( AnneeUniversitaire, pk=id_annee_selectionnee)
         #recuperons le montant d'inscription qui sera injecté dans le script js de template une fois accessible
         frais_scolaire=Frais.objects.get(annee_universitaire=annee_selectionnee)
         frais_inscription=frais_scolaire.montant_inscription  
@@ -323,12 +322,22 @@ def enregistrer_paiement(request, id=0):
             form = PaiementForm(request.POST,instance= paiement)
         if form.is_valid():
             paiement = form.save(commit=False)
+            print(paiement)
             comptable = Comptable.objects.get(user=request.user)
             paiement.comptable = comptable
 
             compte_universite = CompteBancaire.objects.first()
             paiement.compte_bancaire = compte_universite
+            ###
+            print( form.errors)
+            print("annee_selectionnee : ")
+            print(annee_selectionnee)
+            paiement.annee_universitaire=annee_selectionnee
             paiement.save()
+            print(paiement)
+            print(Paiement.objects.all())
+            #return HttpResponse("")
+     
 
             etudiant = paiement.etudiant
             annee_universitaire = paiement.annee_universitaire
@@ -1074,7 +1083,7 @@ def enregistrer_paiement_fournisseur(request, id=0):
         return render(request, 'fournisseurs/enregistrer_paiement_fournisseur.html', {'form': form}) 
     else:
         if id == 0:
-            form = FournisseurForm(request.POST)
+            form = FournisseurForm(request.POST,request.FILES)
         else:
             paiement_fournisseur = Fournisseur.objects.get(pk=id)
             compte_universite = paiement_fournisseur.compte_bancaire
@@ -1085,6 +1094,7 @@ def enregistrer_paiement_fournisseur(request, id=0):
             paiement_fournisseur = form.save(commit=False)
             compte_universite = CompteBancaire.objects.first()
             paiement_fournisseur.compte_bancaire = compte_universite
+            
             paiement_fournisseur.save()
 
             compte_universite.solde_bancaire -= paiement_fournisseur.montant
