@@ -2273,7 +2273,7 @@ class Paiement(models.Model):
 
     def __str__(self):
         return str(self.dateversement) + " : " + str(self.etudiant.nom) + "  " + str(self.etudiant.prenom) + "  " + str(self.montant)
-    
+
 
     
 
