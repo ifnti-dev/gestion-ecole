@@ -1597,14 +1597,16 @@ def option_impression_frais_scolarite_par_semestre(request):
             if compteEtudiant.etudiant.semestres.filter(id = sem, annee_universitaire__id = id_annee_selectionnee).exists():
                 data.append(compteEtudiant)
         buildcontext[semestre.__str__()] = data
+
+
         
+    print(buildcontext)
     
     context ={
         'buildcontext' : buildcontext,
         'recupmin' : recupmin,
         'recupmax' : recupmax,
     }
-    print(context)
     
     latex_input = 'frais_scolarite_par_semestre'
     latex_input = 'bilan_paiements_annuel'

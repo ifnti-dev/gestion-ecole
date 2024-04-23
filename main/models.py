@@ -1771,7 +1771,6 @@ class AnneeUniversitaire(models.Model):
             :return: Un objet AnneUniversitaire correspondant à l'année universitaire en cours
             :retype: AnneeUniversitaire
         """
-        return AnneeUniversitaire.objects.first()
         current_date = timezone.now()
         virtual_current_university_date, created = AnneeUniversitaire.objects.get_or_create(annee_courante=True, defaults={'annee': current_date.year-1})
         if virtual_current_university_date.annee == current_date.year-1 and current_date.month >= 8:

@@ -39,16 +39,20 @@
 \begin{center}
   \newcolumntype{D}[1]{>{}p{#1}}
   
-  \begin{tabular}{|D{3cm}|D{1.8cm}|D{1.8cm}|D{1.8cm}|D{1.8cm}|D{1.8cm}|D{1.8cm}|D{1.8cm}|}
+  \begin{tabular}{|D{3cm}|D{1.8cm}|D{1.8cm}|D{1.8cm}|D{1.8cm}|D{1.8cm}|D{1.8cm}|}
   
   \hline
-  \textbf{\scriptsize ÉTUDIANT}  & \textbf{\scriptsize ARRIÉRÉS} & \textbf{\scriptsize FRAIS INSCRIPTION} & \textbf{\scriptsize FRAIS SCOLARITÉ} & \textbf{\scriptsize TOTAL FRAIS} & \textbf{\scriptsize SOMME VERSÉE}
+  \textbf{\scriptsize NOM}  & \textbf{\scriptsize PRENOM} & \textbf{\scriptsize FRAIS INSCRIPTION} & \textbf{\scriptsize TOTAL VERSÉE} & \textbf{\scriptsize SOMME RESTANTE}
   \tabularnewline
   
   \BLOCK{ for item in buildcontext[seme] }
   \hline
   
-  \VAR{item.etudiant.nom} & \VAR{item.etudiant.prenom} &  \VAR{item.solde} &  \VAR{0} & \VAR{0} &  \VAR{0}
+  \VAR{item.etudiant.nom}
+  & \VAR{item.etudiant.prenom} 
+  &  \VAR{0} 
+  &  \VAR{item.solde} 
+  & \VAR{0}
   
   \tabularnewline\hline
   
