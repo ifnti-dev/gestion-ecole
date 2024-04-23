@@ -1586,6 +1586,15 @@ def option_impression_frais_scolarite_par_semestre(request):
     buildcontext = {}
 
 
+
+    #recuperation du montant d'inscription
+    recup_montant_inscription = Frais.objects.all()
+    for i in recup_montant_inscription:
+        reucp_frais = i.montant_inscription
+        recup_frais_scolarite = i.montant_scolarite
+
+    
+
     # montant_frais_scolarites.filter(etudiant__semestres = semestre)
     id_annee_selectionnee = request.session["id_annee_selectionnee"]
 
@@ -1595,17 +1604,21 @@ def option_impression_frais_scolarite_par_semestre(request):
         data = []
         for compteEtudiant in montant_frais_scolarites:
             if compteEtudiant.etudiant.semestres.filter(id = sem, annee_universitaire__id = id_annee_selectionnee).exists():
+                compteEtudiant.montant_restant = recup_frais_scolarite - compteEtudiant.solde
                 data.append(compteEtudiant)
-        buildcontext[semestre.__str__()] = data
-
 
         
-    print(buildcontext)
-    
+            
+
+
+        buildcontext[semestre.__str__()] = data
+
+    #context pour l'affichage des semestres
     context ={
         'buildcontext' : buildcontext,
         'recupmin' : recupmin,
         'recupmax' : recupmax,
+        'reucp_frais':reucp_frais,
     }
     
     latex_input = 'frais_scolarite_par_semestre'
@@ -1621,3 +1634,4 @@ def option_impression_frais_scolarite_par_semestre(request):
         response = HttpResponse(pdf_preview, content_type='application/pdf')
         response['Content-Disposition'] = 'inline;filename=pdf_frais.pdf'
         return response
+
