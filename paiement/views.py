@@ -550,9 +550,13 @@ def compte_bancaire(request, id_annee_selectionnee):
 
     salaires = Salaire.objects.filter(annee_universitaire=id_annee_selectionnee)
     total_salaire_brut = sum(salaire.personnel.salaireBrut + salaire.prime_efficacite + salaire.prime_qualite + salaire.frais_travaux_complementaires+ salaire.prime_anciennete for salaire in salaires)
-    total_cnss = sum(salaire.frais_prestations_familiale_salsalaire * salaire.personnel.salaireBrut + salaire.frais_prestations_familiales * salaire.personnel.salaireBrut + salaire.frais_risques_professionnel * salaire.personnel.salaireBrut + salaire.frais_pension_vieillesse_emsalaire * salaire.personnel.salaireBrut for salaire in salaires)
+      
+      
+    total_cnss = 0
+    for salaire in salaires:
+        print("frais_prestations_familiale_salsalaire | salaireBrut | frais_prestations_familiales")
+        total_cnss += (salaire.frais_prestations_familiale_salsalaire * salaire.personnel.salaireBrut) + (salaire.frais_prestations_familiales * salaire.personnel.salaireBrut) + (salaire.frais_risques_professionnel * salaire.personnel.salaireBrut) + (salaire.frais_pension_vieillesse_emsalaire * salaire.personnel.salaireBrut) + (salaire.assurance_maladie_universelle*salaire.personnel.salaireBrut + salaire.assurance_maladie_universelle*salaire.personnel.salaireBrut) 
 
-    total_cnss = sum(salaire.frais_prestations_familiale_salsalaire * salaire.personnel.salaireBrut + salaire.frais_prestations_familiales * salaire.personnel.salaireBrut + salaire.frais_risques_professionnel * salaire.personnel.salaireBrut + salaire.frais_pension_vieillesse_emsalaire * salaire.personnel.salaireBrut for salaire in salaires)
     total_irpp = sum(salaire.irpp + salaire.tcs for salaire in salaires)
     total_salaire_net = sum(salaire.salaire_net_a_payer for salaire in salaires)
     montant_total_salaires = sum(salaire.salaire_net_a_payer + (salaire.frais_prestations_familiale_salsalaire * salaire.personnel.salaireBrut + salaire.frais_prestations_familiales * salaire.personnel.salaireBrut + salaire.frais_risques_professionnel * salaire.personnel.salaireBrut + salaire.frais_pension_vieillesse_emsalaire * salaire.personnel.salaireBrut + salaire.tcs)for salaire in salaires)
