@@ -460,6 +460,45 @@ def create_compte(request, id=0):
             print(form.errors)
             return render(request, 'compte_bancaire/create_compte.html', {'form': form})
 
+@login_required(login_url=settings.LOGIN_URL)
+def irpp_mensuel(request,id_annee_selectionnee):
+    """
+    Affiche IRPP pour un mois donnée.
+
+    :param request: L'objet HttpRequest utilisé pour effectuer la requête.
+    :param date_debut: L'ID de l'année universitaire sélectionnée.
+    :param id_annee_selectionnee: L'ID de l'année universitaire sélectionnée.
+    :return: Un objet HttpResponse contenant les donnée sous form de json.
+    :raises: Http404 si l'année universitaire sélectionnée n'est pas trouvée.
+
+    Cette vue récupère IRPP pour un mois donnée,
+    puis  renvoie l'irpp sous form de json.
+    """
+    salaires = Salaire.objects.filter(annee_universitaire=id_annee_selectionnee)
+    total_irpp = sum(salaire.irpp + salaire.tcs for salaire in salaires)    
+    total_irpp_by_month = Salaire.objects.values('date_debut__month').annotate(total_irpp=Sum('irpp'))
+    MONTH_NAMES = {
+    1: "Janvier",
+    2: "Février",
+    3: "Mars",
+    4: "Avril",
+    5: "Mai",
+    6: "Juin",
+    7: "Juillet",
+    8: "Août",
+    9: "Septembre",
+    10: "Octobre",
+    11: "Novembre",
+    12: "Décembre",
+    }
+    for item in total_irpp_by_month:
+        month_number = item['date_debut__month']
+        item['month_name'] = MONTH_NAMES[month_number]
+    context={
+        "total_irpp":total_irpp,
+        "total_irpp_by_month":total_irpp_by_month,
+    }
+    return render(request, 'compte_bancaire/irpp_mensuel.html', context)
 
 
 @login_required(login_url=settings.LOGIN_URL)
@@ -515,6 +554,7 @@ def compte_bancaire(request, id_annee_selectionnee):
         'total_charges': total_charges,
         'total_salaires': total_salaires,
         'compte_existe': compte_existe,
+        'salaires':salaires
     }
     return render(request, 'compte_bancaire/compte_bancaire.html', context)
 
@@ -645,7 +685,7 @@ def liste_etudiants(request, id_annee_selectionnee):
     """
 
 
-   
+
 
 
     context = {
