@@ -275,6 +275,8 @@ def liste_paiements(request, id_annee_selectionnee):
     context = {
         'semestres' : semestres,
         'paiements': paiements,
+        'frais_scolaires_min' : 0,
+        'frais_scolaires_max' : 600000,
     }
     return render(request, 'paiements/liste_paiements.html', context)
 
@@ -1597,8 +1599,17 @@ def option_impression_frais_scolarite_par_semestre(request):
         visualisation du pdf dans le navigateur
     """
 
-    recupmax = request.POST.get('max')
-    recupmin = request.POST.get('min')
+    recupmax = 0
+    recupmin = 0
+    
+
+    recupmin_max = request.POST.get('min_max')
+    separtion_chaine = recupmin_max.split("-")
+    recupmin = separtion_chaine[0]
+    recupmax = separtion_chaine[1]
+
+    
+
     recupsemestre = request.POST.getlist('semestres')
 
     recuperation_montant_frais_scolarite_min, recuperation_montant_frais_scolarite_max = recupmin,recupmax
