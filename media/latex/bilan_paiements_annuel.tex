@@ -30,7 +30,6 @@
   \underline{\textbf{LISTES ETUDIANT EYANT VERSÉ ENTRE :  \textbf{\color{blue}{\VAR{recupmin}}} à \textbf{\color{blue}{\VAR{recupmax}}}}} 
 \end{center}
 
-
 \BLOCK{ for seme in buildcontext }
 \begin{center}
   \textbf{\VAR{seme} }
@@ -45,28 +44,24 @@
   \textbf{\scriptsize NOM}  & \textbf{\scriptsize PRENOM} & \textbf{\scriptsize FRAIS INSCRIPTION} & \textbf{\scriptsize TOTAL VERSÉE} & \textbf{\scriptsize SOMME RESTANTE}
   \tabularnewline
   
-  \BLOCK{ for item in buildcontext[seme] }
+  \BLOCK{ if buildcontext[seme] | length == 0 }
+    \multicolumn{5}{|c|}{pas d'étudiant} \\
   \hline
-  
-  \VAR{item.etudiant.nom}
-  & \VAR{item.etudiant.prenom} 
-  &  \VAR{reucp_frais} 
-  &  \VAR{item.solde} 
-  & \VAR{item.montant_restant}
-  
-  \tabularnewline\hline
-  
-  \BLOCK{endfor}
+  \BLOCK{ else }
+    \BLOCK{ for item in buildcontext[seme] }
+      \hline
+      \VAR{item.etudiant.nom}
+      & \VAR{item.etudiant.prenom} 
+      &  \VAR{reucp_frais} 
+      &  \VAR{item.solde} 
+      & \VAR{item.montant_restant}
+      \tabularnewline\hline
+    \BLOCK{ endfor }
+  \BLOCK{ endif }
   
   \end{tabular}
   
 \end{center}
 
-  
-\BLOCK{endfor}
+\BLOCK{ endfor }
 \end{document}
-
-
-
-
-
