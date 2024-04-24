@@ -8,7 +8,7 @@ urlpatterns = [
         ##cherifa##
         #delete_frais_scolarite
         path('delete_frais_scolarite/<int:id>/',views.delete_frais_scolarite,name="delete_frais_scolarite"),
-
+   
 
                         #### Compte bancaire ####
 
