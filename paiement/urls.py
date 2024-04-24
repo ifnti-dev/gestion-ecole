@@ -16,6 +16,7 @@ urlpatterns = [
     path('etat_compte_bancaire/<int:id_annee_selectionnee>/<int:compte_bancaire_id>/', views.etat_compte_bancaire, name='etat_compte_bancaire'),
     path('compte_bancaire/<int:id_annee_selectionnee>/', views.compte_bancaire, name='compte_bancaire'),
     path('create_compte/', views.create_compte, name='create_compte'),
+    path('irpp_mensuel/<int:id_annee_selectionnee>/', views.irpp_mensuel, name='irpp_mensuel'),
 
 
                              #### Frais ####
