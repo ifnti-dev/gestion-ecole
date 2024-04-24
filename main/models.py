@@ -2330,6 +2330,14 @@ class Salaire(models.Model):
         ("Agent d'entretien", "Agent d'entretien"),
         ('Stagiaire', 'Stagiaire'),
     ]
+    qualification_professionnel = models.CharField(
+        max_length=30, choices=TYPE_CHOICES, verbose_name="Qualification professionnelle")
+    """
+        Qualification professionelle de l'employé
+
+        **Type:** string
+
+    """
     date_debut = models.DateField(verbose_name="Date de début", null=True)
     """
         Date à laquelle l'employé à commencé par travailler
@@ -2358,14 +2366,7 @@ class Salaire(models.Model):
         **Nullable:** true
 
     """
-    qualification_professionnel = models.CharField(
-        max_length=30, choices=TYPE_CHOICES, verbose_name="Qualification professionnelle")
-    """
-        Qualification professionelle de l'employé
-
-        **Type:** string
-
-    """
+   
     prime_efficacite = models.DecimalField(
         max_digits=10, decimal_places=2, default=0, verbose_name="Prime d'éfficacité")
     """
