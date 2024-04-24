@@ -80,9 +80,9 @@ Enregistrement d'un paiement
 {% block scripts %}
 <script>
   console.log("hello");
-  // frais_inscription est une variable défini depuis la vue et on l'utilise ici
+  // frais_inscription est une variable défini depuis la vue et qui contient le montant du frais_inscription
   let valeur= {% autoescape off %} {{frais_inscription}}{% endautoescape %};
-  
+  //valeur=parseFloat((valeur+"").replace(",","."));
   $('#id_type').on("change",function(){
    // console.log( $('#id_type').val())
     if($('#id_type').val()=="Frais d'inscription"){
