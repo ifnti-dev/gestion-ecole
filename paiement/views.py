@@ -308,7 +308,9 @@ def enregistrer_paiement(request, id=0):
             form = PaiementForm(instance=paiement) 
             
         #recuperons le montant d'inscription qui sera injecté dans le script js de template une fois accessible
+        
         frais_scolaire=Frais.objects.get(annee_universitaire=annee_selectionnee)
+
         frais_inscription=frais_scolaire.montant_inscription  
         return render(request, 'paiements/enregistrer_paiement.html', {'form': form,'frais_inscription':frais_inscription}) 
     else:
