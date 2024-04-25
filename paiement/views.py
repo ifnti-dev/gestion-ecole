@@ -1587,6 +1587,7 @@ def option_impression_frais_scolarite_par_semestre(request):
     recupmin = separtion_chaine[0]
     recupmax = separtion_chaine[1]
 
+
     
 
     recupsemestre = request.POST.getlist('semestres')
