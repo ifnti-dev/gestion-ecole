@@ -43,6 +43,8 @@
 \vspace{1mm}
 \textbf{PRÉNOMS : }\hspace{0.8cm}\textbf{\VAR{fiche_de_charge.personnel.prenom}}\\
 \vspace{1mm}
+\textbf{TÉLÉPHONE : }\hspace{0.3cm}\textbf{\VAR{fiche_de_charge.personnel.contact}}\\
+\vspace{1mm}
 \textbf{Période : }\hspace{1.6cm}\textbf{Du \VAR{date_debut_formatted} au \VAR{date_fin_formatted}}\\
 \end{tabular}
 \end{center}
@@ -77,9 +79,26 @@ Sokodé le \today
 \end{flushright}\vspace{2mm}
 
 
-\begin{flushright}
-Le Responsable d'établissement
-\end{flushright}
+
+Signature de l'Employé \hspace{6.3cm}  Le Responsable d'établissement
+
+
+\vspace{1cm}
+
+
+
+\begin{minipage}[t]{0.5\textwidth} % Début de la première zone de texte
+\raggedright % Alignement à gauche
+\VAR{fiche_de_charge.personnel.nom} \VAR{fiche_de_charge.personnel.prenom}
+\end{minipage} % Fin de la première zone de texte
+\hfill % Espace flexible pour remplir l'espace entre les deux zones de texte
+\begin{minipage}[t]{0.4\textwidth} % Début de la deuxième zone de texte
+\raggedleft % Alignement à droite
+Mr Sabirou Mohamed TEOURI
+  
+\end{minipage} % Fin de la deuxième zone de texte
+
+
 
 
 

@@ -275,6 +275,8 @@ def liste_paiements(request, id_annee_selectionnee):
     context = {
         'semestres' : semestres,
         'paiements': paiements,
+        'frais_scolaires_min' : 0,
+        'frais_scolaires_max' : 600000,
     }
     return render(request, 'paiements/liste_paiements.html', context)
 
@@ -1597,8 +1599,18 @@ def option_impression_frais_scolarite_par_semestre(request):
         visualisation du pdf dans le navigateur
     """
 
-    recupmax = request.POST.get('max')
-    recupmin = request.POST.get('min')
+    recupmax = 0
+    recupmin = 0
+    
+
+    recupmin_max = request.POST.get('min_max')
+    separtion_chaine = recupmin_max.split("-")
+    recupmin = separtion_chaine[0]
+    recupmax = separtion_chaine[1]
+
+
+    
+
     recupsemestre = request.POST.getlist('semestres')
 
     recuperation_montant_frais_scolarite_min, recuperation_montant_frais_scolarite_max = recupmin,recupmax
@@ -1606,6 +1618,15 @@ def option_impression_frais_scolarite_par_semestre(request):
 
     buildcontext = {}
 
+
+
+    #recuperation du montant d'inscription
+    recup_montant_inscription = Frais.objects.all()
+    for i in recup_montant_inscription:
+        reucp_frais = i.montant_inscription
+        recup_frais_scolarite = i.montant_scolarite
+
+    
 
     # montant_frais_scolarites.filter(etudiant__semestres = semestre)
     id_annee_selectionnee = request.session["id_annee_selectionnee"]
@@ -1616,16 +1637,22 @@ def option_impression_frais_scolarite_par_semestre(request):
         data = []
         for compteEtudiant in montant_frais_scolarites:
             if compteEtudiant.etudiant.semestres.filter(id = sem, annee_universitaire__id = id_annee_selectionnee).exists():
+                compteEtudiant.montant_restant = recup_frais_scolarite - compteEtudiant.solde
                 data.append(compteEtudiant)
-        buildcontext[semestre.__str__()] = data
+
         
-    
+            
+
+
+        buildcontext[semestre.__str__()] = data
+
+    #context pour l'affichage des semestres
     context ={
         'buildcontext' : buildcontext,
         'recupmin' : recupmin,
         'recupmax' : recupmax,
+        'reucp_frais':reucp_frais,
     }
-    print(context)
     
     latex_input = 'frais_scolarite_par_semestre'
     latex_input = 'bilan_paiements_annuel'
@@ -1640,3 +1667,4 @@ def option_impression_frais_scolarite_par_semestre(request):
         response = HttpResponse(pdf_preview, content_type='application/pdf')
         response['Content-Disposition'] = 'inline;filename=pdf_frais.pdf'
         return response
+
