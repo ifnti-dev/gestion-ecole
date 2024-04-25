@@ -46,15 +46,16 @@
 \begin{center}
   \newcolumntype{D}[1]{>{}p{#1}}
   
-  \begin{tabular}{|D{3cm}|D{1.8cm}|D{1.8cm}|D{1.8cm}|D{1.8cm}|D{1.8cm}|D{1.8cm}|}
+  \begin{tabular}{|D{3cm}|D{1.8cm}|D{2.5cm}|D{1.8cm}|D{1.8cm}|D{1.8cm}|D{1.8cm}|}
   
   \hline
   \textbf{\scriptsize NOM}  & \textbf{\scriptsize PRENOM} & \textbf{\scriptsize FRAIS INSCRIPTION} & \textbf{\scriptsize TOTAL VERSÉE} & \textbf{\scriptsize SOMME RESTANTE}
   \tabularnewline
   
   \BLOCK{ if buildcontext[seme] | length == 0 }
-    \multicolumn{5}{|c|}{\textit{... Aucun étudiant trouvé ...}} \\
   \hline
+  \multicolumn{5}{|c|}{\textit{... Aucun étudiant trouvé ...}} 
+  \tabularnewline\hline
   \BLOCK{ else }
     \BLOCK{ for item in buildcontext[seme] }
       \hline

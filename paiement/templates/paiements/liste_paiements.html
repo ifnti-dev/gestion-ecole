@@ -26,16 +26,19 @@
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
+
+
                         <div class="modal-body">
                             <div class="form-group">
                                 <label for="semestres">Semestres</label>
-                                <select class="form-control" id="annee_selectionnee" name="semestres" multiple>
+                                <select required class="form-control js-select2" id="annee_selectionnee" name="semestres" multiple style="width: 100%;">
                                     <option disabled>Sélectionner semestres</option>
                                     {% for semestre in semestres %}
                                     <option value="{{ semestre.id }}">{{ semestre.libelle }}</option>
                                     {% endfor %}
                                 </select>
                             </div>
+                            
                             <div class="form-group">
                                 <label for="">Interval de prix des frais de scolarité</label>
                                 <input type="range" value="0" class="js-rangeslider form-control" id="" data-type="double" data-grid="true" data-min="{{ frais_scolaires_min }}" data-max="{{ frais_scolaires_max }}" data-from="{{ frais_scolaires_min }}" data-to="{{ frais_scolaires_max }}">
