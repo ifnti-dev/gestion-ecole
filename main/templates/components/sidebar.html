@@ -43,41 +43,41 @@
                 {% if is_comptable %}
                 <li class="nav-main-item">
                     <a class="nav-main-link nav-main-link-submenu" data-toggle="submenu" aria-haspopup="true" aria-expanded="false" href="#">
-                        <i class="nav-main-link-icon si si-grid"></i>
+                        <i class="nav-main-link-icon fa fa-user-graduate"></i>
                         <span class="nav-main-link-name">Tables</span>
                     </a>
                     <ul class="nav-main-submenu">
                         <li class="nav-main-item">
                             <a class="nav-main-link" href="{% url 'main:etudiants' %}">
-                                <i class="nav-main-link-icon si si-energy"></i>
+                                <i class="fa fa-users" style="color: white; margin-right: 5px;"></i>
                                 <span class="nav-main-link-name text-capitalize">Étudiants</span>
                             </a>
                         </li>
         
                         <li class="nav-main-item">
                             <a class="nav-main-link" href="{% url 'main:liste_des_tuteurs' %}">
-                                <i class="nav-main-link-icon si si-energy"></i>
+                                <i class="nav-main-link-icon fa fa-user"></i>
                                 <span class="nav-main-link-name text-capitalize">Tuteurs</span>
                             </a>
                         </li>
         
                         <li class="nav-main-item">
                             <a class="nav-main-link" href="{% url 'main:enseignants' %}">
-                                <i class="nav-main-link-icon si si-energy"></i>
+                                <i class="nav-main-link-icon fa fa-user"></i>
                                 <span class="nav-main-link-name text-capitalize">Enseignants</span>
                             </a>
                         </li>
         
                         <li class="nav-main-item">
                             <a class="nav-main-link" href="{% url 'paiement:comptable_list' %}">
-                                <i class="nav-main-link-icon si si-energy"></i>
+                                <i class="nav-main-link-icon fa fa-user"></i>
                                 <span class="nav-main-link-name text-capitalize">Comptables</span>
                             </a>
                         </li>
         
                         <li class="nav-main-item">
                             <a class="nav-main-link" href="{% url 'paiement:liste_des_membres_de_personnels' %}">
-                                <i class="nav-main-link-icon si si-energy"></i>
+                                <i class="nav-main-link-icon fa fa-user"></i>
                                 <span class="nav-main-link-name text-capitalize">Membres de personnel</span>
                             </a>
                         </li>
@@ -89,7 +89,7 @@
                 <li class="nav-main-item">
                    
                     <a class="nav-main-link nav-main-link-submenu" data-toggle="submenu" aria-haspopup="true" aria-expanded="false" href="#">
-                        <i class="nav-main-link-icon si si-grid"></i>
+                        <i class="nav-main-link-icon si si-credit-card"></i>
                         <span class="nav-main-link-name">paiements</span>
                     </a>
                     <ul class="nav-main-submenu">
@@ -148,7 +148,7 @@
 
                 <li class="nav-main-item">
                     <a class="nav-main-link nav-main-link-submenu" data-toggle="submenu" aria-haspopup="true" aria-expanded="false" href="#">
-                        <i class="nav-main-link-icon si si-grid"></i>
+                        <i class="nav-main-link-icon fa fa-money-check-alt"></i>
                         <span class="nav-main-link-name">Compte bancaire</span>
                     </a>
                     
@@ -164,7 +164,7 @@
 
                 <li class="nav-main-item">
                     <a class="nav-main-link nav-main-link-submenu" data-toggle="submenu" aria-haspopup="true" aria-expanded="false" href="#">
-                        <i class="nav-main-link-icon si si-grid"></i>
+                        <i class="nav-main-link-icon fa fa-coffee"></i>
                         <span class="nav-main-link-name">Congés</span>
                     </a>
                     
@@ -319,7 +319,7 @@
                 {% if is_etudiant or is_enseignant or is_comptable or is_directeur_des_etudes %}
                 <li class="nav-main-item">
                     <a class="nav-main-link nav-main-link-submenu" data-toggle="submenu" aria-haspopup="true" aria-expanded="false" href="#">
-                        <i class="nav-main-link-icon si si-grid"></i>
+                        <i class="nav-main-link-icon fa fa-calendar"></i>
                         <span class="nav-main-link-name">Emploie du Temps</span>
                     </a>
 
@@ -376,7 +376,7 @@
                
                 <li class="nav-main-item">
                     <a class="nav-main-link nav-main-link-submenu" data-toggle="submenu" aria-haspopup="true" aria-expanded="false" href="#">
-                        <i class="nav-main-link-icon si si-grid"></i>
+                        <i class="nav-main-link-icon fa fa-graduation-cap"></i>
                         <span class="nav-main-link-name">Programmes</span>
                     </a>
 
@@ -584,5 +584,20 @@
                 {% endif %}
             </ul>
         </div>
-    </div>
+    </div> 
 </nav>
+
+<script>
+    const liElements = document.querySelectorAll('.nav-main-item');
+    console.log(liElements);
+    
+    liElements.forEach((liElement) => {
+        liElement.addEventListener('click', () => {
+            liElements.forEach((el) => {
+                el.style.color = 'red';
+            });
+            liElement.style.color = 'red';
+        });
+    });
+    
+</script>
