@@ -324,7 +324,7 @@ def enregistrer_paiement(request, id=0):
             form = PaiementForm(request.POST,instance= paiement)
         if form.is_valid():
             paiement = form.save(commit=False)
-            print(paiement)
+            print(paiement.etudiant)
             comptable = Comptable.objects.get(user=request.user)
             paiement.comptable = comptable
 

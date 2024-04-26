@@ -891,7 +891,7 @@ class Etudiant(Utilisateur):
 
         """
         str_sem = "|".join([sem.id for sem in self.semestres.all()])
-        return self.user.username
+        return self.full_name()
 
     def create_compte_etudiant(self):
         """
@@ -2612,7 +2612,9 @@ class Salaire(models.Model):
 
     def calculer_net_taxable(self):
         G43 = self.calculer_semi_net()
+        print("G43  = ",G43)
         G44 = self.calculer_charges_de_familles()
+        print("G44  = ",G44)
         net_taxable = G43 - G44
         return net_taxable
 
@@ -2622,6 +2624,7 @@ class Salaire(models.Model):
 
     def calculer_net_imposable_arrondi(self):
         G50 = self.calculer_net_imposable()
+        print("G50 = ",G50)
         net_imposable_arrondi = round(G50, -3)
         net_imposable_arrondi_str = "{:.0f}".format(net_imposable_arrondi)
         return int(net_imposable_arrondi_str)
@@ -2635,22 +2638,32 @@ class Salaire(models.Model):
             :retype: Decimal
         """
         G51 = self.calculer_net_imposable_arrondi()
+        print("G51 = ",G51)
         if G51 < 900000 or G51 == 900000:
             irpp = G51 * 0
+            print("irpp1= ",irpp)
         elif G51 < 3000000 or G51 == 3000000:
             irpp = (G51 - 900000) * 0.03 + 0
+            print("irpp2= ",irpp)
         elif G51 < 6000000 or G51 == 6000000:
             irpp = (G51 - 3000000) * 0.1 + 63000
+            print("irpp3= ",irpp)
         elif G51 < 9000000 or G51 == 9000000:
             irpp = (G51 - 6000000) * 0.15 + 363000
+            print("irpp4= ",irpp)
         elif G51 < 12000000 or G51 == 12000000:
             irpp = (G51 - 9000000) * 0.2 + 813000
+            print("irpp5= ",irpp)
         elif G51 < 15000000 or G51 == 15000000:
             irpp = (G51 - 12000000) * 0.25 + 1413000
+            print("irpp5= ",irpp)
         elif G51 < 20000000 or G51 == 20000000:
             irpp = (G51 - 15000000) * 0.3 + 2163000
+            print("irpp6= ",irpp)
         else:
             irpp = (G51 - 20000000) * 0.35 + 3663000
+            print("irpp7= ",irpp)
+        print("irpp_ann= ",irpp)
         return irpp
 
     def calculer_irpp_mensuel(self):
@@ -2662,6 +2675,7 @@ class Salaire(models.Model):
             :retype: Decimal
         """
         irpp_mensuel = self.calculer_irpp_annuel() / 12
+        print("irpp_mensuel: ",irpp_mensuel)
         return irpp_mensuel
 
     def calculer_deductions_cnss(self):
@@ -2685,6 +2699,8 @@ class Salaire(models.Model):
 
         tcs = Decimal(self.tcs)
         irpp = self.calculer_irpp_mensuel()
+        print("irpp : ")
+        print(irpp)
         self.irpp = Decimal(irpp)
         prime_forfaitaire = self.prime_forfaitaire
         acomptes = self.acomptes
