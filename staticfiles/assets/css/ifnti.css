@@ -1,7 +1,7 @@
 :root {
-    --primary-color: #045BEA;
-    --primary-color-glace: #1c72d6;
-    --chart-orange-color: #cc5034;
+    --primary-color: #07ff13;
+    --primary-color-glace: #10ff38;
+    --chart-orange-color: #0dff2d;
     --chart-orange-color-hover: #ee3309;
 }
 
@@ -46,7 +46,7 @@
 
 ul>.nav-main-item .nav-main-link .nav-main-link-name,
 .nav-main-item .nav-main-link .nav-main-link-icon {
-    color: white;
+    color: rgb(255, 7, 7);
     /* Changer la couleur du texte en vert lors du survol */
 }
 
