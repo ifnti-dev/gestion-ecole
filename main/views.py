@@ -992,7 +992,7 @@ def diplome_etudiant(request, id):
 
     etudiant = get_object_or_404(Etudiant, id=id)
     in_format = "%Y-%m-%d"
-    out_format = "%d-%m-%Y"
+    out_format = "%jj-%mm-%YYYY"
 
     if etudiant.datenaissance:
         date_formatee = datetime.strptime(
