@@ -2563,10 +2563,14 @@ class Salaire(models.Model):
 
     def calculer_total_A(self):
         total_A = self.calculer_salaire_brut_annuel()
+        print("total A: ")
+        print(total_A)
         return total_A
 
     def calculer_total_B(self):
         total_B = Decimal(self.calculer_salaire_brut_annuel()) * Decimal(0.04)
+        print("total B: ")
+        print(total_B)
         return total_B
 
     def calculer_total_C(self):
@@ -2585,14 +2589,20 @@ class Salaire(models.Model):
 
     def calculer_semi_net(self):
         G41 = self.calculer_total_C()
+        print("total C: ")
+        print(G41)
         G42 = self.calculer_total_D()
-        
+        print("total D: ")
+        print(G42)
         try:
             semi_net = float(G41) - float(G42)
-            semi_net = float(format(1.25555, '.2f') )
+            print("semi_net: ")
+            print(semi_net)
+            semi_net = float(format(semi_net, '.2f') )
         except Exception as e:
-            semi_net = float(format(1.25555, '.2f') )
-
+            print(e)
+            semi_net = float(format(semi_net, '.2f') )
+        
         return semi_net
 
     def calculer_charges_de_familles(self):
