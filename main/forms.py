@@ -245,7 +245,7 @@ class EnseignantForm(forms.ModelForm):
     datenaissance = DateField(widget=forms.SelectDateWidget(years=range(1990, 2006)), label='Date de naissance')
     class Meta:
         model = Enseignant
-        fields = ['nom', 'prenom', 'contact', 'sexe', 'email', 'adresse', 'datenaissance', 'lieunaissance', 'numero_cnss', 'nif', 'profil', 'salaireBrut', 'nombre_de_personnes_en_charge', 'dernierdiplome', 'is_active', 'type', 'specialite']
+        fields = ['nom', 'prenom', 'contact', 'sexe', 'email', 'adresse', 'datenaissance', 'lieunaissance', 'numero_cnss', 'nif', 'profil', 'salaireBrut', 'nombre_de_personnes_en_charge', 'dernierdiplome', 'is_active', 'type', 'specialite','qualification_professionnel']
         widgets = {
             'nom': forms.TextInput(attrs={'class': 'form-control'}),
             'prenom': forms.TextInput(attrs={'class': 'form-control'}),
@@ -263,8 +263,8 @@ class EnseignantForm(forms.ModelForm):
             'dernierdiplome': forms.FileInput(attrs={'class': 'form-control'}),
             'is_active': forms.CheckboxInput(attrs={'class': 'form-control'}),
             'type': forms.Select(attrs={'class': 'form-control'}),
-            'specialite': forms.TextInput(attrs={'class': 'form-control'})      
-
+            'specialite': forms.TextInput(attrs={'class': 'form-control'}),      
+            'qualification_professionnel': forms.Select(attrs={'class': 'form-control'}),
         }
 
     def clean(self):

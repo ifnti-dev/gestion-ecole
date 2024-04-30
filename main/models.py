@@ -918,6 +918,23 @@ class Personnel(Utilisateur):
     """
         Classe Personnel, représentant les membres du personnel. Elle hérite de la classe Utilisateur
     """
+    TYPE_CHOICES = [
+        ('Enseignant', 'Enseignant'),
+        ("Comptable", "Comptable"),
+        ("Directeur des études", "Directeur des études"),
+        ("Gardien", "Gardien"),
+        ("Agent d'entretien", "Agent d'entretien"),
+        ('Stagiaire', 'Stagiaire'),
+    ]
+    qualification_professionnel = models.CharField(
+        max_length=30,choices=TYPE_CHOICES, verbose_name="Qualification professionnelle")
+    """
+        Qualification professionelle de l'employé
+
+        **Type:** string
+
+    """
+    
     numero_cnss = models.CharField(
         max_length=30, verbose_name="Numéro CNSS", default=0)
     """
@@ -1142,20 +1159,20 @@ class DirecteurDesEtudes(Personnel):
 
         return super().save(*args, **kwargs)
 
-class Comptable(Personnel):
-    """
-    Cette classe hérite de la classe Personnel, elle représente les comptables.
-    """
+# class Comptable(Personnel):
+#     """
+#     Cette classe hérite de la classe Personnel, elle représente les comptables.
+#     """
     
-    pass
+#     pass
 
-    def save(self, *args, **kwargs):
-        if not self.id:
-            super().save(*args, **kwargs) 
-            group_comptable = Group.objects.get(name="comptable")
-            self.user.groups.add(group_comptable)
-        else:
-            super().save(*args, **kwargs)
+#     def save(self, *args, **kwargs):
+#         if not self.id:
+#             super().save(*args, **kwargs) 
+#             group_comptable = Group.objects.get(name="comptable")
+#             self.user.groups.add(group_comptable)
+#         else:
+#             super().save(*args, **kwargs)
         
 
 class Tuteur(models.Model):
@@ -1253,6 +1270,7 @@ class Ue(models.Model):
         ("Maths", "Maths"),
         ("Organisation", "Organisation"),
     ]
+    
     TYPES_NIVEAU = [
         ("1", "Licence"),
         ("2", "Master"),
@@ -2235,7 +2253,7 @@ class Paiement(models.Model):
 
     """
     comptable = models.ForeignKey(
-        'Comptable', on_delete=models.CASCADE, verbose_name="Comptable")
+        'Personnel', on_delete=models.CASCADE, verbose_name="Comptable")
     """
         Total à solder par l'étudiant au cours de l'année scolaire
 
@@ -2273,9 +2291,6 @@ class Paiement(models.Model):
 
     def __str__(self):
         return str(self.dateversement) + " : " + str(self.etudiant.nom) + "  " + str(self.etudiant.prenom) + "  " + str(self.montant)
-
-
-    
 
 class CompteBancaire(models.Model):
     """
@@ -2318,25 +2333,9 @@ class CompteBancaire(models.Model):
         return "Solde actuel : " + str(self.solde_bancaire)
 
 
-class Salaire(models.Model):
+class VersmentSalaire(models.Model):
     """
     Modèle représentant les détails du salaire d'un personnel.
-    """
-    TYPE_CHOICES = [
-        ('Enseignant', 'Enseignant'),
-        ("Comptable", "Comptable"),
-        ("Directeur des études", "Directeur des études"),
-        ("Gardien", "Gardien"),
-        ("Agent d'entretien", "Agent d'entretien"),
-        ('Stagiaire', 'Stagiaire'),
-    ]
-    qualification_professionnel = models.CharField(
-        max_length=30, choices=TYPE_CHOICES, verbose_name="Qualification professionnelle")
-    """
-        Qualification professionelle de l'employé
-
-        **Type:** string
-
     """
     date_debut = models.DateField(verbose_name="Date de début", null=True)
     """
@@ -2721,7 +2720,7 @@ class Salaire(models.Model):
         salaire_net = salaire_brut - deductions
         pret = salaire_net - acomptes
         self.salaire_net_a_payer = pret + prime_forfaitaire
-        super(Salaire, self).save(*args, **kwargs)
+        super(VersmentSalaire, self).save(*args, **kwargs)
 
     def __str__(self):
         return str(self.personnel.nom)
