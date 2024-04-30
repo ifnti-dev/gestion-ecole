@@ -5,14 +5,56 @@
 <div class="block block-rounded m-5">
     <div class="block-header p-4">
         <h3 class="block-title">Liste des Paiements</h3>
-        <a href="{% url 'paiement:bilan_paiements_annuel' id_annee_selectionnee %}" class="btn btn-outline-dark">
-                <span class="fa fa-eye"></span> Bilan
-        </a>  
 
-         {% if is_comptable %}
-        <a href="{% url 'paiement:enregistrer_paiement'%}" class="btn btn-outline-primary">
-                <i class="fas fa-plus"></i> Ajouter
-        </a>
+        <!-- <button class="btn " id="btnimprimer">
+            billan
+        </button> -->
+
+        <div>
+            <button type="button" class="btn btn-dark push" data-toggle="modal" data-target="#modal-block-vcenter">Imprimer</button>
+        </div>
+
+
+        <div class="modal" id="modal-block-vcenter" tabindex="-1" role="dialog" aria-labelledby="modal-block-vcenter" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <form action="{% url 'paiement:option_impression_frais_scolarite_par_semestre' %}" method="POST">
+                        {% csrf_token %}
+                        <div class="modal-header bg-primary">
+                            <h5 class="modal-title">PARAMÈTRES D'IMPRESSION</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label for="semestres">Semestres</label>
+                                <select class="form-control" id="annee_selectionnee" name="semestres" multiple>
+                                    <option disabled>Sélectionner semestres</option>
+                                    {% for semestre in semestres %}
+                                    <option value="{{ semestre.id }}">{{ semestre.libelle }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="">Interval de prix des frais de scolarité</label>
+                                <input type="range" value="0" class="js-rangeslider form-control" id="" data-type="double" data-grid="true" data-min="{{ frais_scolaires_min }}" data-max="{{ frais_scolaires_max }}" data-from="{{ frais_scolaires_min }}" data-to="{{ frais_scolaires_max }}">
+                                <input type="text" value="{{ frais_scolaires_min }}-{{ frais_scolaires_max }}" id="range_values" name="min_max" hidden>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+                            <button type="submit" class="btn btn-primary">Valider</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        {% if is_comptable %}
+            <a href="{% url 'paiement:enregistrer_paiement'%}" class="btn btn-outline-primary">
+                    <i class="fas fa-plus"></i> Ajouter
+            </a>
         {% endif %}
     </div>
 
@@ -27,7 +69,7 @@
                     <th class="text-center" style="width: 25%;">Numéro bordereau</th>
                     <th class="text-center" style="width: 25%;">Comptable</th>
                     {% if is_comptable %}
-                        <th class="text-center" style="width: 15%;">Modifier</th>
+                        <th class="text-center" style="width: 15%;">Actions</th>
                     {% endif %}
                 </tr>
             </thead>
@@ -41,12 +83,27 @@
                     <td class="text-center font-size-sm">{{ paiement.numerobordereau }}</td>
                     <td class="text-center font-size-sm">{{ paiement.comptable }}</td>
                     {% if is_comptable %}
-                    <td style="text-align: center;">
-                        <button type="button" class="update-book btn btn-sm btn-warning">
-                            <a style="color: blanchedalmond;" href="{% url 'paiement:modifier_paiement' paiement.id %}">
-                                <span><i class="far fa-edit"></i></span>
-                            </a>
+                  
+                    <td class="text-center">     
+                        <button type="button" class="btn btn-secondary dropdown-toggle" id="dropdown-default-secondary" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fa fa-bars" aria-hidden="true"></i>
                         </button>
+                        <div class="dropdown-menu font-size-sm" aria-labelledby="dropdown-default-secondary">
+                            <li class="nav-main-item">
+                                <a class="nav-main-link nav-main-link-name" data-toggle="" aria-haspopup="true" aria-expanded="false" href="{% url 'paiement:modifier_paiement' paiement.id %}">
+                                    <i class="fa fa-edit mr-1" aria-hidden="true"></i>
+                                    <span class="nav-main-link-name">Edit</span>
+                                </a>                   
+                            </li>
+                            <li class="nav-main-item">
+                                <a class="nav-main-link nav-main-link-name"
+                                onclick="delete_object('/paiement/delete_frais_scolarite/{{ paiement.id}}/', 'un frais de scolarité')"
+                                href="#">
+                                    <i class="fa fa-trash mr-1 text-danger"></i>
+                                    <span class="nav-main-link-name">Supprimer</span>
+                                </a>                   
+                            </li>
+                        </div>                                  
                     </td>
                     {% endif %}
                 </tr>
@@ -56,4 +113,20 @@
     </div>
 </div>
 
+
 {% endblock %}
+{% block scripts %}
+<script>
+    $(document).ready(function() {
+        $('#printable').hide()
+        $('#btnimprimer').click(function(){
+            $('#printable').slideToggle()
+        })
+    })
+    function setrangeValue(input_range){
+        console.log(input_range.getAttribute('range-value'));
+        tag_min_max = document.getElementById('range_value');
+        tag_min_max.value = input_range.getAttribute('range-value');
+    }
+</script>
+{% endblock scripts %}

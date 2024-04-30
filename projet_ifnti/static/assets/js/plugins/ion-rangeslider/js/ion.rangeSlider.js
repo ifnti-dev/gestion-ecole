@@ -1656,6 +1656,7 @@
                 this.$cache.input.data("from", this.result.from);
             } else {
                 if (this.options.values.length) {
+                    console.log(this.result.from_value + this.options.input_values_separator + this.result.to_value);
                     this.$cache.input.prop("value", this.result.from_value + this.options.input_values_separator + this.result.to_value);
                 } else {
                     this.$cache.input.prop("value", this.result.from + this.options.input_values_separator + this.result.to);

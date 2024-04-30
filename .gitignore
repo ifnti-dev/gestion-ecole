@@ -148,6 +148,7 @@ GitHub.sublime-settings
 !.vscode/launch.json 
 !.vscode/extensions.json 
 .history
+.obsidian
 
 
 # ignore generated PDF from application
@@ -160,3 +161,6 @@ media/pdf/*
 !**/migrations/__init__.py
 planning/migrations/0001_initial.py
 main/migrations/0001_initial.py
+
+# Ignor Django Settings
+projet_ifnti/settings.py

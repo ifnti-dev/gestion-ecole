@@ -23,11 +23,11 @@ Enregistrement des frais scolaires
       <form class="container-fluid p-3" action="#" method="POST">
         {% csrf_token %}
         <div class="form-row mb-12">
-          <div class="col-md-12">
+          {% comment %} <div class="col-md-12">
             {{ form.annee_universitaire.label_tag }}
             {{ form.annee_universitaire }}
             <span class="text-danger">{{ form.annee_universitaire.errors }}</span>
-          </div>
+          </div> {% endcomment %}
         </div>
 
         <br>

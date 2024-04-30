@@ -26,7 +26,7 @@
 \newcommand\BackgroundPic{
 \put(0,0){
 \parbox[b][\paperheight]{\paperwidth}{
-\includegraphics[width=\paperwidth,height=\paperheight]{CharteGraphiqueDocumentPageDeGardeLogo}
+\includegraphics[width=\paperwidth,height=\paperheight]{\VAR{image_path} CharteGraphiqueDocumentPageDeGardeLogo}
 }}}
 
 
@@ -84,9 +84,23 @@ Sokodé le \today
 \end{flushright}\vspace{2mm}
 
 
-\begin{flushright}
-Le Responsable d'établissement
-\end{flushright}
+
+Signature de l'Employé \hspace{6.3cm}  Le Responsable d'établissement
+
+
+\vspace{1cm}
+
+
+\begin{minipage}[t]{0.5\textwidth} % Début de la première zone de texte
+  \raggedright % Alignement à gauche
+  \VAR{fiche_paie.enseignant.nom} \VAR{fiche_paie.enseignant.prenom}
+  \end{minipage} % Fin de la première zone de texte
+  \hfill % Espace flexible pour remplir l'espace entre les deux zones de texte
+  \begin{minipage}[t]{0.4\textwidth} % Début de la deuxième zone de texte
+  \raggedleft % Alignement à droite
+  Mr Sabirou Mohamed TEOURI
+    
+  \end{minipage} % Fin de la deuxième zone de texte
 
 
 

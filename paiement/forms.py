@@ -41,9 +41,9 @@ class PersonnelForm(forms.ModelForm):
 class FraisForm(forms.ModelForm):
     class Meta:
         model = Frais
-        fields = ['annee_universitaire', 'montant_inscription', 'montant_scolarite' ]
+        fields = ['montant_inscription', 'montant_scolarite' ]
         widgets = {
-            'annee_universitaire': forms.Select(attrs={'class': 'form-control'}),       
+            #'annee_universitaire': forms.Select(attrs={'class': 'form-control'}),       
             'montant_inscription': forms.NumberInput(attrs={'class': 'form-control'}),
             'montant_scolarite': forms.NumberInput(attrs={'class': 'form-control'}),
         }
@@ -60,17 +60,17 @@ class CompteBancaireForm(forms.ModelForm):
 
 
 class PaiementForm(forms.ModelForm):
+    montant=forms.IntegerField(initial=None,widget=forms.NumberInput(attrs={'class': 'form-control','placeholder':0},))
     class Meta:
         model = Paiement
-        fields = ['type','etudiant', 'montant', 'dateversement', 'numerobordereau', 'annee_universitaire']
+        fields = ['type','etudiant', 'montant', 'dateversement', 'numerobordereau']
         
         widgets = {
             'type': forms.Select(attrs={'class': 'form-control'}),
             'dateversement': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
-            'montant': forms.NumberInput(attrs={'class': 'form-control'}),
             'etudiant': forms.Select(attrs={'class': 'form-control'}),
             'numerobordereau': forms.TextInput(attrs={'class': 'form-control'}),
-            'annee_universitaire': forms.Select(attrs={'class': 'form-control'}),
+          
         }
 
     def clean(self):
@@ -78,20 +78,24 @@ class PaiementForm(forms.ModelForm):
         etudiant = cleaned_data.get('etudiant')
         montant = cleaned_data.get('montant')
         annee_universitaire = cleaned_data.get('annee_universitaire')
-
-        if etudiant and annee_universitaire:
+        
+        if etudiant and annee_universitaire :
             total_versements = Paiement.objects.filter(etudiant=etudiant, annee_universitaire=annee_universitaire).aggregate(Sum('montant'))['montant__sum'] or 0
             frais = Frais.objects.filter(annee_universitaire=annee_universitaire).first()
 
             if frais:
                 total_frais = frais.montant_inscription + frais.montant_scolarite
+                #cherifa# modifier la validation
+                if  montant < frais.montant_scolarite :
+                    if montant and montant + total_versements > total_frais:
+                        raise forms.ValidationError(f"L'étudiant a déjà versé une somme de : {total_versements} FCFA .Il lui reste {total_frais-total_versements} FCFA")
+                else:
+                    raise forms.ValidationError(f"Le Montant du frais de scolarité ne doit pas depassé {frais.montant_scolarite}")
 
-                if montant and montant + total_versements > total_frais:
-                    raise forms.ValidationError("L'étudiant a déjà versé le montant total des frais. Aucun versement supplémentaire n'est autorisé.")
             else:
                 raise forms.ValidationError("Les frais ne sont pas définis pour l'année universitaire sélectionnée.")
 
-        return cleaned_data
+            return cleaned_data
 
         
 
@@ -228,12 +232,13 @@ class StagiairesForm(forms.ModelForm):
 class FournisseurForm(forms.ModelForm):
     class Meta:
         model = Fournisseur
-        fields = ['type', 'montant', 'dateversement', 'le_mois']      
+        fields = ['type', 'montant', 'dateversement', 'le_mois','facture_pdf']      
         widgets = {
             'type': forms.Select(attrs={'class': 'form-control'}),
             'montant': forms.NumberInput(attrs={'class': 'form-control'}),
             'dateversement': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'le_mois': forms.Select(attrs={'class': 'form-control'}),
+            'facture_pdf': forms.FileInput(attrs={'class': 'form-control'}),
         }
 
 
@@ -293,13 +298,15 @@ class FicheDePaieForm(forms.ModelForm):
 class ChargeForm(forms.ModelForm):
     class Meta:
         model = Charge
-        fields = ['dateDebut', 'dateFin',  'personnel', 'frais_de_vie', 'frais_nourriture']   
+        fields = ['dateDebut', 'dateFin',  'personnel', 'frais_de_vie', 'frais_nourriture', 'frais_de_vie_dcc', 'frais_nourriture_dcc']   
         widgets = {
             'dateDebut': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
             'dateFin': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
             'personnel': forms.Select(attrs={'class': 'form-control'}),
             'frais_de_vie': forms.NumberInput(attrs={'class': 'form-control'}),
             'frais_nourriture': forms.NumberInput(attrs={'class': 'form-control'}),
+            'frais_de_vie_dcc': forms.NumberInput(attrs={'class': 'form-control'}),
+            'frais_nourriture_dcc': forms.NumberInput(attrs={'class': 'form-control'}),
         }
 
-     
+

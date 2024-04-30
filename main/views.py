@@ -2746,4 +2746,6 @@ def importer_data(request):
         messages.success(request, "Donnée importer avec succes !")
         return redirect('main:create_etudiant')
 
+
     # return render(request, 'etudiants/importer.html')
+

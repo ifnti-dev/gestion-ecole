@@ -14,8 +14,33 @@ from django.core.exceptions import ValidationError
 from decimal import Decimal, ROUND_DOWN
 from datetime import datetime
 import locale
+from django.contrib import messages
 # Définir la locale en français
 locale.setlocale(locale.LC_TIME, 'fr_FR.UTF-8')
+
+
+###############
+@login_required(login_url=settings.LOGIN_URL)
+def delete_frais_scolarite(request,id):
+    """
+   Supprime un frais soclaire .
+
+    :param request: L'objet HttpRequest utilisé pour effectuer la requête.
+    :param id: L'ID du paiment à supprimer.
+    :return: rediriger vers l'url  'paiement/liste_paiements' qui affiche la liste des paiements.
+   
+
+    Cette vue récupère un frais soclaire associé à l'Id spécifié et la supprime,
+    puis redirige vers l'url 'paiement/liste_paiements' pour affichage de la liste des paiements.
+    """
+    
+    paiement=get_object_or_404(Paiement,pk=id)
+    paiement.delete()
+    id_annee_selectionnee = request.session.get('id_annee_selectionnee')
+    texte=f"Le paiement {paiement.type}  a été supprimé avec sucèss"
+    messages.success(request, texte)
+    return redirect("paiement:liste_paiements",id_annee_selectionnee=id_annee_selectionnee)
+
 
 
 @login_required(login_url=settings.LOGIN_URL)
@@ -112,7 +137,14 @@ def enregistrer_frais(request, id=0):
             frais = Frais.objects.get(pk=id)
             form = FraisForm(request.POST,instance = frais)
         if form.is_valid():
-            form.save()
+            ###retarder la sauvegarde pour recuperer annee_selectionnee avant de sauvegarder
+            frais=form.save(commit=False)
+            id_annee_selectionnee = request.session.get('id_annee_selectionnee')
+            annee_selectionnee = get_object_or_404( AnneeUniversitaire, pk=id_annee_selectionnee)
+            frais.annee_universitaire =annee_selectionnee
+            frais.save()
+
+            
             id_annee_selectionnee = AnneeUniversitaire.static_get_current_annee_universitaire().id
             return redirect('paiement:liste_frais', id_annee_selectionnee=id_annee_selectionnee)
         else:
@@ -231,11 +263,20 @@ def liste_paiements(request, id_annee_selectionnee):
     Cette vue récupère les versements de frais de scolarité  associés à l'année universitaire spécifiée,
     puis les renvoie au template 'paiements/liste_paiements.html' pour affichage.
     """
+    id_annee_selectionnee = request.session["id_annee_selectionnee"]
     annee_universitaire = get_object_or_404(AnneeUniversitaire, pk=id_annee_selectionnee)
     paiements = Paiement.objects.filter(annee_universitaire=annee_universitaire)
+
+    
+    semestres = annee_universitaire.get_semestres()
+    
+    
+
     context = {
-        'annee_universitaire': annee_universitaire,
+        'semestres' : semestres,
         'paiements': paiements,
+        'frais_scolaires_min' : 0,
+        'frais_scolaires_max' : 600000,
     }
     return render(request, 'paiements/liste_paiements.html', context)
 
@@ -258,13 +299,20 @@ def enregistrer_paiement(request, id=0):
     Raises:
         None
     """
+    #recuperons l'annee courante
+    id_annee_selectionnee = request.session.get('id_annee_selectionnee')
+    annee_selectionnee = get_object_or_404( AnneeUniversitaire, pk=id_annee_selectionnee)
     if request.method == "GET":
         if id == 0:
             form = PaiementForm()
         else:
             paiement = Paiement.objects.get(pk=id)
-            form = PaiementForm(instance=paiement)   
-        return render(request, 'paiements/enregistrer_paiement.html', {'form': form}) 
+            form = PaiementForm(instance=paiement) 
+            
+        #recuperons le montant d'inscription qui sera injecté dans le script js de template une fois accessible
+        frais_scolaire=Frais.objects.get(annee_universitaire=annee_selectionnee)
+        frais_inscription=frais_scolaire.montant_inscription  
+        return render(request, 'paiements/enregistrer_paiement.html', {'form': form,'frais_inscription':frais_inscription}) 
     else:
         if id == 0:
             form = PaiementForm(request.POST)
@@ -276,12 +324,22 @@ def enregistrer_paiement(request, id=0):
             form = PaiementForm(request.POST,instance= paiement)
         if form.is_valid():
             paiement = form.save(commit=False)
+            print(paiement)
             comptable = Comptable.objects.get(user=request.user)
             paiement.comptable = comptable
 
             compte_universite = CompteBancaire.objects.first()
             paiement.compte_bancaire = compte_universite
+            ###
+            print( form.errors)
+            print("annee_selectionnee : ")
+            print(annee_selectionnee)
+            paiement.annee_universitaire=annee_selectionnee
             paiement.save()
+            print(paiement)
+            print(Paiement.objects.all())
+            #return HttpResponse("")
+     
 
             etudiant = paiement.etudiant
             annee_universitaire = paiement.annee_universitaire
@@ -413,6 +471,47 @@ def create_compte(request, id=0):
             print(form.errors)
             return render(request, 'compte_bancaire/create_compte.html', {'form': form})
 
+@login_required(login_url=settings.LOGIN_URL)
+def irpp_mensuel(request,id_annee_selectionnee):
+    """
+    Affiche IRPP pour un mois donnée.
+
+    :param request: L'objet HttpRequest utilisé pour effectuer la requête.
+    :param date_debut: L'ID de l'année universitaire sélectionnée.
+    :param id_annee_selectionnee: L'ID de l'année universitaire sélectionnée.
+    :return: Un objet HttpResponse contenant les donnée sous form de json.
+    :raises: Http404 si l'année universitaire sélectionnée n'est pas trouvée.
+
+    Cette vue récupère IRPP pour un mois donnée,
+    puis  renvoie l'irpp sous form de json.
+    """
+    salaires = Salaire.objects.filter(annee_universitaire=id_annee_selectionnee)
+    total_irpp = sum(salaire.irpp + salaire.tcs for salaire in salaires)    
+    total_irpp_by_month = Salaire.objects.values('date_debut__month').annotate(total_irpp=Sum('irpp'))
+    MONTH_NAMES = {
+    1: "Janvier",
+    2: "Février",
+    3: "Mars",
+    4: "Avril",
+    5: "Mai",
+    6: "Juin",
+    7: "Juillet",
+    8: "Août",
+    9: "Septembre",
+    10: "Octobre",
+    11: "Novembre",
+    12: "Décembre",
+    }
+    for item in total_irpp_by_month:
+        month_number = item['date_debut__month']
+        item['month_name'] = MONTH_NAMES[month_number]
+    context={
+        "total_irpp":total_irpp,
+        "total_irpp_by_month":total_irpp_by_month,
+    }
+    return render(request, 'compte_bancaire/irpp_mensuel.html', context)
+
+
 
 
 @login_required(login_url=settings.LOGIN_URL)
@@ -433,9 +532,27 @@ def compte_bancaire(request, id_annee_selectionnee):
     paiements_annee = Paiement.objects.filter(etudiant__in=etudiants_annee)
     montant_total_paiements = paiements_annee.aggregate(Sum('montant'))['montant__sum'] or 0
 
-    salaires = Salaire.objects.filter(annee_universitaire=id_annee_selectionnee)
+    ##########
+    salaires=Salaire.objects.filter(annee_universitaire=id_annee_selectionnee)
+    
+    salaires_anpe =Salaire.objects.filter(annee_universitaire=id_annee_selectionnee,qualification_professionnel='Stagiaire')
+    ### salaires_ifnti est une liste des salaires des enseignants d'ifnti sauf le stagiaire
+    salaires_ifnti = Salaire.objects.filter(annee_universitaire=id_annee_selectionnee).exclude(qualification_professionnel='Stagiaire')
+       
     total_salaire_brut = sum(salaire.personnel.salaireBrut + salaire.prime_efficacite + salaire.prime_qualite + salaire.frais_travaux_complementaires+ salaire.prime_anciennete for salaire in salaires)
-    total_cnss = sum(salaire.frais_prestations_familiale_salsalaire * salaire.personnel.salaireBrut + salaire.frais_prestations_familiales * salaire.personnel.salaireBrut + salaire.frais_risques_professionnel * salaire.personnel.salaireBrut + salaire.frais_pension_vieillesse_emsalaire * salaire.personnel.salaireBrut for salaire in salaires)
+      
+      
+    total_cnss = 0
+    total_ifnti=0
+    total_anpe=0
+    for salaire in salaires_ifnti:
+        total_ifnti += (salaire.frais_prestations_familiale_salsalaire * salaire.personnel.salaireBrut) + (salaire.frais_prestations_familiales * salaire.personnel.salaireBrut) + (salaire.frais_risques_professionnel * salaire.personnel.salaireBrut) + (salaire.frais_pension_vieillesse_emsalaire * salaire.personnel.salaireBrut) + (salaire.assurance_maladie_universelle*salaire.personnel.salaireBrut + salaire.assurance_maladie_universelle*salaire.personnel.salaireBrut) 
+    
+    for salaire in salaires_anpe:
+        total_anpe+=salaire.frais_risques_professionnel * salaire.personnel.salaireBrut
+        
+    total_cnss=total_ifnti+total_anpe
+      
     total_irpp = sum(salaire.irpp + salaire.tcs for salaire in salaires)
     total_salaire_net = sum(salaire.salaire_net_a_payer for salaire in salaires)
     montant_total_salaires = sum(salaire.salaire_net_a_payer + (salaire.frais_prestations_familiale_salsalaire * salaire.personnel.salaireBrut + salaire.frais_prestations_familiales * salaire.personnel.salaireBrut + salaire.frais_risques_professionnel * salaire.personnel.salaireBrut + salaire.frais_pension_vieillesse_emsalaire * salaire.personnel.salaireBrut + salaire.tcs)for salaire in salaires)
@@ -468,8 +585,10 @@ def compte_bancaire(request, id_annee_selectionnee):
         'total_charges': total_charges,
         'total_salaires': total_salaires,
         'compte_existe': compte_existe,
+        'salaires':salaires
     }
     return render(request, 'compte_bancaire/compte_bancaire.html', context)
+
 
 
 @login_required(login_url=settings.LOGIN_URL)
@@ -596,8 +715,12 @@ def liste_etudiants(request, id_annee_selectionnee):
     """
         Créer un contexte contenant les données nécessaires pour le template
     """
+
+
+
+
+
     context = {
-        'id_annee_selectionnee': id_annee_selectionnee,
         'etudiants_avec_montant_total': etudiants_avec_montant_total,
         'total_frais_courante': total_frais_courante,
     }
@@ -1023,7 +1146,7 @@ def enregistrer_paiement_fournisseur(request, id=0):
         return render(request, 'fournisseurs/enregistrer_paiement_fournisseur.html', {'form': form}) 
     else:
         if id == 0:
-            form = FournisseurForm(request.POST)
+            form = FournisseurForm(request.POST,request.FILES)
         else:
             paiement_fournisseur = Fournisseur.objects.get(pk=id)
             compte_universite = paiement_fournisseur.compte_bancaire
@@ -1034,6 +1157,7 @@ def enregistrer_paiement_fournisseur(request, id=0):
             paiement_fournisseur = form.save(commit=False)
             compte_universite = CompteBancaire.objects.first()
             paiement_fournisseur.compte_bancaire = compte_universite
+            
             paiement_fournisseur.save()
 
             compte_universite.solde_bancaire -= paiement_fournisseur.montant
@@ -1502,4 +1626,84 @@ def delete_bulletin_stagiaire(request):
         bulletin.delete()
     id_annee_selectionnee = AnneeUniversitaire.static_get_current_annee_universitaire().id
     return redirect('paiement:bulletins_de_paye_stagiaire', id_annee_selectionnee=id_annee_selectionnee)
+
+
+
+
+
+#---------------------------------Option de filtrage lors de l'impression-----------------------------
+def option_impression_frais_scolarite_par_semestre(request):
+    """
+        Reperer l'id de l'année universitaire courante
+        Récuperer le montant des frais de scolarité par semestre
+        visualisation du pdf dans le navigateur
+    """
+
+    recupmax = 0
+    recupmin = 0
+    
+
+    recupmin_max = request.POST.get('min_max')
+    separtion_chaine = recupmin_max.split("-")
+    recupmin = separtion_chaine[0]
+    recupmax = separtion_chaine[1]
+
+    
+
+    recupsemestre = request.POST.getlist('semestres')
+
+    recuperation_montant_frais_scolarite_min, recuperation_montant_frais_scolarite_max = recupmin,recupmax
+    montant_frais_scolarites = CompteEtudiant.objects.filter(solde__gte=recuperation_montant_frais_scolarite_min, solde__lte=recuperation_montant_frais_scolarite_max,)
+
+    buildcontext = {}
+
+
+
+    #recuperation du montant d'inscription
+    recup_montant_inscription = Frais.objects.all()
+    for i in recup_montant_inscription:
+        reucp_frais = i.montant_inscription
+        recup_frais_scolarite = i.montant_scolarite
+
+    
+
+    # montant_frais_scolarites.filter(etudiant__semestres = semestre)
+    id_annee_selectionnee = request.session["id_annee_selectionnee"]
+
+    semestres = []
+    for sem in recupsemestre:
+        semestre = Semestre.objects.filter(id = sem).get()
+        data = []
+        for compteEtudiant in montant_frais_scolarites:
+            if compteEtudiant.etudiant.semestres.filter(id = sem, annee_universitaire__id = id_annee_selectionnee).exists():
+                compteEtudiant.montant_restant = recup_frais_scolarite - compteEtudiant.solde
+                data.append(compteEtudiant)
+
+        
+            
+
+
+        buildcontext[semestre.__str__()] = data
+
+    #context pour l'affichage des semestres
+    context ={
+        'buildcontext' : buildcontext,
+        'recupmin' : recupmin,
+        'recupmax' : recupmax,
+        'reucp_frais':reucp_frais,
+    }
+    
+    latex_input = 'frais_scolarite_par_semestre'
+    latex_input = 'bilan_paiements_annuel'
+    latex_ouput = 'generated_bilan_paiements_annuel'
+    pdf_file = 'pdf_bilan_paiements_annuel'
+
+    generate_pdf(context, latex_input, latex_ouput, pdf_file)
+
+    # visualisation du pdf dans le navigateur
+    with open('media/pdf/' + str(pdf_file) + '.pdf', 'rb') as f:
+        pdf_preview = f.read()
+        response = HttpResponse(pdf_preview, content_type='application/pdf')
+        response['Content-Disposition'] = 'inline;filename=pdf_frais.pdf'
+        return response
 

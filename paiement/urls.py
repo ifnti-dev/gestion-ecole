@@ -5,12 +5,18 @@ app_name = 'paiement'
 
 urlpatterns = [
 
-
+        ##cherifa##
+        #delete_frais_scolarite
+        path('delete_frais_scolarite/<int:id>/',views.delete_frais_scolarite,name="delete_frais_scolarite"),
+   
 
                         #### Compte bancaire ####
+
+
     path('etat_compte_bancaire/<int:id_annee_selectionnee>/<int:compte_bancaire_id>/', views.etat_compte_bancaire, name='etat_compte_bancaire'),
     path('compte_bancaire/<int:id_annee_selectionnee>/', views.compte_bancaire, name='compte_bancaire'),
     path('create_compte/', views.create_compte, name='create_compte'),
+    path('irpp_mensuel/<int:id_annee_selectionnee>/', views.irpp_mensuel, name='irpp_mensuel'),
 
 
                              #### Frais ####
@@ -80,6 +86,9 @@ urlpatterns = [
     path('modifier_fiche_de_prise_en_charge/<int:id>/', views.enregistrer_fiche_de_prise_en_charge, name='modifier_fiche_de_prise_en_charge'),
     path('fiche_de_charge/<int:id>/', views.fiche_de_charge, name='fiche_de_charge'),
 
-    
+                        ### Fiche d'impression par semestre###
+
+    path('option_impression_frais_scolarite_par_semestre/', views.option_impression_frais_scolarite_par_semestre, name='option_impression_frais_scolarite_par_semestre'),
+
 
 ]
