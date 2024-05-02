@@ -583,12 +583,35 @@
                 </li>
                 {% endif %}
             </ul>
+
+            <div class="roles">
+                <div class="roleschanges">
+                    {% for role in request.user.groups.all %}
+                        <a href="{% url 'main:change_role' role.id %}" class="text-white text-center trole">Utiliser le role <strong>{{ role.name }}</strong> </a> <br>
+                    {% endfor %} 
+                </div>
+
+                <div class="rolesmodif">
+                    <div>
+                        <p class="text-white">{{ user.groups.all.0 }}</p>
+                    </div>
+                    
+                    <div>
+                        <p class="ics">
+                            <i class="fa fa-edit text-white"></i>
+                        </p>
+                    </div>  
+                </div>
+            </div>
+            
         </div>
     </div> 
 </nav>
 
 <script>
     const liElements = document.querySelectorAll('.ntem');
+    let rolleschanges = document.querySelector('.roleschanges');
+    let iconchanges = document.querySelector('.ics');
     function removeactive(){
         liElements.forEach((liElement) => {
             liElement.classList.remove('active');
@@ -600,5 +623,10 @@
             liElement.classList.add('active');
         });
     });
+
+    iconchanges.addEventListener('click', (e)=>{
+        e.preventDefault();
+        rolleschanges.classList.toggle('visibleroleschanges');
+    })
     
 </script>

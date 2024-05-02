@@ -32,8 +32,8 @@
                 <div class="dropdown-menu dropdown-menu-md dropdown-menu-right p-0 border-0" aria-labelledby="page-header-user-dropdown">
                     <div class="p-3 text-center  primary-bg-glace rounded-top">
                         <img class="img-avatar img-avatar48 img-avatar-thumb" src="{%static 'assets/media/avatars/avatar1.jpg' %}" alt="">
-                        <p class="mt-2 mb-0 text-white font-w500">{{   user.first_name}} {{   user.last_name}} </p>
-                        <p class="mb-0 text-white-50 font-size-sm">{{   user.groups.all.0 }}</p>
+                        <p class="mt-2 mb-0 text-black font-w500">{{   user.first_name}} {{   user.last_name}} </p>
+                        <p class="mb-0 text-blue font-size-sm">{{   user.groups.all.0 }}</p>
                     </div>
                     <div class="p-2">
                         <a class="dropdown-item d-flex align-items-center justify-content-between" href="{% url 'main:profil' %}">
