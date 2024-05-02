@@ -1599,15 +1599,14 @@ def option_impression_frais_scolarite_par_semestre(request):
         visualisation du pdf dans le navigateur
     """
 
-    recupmax = 0
-    recupmin = 0
-
     recupmin_max = request.POST.get('min_max')
     separtion_chaine = recupmin_max.split("-")
     recupmin = separtion_chaine[0]
     recupmax = separtion_chaine[1]
-
     recupsemestre = request.POST.getlist('semestres')
+
+
+
     recuperation_montant_frais_scolarite_min, recuperation_montant_frais_scolarite_max = recupmin,recupmax
     montant_frais_scolarites = CompteEtudiant.objects.filter(solde__gte=recuperation_montant_frais_scolarite_min, solde__lte=recuperation_montant_frais_scolarite_max,)
 
