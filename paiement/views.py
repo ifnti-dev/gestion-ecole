@@ -576,7 +576,7 @@ def etat_compte_bancaire(request, id_annee_selectionnee, compte_bancaire_id):
     etudiants_annee = Etudiant.objects.filter(semestres__in=semestres_annee)
     paiements_frais_scolaires = Paiement.objects.filter(compte_bancaire=compte_bancaire, etudiant__in=etudiants_annee)
     
-    salaires = Salaire.objects.filter(annee_universitaire=id_annee_selectionnee)
+    salaires = VersmentSalaire.objects.filter(annee_universitaire=id_annee_selectionnee)
     montant_total_paiements = paiements_frais_scolaires.aggregate(Sum('montant'))['montant__sum'] or 0
     fournisseurs = Fournisseur.objects.filter(annee_universitaire=id_annee_selectionnee)
     fiches_de_paies = FicheDePaie.objects.filter(annee_universitaire=id_annee_selectionnee)
@@ -888,7 +888,7 @@ def delete_bulletin(request):
     """
     if request.method == 'GET':
         bulletin_id = request.GET.get('id')
-        bulletin = get_object_or_404(Salaire, id=bulletin_id)
+        bulletin = get_object_or_404(VersmentSalaire, id=bulletin_id)
         bulletin.delete()
     id_annee_selectionnee = AnneeUniversitaire.static_get_current_annee_universitaire().id
     return redirect('paiement:bulletins_de_paye', id_annee_selectionnee=id_annee_selectionnee)
@@ -952,7 +952,7 @@ def bulletin_de_paye(request, id):
 
     """
 
-    bulletin = get_object_or_404(Salaire, id=id)
+    bulletin = get_object_or_404(VersmentSalaire, id=id)
     salaireDeBase = int(bulletin.personnel.salaireBrut)
     prime_efficacite = int(bulletin.prime_efficacite)
     prime_qualite = int(bulletin.prime_qualite)
@@ -1442,19 +1442,19 @@ def enregistrer_bulletin_stagiaire(request, id=0):
         if id == 0:
             form = StagiairesForm()
         else:
-            bulletin = Salaire.objects.get(pk=id)
+            bulletin = VersmentSalaire.objects.get(pk=id)
             form = StagiairesForm(instance=bulletin)   
         return render(request, 'salaires/enregistrer_bulletin_stagiaire.html', {'form': form})
     else:
         if id == 0:
             form = StagiairesForm(request.POST)
         else:
-            bulletin = Salaire.objects.get(pk=id)
+            bulletin = VersmentSalaire.objects.get(pk=id)
             compte_universite = bulletin.compte_bancaire
             compte_universite.solde_bancaire += bulletin.salaire_net_a_payer + (Decimal(bulletin.frais_risques_professionnel) * Decimal(bulletin.personnel.salaireBrut))
             print(bulletin.salaire_net_a_payer + (Decimal(bulletin.frais_risques_professionnel) * Decimal(bulletin.personnel.salaireBrut)))
             compte_universite.save()
-            form = SalaireForm(request.POST, instance=bulletin)
+            form = VersmentSalaireForm(request.POST, instance=bulletin)
         if form.is_valid():
             bulletin = form.save(commit=False)
             qualification_professionnelle = 'Stagiaire'
@@ -1487,7 +1487,7 @@ def enregistrer_bulletin_stagiaire(request, id=0):
 
 @login_required(login_url=settings.LOGIN_URL)
 def bulletin_de_paye_stagiaire(request, id):
-    bulletin = get_object_or_404(Salaire, id=id)
+    bulletin = get_object_or_404(VersmentSalaire, id=id)
     salaireDeBase = int(bulletin.personnel.salaireBrut)
     prime_efficacite = int(bulletin.prime_efficacite)
     prime_qualite = int(bulletin.prime_qualite)
@@ -1583,7 +1583,7 @@ def delete_bulletin_stagiaire(request):
     """
     if request.method == 'GET':
         bulletin_id = request.GET.get('id')
-        bulletin = get_object_or_404(Salaire, id=bulletin_id)
+        bulletin = get_object_or_404(VersmentSalaire, id=bulletin_id)
         bulletin.delete()
     id_annee_selectionnee = AnneeUniversitaire.static_get_current_annee_universitaire().id
     return redirect('paiement:bulletins_de_paye_stagiaire', id_annee_selectionnee=id_annee_selectionnee)

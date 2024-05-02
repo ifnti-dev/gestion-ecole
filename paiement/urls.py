@@ -32,9 +32,9 @@ urlpatterns = [
 
 
                             #### Comptable ####
-    path('create_comptable/', views.create_comptable, name='create_comptable'),
+#   path('create_comptable/', views.create_comptable, name='create_comptable'),
     path('comptable_detail/(?P<id>[0-9]+)\\Z/', views.comptable_detail, name='comptable_detail'),
-    path('edit_comptable/(?P<id>[0-9]+)\\Z/', views.create_comptable, name='edit_comptable'),
+#   path('edit_comptable/(?P<id>[0-9]+)\\Z/', views.create_comptable, name='edit_comptable'),
     path('comptable_list/', views.comptable_list, name='comptable_list'),
     path('comptables_suspendu/', views.comptables_suspendu, name='comptables_suspendu'),
 

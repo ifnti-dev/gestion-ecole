@@ -210,6 +210,7 @@ def create_seed():
         nbreJrsCongesRestant=30,
         nbreJrsConsomme=0,
         specialite="Base de donnée",
+        qualification_professionnel="Directeur des études"
     )
     enseignant.save()
     group = Group.objects.get(name="directeur_des_etudes")
@@ -230,7 +231,8 @@ def create_seed():
             nationalite="togolais",
             salaireBrut=200000,
             nbreJrsCongesRestant=30,
-            nbreJrsConsomme=0
+            nbreJrsConsomme=0,
+            qualification_professionnel="Enseignant"
         )
     personnel.save()
     personnel.user.is_superuser=True
