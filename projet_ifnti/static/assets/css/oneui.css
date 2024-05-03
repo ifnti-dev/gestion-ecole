@@ -27541,3 +27541,8 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination {
   visibility: visible;
 }
 
+/* ----------------- */
+
+.cads:hover{
+  background-color: blue;
+}
