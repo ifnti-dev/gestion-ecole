@@ -27473,7 +27473,6 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination {
 
 .headers1{
   box-shadow : 1px 1px 10px gray;
-
   border : 0px;
   outline: none;
   
@@ -27541,3 +27540,5 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination {
   visibility: visible;
 }
 
+
+/*----------------------tableau responsivité----------------------------------*/
