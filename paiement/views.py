@@ -221,7 +221,15 @@ def comptable_list(request):
 
     """
     current_annee = AnneeUniversitaire.static_get_current_annee_universitaire()
-    comptables = Comptable.objects.filter(is_active=True)
+    group = Group.objects.get(name="comptable")
+    personnels = Personnel.objects.filter(is_active=True)
+    
+    comptables= []
+    for p in personnels:
+        print(p)
+        if p.user.groups== group:
+            comptables.append(p)
+    #comptables = Comptable.objects.filter(is_active=True)
     context = {
         "comptables": comptables,
     }

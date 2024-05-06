@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Enseignant, Evaluation, CompteBancaire, Fournisseur, Domaine,Information, Parcours,Programme, Matiere, Etudiant, Competence, Note, Semestre, Ue, AnneeUniversitaire, Personnel, Tuteur, Paiement, FicheDePaie, DirecteurDesEtudes, Frais, CompteEtudiant, VersmentSalaire, Conge
+from .models import Enseignant, Evaluation, CompteBancaire, Fournisseur, Domaine,Information, Parcours,Programme, Matiere, Etudiant, Competence, Note, Semestre, Ue, AnneeUniversitaire, Personnel, Tuteur, Paiement, FicheDePaie, Frais, CompteEtudiant, VersmentSalaire, Conge
 from cahier_de_texte.models import Seance
 from planning.models import Planning,SeancePlannifier
 from main.forms import EnseignantForm
@@ -62,7 +62,7 @@ admin.site.register(Personnel)
 admin.site.register(AnneeUniversitaire)
 admin.site.register(Information)
 admin.site.register(Paiement)
-admin.site.register(DirecteurDesEtudes)
+#admin.site.register(DirecteurDesEtudes)
 admin.site.register(Seance)
 admin.site.register(FicheDePaie)
 admin.site.register(Parcours)

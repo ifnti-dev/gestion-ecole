@@ -1139,25 +1139,25 @@ class Enseignant(Personnel):
         # return f'{self.user.username}'
 
 
-class DirecteurDesEtudes(Personnel):
-    """
-        Cette classe hérite de la classe Personnel, elle correspont au Directeur des Études.
-    """
+# class DirecteurDesEtudes(Personnel):
+#     """
+#         Cette classe hérite de la classe Personnel, elle correspont au Directeur des Études.
+#     """
 
-    def save(self, *args, **kwargs):
-        if not self.id:
-            super().save(*args, **kwargs) 
-            group_comptable = Group.objects.get(name="comptable")
-            self.user.groups.add(group_comptable)
-        else:
-            super().save(*args, **kwargs)
+#     def save(self, *args, **kwargs):
+#         if not self.id:
+#             super().save(*args, **kwargs) 
+#             group_comptable = Group.objects.get(name="comptable")
+#             self.user.groups.add(group_comptable)
+#         else:
+#             super().save(*args, **kwargs)
             
-        if self.is_active:
-            # Désactiver les autres directeurs des études
-            DirecteurDesEtudes.objects.exclude(
-                pk=self.pk).update(is_active=False)
+#         if self.is_active:
+#             # Désactiver les autres directeurs des études
+#             DirecteurDesEtudes.objects.exclude(
+#                 pk=self.pk).update(is_active=False)
 
-        return super().save(*args, **kwargs)
+#         return super().save(*args, **kwargs)
 
 # class Comptable(Personnel):
 #     """
@@ -2838,16 +2838,7 @@ class Information(models.Model):
         **Nullable:** true
 
     """
-    directeur = models.ForeignKey(
-        'DirecteurDesEtudes', on_delete=models.CASCADE, verbose_name="Directeur des études", null=True)
-    """
-        Directeur des études asscocié à l'information
-
-        **Type:** string
-
-        **Nullable:** true
-
-    """
+  
     numeroSecurite = models.IntegerField(
         verbose_name="Numéro de sécurité sociale")
     """

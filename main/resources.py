@@ -1,5 +1,5 @@
 from import_export import resources
-from .models import Enseignant, Frais, CompteEtudiant, CompteBancaire, VersmentSalaire, Fournisseur, Charge, Conge, Evaluation, Domaine,Information, Parcours,Programme, Matiere, Etudiant, Competence, Note, Semestre, Ue, AnneeUniversitaire, Personnel, Tuteur, Paiement, FicheDePaie, DirecteurDesEtudes
+from .models import Enseignant, Frais, CompteEtudiant, CompteBancaire, VersmentSalaire, Fournisseur, Charge, Conge, Evaluation, Domaine,Information, Parcours,Programme, Matiere, Etudiant, Competence, Note, Semestre, Ue, AnneeUniversitaire, Personnel, Tuteur, Paiement, FicheDePaie
 from cahier_de_texte.models import  Seance
 
 
@@ -17,9 +17,9 @@ class EnseignantResource(resources.ModelResource):
 
 
 
-class DirecteurDesEtudesResource(resources.ModelResource):
-    class Meta:
-        model = DirecteurDesEtudes
+# class DirecteurDesEtudesResource(resources.ModelResource):
+#     class Meta:
+#         model = DirecteurDesEtudes
 
 class EvaluationResource(resources.ModelResource):
     class Meta:
