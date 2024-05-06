@@ -60,17 +60,18 @@ class CompteBancaireForm(forms.ModelForm):
 
 
 class PaiementForm(forms.ModelForm):
-    montant=forms.IntegerField(initial=None,widget=forms.NumberInput(attrs={'class': 'form-control','placeholder':0},))
+    montant=forms.IntegerField(initial=None,widget=forms.NumberInput(attrs={'class': 'form-control','placeholder':1,"min":1},))
+  
     class Meta:
         model = Paiement
-        fields = ['type','etudiant', 'montant', 'dateversement', 'numerobordereau']
+        fields = ['type', 'montant', 'dateversement','etudiant' ,'numerobordereau']
         
         widgets = {
             'type': forms.Select(attrs={'class': 'form-control'}),
             'dateversement': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
-            'etudiant': forms.Select(attrs={'class': 'form-control'}),
+            'etudiant':forms.Select(attrs={'class': 'form-control js-select2 col-md-12'}),
             'numerobordereau': forms.TextInput(attrs={'class': 'form-control'}),
-          
+            # forms.SelectMultiple(attrs={'class': 'form-control js-select2 col-md-12'}),
         }
 
     def clean(self):
