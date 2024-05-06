@@ -24,12 +24,19 @@
 \usepackage{datetime}
 \usepackage{eso-pic, graphicx}
 
+
+\newcommand\BackgroundPic{
+\put(2,2){
+\parbox[b][\paperheight]{\paperwidth}{
+\includegraphics[width=\paperwidth,height=\paperheight]{CharteGraphiqueDocumentPageDeGardeLogo}
+}}}
+\geometry{hmargin=5cm,vmargin=1.5cm}
 \begin{document}
+\AddToShipoutPicture*{\BackgroundPic}
 
 \begin{center}
-  \underline{\textbf{LISTES ETUDIANT EYANT VERSÉ ENTRE :  \textbf{\color{blue}{\VAR{recupmin}}} à \textbf{\color{blue}{\VAR{recupmax}}}}} 
+  \underline{\large{\textbf{LISTE ETUDIANT AYANT VERSÉ ENTRE :  \textbf{\VAR{recupmin}F}} à \textbf{\VAR{recupmax}F}}} 
 \end{center}
-
 
 \BLOCK{ for seme in buildcontext }
 \begin{center}
@@ -39,30 +46,31 @@
 \begin{center}
   \newcolumntype{D}[1]{>{}p{#1}}
   
-  \begin{tabular}{|D{3cm}|D{1.8cm}|D{1.8cm}|D{1.8cm}|D{1.8cm}|D{1.8cm}|D{1.8cm}|D{1.8cm}|}
+  \begin{tabular}{|D{3cm}|D{1.8cm}|D{2.5cm}|D{1.8cm}|D{1.8cm}|D{1.8cm}|D{1.8cm}|}
   
   \hline
-  \textbf{\scriptsize ÉTUDIANT}  & \textbf{\scriptsize ARRIÉRÉS} & \textbf{\scriptsize FRAIS INSCRIPTION} & \textbf{\scriptsize FRAIS SCOLARITÉ} & \textbf{\scriptsize TOTAL FRAIS} & \textbf{\scriptsize SOMME VERSÉE}
+  \textbf{\scriptsize NOM}  & \textbf{\scriptsize PRENOM} & \textbf{\scriptsize FRAIS INSCRIPTION} & \textbf{\scriptsize TOTAL VERSÉE} & \textbf{\scriptsize SOMME RESTANTE}
   \tabularnewline
   
-  \BLOCK{ for item in buildcontext[seme] }
+  \BLOCK{ if buildcontext[seme] | length == 0 }
   \hline
-  
-  \VAR{item.etudiant.nom} & \VAR{item.etudiant.prenom} &  \VAR{item.solde} &  \VAR{0} & \VAR{0} &  \VAR{0}
-  
+  \multicolumn{5}{|c|}{\textit{... Aucun étudiant trouvé ...}} 
   \tabularnewline\hline
-  
-  \BLOCK{endfor}
+  \BLOCK{ else }
+    \BLOCK{ for item in buildcontext[seme] }
+      \hline
+      \VAR{item.etudiant.nom}
+      & \VAR{item.etudiant.prenom} 
+      &  \VAR{reucp_frais} 
+      &  \VAR{item.solde} 
+      & \VAR{item.montant_restant}
+      \tabularnewline\hline
+    \BLOCK{ endfor }
+  \BLOCK{ endif }
   
   \end{tabular}
   
 \end{center}
 
-  
-\BLOCK{endfor}
+\BLOCK{ endfor }
 \end{document}
-
-
-
-
-

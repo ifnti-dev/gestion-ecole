@@ -62,7 +62,9 @@ def create_faker():
     if response.lower() in ['o', 'oui', 'y', 'yes']:
         fake = Faker()
         s1 = AnneeUniversitaire.objects.last().semestre_set.first()
+
         s1.save()
+
         for _ in range(5):
             etudiant = Etudiant(
                 nom=fake.last_name()[:10],
@@ -216,6 +218,7 @@ def create_seed():
     group = Group.objects.get(name="directeur_des_etudes")
     enseignant.user.groups.add(group)
     print(f"Enseignant créé : {enseignant.user.username}")
+
     
     personnel = Personnel(
             nom="ifnti",
@@ -244,6 +247,13 @@ def create_seed():
     personnel.user.groups.add(group)
     personnel.user.save()
     print(f"User directeur créé : {personnel.user}")
+
+    user = User.objects.create_user(username="ifnti", password="ifnti", is_superuser=True,  is_staff=True, is_active=True)
+    user.groups.add(group)
+    group = Group.objects.get(name="comptable")
+    user.groups.add(group)
+    print(f"User directeur créé : {user}")
+
 
 def create_groups_if_exist():
     permissions = [

@@ -6,50 +6,54 @@
     <div class="block-header p-4">
         <h3 class="block-title">Liste des Paiements</h3>
 
-        <button class="btn btn-dark" id="btnimprimer">
+        <!-- <button class="btn " id="btnimprimer">
             billan
-        </button>
+        </button> -->
 
-
-        <div class="" id="printable">
-            <form action="{% url 'paiement:option_impression_frais_scolarite_par_semestre' %}" method="POST">
-
-                {% csrf_token %}
-
-                <div class="block-options">
-                    <div class="block-options-item">
-                        <div class="block-options-item">
-                            <select class="form-control" id="annee_selectionnee" name="semestres" multiple>
-                                <option disabled>Sélectionner semestres</option>
-                                {% for semestre in semestres %}
-                                    <option value="{{ semestre.id }}">{{ semestre.libelle }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="block-options">
-                    <div class="block-options-item">
-                        <div class="block-options-item">
-                            <input type="number" class="form-control" id="item-name" name="min" placeholder="Montant" min="0">
-                        </div>
-                        <div class="block-options-item">
-                            <input type="number" class="form-control" id="item-name" name="max" placeholder="Montant" min="0">
-                        </div>
-                    </div>
-                </div>
-    
-                <div class="block-options">
-                    <button type="submit">Envoyer</button>
-                </div>
-            </form>
+        <div>
+            <button type="button" class="btn btn-dark push" data-toggle="modal" data-target="#modal-block-vcenter">Imprimer</button>
         </div>
 
 
+        <div class="modal" id="modal-block-vcenter" tabindex="-1" role="dialog" aria-labelledby="modal-block-vcenter" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <form action="{% url 'paiement:option_impression_frais_scolarite_par_semestre' %}" method="POST">
+                        {% csrf_token %}
+                        <div class="modal-header bg-primary">
+                            <h5 class="modal-title">PARAMÈTRES D'IMPRESSION</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
 
 
-
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label for="semestres">Semestres</label>
+                                <select required class="form-control js-select2" id="annee_selectionnee" name="semestres" multiple style="width: 100%;">
+                                    <option disabled>Sélectionner semestres</option>
+                                    {% for semestre in semestres %}
+                                    <option value="{{ semestre.id }}">{{ semestre.libelle }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="">Interval de prix des frais de scolarité</label>
+                                <input type="range" value="0" class="js-rangeslider form-control" id="" data-type="double" data-grid="true" data-min="{{ frais_scolaires_min }}" data-max="{{ frais_scolaires_max }}" data-from="{{ frais_scolaires_min }}" data-to="{{ frais_scolaires_max }}">
+                                <input type="text" value="{{ frais_scolaires_min }}-{{ frais_scolaires_max }}" id="range_values" name="min_max" hidden>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+                            <button type="submit" class="btn btn-primary">Valider</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
         {% if is_comptable %}
             <a href="{% url 'paiement:enregistrer_paiement'%}" class="btn btn-outline-primary">
                     <i class="fas fa-plus"></i> Ajouter
@@ -113,6 +117,8 @@
 </div>
 
 
+{% endblock %}
+{% block scripts %}
 <script>
     $(document).ready(function() {
         $('#printable').hide()
@@ -120,8 +126,10 @@
             $('#printable').slideToggle()
         })
     })
+    function setrangeValue(input_range){
+        console.log(input_range.getAttribute('range-value'));
+        tag_min_max = document.getElementById('range_value');
+        tag_min_max.value = input_range.getAttribute('range-value');
+    }
 </script>
-<!-- {% block scripts %}
-{% endblock scripts %} -->
-
-{% endblock %}
+{% endblock scripts %}
