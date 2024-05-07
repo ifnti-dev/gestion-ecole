@@ -5,11 +5,11 @@
 <div class="block block-rounded m-5">
     <div class="block-header p-4">
         <h3 class="block-title">Liste des Comptables</h3>
-        {% if is_admin or is_directeur_des_etudes %}           
+        {% comment %} {% if is_admin or is_directeur_des_etudes %}           
             <a href="{% url 'paiement:create_comptable'%}" class="btn btn-outline-primary">
                 <i class="fas fa-plus"></i> Ajouter
             </a>  
-        {% endif %}      
+        {% endif %}       {% endcomment %}
     </div>
 
     <div class="block-content block-content-full">

@@ -1032,7 +1032,7 @@ class Personnel(Utilisateur):
         :retype: Decimal
 
         """
-        salaires = Salaire.objects.filter(personnel=self)
+        salaires = VersmentSalaire.objects.filter(personnel=self)
         total_salaire_brut_annuel = sum(
             salaire.calculer_salaire_brut_mensuel() for salaire in salaires)
         return int(total_salaire_brut_annuel)
@@ -1047,7 +1047,7 @@ class Personnel(Utilisateur):
         :retype: Decimal
         """
 
-        salaires = Salaire.objects.filter(personnel=self)
+        salaires = VersmentSalaire.objects.filter(personnel=self)
         total_irpp_annuel = sum(salaire.calculer_irpp_mensuel()
                                 for salaire in salaires)
         total_tcs_annuel = sum(salaire.tcs for salaire in salaires)
@@ -1065,7 +1065,7 @@ class Personnel(Utilisateur):
         :retype: Decimal
         """
 
-        salaires = Salaire.objects.filter(personnel=self)
+        salaires = VersmentSalaire.objects.filter(personnel=self)
 
         total_deductions_cnss = sum(
             salaire.calculer_deductions_cnss() for salaire in salaires)
@@ -1137,43 +1137,6 @@ class Enseignant(Personnel):
     def __str__(self):
         return f'{super().__str__()}'
         # return f'{self.user.username}'
-
-
-# class DirecteurDesEtudes(Personnel):
-#     """
-#         Cette classe hérite de la classe Personnel, elle correspont au Directeur des Études.
-#     """
-
-#     def save(self, *args, **kwargs):
-#         if not self.id:
-#             super().save(*args, **kwargs) 
-#             group_comptable = Group.objects.get(name="comptable")
-#             self.user.groups.add(group_comptable)
-#         else:
-#             super().save(*args, **kwargs)
-            
-#         if self.is_active:
-#             # Désactiver les autres directeurs des études
-#             DirecteurDesEtudes.objects.exclude(
-#                 pk=self.pk).update(is_active=False)
-
-#         return super().save(*args, **kwargs)
-
-# class Comptable(Personnel):
-#     """
-#     Cette classe hérite de la classe Personnel, elle représente les comptables.
-#     """
-    
-#     pass
-
-#     def save(self, *args, **kwargs):
-#         if not self.id:
-#             super().save(*args, **kwargs) 
-#             group_comptable = Group.objects.get(name="comptable")
-#             self.user.groups.add(group_comptable)
-#         else:
-#             super().save(*args, **kwargs)
-        
 
 class Tuteur(models.Model):
     """

@@ -172,17 +172,17 @@ def create_comptable(request, id=0):
     """
     if request.method == "GET":
         if id == 0:
-            form = ComptableForm()
+            form = PersonnelForm()
         else:
-            comptable = Comptable.objects.get(pk=id)
-            form = ComptableForm(instance=comptable)   
+            comptable = PersonnelForm.objects.get(pk=id)
+            form = PersonnelForm(instance=comptable)   
         return render(request, 'comptables/create_comptable.html', {'form': form})
     else:
         if id == 0:
-            form = ComptableForm(request.POST)
+            form = PersonnelForm(request.POST)
         else:
-            comptable = Comptable.objects.get(pk=id)
-            form = ComptableForm(request.POST,instance= comptable)
+            comptable = Personnel.objects.get(pk=id)
+            form = PersonnelForm(request.POST,instance= comptable)
         if form.is_valid():
             form.save()
             return redirect('paiement:comptable_list')
@@ -203,7 +203,7 @@ def comptable_detail(request, id):
     Cette vue récupère les informations détaillées d'un comptable spécifique,
     puis les renvoie au template 'comptables/comptable_detail.html' pour affichage.
     """
-    comptable = get_object_or_404(Comptable, id=id)
+    comptable = get_object_or_404(Personnel, id=id)
     return render(request, 'comptables/comptable_detail.html', {'comptable': comptable})
 
 
@@ -222,14 +222,9 @@ def comptable_list(request):
     """
     current_annee = AnneeUniversitaire.static_get_current_annee_universitaire()
     group = Group.objects.get(name="comptable")
-    personnels = Personnel.objects.filter(is_active=True)
+    comptables = Personnel.objects.filter(is_active=True,user__groups__name="comptable")
+    print( c for c in comptables)
     
-    comptables= []
-    for p in personnels:
-        print(p)
-        if p.user.groups== group:
-            comptables.append(p)
-    #comptables = Comptable.objects.filter(is_active=True)
     context = {
         "comptables": comptables,
     }
@@ -250,7 +245,7 @@ def comptables_suspendu(request):
 
     """
     annee_universitaire_courante = AnneeUniversitaire.static_get_current_annee_universitaire()
-    comptables = Comptable.objects.filter(is_active=False)
+    comptables = Personnel.objects.filter(is_active=False,user__groups__name="comptable")
     context = {
         "comptables": comptables,
         "annee_universitaire_courante": annee_universitaire_courante,

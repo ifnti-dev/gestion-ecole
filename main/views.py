@@ -967,7 +967,216 @@ def carte_etudiant_all(request, niveau):
         response = HttpResponse(pdf_preview, content_type='application/pdf')
         response['Content-Disposition'] = 'inline;filename=pdf_file.pdf'
         return response
+# def carte_etudiant_all(request, niveau):
+#     """
+#     Génére les cartes étudiantes de tout les étudiants d'un niveau donné
+#     :param request: L'objet de requête Django.
+#     :param niveau: Le niveau des étudiants (L1, L2, L3).
+#     :type niveau: str
 
+#     :return: Une réponse HTTP affichant le pdf des cartes étudiantes générées.
+#     """
+#     if request.user.groups.all().first().name not in ['directeur_des_etudes', 'secretaire']:
+#         return render(request, 'errors_pages/403.html')
+
+#     id_annee_selectionnee = request.session["id_annee_selectionnee"]
+#     annee_universitaire = get_object_or_404(
+#         AnneeUniversitaire, pk=id_annee_selectionnee)
+#     annee_suiv = int(annee_universitaire.annee) + 1
+
+#     semestre = Semestre.objects.filter(id=niveau)
+#     if semestre:
+#         semestres = [semestre.get().libelle]
+#     elif niveau == "__all__":
+#         semestres = ['S1', 'S2', 'S3', 'S4', 'S5', 'S6']
+
+#     etudiants = semestre.get().etudiant_set.all().order_by('nom', 'prenom')
+    
+#     L3_DICT = {
+#     "TS202001":{
+#         "tel": 91384224,
+#         "person_a_prev": 90918141,
+#         "adresse":"Didauré",
+#         "date_naissance":"07/06/2003"
+#     },
+#     "OT202103":{
+#         "tel": 70158732,
+#         "person_a_prev": 91700232,
+#         "adresse":"Alkpadè",
+#         "date_naissance":"04/04/2002"
+#     },
+#     "TA202113":{
+#         "tel": 92193983,
+#         "person_a_prev": 91264004,
+#         "adresse":"Kloundè",
+#         "date_naissance":"26/03/2004"
+#     },
+#     "AB202101":{
+#         "tel": 70478925,
+#         "person_a_prev": 90236130,
+#         "adresse":"Tchawanda",
+#         "date_naissance":"07/02/2003"
+#     },
+#     "TA202013":{
+#         "tel": 92342109,
+#         "person_a_prev": 90322378,
+#         "adresse":"Kadambara",
+#         "date_naissance":"10/10/2002"
+#     },
+#     "EK202120":{
+#         "tel": 79439850,
+#         "person_a_prev": 98829343,
+#         "adresse":"Komah",
+#         "date_naissance":"06/11/2002"
+#     },
+#     "TT202015":{
+#         "tel": 91122012,
+#         "person_a_prev": 90918141,
+#         "adresse":"Didauré",
+#         "date_naissance":"25/03/2002"
+#     },
+#     "IM202004":{
+#         "tel": 91414124,
+#         "person_a_prev": 90344320,
+#         "adresse":"Didauré",
+#         "date_naissance":"9/11/2001"
+#     },
+#     "KA202005":{
+#         "tel": 93561240,
+#         "person_a_prev": 90348141,
+#         "adresse":"Komah 2",
+#         "date_naissance":"06/05/2002"
+#     },
+#     "TF202016":{
+#         "tel": 70839169,
+#         "person_a_prev": 990330809,
+#         "adresse":"Bamabodolo",
+#         "date_naissance":"05/05/2003"
+#     },
+# }
+
+#     L2_DICT = {
+#         "DR202206": {
+#             "tel": 92168090,
+#             "person_a_prev": 90262793,
+#             "adresse":"Kouloumdè2",
+#             "date_naissance":"26/12/2004"
+#             },
+#         "OI202211":  {
+#             "tel": 92051092,
+#             "person_a_prev": 92047566,
+#             "adresse":"Kpangalame",
+#             "date_naissance":"10/09/2005"
+#             },
+#         "DA202115":  {
+#             "tel": 97493235,
+#             "person_a_prev": 90254967,
+#             "adresse":"Komah",
+#             "date_naissance":"14/08/2002"
+#             },
+#         "AT202117":  {
+#             "tel": 91714388,
+#             "person_a_prev": 91942915,
+#             "adresse":"Komah",
+#             "date_naissance":"31/12/2003"
+#             },
+#         "AM202201":  {
+#             "tel": 93349818,
+#             "person_a_prev": 91957231,
+#             "adresse":"Lomnava",
+#             "date_naissance":"10/12/2003"
+#             },
+#         "BK202204":  {
+#             "tel": 91361711,
+#             "person_a_prev": 90853172,
+#             "adresse":"Komah",
+#             "date_naissance":"25/10/2004"
+#             },
+#         "DF202119":  {
+#             "tel": 90148882,
+#             "person_a_prev": 91108628,
+#             "adresse":"Komah",
+#             "date_naissance":"31/12/2000"
+#             },
+#         "TF202110":  {
+#             "tel": 93516499,
+#             "person_a_prev": 90883471,
+#             "adresse":"Bamabodolo",
+#             "date_naissance":"01/10/1997"
+#             },
+#         "ME202210":  {
+#             "tel": 96613258,
+#             "person_a_prev": 90287946,
+#             "adresse":"Kloundè",
+#             "date_naissance":"19/10/2005"
+#             },
+#         "TE202116":  {
+#             "tel": 93667600,
+#             "person_a_prev": 90133474,
+#             "adresse":"Komah2",
+#             "date_naissance":"08/11/2001"
+#         },
+#     }
+
+#     L2 = [mat for mat in L2_DICT]
+#     L3 = [mat for mat in L3_DICT]
+#     L=L2+L3
+#     print(len(L))
+#     etudiants = Etudiant.objects.filter(contact__in=L)
+#     print(etudiants)
+#     print(etudiants.count())
+#     # return HttpResponse("Hello")
+#     for etudiant in etudiants:
+#         etudiant.niveau, _ = etudiant.get_niveau_annee(annee_universitaire)
+#         in_format = "%Y-%m-%d"
+#         out_format = "%d-%m-%Y"
+        
+#         if etudiant.datenaissance:
+#             date_formatee = datetime.strptime(
+#                 str(etudiant.datenaissance), in_format).strftime(out_format)
+#         else:
+#             date_formatee = 'None'
+
+#         etudiant.datenaissance = date_formatee
+#     nbre_pages = len(etudiants) // 9
+
+
+#     # ajout des étudiants dans le dictionnaire
+#     context = {'etudiants': etudiants, 'annee': str(
+#         annee_universitaire.annee) + '-' + str(annee_universitaire.annee + 1), 'niveau': "niveau",  'nbre_pages': nbre_pages}
+
+
+
+#     for etudiant in etudiants:
+#         try:
+#             other_information = L2_DICT[etudiant.contact]
+#             other_information['niveau'] = "L2"
+#         except Exception as e:
+#             other_information = L3_DICT[etudiant.contact]
+#             other_information['niveau'] = "L3"
+        
+#         latex_input = 'carte_etudiant'
+#         latex_ouput = 'generated_carte_etudiant'
+#         pdf_file = 'carte_etudiant_' + str(etudiant.contact)
+
+#         temp_context = {'etudiant': etudiant, 'niveau': niveau, 'annee': str(annee_universitaire.annee) + '-' + str(annee_suiv), "other_information": other_information}
+
+#         # génération du pdf
+#         generate_pdf(temp_context, latex_input, latex_ouput, pdf_file)
+
+#     latex_input = 'cartes_rassemblees'
+#     latex_ouput = 'generated_cartes_rassemblees'
+#     pdf_file = 'pdf_carte_etudiant_rassemblees'
+
+#     # génération du pdf
+#     generate_pdf(context, latex_input, latex_ouput, pdf_file)
+
+#     # visualisation du pdf dans le navigateur
+#     with open('media/pdf/' + str(pdf_file) + '.pdf', 'rb') as f:
+#         pdf_preview = f.read()
+#         response = HttpResponse(pdf_preview, content_type='application/pdf')
+#         response['Content-Disposition'] = 'inline;filename=pdf_file.pdf'
+#         return response
 
 @login_required(login_url=settings.LOGIN_URL)
 # methode générant le diplome de l'étudiant
