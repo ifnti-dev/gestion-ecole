@@ -1,6 +1,6 @@
 import random
 from faker import Faker
-from main.models import Etudiant, Personnel, FicheDePaie, Enseignant, Comptable, Programme,  Tuteur, Ue, Matiere, Evaluation, Competence, Semestre, Domaine, Parcours, AnneeUniversitaire, Note
+from main.models import Etudiant, Personnel, FicheDePaie, Enseignant, Programme,  Tuteur, Ue, Matiere, Evaluation, Competence, Semestre, Domaine, Parcours, AnneeUniversitaire, Note
 from cahier_de_texte.models import Seance
 from django.contrib.auth.models import User 
 from django.contrib.auth.models import Group, Permission
@@ -19,7 +19,7 @@ def run():
         create_faker()
 
 def clean_data_base():
-    models = [AnneeUniversitaire, Programme, Seance, Personnel, Enseignant, Etudiant, Comptable, Tuteur, Ue, Matiere, Evaluation, Competence, Semestre, Domaine, Note]
+    models = [AnneeUniversitaire, Programme, Seance, Personnel, Enseignant, Etudiant, Tuteur, Ue, Matiere, Evaluation, Competence, Semestre, Domaine, Note]
     for model in models:
         print(f"::::::::::::::::::::::: Delete Model {model.__name__} :::::::::::::::::::::::")
         model.objects.all().delete()
@@ -62,6 +62,9 @@ def create_faker():
     if response.lower() in ['o', 'oui', 'y', 'yes']:
         fake = Faker()
         s1 = AnneeUniversitaire.objects.last().semestre_set.first()
+
+        s1.save()
+
         for _ in range(5):
             etudiant = Etudiant(
                 nom=fake.last_name()[:10],
@@ -92,11 +95,12 @@ def create_faker():
                 francaisTerminale = round(random.uniform(10, 20), 2),
                 anglaisTerminale = round(random.uniform(10, 20), 2),
                 mathematiqueTerminale = round(random.uniform(10, 20), 2),
+                
             )
             
             #etudiant.semestre.add(Semestre.objects.all()[0])
             etudiant.save()
-            # etudiant.semestres.add(s1)
+            etudiant.semestres.add(s1)
             print(f"Etudiant créé : {etudiant.user.username}")
         
         for _ in range(2):
@@ -208,16 +212,48 @@ def create_seed():
         nbreJrsCongesRestant=30,
         nbreJrsConsomme=0,
         specialite="Base de donnée",
+        qualification_professionnel="Directeur des études"
     )
     enseignant.save()
     group = Group.objects.get(name="directeur_des_etudes")
     enseignant.user.groups.add(group)
     print(f"Enseignant créé : {enseignant.user.username}")
+
+    
+    personnel = Personnel(
+            nom="ifnti",
+            prenom=".",
+            sexe="M",
+            datenaissance="1998-12-12",
+            lieunaissance="lome",
+            contact="90789502",
+            email="ifnti@ifnti.com",
+            adresse="sokode",
+            prefecture="tchaoudjo",
+            carte_identity=1234,
+            nationalite="togolais",
+            salaireBrut=200000,
+            nbreJrsCongesRestant=30,
+            nbreJrsConsomme=0,
+            qualification_professionnel="Enseignant"
+        )
+    personnel.save()
+    personnel.user.is_superuser=True
+    personnel.user.is_staff=True
+    personnel.user.is_active=True
+    
+    personnel.user.groups.add(group)
+    group = Group.objects.get(name="comptable")
+    personnel.user.groups.add(group)
+    personnel.user.save()
+    print(f"User directeur créé : {personnel.user}")
+
     user = User.objects.create_user(username="ifnti", password="ifnti", is_superuser=True,  is_staff=True, is_active=True)
     user.groups.add(group)
     group = Group.objects.get(name="comptable")
     user.groups.add(group)
     print(f"User directeur créé : {user}")
+
 
 def create_groups_if_exist():
     permissions = [
@@ -315,4 +351,3 @@ def add_permissions_to_groupe(groupe, model_dictionnary):
         except Exception as e:
             #print(e, name)
             print(":::: Exception ::::")
-

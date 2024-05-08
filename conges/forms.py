@@ -3,7 +3,7 @@ import re
 from typing import Any, Dict
 from django import forms
 from django.db.models import Sum  
-from main.models import Comptable, Paiement, FicheDePaie
+from main.models import  Paiement, FicheDePaie
 from .models import  Utilisateur, Personnel, Enseignant, AnneeUniversitaire, Conge
 from django.core.exceptions import ValidationError
 from django.forms import DateField
