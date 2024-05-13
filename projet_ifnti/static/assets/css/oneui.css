@@ -27543,5 +27543,8 @@ div.dataTables_wrapper div.dataTables_paginate ul.pagination {
 .ifnhover:hover{
   color: black;
 }
+.ifnflex{
+  display: flex;
+}
 
 /*----------------------tableau responsivité----------------------------------*/

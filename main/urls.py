@@ -152,6 +152,12 @@ urlpatterns = [
 
 
      #Table de paramètre globale
+     
+
+     #Listes des employes
+     path('employes/', views.personnel, name='personnel'),
+
+     
 
 
 ]

@@ -2458,8 +2458,9 @@ def semestres(request):
 
 
 @login_required(login_url=settings.LOGIN_URL)
-def personnels(request):
-    return render()
+def personnel(request):
+    listespersonnelles = Personnel.objects.all()
+    return render(request, "employes/index.html", {'listespersonnelles' : listespersonnelles})
 
 @login_required(login_url=settings.LOGIN_URL)
 def create_personnel(request):
