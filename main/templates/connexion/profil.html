@@ -3,11 +3,11 @@
 
 {% block content %}
     <!-- Hero -->
-    <div class="bg-image" style="background-image: url('{% static 'assets/media/ifnti_background.jpeg' %}');">
-        <div class="bg-black-50">
+    <div class="bg-image object-fit-cover" style=" background-image: url('{% static 'assets/media/ifnti_background.jpeg' %}');">
+        <div class="">
             <div class="content content-full text-center">
-                <div class="my-3">
-                    <img class="img-avatar img-avatar-thumb" src="assets/media/avatars/avatar13.jpg" alt="">
+                <div class="my-9 vh-50">
+                    <img class="img-avatar img-avatar-thumb object-fit-cover" src="assets/media/avatars/avatar13.jpg" alt="">
                 </div>
                 <h1 class="h2 text-white mb-0">{{utilisateur.first_name}} {{utilisateur.last_name}}</h1>
                 <span class="text-white-75 text-uppercase"> {{ auth_user_role }} </span>
@@ -17,24 +17,26 @@
     <!-- END Hero -->
 
     <!-- Stats -->
-    <div class="bg-white border-bottom">
+    <div class="bg-white border-bottom mt-4">
         <div class="content content-boxed">
-            <div class="row items-push text-center">
-                <div class="col-6 col-md-4">
-                    <div class="font-size-sm font-w600 text-muted text-uppercase">Etudiants</div>
+            <div class="row items-push text-center parentsmodifi">
+                <div class="col-6 col-md-4 profilmodif p-2">
+                    <div class="font-size-lg font-w600 text-muted text-black text-uppercase hovertext">Etudiants</div>
                     <a class="link-fx font-size-h3" href="javascript:void(0)">0</a>
                 </div>
-                <div class="col-6 col-md-4">
-                    <div class="font-size-sm font-w600 text-muted text-uppercase">Enseignants</div>
+                <div class="col-6 col-md-4 p-2 profilmodif">
+                    <div class="font-size-lg text-black font-w600 text-muted text-uppercase">Enseignants</div>
                     <a class="link-fx font-size-h3" href="javascript:void(0)">0</a>
                 </div>
-                <div class="col-6 col-md-4">
-                    <div class="font-size-sm font-w600 text-muted text-uppercase">Ues</div>
+                <div class="col-6 col-md-4 p-2 profilmodif">
+                    <div class="font-size-lg text-black font-w600 text-muted text-uppercase">Ues</div>
                     <a class="link-fx font-size-h3" href="javascript:void(0)">0</a>
                 </div>
             </div>
         </div>
     </div>
+    
+
     <!-- END Stats -->
     <div class="bg-white border-bottom">
         <div class="content content-boxed">
@@ -49,6 +51,8 @@
             </div>
         </div>
     </div>
+
+    
 
     {% comment %} <!-- Page Content -->
     <div class="content content-boxed">
