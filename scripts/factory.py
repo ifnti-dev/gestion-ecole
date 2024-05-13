@@ -140,27 +140,27 @@ def create_faker():
 
             print(f"Personnel créé : {personnel}")
 
-        for _ in range(2):
-            enseignant = Enseignant(
-                nom=fake.last_name()[:10],
-                prenom=fake.first_name()[:10],
-                sexe=random.choice(['F', 'M']),
-                datenaissance=fake.date_of_birth(minimum_age=25, maximum_age=60),
-                lieunaissance=fake.city()[:10],
-                contact=fake.phone_number(),
-                email=fake.email()[:10],
-                adresse=fake.address()[:10],
-                prefecture=fake.city(),
-                carte_identity=fake.random_number(digits=10),
-                nationalite='Togolaise',
-                salaireBrut=random.uniform(1000, 5000),
-                dernierdiplome=None,
-                nbreJrsCongesRestant=random.randint(0, 30),
-                nbreJrsConsomme=random.randint(0, 30),
-                specialite=fake.job()[:10],
-            )
-            enseignant.save()
-            print(f"Enseignant créé : {enseignant}")
+        # for _ in range(2):
+            #enseignant = Enseignant(
+                # nom=fake.last_name()[:10],
+                # prenom=fake.first_name()[:10],
+                # sexe=random.choice(['F', 'M']),
+                # datenaissance=fake.date_of_birth(minimum_age=25, maximum_age=60),
+                # lieunaissance=fake.city()[:10],
+                # contact=fake.phone_number(),
+                # email=fake.email()[:10],
+                # adresse=fake.address()[:10],
+                # prefecture=fake.city(),
+                # carte_identity=fake.random_number(digits=10),
+                # nationalite='Togolaise',
+                # salaireBrut=random.uniform(1000, 5000),
+                # dernierdiplome=None,
+                # nbreJrsCongesRestant=random.randint(0, 30),
+                # nbreJrsConsomme=random.randint(0, 30),
+                #specialite=fake.job()[:10],
+            # )
+            # enseignant.save()
+            # print(f"Enseignant créé : {enseignant}")
 
 def create_seed():
     print("::::::::::::::::::::::: Create Seed Data :::::::::::::::::::::::")
@@ -195,30 +195,7 @@ def create_seed():
     
     parcours.save()
     print(f"::: Parcours créé : {parcours} :::")
-    enseignant = Enseignant(
-        nom="TEOURI",
-        prenom="Mohamed Sabirou",
-        sexe="M",
-        datenaissance="1966-05-03",
-        lieunaissance="Sokodé",
-        contact="90919141",
-        email="sabirou.teouri@ifnti.com",
-        adresse="Sokodé",
-        prefecture="Sokodé",
-        carte_identity=0,
-        nationalite='Togolaise',
-        salaireBrut=0,
-        dernierdiplome=None,
-        nbreJrsCongesRestant=30,
-        nbreJrsConsomme=0,
-        specialite="Base de donnée",
-        qualification_professionnel="Directeur des études"
-    )
-    enseignant.save()
-    group = Group.objects.get(name="directeur_des_etudes")
-    enseignant.user.groups.add(group)
-    print(f"Enseignant créé : {enseignant.user.username}")
-
+    
     
     personnel = Personnel(
             nom="ifnti",
@@ -235,16 +212,18 @@ def create_seed():
             salaireBrut=200000,
             nbreJrsCongesRestant=30,
             nbreJrsConsomme=0,
-            qualification_professionnel="Enseignant"
+            qualification_professionnel="Directeur des études"
         )
     personnel.save()
     personnel.user.is_superuser=True
     personnel.user.is_staff=True
     personnel.user.is_active=True
     
+    #personnel.user.groups.add(group)
+    group = Group.objects.get(name="directeur_des_etudes")
     personnel.user.groups.add(group)
-    group = Group.objects.get(name="comptable")
-    personnel.user.groups.add(group)
+    group2 = Group.objects.get(name="comptable")
+    personnel.user.groups.add(group2)
     personnel.user.save()
     print(f"User directeur créé : {personnel.user}")
 
@@ -253,6 +232,18 @@ def create_seed():
     group = Group.objects.get(name="comptable")
     user.groups.add(group)
     print(f"User directeur créé : {user}")
+    
+    enseignant = Enseignant(
+        
+        type="Permanent",
+        specialite="Base de donnée",
+        personnel=personnel,
+    )
+    enseignant.save()
+    #group = Group.objects.get(name="directeur_des_etudes")
+    #enseignant.user.groups.add(group)
+    #print(f"Enseignant créé : {enseignant.personnel.user.username}")
+
 
 
 def create_groups_if_exist():

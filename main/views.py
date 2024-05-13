@@ -2310,7 +2310,7 @@ def enseignants(request):
     role = get_user_role(request)
     annee_universitaire = get_object_or_404(
         AnneeUniversitaire, pk=id_annee_selectionnee)
-    enseignants = Enseignant.objects.filter(is_active=True)
+    enseignants = Enseignant.objects.filter(personnel__user__is_active=True)
     data = {}
     etats = [{'id': 1, 'value': 'Actif'}, {'id': 0, 'value': 'Suspendue'}]
     etats_selected = [True, False]
@@ -2343,10 +2343,10 @@ def enseignants(request):
             niveau = "Nos Enseignants"
             if semestre_id == "__all__":
                 enseignants = Enseignant.objects.filter(
-                    is_active__in=etats_selected)
+                    personnel__user__is_active__in=etats_selected)
             else:
                 enseignants = Enseignant.objects.filter(
-                    is_active__in=etats_selected, matiere__ue__programme__semestre__in=semestres_selected).distinct()
+                    personnel__user__is_active__in=etats_selected, matiere__ue__programme__semestre__in=semestres_selected).distinct()
 
     semestres_selected = {'id': semestre_id}
     etats_selected = {'id': etat_id}

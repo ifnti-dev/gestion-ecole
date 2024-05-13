@@ -1144,13 +1144,13 @@ class Enseignant(models.Model):
         **Type:** Personnel
 
     """
-    def save(self, *args, **kwargs):
-        if not self.id:
-            super().save(*args, **kwargs)  
-            group = Group.objects.get(name="enseignant")
-            self.user.groups.add(group)
-        else:
-            super().save(*args, **kwargs)
+    # def save(self, *args, **kwargs):
+    #     if not self.id:
+    #         super().save(*args, **kwargs)  
+    #         group = Group.objects.get(name="enseignant")
+    #         self.user.groups.add(group)
+    #     else:
+    #         super().save(*args, **kwargs)
 
     def niveaux(self):
         """
