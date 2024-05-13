@@ -366,15 +366,17 @@ class PersonnelForm(forms.ModelForm):
             'dernierdiplome': forms.TextInput(attrs={'class': 'form-control'}),
             'nbreJrsCongesRestant': forms.TextInput(attrs={'class': 'form-control'}),
             'nbreJrsConsomme': forms.TextInput(attrs={'class': 'form-control'}),
+            'qualification_professionnel': forms.TextInput(attrs={'class': 'form-control'}),
         }
 
-    def clean(self):
-        cleaned_data = super(EnseignantForm, self).clean()
-        nom = cleaned_data.get('nom', '')
-        prenom = cleaned_data.get('prenom', '')
-        contact = cleaned_data.get('contact', '')
-        email = cleaned_data.get('email', '')
-        adresse = cleaned_data.get('adresse', '')
-        sexe = cleaned_data.get('sexe', '')
+
+    # def clean(self):
+    #     cleaned_data = super(EnseignantForm, self).clean()
+    #     nom = cleaned_data.get('nom', '')
+    #     prenom = cleaned_data.get('prenom', '')
+    #     contact = cleaned_data.get('contact', '')
+    #     email = cleaned_data.get('email', '')
+    #     adresse = cleaned_data.get('adresse', '')
+    #     sexe = cleaned_data.get('sexe', '')
 
 
