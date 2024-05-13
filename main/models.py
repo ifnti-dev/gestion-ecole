@@ -1054,6 +1054,23 @@ class Personnel(Utilisateur):
         total_irpp_tcs_annuel = Decimal(
             total_irpp_annuel) + Decimal(total_tcs_annuel)
         return int(total_irpp_tcs_annuel)
+    
+    def calculer_irpp_tcs_mensuel(self,date_debut):
+        """
+        Fonction calculant la cumulation mensuel de l'IRPP (Import sur le Revenu des Personnes Physiques) et de la TCS (Taxe Complémentaire sur le Salaire).
+
+        :return: Somme entre le IRPP annuel et le TCS annuel del'employé
+
+        :retype: Decimal
+        """
+
+        salaires = Salaire.objects.filter(date_debut=date_debut)
+        total_irpp_mensuel = sum(salaire.calculer_irpp_mensuel()
+                                for salaire in salaires)
+        total_tcs_mensuel = sum(salaire.tcs for salaire in salaires)
+        total_irpp_tcs_mensuel = Decimal(
+            total_irpp_mensuel) + Decimal(total_tcs_mensuel)
+        return int(total_irpp_tcs_mensuel)
 
 
     def calcule_deductions_cnss_annuel(self):
