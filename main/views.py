@@ -4,7 +4,7 @@ from django import forms
 from django.http import HttpResponse, HttpResponseForbidden, HttpResponseNotFound
 from main.pdfMaker import generate_pdf
 from django.conf import settings
-from main.forms import EnseignantForm, EtudiantForm, EvaluationForm, InformationForm, ProgrammeForm, NoteForm, TuteurForm, UeForm, MatiereForm
+from main.forms import EnseignantForm, EtudiantForm, EvaluationForm, InformationForm, PersonnelForm, ProgrammeForm, NoteForm, TuteurForm, UeForm, MatiereForm
 from scripts.mail_utils import send_email_task
 from scripts.utils import load_notes_from_evaluation, pre_load_evaluation_template_data
 from .models import Domaine, Enseignant, Evaluation, Personnel, Information, Matiere, Etudiant, Competence, Note, Parcours, Programme, Semestre, Ue, AnneeUniversitaire, Tuteur
@@ -2462,15 +2462,20 @@ def personnel(request):
     listespersonnelles = Personnel.objects.all()
     return render(request, "employes/index.html", {'listespersonnelles' : listespersonnelles})
 
-
 @login_required(login_url=settings.LOGIN_URL)
 def create_personnel(request):
+    data = {}
     if request.method == "POST":
-        pass
-    return
+        form = PersonnelForm(request.POST)
+        if form.is_valid:
+            form.save()
+            return redirect('main:personnels')
+    else:
+        data['form'] = PersonnelForm()
+    return render(request, 'employes/create_or_edit.html', data=data)
 
 @login_required(login_url=settings.LOGIN_URL)
-def edit_personnel(request):
+def update_personnel(request):
     if request.method == "POST":
         pass
     return
