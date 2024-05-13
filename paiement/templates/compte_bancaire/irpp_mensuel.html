@@ -1,0 +1,41 @@
+{% extends 'index.html' %}
+{% block content_title %}
+
+{% endblock %}
+{% block content %}
+<div class="block block-rounded m-5">
+  <div>
+    <h1>
+      <a href="{% url 'paiement:compte_bancaire' id_annee_selectionnee %}" class="btn btn-outline-primary">
+          <i class="fas fa-back"></i> Retour</a>
+  </h1>
+    <h3 style="text-align: center;"> L'IRPP par mois </h3>
+  </div>
+  <table class="table table-bordered ">
+  <thead>
+    <tr>
+      <th scope="col">Mois</th>
+      <th scope="col">Montant</th>
+    </tr>
+  </thead>
+  <tbody>
+    
+     
+     {% for irpp in total_irpp_by_month  %}
+        <tr>
+            <th scope="col">{{irpp.month_name}}</th>
+            <th scope="col">{{irpp.total_irpp}}</th>
+        </tr>
+     {% endfor %}
+        
+  </tbody>
+</table>
+
+
+
+  </div>
+</div>
+{% endblock %}
+
+
+
