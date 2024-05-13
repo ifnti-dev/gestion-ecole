@@ -114,19 +114,25 @@ Enregistrement d'un enseignant
         </div>
 
       <div class="form-row mb-3">
-        <div class="col-md-6">
+          <div class="col-md-6">
             {{ form.photo_passport.label_tag }}
             {{ form.photo_passport }}
             <span class="text-danger">{{ form.photo_passport.errors }}</span>
           </div>
           <div class="col-md-6">
+            {{ form.qualification_professionnel.label_tag }}
+            {{ form.qualification_professionnel }}
+            <span class="text-danger">{{ form.dernierdiplome.errors }}</span>
+          </div>
+         
+        </div>
+
+        <div class="form-row mb-3">
+          <div class="col-md-6">
             {{ form.dernierdiplome.label_tag }}
             {{ form.dernierdiplome }}
             <span class="text-danger">{{ form.dernierdiplome.errors }}</span>
           </div>
-        </div>
-
-        <div class="form-row mb-3">
           <div class="col-md-6">
             {{ form.is_active.label_tag }}
             <div class="d-flex">{{ form.is_active }}</div>

@@ -24,8 +24,8 @@
         </form>
 
         {% if is_secretaire or is_directeur_des_etudes or is_admin %}
-        <a href="{% url 'main:create_etudiant' %}" class="btn btn-outline-primary">
-            <i class="fas fa-plus"></i> Inscrire étudiant
+        <a href="{% url 'main:create_etudiant' %}" class="btn btn-outline-primary ">
+            <i class="fas fa-plus "></i> Inscrire étudiant
         </a>
         {% endif %}
     </div>
@@ -112,7 +112,8 @@
         </div>
         {% endif %}
     </div>
-    <div class="block-content block-content-full">
+
+    <!-- <div class="block-content block-content-full ">
         <form action="{% url 'main:passage_etudiants' %}" method="post" onsubmit="return confirmPassageEtudiants();">
             {% csrf_token %}
             <table class="table table-bordered table-vcenter js-dataTable-full-pagination">
@@ -324,8 +325,112 @@
             </button>
             {% endif %}
         </form>
+    </div> -->
+
+
+
+    <div class="block-content block-content-full">
+        <form action="{% url 'main:passage_etudiants' %}" method="post" onsubmit="return confirmPassageEtudiants();">
+            {% csrf_token %}
+            <div class="table-responsive">
+                <table class="table table-bordered table-vcenter js-dataTable-full-pagination">
+                    <thead>
+                        <tr>
+                            <th class="text-center" style="width: 30%;">Nom &amp; Prénoms</th>
+                            <th class="text-center">Niveau</th>
+                            <th class="text-center" style="width: 80px;">Email</th>
+                            <th class="text-center" style="width: 15%;">Contact</th>
+                            {% if is_directeur_des_etudes or is_comptable %}
+                            <th scope="col" class="text-center" style="width: 15%">État paiement</th>
+                            {% endif %}
+                            {% if is_directeur_des_etudes or is_etudiant or is_secretaire %}
+                            <th scope="col" class="" style="width: 15%;">Actions</th>
+                            {% endif %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for etudiant in etudiants %}
+                        <tr class="{% if etudiant in etudiants_insuffisants %}bg-danger text-white{% endif %} {% if not etudiant.etudiant.is_active %}text-danger{% endif %}">
+                            <td class="text-center font-size-sm">{{ etudiant.etudiant.nom }} {{ etudiant.etudiant.prenom }}</td>
+                            <td class="text-center d-sm-table-cell">
+                                {% if etudiant.niveau == 'L1' %}
+                                <span class="badge badge-info">{{ etudiant.niveau }}</span>
+                                {% elif etudiant.niveau == 'L2' %}
+                                <span class="badge badge-primary">{{ etudiant.niveau }}</span>
+                                {% elif etudiant.niveau == 'L3' %}
+                                <span class="badge badge-success">{{ etudiant.niveau }}</span>
+                                {% else %}
+                                <span class="badge badge-secondary">ancien</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-center font-size-sm">{{ etudiant.etudiant.email }}</td>
+                            <td class="text-center font-size-sm">{{ etudiant.etudiant.contact }}</td>
+                            {% if is_directeur_des_etudes or is_comptable %}
+                            <td style="text-align: center;">
+                                <button type="button" class="bs-modal read-book btn btn-sm btn-primary">
+                                    <a style="color: blanchedalmond;" href="{% url 'paiement:etat_paiements' etudiant.etudiant.id id_annee_selectionnee %}">
+                                        <span class="fa fa-eye"></span> Afficher
+                                    </a>
+                                </button>
+                            </td>
+                            {% endif %}
+                            <td style="text-align: center;">
+                                {% if is_directeur_des_etudes or is_secretaire or is_etudiant and user.etudiant.id == etudiant.etudiant.id %}
+                                <input type="text" name="decision_conseil_{{ etudiant.etudiant.id }}" style="display: none;">
+                                <div class="dropdown">
+                                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <i class="fa fa-bars" aria-hidden="true"></i>
+                                    </button>
+                                    <div class="dropdown-menu font-size-sm" aria-labelledby="dropdownMenuButton">
+                                        <a class="dropdown-item" href="{% url 'main:detail_etudiant' etudiant.etudiant.id %}">
+                                            <i class="fa fa-eye mr-1" aria-hidden="true"></i> Voir
+                                        </a>
+                                        {% if is_directeur_des_etudes or is_secretaire %}
+                                        <a class="dropdown-item" href="{% url 'main:update_etudiant' etudiant.etudiant.id %}">
+                                            <i class="fa fa-edit mr-1" aria-hidden="true"></i> Editer
+                                        </a>
+                                        {% endif %}
+                                        <a class="dropdown-item" href="{% url 'main:releve_notes' etudiant.etudiant.id selected_semestre.id %}">
+                                            <i class="fa fa-file mr-1" aria-hidden="true"></i> Relevé de notes
+                                        </a>
+                                        {% if is_secretaire or is_directeur_des_etudes %}
+                                        <a class="dropdown-item" href="{% url 'main:carte_etudiant' etudiant.etudiant.id etudiant.niveau %}">
+                                            <i class="fa fa-id-card mr-1" aria-hidden="true"></i> Carte étudiant
+                                        </a>
+                                        {% endif %}
+                                        {% if is_directeur_des_etudes and etudiant.niveau == 'L3' %}
+                                        <a class="dropdown-item" href="{% url 'main:diplome_etudiant' etudiant.etudiant.id %}">
+                                            <i class="fa fa-certificate mr-1" aria-hidden="true"></i> Diplome étudiant
+                                        </a>
+                                        {% endif %}
+                                        {% if is_secretaire or is_directeur_des_etudes %}
+                                        <a class="dropdown-item" href="{% url 'main:certificat_scolaire' etudiant.etudiant.id etudiant.niveau %}">
+                                            <i class="fa fa-certificate mr-1" aria-hidden="true"></i> Attestation
+                                        </a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% if is_directeur_des_etudes %}
+            <button type="submit" class="btn btn-outline-primary">
+                Enregistrer
+            </button>
+            {% endif %}
+        </form>
     </div>
+    
+
+    
+    
 </div>
+
+
 {% endblock  %}
 {% block scripts %}
 <script type="text/javascript">

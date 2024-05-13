@@ -13,8 +13,8 @@
 \begin{longtable}{|p{8.4cm}|p{8.4cm}|}
 
 \BLOCK{for etudiant in etudiants}
-\includegraphics[width=8.3cm]{carte_etudiant_\VAR{etudiant.id}.pdf} & 
-\includegraphics[page=2,width=8.3cm]{carte_etudiant_\VAR{etudiant.id }.pdf} \\
+\includegraphics[width=8.3cm]{\VAR{pdf_path}carte_etudiant_\VAR{etudiant.contact}.pdf} & 
+\includegraphics[page=2,width=8.3cm]{\VAR{pdf_path}carte_etudiant_\VAR{etudiant.contact }.pdf} \\
 \hline
 \BLOCK{endfor}
 
