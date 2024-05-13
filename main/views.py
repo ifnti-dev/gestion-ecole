@@ -4,7 +4,7 @@ from django import forms
 from django.http import HttpResponse, HttpResponseForbidden, HttpResponseNotFound
 from main.pdfMaker import generate_pdf
 from django.conf import settings
-from main.forms import EnseignantForm, EtudiantForm, EvaluationForm, InformationForm, ProgrammeForm, NoteForm, TuteurForm, UeForm, MatiereForm
+from main.forms import EnseignantForm, EtudiantForm, EvaluationForm, InformationForm, PersonnelForm, ProgrammeForm, NoteForm, TuteurForm, UeForm, MatiereForm
 from scripts.mail_utils import send_email_task
 from scripts.utils import load_notes_from_evaluation, pre_load_evaluation_template_data
 from .models import Domaine, Enseignant, Evaluation, Personnel, Information, Matiere, Etudiant, Competence, Note, Parcours, Programme, Semestre, Ue, AnneeUniversitaire, Tuteur
@@ -2088,7 +2088,6 @@ def edit_profil(request):
         user = request.user
         return render(request, "connexion/edit_profil.html", {"utilisateur": user, 'page_is_not_profil': False, })
 
-
 @login_required(login_url=settings.LOGIN_URL)
 def changer_mdp(request):
     old = request.POST.get("old_password")
@@ -2108,7 +2107,6 @@ def changer_mdp(request):
         notification = {
             "message": "Ancien mot de passe incorrect", "type": "erreur"}
     return render(request, "connexion/edit_profil.html", {"notification": notification,  'page_is_not_profil': False, })
-
 
 def login_view(request):
     if request.method == "POST":
@@ -2161,7 +2159,6 @@ def login_view(request):
 
     return render(request, "connexion/login.html")
 
-
 def recuperation_mdp(request):
     if request.method == "POST":
         username_or_email = request.POST.get('username_or_email')
@@ -2201,7 +2198,6 @@ def recuperation_mdp(request):
 
     return render(request, "connexion/reminder.html")
 
-
 @login_required(login_url=settings.LOGIN_URL)
 def change_role(request, id_role):
     user = request.user
@@ -2219,14 +2215,12 @@ def change_role(request, id_role):
     request.session['is_comptable'] = False if is_directeur_des_etudes else is_comptable
     return redirect('/')
 
-
 @login_required(login_url=settings.LOGIN_URL)
 def logout_view(request):
     logout(request)
     return render(request, "connexion/login.html")
 
     ##### Enseignant #####
-
 
 @login_required(login_url=settings.LOGIN_URL)
 def create_enseignant(request, id=0):
@@ -2250,7 +2244,6 @@ def create_enseignant(request, id=0):
 
         else:
             return render(request, "enseignants/create_enseignant.html", {'form': form})
-
 
 # Cette vue permet d'importer les données enseignants via un fichier excel de foemat xlsx
 def importer_les_enseignants(request):
@@ -2302,7 +2295,6 @@ def importer_les_enseignants(request):
         except Exception as e:
             return render(request, 'etudiants/message_erreur.html', {'message': "Erreur lors de l importation du fichier Excel."})
     return render(request, 'enseignants/importer.html')
-
 
 @login_required(login_url=settings.LOGIN_URL)
 def enseignants(request):
@@ -2362,18 +2354,15 @@ def enseignants(request):
 
     return render(request, 'enseignants/enseignants.html', context=data)
 
-
 @login_required(login_url=settings.LOGIN_URL)
 def enseignant_inactif(request):
     enseignants = Enseignant.objects.filter(is_active=False)
     return render(request, 'enseignants/enseignants.html', {'enseignants': enseignants})
 
-
 @login_required(login_url=settings.LOGIN_URL)
 def enseignant_detail(request, id):
     enseignant = Enseignant.objects.get(id=id)
     return render(request, 'enseignants/enseignant_detail.html', {'enseignant': enseignant})
-
 
 @login_required(login_url=settings.LOGIN_URL)
 def certificat_travail(request, id):
@@ -2395,7 +2384,6 @@ def certificat_travail(request, id):
         response['Content-Disposition'] = 'inline;filename=pdf_file.pdf'
         return response
 
-
 @login_required(login_url=settings.LOGIN_URL)
 def liste_informations_enseignants(request):
     informations_enseignants = Information.objects.all()
@@ -2403,7 +2391,6 @@ def liste_informations_enseignants(request):
         'informations_enseignants': informations_enseignants,
     }
     return render(request, 'informations/information_list.html', context)
-
 
 @login_required(login_url=settings.LOGIN_URL)
 def enregistrer_informations(request, id=0):
@@ -2441,7 +2428,6 @@ def enregistrer_informations(request, id=0):
         else:
             return render(request, "informations/enregistrer_informations.html", {'form': form})
 
-
 @login_required(login_url=settings.LOGIN_URL)
 # Cette vue affiche la liste des semestre courants
 def semestres(request):
@@ -2456,27 +2442,44 @@ def semestres(request):
     }
     return render(request, 'semestres/semestres.html', context)
 
-
 @login_required(login_url=settings.LOGIN_URL)
-def personnel(request):
-    return render()
+def personnels(request):
+    listespersonnelles = Personnel.objects.all()
+    print(listespersonnelles)
+    return render(request, "employes/index.html", {'listespersonnelles' : listespersonnelles})
 
 @login_required(login_url=settings.LOGIN_URL)
 def create_personnel(request):
+    data = {}
     if request.method == "POST":
-        pass
-    return
+        form = PersonnelForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('main:personnels')
+        data['form'] = form
+    else:
+        data['form'] = PersonnelForm()
+        
+    return render(request, 'employes/create_or_edit.html', context=data)
 
 @login_required(login_url=settings.LOGIN_URL)
-def edit_personnel(request):
+def update_personnel(request, id):
+    data = {}
+    personnel = get_object_or_404(Personnel, pk=id)
     if request.method == "POST":
-        pass
-    return
+        form = PersonnelForm(request.POST, instance=personnel)
+        if form.is_valid():
+            form.save()
+            return redirect('main:personnels')
+        data['form'] = form
+    else:
+        data['form'] = PersonnelForm(instance=personnel)
+        
+    return render(request, 'employes/create_or_edit.html', context=data)
 
 @login_required(login_url=settings.LOGIN_URL)
 def delete_personnel(request):
     pass
-
 
 
 

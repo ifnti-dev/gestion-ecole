@@ -314,7 +314,6 @@ class EnseignantForm(forms.ModelForm):
                 self._errors['sexe'] = ErrorDict()
             self._errors['sexe'] = 'Le sexe ne doit pas contenir des chiffres'
 
-
 class InformationForm(forms.ModelForm):
     class Meta:
         model = Information
@@ -331,14 +330,39 @@ class InformationForm(forms.ModelForm):
         }
 
 
-         
-        
-        
-        
+class PersonnelForm(forms.ModelForm):
+    class Meta:
+        model = Personnel
+        fields = ['nom', 'prenom', 'contact', 'sexe', 'email', 'adresse', 'datenaissance', 'lieunaissance', 'numero_cnss', 'nif', 'profil', 'salaireBrut', 'nombre_de_personnes_en_charge', 'dernierdiplome', 'is_active','qualification_professionnel']
+        widgets = {
+            'nom': forms.TextInput(attrs={'class': 'form-control'}),
+            'prenom': forms.TextInput(attrs={'class': 'form-control'}),
+            'contact': forms.TextInput(attrs={'class': 'form-control'}),
+            'sexe': forms.Select(choices=Etudiant.SEXE_CHOISE, attrs={'class': 'form-control'}),
+            'email': forms.TextInput(attrs={'class': 'form-control'}),
+            'adresse': forms.TextInput(attrs={'class': 'form-control'}),
+            'datenaissance': forms.DateInput(attrs={'type': 'date'}),
+            'lieunaissance': forms.TextInput(attrs={'class': 'form-control'}),
+            'contact': forms.TextInput(attrs={'class': 'form-control'}),
+            'email': forms.TextInput(attrs={'class': 'form-control'}),
+            'adresse': forms.TextInput(attrs={'class': 'form-control'}),
+            'prefecture': forms.NumberInput(attrs={'class': 'form-control'}),
+            'numero_cnss': forms.TextInput(attrs={'class': 'form-control'}),
+            'salaireBrut': forms.TextInput(attrs={'class': 'form-control'}),
+            'dernierdiplome': forms.TextInput(attrs={'class': 'form-control'}),
+            'nbreJrsCongesRestant': forms.TextInput(attrs={'class': 'form-control'}),
+            'nbreJrsConsomme': forms.TextInput(attrs={'class': 'form-control'}),
+            'qualification_professionnel': forms.TextInput(attrs={'class': 'form-control'}),
+        }
 
-        
 
-        
+    # def clean(self):
+    #     cleaned_data = super(EnseignantForm, self).clean()
+    #     nom = cleaned_data.get('nom', '')
+    #     prenom = cleaned_data.get('prenom', '')
+    #     contact = cleaned_data.get('contact', '')
+    #     email = cleaned_data.get('email', '')
+    #     adresse = cleaned_data.get('adresse', '')
+    #     sexe = cleaned_data.get('sexe', '')
 
-        
 
