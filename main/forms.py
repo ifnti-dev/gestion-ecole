@@ -359,7 +359,7 @@ class PersonnelForm(forms.ModelForm):
             'lieunaissance': forms.TextInput(attrs={'class': 'form-control'}),
             'contact': forms.TextInput(attrs={'class': 'form-control'}),
             'email': forms.TextInput(attrs={'class': 'form-control'}),
-            'adresse': forms.FileInput(attrs={'class': 'form-control'}),
+            'adresse': forms.TextInput(attrs={'class': 'form-control'}),
             'prefecture': forms.NumberInput(attrs={'class': 'form-control'}),
             'numero_cnss': forms.TextInput(attrs={'class': 'form-control'}),
             'salaireBrut': forms.TextInput(attrs={'class': 'form-control'}),

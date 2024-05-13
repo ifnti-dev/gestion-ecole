@@ -2458,7 +2458,7 @@ def semestres(request):
 
 
 @login_required(login_url=settings.LOGIN_URL)
-def personnel(request):
+def personnels(request):
     listespersonnelles = Personnel.objects.all()
     return render(request, "employes/index.html", {'listespersonnelles' : listespersonnelles})
 
@@ -2467,12 +2467,14 @@ def create_personnel(request):
     data = {}
     if request.method == "POST":
         form = PersonnelForm(request.POST)
-        if form.is_valid:
+        print(form)
+        if form.is_valid():
             form.save()
             return redirect('main:personnels')
     else:
         data['form'] = PersonnelForm()
-    return render(request, 'employes/create_or_edit.html', data=data)
+        
+    return render(request, 'employes/create_or_edit.html', context=data)
 
 @login_required(login_url=settings.LOGIN_URL)
 def update_personnel(request):
