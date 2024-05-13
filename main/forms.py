@@ -245,26 +245,12 @@ class EnseignantForm(forms.ModelForm):
     datenaissance = DateField(widget=forms.SelectDateWidget(years=range(1990, 2006)), label='Date de naissance')
     class Meta:
         model = Enseignant
-        fields = ['nom', 'prenom', 'contact', 'sexe', 'email', 'adresse', 'datenaissance', 'lieunaissance', 'numero_cnss', 'nif', 'profil', 'salaireBrut', 'nombre_de_personnes_en_charge', 'dernierdiplome', 'is_active', 'type', 'specialite','qualification_professionnel']
+        fields = ['type', 'specialite', "personnel"]
         widgets = {
-            'nom': forms.TextInput(attrs={'class': 'form-control'}),
-            'prenom': forms.TextInput(attrs={'class': 'form-control'}),
-            'contact': forms.TextInput(attrs={'class': 'form-control'}),
-            'sexe': forms.Select(choices=Etudiant.SEXE_CHOISE, attrs={'class': 'form-control'}),
-            'email': forms.TextInput(attrs={'class': 'form-control'}),
-            'adresse': forms.TextInput(attrs={'class': 'form-control'}),
-            'datenaissance': DateField(widget=forms.SelectDateWidget(years=range(1900, 2006)), label="Date de naissance"),
-            'lieunaissance': forms.TextInput(attrs={'class': 'form-control'}),
-            'numero_cnss': forms.TextInput(attrs={'class': 'form-control'}),
-            'nif': forms.TextInput(attrs={'class': 'form-control'}),
-            'profil': forms.FileInput(attrs={'class': 'form-control'}),
-            'salaireBrut': forms.NumberInput(attrs={'class': 'form-control'}),
-            'nombre_de_personnes_en_charge': forms.NumberInput(attrs={'class': 'form-control'}),
-            'dernierdiplome': forms.FileInput(attrs={'class': 'form-control'}),
-            'is_active': forms.CheckboxInput(attrs={'class': 'form-control'}),
+            
             'type': forms.Select(attrs={'class': 'form-control'}),
             'specialite': forms.TextInput(attrs={'class': 'form-control'}),      
-            'qualification_professionnel': forms.Select(attrs={'class': 'form-control'}),
+            'personnel': forms.Select(attrs={'class': 'form-control'}),
         }
 
     def clean(self):

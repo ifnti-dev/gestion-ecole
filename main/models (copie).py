@@ -1073,20 +1073,7 @@ class Personnel(Utilisateur):
 
         return int(total_deductions_cnss)
 
-class Enseignant(models.Model):
-
-    
-
-    class Meta:
-        verbose_name = _("")
-        verbose_name_plural = _("s")
-
-    def __str__(self):
-        return self.name
-
-    def get_absolute_url(self):
-        return reverse("_detail", kwargs={"pk": self.pk})
-
+class Enseignant(Personnel):
     """
     Cette classe hérite de la classe Personnel, elle représente les enseignants.
     """    
@@ -1119,14 +1106,7 @@ class Enseignant(models.Model):
 
         **Nullable:** true
     """
-    personnel=models.ForeignKey("Personnel", verbose_name=_("Personnel"), on_delete=models.CASCADE,null=True,blank=True)
-    
-    """
-        Identifiant d'un personnel lié à un enseigant
 
-        **Type:** Personnel
-
-    """
     def save(self, *args, **kwargs):
         if not self.id:
             super().save(*args, **kwargs)  
