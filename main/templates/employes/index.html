@@ -1,0 +1,101 @@
+{% extends 'index.html' %}
+{% block content %}
+
+<div class="block block-rounded m-5">
+    <!-- {% url 'paiement:enregistrer_paiement'%} -->
+
+
+    <div class="d-flex justify-content-between align-items-center">
+        <h3>Liste des personnels</h3>
+        
+        <div class="d-flex align-items-center">
+            <div>
+                <a href="" class="btn btn-outline-primary">
+                    <i class="fas fa-plus"></i> Ajouter
+                </a>
+            </div>
+
+            <div class="block-header p-4">
+                <h3 class="block-title">{{ niveau }} </h3>
+                <form action="" method="post" id="form-semestre" class="d-flex mr-3">
+                    {% csrf_token %}
+                    
+                    <select name="semestre" id="semestre" class="form-control">
+                        <option value="">Rôles</option>
+                        {% for personnel in listespersonnelles %}
+                        <option value="{{ personnel.TYPE_CHOICES }}">
+                            {{ personnel.libelle }} {{personnel.annee_universitaire}}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </form>
+            </div>
+        </div>
+        
+        
+    </div>
+    
+<!-- ------------------------------------------------------------------------------------------------------------------- -->
+
+    <div class="block-content block-content-full">
+        <table class="table table-bordered table-striped table-vcenter js-dataTable-full-pagination">
+            <thead>
+                <tr>
+                    <th class="text-center" style="width: 18%;">Nom & Prenom</th>
+                    <th class="text-center" style="width: 15%;">Qualification</th>
+                    <th class="text-center" style="width: 10%;">Numero_CNSS</th>
+                    <th class="text-center" style="width: 13%;">Salaire Brut</th>
+                    <th class="text-center" style="width: 10%;">Nbre Jrs Consommé</th>
+                    <th class="text-center" style="width: 10%;">Nbre Jrs Restant</th> 
+                    <th class="text-center" style="width: 10%;">Nif</th>                    
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for personnel in listespersonnelles %}
+                    <tr>
+                        <td class="font-w600 font-size-sm">{{personnel.nom}}  {{personnel.prenom}}</td>
+                        <td class="font-w600 font-size-sm">{{personnel.qualification_professionnel }}</td>
+                        <td class="font-w600 font-size-sm">{{personnel.numero_cnss  }}</td>
+                        <td class="font-w600 font-size-sm">{{personnel.salaireBrut }}</td>
+                        <td class="font-w600 font-size-sm">{{personnel.nbreJrsConsomme  }}</td>
+                        <td class="font-w600 font-size-sm">{{personnel.nbreJrsCongesRestant }}</td>
+                        <td class="font-w600 font-size-sm">{{personnel.nif }}</td>
+                        <td>
+                            
+                            <button type="button" class="btn btn-secondary dropdown-toggle" id="dropdown-default-secondary" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="fa fa-bars" aria-hidden="true"></i>
+                            </button>
+                            <div class="dropdown-menu font-size-sm" aria-labelledby="dropdown-default-secondary">
+
+                                <li class="nav-main-item">
+                                    <a class="nav-main-link nav-main-link-name" data-toggle="" aria-haspopup="true" aria-expanded="false" href="">
+                                        <i class="fa fa-user-edit mr-1 text-primary" aria-hidden="true"></i>
+                                        <span class="nav-main-link-name text-primary">Editer</span>
+                                    </a>                   
+                                </li>
+                                
+                               
+
+
+                                <li class="nav-main-item">
+                                    <a class="nav-main-link nav-main-link-name" data-toggle="" aria-haspopup="true" aria-expanded="false" href="">
+                                        <i class="fa fa-trash mr-1 text-danger" aria-hidden="true"></i>
+                                        <span class="nav-main-link-name text-danger">Supprimer</span>
+                                    </a>                   
+                                </li>
+                                
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+               
+
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+
+{% endblock %}
