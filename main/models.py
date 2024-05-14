@@ -442,7 +442,7 @@ class Etudiant(Utilisateur):
         **Valeur par défaut:** Décision du conseil
     """
 
-    photo_passport = models.ImageField(storage="photo_passport", null=True, blank=True, verbose_name="Photo passport")
+    photo_passport = models.ImageField(upload_to="etudiant/photo_passports", null=True, blank=True, verbose_name="Photo passport")
 
     """
         Photo de profil

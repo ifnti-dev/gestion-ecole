@@ -29,11 +29,13 @@ Détails de l'étudiant <span class="text-primary">{{etudiant.nom}} {{etudiant.p
         background-color: #d6eaf8;
     }
 </style>
+
+
 <div class="d-flex justify-content-center">
-    <div class="m-4 col-md-10 col-lg-8 col-xl-6 bg-white p-3 shadow-sm">
+    <div class="m-4 col-md-10 col-lg-8 col-xl-6 bg-white p-3 shadow">
         <div class="row col-md-12">
-            <div class="border col-md-4" style="width: 200px; height: 200px;">
-                <img src="/{{ MEDIA_URL }}/{{ etudiant.photo_passport }}" alt="">
+            <div class="border col-md-4 imageparent" style="width: 200px; height: 200px;">
+                <img src="{{ MEDIA_URL }}{{ etudiant.photo_passport }}" alt="" style="width: 100%; height : 100%; object-fit: cover;">
             </div>
             <div class="col-md-8">
                 <div class="col-md-12">
