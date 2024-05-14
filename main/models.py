@@ -21,6 +21,7 @@ import math
 
 def create_auth_user(nom, prenom, email):
     username = (prenom + nom).lower()
+    print(username)
     username = username.replace(" ", "")
     year = date.today().year
     password = 'ifnti' + str(year) + '!'
@@ -924,8 +925,9 @@ class Personnel(Utilisateur):
         ("Directeur des études", "Directeur des études"),
         ("Gardien", "Gardien"),
         ("Agent d'entretien", "Agent d'entretien"),
-        ('Stagiaire', 'Stagiaire'),
+        ("Stagiaire", "Stagiaire"),
     ]
+    
     qualification_professionnel = models.CharField(
         max_length=30,choices=TYPE_CHOICES, verbose_name="Qualification professionnelle")
     """
@@ -963,8 +965,7 @@ class Personnel(Utilisateur):
 
         **Valeur par défaut:** 0
     """
-    dernierdiplome = models.ImageField(
-        null=True, blank=True, verbose_name="Dernier diplome")
+    dernierdiplome = models.ImageField(null=True, blank=True, verbose_name="Dernier diplome")
     """
         Dernier diplome obtenu par le membre du employé
 
@@ -1005,7 +1006,6 @@ class Personnel(Utilisateur):
         Fonction rattachant l'employé à un utilisateur lors de sa sauvegarde.
 
         """
-        print(f'----{self.id}----')
         if not self.id:
             self.user = create_auth_user(self.prenom, self.nom, self.email)  
         super().save()
