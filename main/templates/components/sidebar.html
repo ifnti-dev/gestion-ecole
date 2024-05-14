@@ -44,61 +44,17 @@
                     <i class="nav-main-link-icon fa fa-user-graduate"></i>
                     <span class="nav-main-link-name ifnhover">Employées</span>
                 </a>
+                <a class="nav-main-link text-white" href="{% url 'main:etudiants' %}">
+                    <!-- <i class="nav-main-link-icon fa fa-user-graduate"></i> -->
+                    <i class="nav-main-link-icon fa fa-users"></i>
+                    <span class="nav-main-link-name ifnhover">Etudiants</span>
+                </a>
+                <a class="nav-main-link text-white" href="{% url 'main:liste_des_tuteurs' %}">
+                    <i class="nav-main-link-icon fa fa-user"></i>
+                    <span class="nav-main-link-name ifnhover">Tuteurs</span>
+                </a>
 
-
-            <!-- 
-                <li class=" ntem nav-main-item">
-                    <ul class="nav-main-submenu">
-                        <li class="compte">
-                            <a class="nav-main-link" href="{% url 'main:enseignants' %}">
-                                <i class="nav-main-link-icon fa fa-user"></i>
-                                <span class="nav-main-link-name text-capitalize">Enseignants</span>
-                            </a>
-                        </li>
-        
-                        <li class="compte">
-                            <a class="nav-main-link" href="{% url 'paiement:comptable_list' %}">
-                                <i class="nav-main-link-icon fa fa-user"></i>
-                                <span class="nav-main-link-name text-capitalize">Comptables</span>
-                            </a>
-                        </li>
-        
-                        <li class="compte">
-                            <a class="nav-main-link" href="{% url 'paiement:liste_des_membres_de_personnels' %}">
-                                <i class="nav-main-link-icon fa fa-user"></i>
-                                <span class="nav-main-link-name text-capitalize">Membres de personnel</span>
-                            </a>
-                        </li>
-                    </ul>
-                </li> -->
-
-
-
-
-                <li class=" ntem nav-main-item">
-                    <a class="nav-main-link nav-main-link-submenu" data-toggle="submenu" aria-haspopup="true" aria-expanded="false" href="#">
-                        <i class="nav-main-link-icon fa fa-user-graduate"></i>
-                        <span class="nav-main-link-name">Tables</span>
-                    </a>
-                    <ul class="nav-main-submenu">
-                        <li class="compte">
-                            <a class="nav-main-link" href="{% url 'main:etudiants' %}">
-                                <i class="fa fa-users" style="margin-right: 10px;"></i>
-                                <span class="nav-main-link-name text-capitalize">Étudiants</span>
-                            </a>
-                        </li>
-        
-                        <li class="compte">
-                            <a class="nav-main-link" href="{% url 'main:liste_des_tuteurs' %}">
-                                <i class="nav-main-link-icon fa fa-user"></i>
-                                <span class="nav-main-link-name text-capitalize">Tuteurs</span>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
                 
-
-
                 <li class="ntem nav-main-item">
                    
                     <a class="nav-main-link nav-main-link-submenu" data-toggle="submenu" aria-haspopup="true" aria-expanded="false" href="#">
@@ -153,7 +109,7 @@
                             <a class="nav-main-link"
                                 href="{% url 'paiement:liste_paiements_fournisseurs' id_annee_selectionnee %}">
                                 <i class="nav-main-link-icon si si-energy"></i>
-                                <span class="nav-main-link-name text-capitalize">Fournisseurs</span>
+                                <span class="nav-main-link-name text-capitalize">Operateurs fournisseurs</span>
                             </a>
                         </li>
                     </ul>
@@ -169,7 +125,7 @@
                         <li class="compte">
                             <a class="nav-main-link" href="{% url 'paiement:compte_bancaire' id_annee_selectionnee %}">
                                 <i class="nav-main-link-icon si si-energy"></i>
-                                <span class="nav-main-link-name text-capitalize">Solde bancaire</span>
+                                <span class="nav-main-link-name text-capitalize">Bilan de compte</span>
                             </a>
                         </li>
                     </ul>
