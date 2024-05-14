@@ -22,6 +22,9 @@
     </div>
       <form class="container-fluid p-3" action="#" method="POST">
         {% csrf_token %}
+        <div class="text-danger mb-3">
+          <span>{{ form.custom_errors.errors }}</span>
+        </div>
         <div class="form-row mb-3">
           <div class="col-md-6">
             {{ form.nom.label_tag }}
@@ -113,30 +116,16 @@
           </div>
         </div>
 
-      <div class="form-row mb-3">
-          <div class="col-md-6">
-            {{ form.photo_passport.label_tag }}
-            {{ form.photo_passport }}
-            <span class="text-danger">{{ form.photo_passport.errors }}</span>
-          </div>
+        <div class="form-row mb-3">
           <div class="col-md-6">
             {{ form.qualification_professionnel.label_tag }}
             {{ form.qualification_professionnel }}
             <span class="text-danger">{{ form.dernierdiplome.errors }}</span>
           </div>
-         
-        </div>
-
-        <div class="form-row mb-3">
           <div class="col-md-6">
             {{ form.dernierdiplome.label_tag }}
             {{ form.dernierdiplome }}
             <span class="text-danger">{{ form.dernierdiplome.errors }}</span>
-          </div>
-          <div class="col-md-6">
-            {{ form.is_active.label_tag }}
-            <div class="d-flex">{{ form.is_active }}</div>
-            <span class="text-danger">{{ form.is_active.errors }}</span>
           </div>
         </div>
 

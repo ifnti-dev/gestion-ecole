@@ -284,11 +284,11 @@ def create_etudiant(request, id=0):
         # Gestion de la requête POST
         if id == 0:
             # Création d'un nouvel étudiant à partir des données POST
-            form = EtudiantForm(request.POST)
+            form = EtudiantForm(request.POST, request.FILES)
         else:
             # Modification d'un étudiant existant avec les données POST
             etudiant = Etudiant.objects.get(pk=id)
-            form = EtudiantForm(request.POST, instance=etudiant)
+            form = EtudiantForm(request.POST, request.FILES, instance=etudiant)
 
         if form.is_valid():
             # Sauvegarde de l'étudiant pour générer un ID
@@ -2458,7 +2458,8 @@ def create_personnel(request):
             return redirect('main:personnels')
         data['form'] = form
     else:
-        data['form'] = PersonnelForm()
+        personnel = Personnel.objects.all()[2]
+        data['form'] = PersonnelForm(instance=personnel)
         
     return render(request, 'employes/create_or_edit.html', context=data)
 
@@ -2473,8 +2474,7 @@ def update_personnel(request, id):
             return redirect('main:personnels')
         data['form'] = form
     else:
-        data['form'] = PersonnelForm(instance=personnel)
-        
+        data['form'] = PersonnelForm(instance=personnel)  
     return render(request, 'employes/create_or_edit.html', context=data)
 
 @login_required(login_url=settings.LOGIN_URL)
