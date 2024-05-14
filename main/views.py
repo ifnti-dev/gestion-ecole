@@ -2472,7 +2472,6 @@ def create_personnel(request):
         
     return render(request, 'employes/create_or_edit.html', context=data)
 
-
 @login_required(login_url=settings.LOGIN_URL)
 def update_personnel(request, id):
     data = {}
@@ -2503,9 +2502,10 @@ def update_personnel(request, id):
     return render(request, 'employes/create_or_edit.html', context=data)
 
 @login_required(login_url=settings.LOGIN_URL)
-def delete_personnel(request):
-    pass
-
+def delete_personnel(request, id):
+    personnel = get_object_or_404(Personnel, pk=id)
+    personnel.delete()
+    return redirect('main:personnels')
 
 
 @login_required(login_url=settings.LOGIN_URL)

@@ -111,6 +111,7 @@ urlpatterns = [
      path('personnels/',views.personnels, name='personnels'),
      path('create_personnel/', views.create_personnel, name='create_personnel'),
      path('update_personnel/<int:id>/',views.update_personnel, name='update_personnel'),
+     path('delete_personnel/<int:id>/',views.delete_personnel, name='delete_personnel'),
 
      #### Enseignant ####
      path('enseignants/',views.enseignants, name='enseignants'),
