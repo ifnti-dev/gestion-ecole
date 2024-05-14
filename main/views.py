@@ -284,11 +284,11 @@ def create_etudiant(request, id=0):
         # Gestion de la requête POST
         if id == 0:
             # Création d'un nouvel étudiant à partir des données POST
-            form = EtudiantForm(request.POST)
+            form = EtudiantForm(request.POST, request.FILES)
         else:
             # Modification d'un étudiant existant avec les données POST
             etudiant = Etudiant.objects.get(pk=id)
-            form = EtudiantForm(request.POST, instance=etudiant)
+            form = EtudiantForm(request.POST, request.FILES, instance=etudiant)
 
         if form.is_valid():
             # Sauvegarde de l'étudiant pour générer un ID
