@@ -2,6 +2,8 @@ from typing import Any, Dict
 import re
 from typing import Any, Dict
 from django import forms
+
+from main.utils.forms_utils import chercher_utilisateur
 from .models import Evaluation, Information, Programme, Parcours, Note, Utilisateur, Personnel, Enseignant, Etudiant, Matiere, AnneeUniversitaire, Ue, Tuteur, Semestre
 from django.core.exceptions import ValidationError
 from django.forms import DateField
@@ -345,6 +347,7 @@ class InformationForm(forms.ModelForm):
 
 
 class PersonnelForm(forms.ModelForm):
+    custom_errors = forms.CharField(widget=forms.TextInput(attrs={"hidden": True}))
     class Meta:
         model = Personnel
         fields = ['nom', 'prenom', 'contact', 'sexe', 'email', 'adresse', 'datenaissance', 'lieunaissance', 'numero_cnss', 'nif', 'profil', 'salaireBrut', 'nombre_de_personnes_en_charge', 'dernierdiplome', 'is_active','qualification_professionnel']
@@ -355,28 +358,32 @@ class PersonnelForm(forms.ModelForm):
             'sexe': forms.Select(choices=Etudiant.SEXE_CHOISE, attrs={'class': 'form-control'}),
             'email': forms.TextInput(attrs={'class': 'form-control'}),
             'adresse': forms.TextInput(attrs={'class': 'form-control'}),
-            'datenaissance': forms.DateInput(attrs={'type': 'date'}),
+            'datenaissance': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'lieunaissance': forms.TextInput(attrs={'class': 'form-control'}),
             'contact': forms.TextInput(attrs={'class': 'form-control'}),
             'email': forms.TextInput(attrs={'class': 'form-control'}),
             'adresse': forms.TextInput(attrs={'class': 'form-control'}),
-            'prefecture': forms.NumberInput(attrs={'class': 'form-control'}),
-            'numero_cnss': forms.TextInput(attrs={'class': 'form-control'}),
-            'salaireBrut': forms.TextInput(attrs={'class': 'form-control'}),
-            'dernierdiplome': forms.TextInput(attrs={'class': 'form-control'}),
-            'nbreJrsCongesRestant': forms.TextInput(attrs={'class': 'form-control'}),
-            'nbreJrsConsomme': forms.TextInput(attrs={'class': 'form-control'}),
-            'qualification_professionnel': forms.TextInput(attrs={'class': 'form-control'}),
+            'prefecture': forms.TextInput(attrs={'class': 'form-control'}),
+            'numero_cnss': forms.NumberInput(attrs={'class': 'form-control'}),
+            'salaireBrut': forms.NumberInput(attrs={'class': 'form-control'}),
+            'dernierdiplome': forms.FileInput(attrs={'class': 'form-control'}),
+            'nombre_de_personnes_en_charge': forms.NumberInput(attrs={'class': 'form-control'}),
+            'nif': forms.NumberInput(attrs={'class': 'form-control'}),
+            'qualification_professionnel': forms.Select(attrs={'class': 'form-control'}, choices=Personnel.TYPE_CHOICES),
         }
 
 
-    # def clean(self):
-    #     cleaned_data = super(EnseignantForm, self).clean()
-    #     nom = cleaned_data.get('nom', '')
-    #     prenom = cleaned_data.get('prenom', '')
-    #     contact = cleaned_data.get('contact', '')
-    #     email = cleaned_data.get('email', '')
-    #     adresse = cleaned_data.get('adresse', '')
-    #     sexe = cleaned_data.get('sexe', '')
+    def clean(self):
+        cleaned_data = super(PersonnelForm, self).clean()
+        nom = cleaned_data.get('nom')
+        prenom = cleaned_data.get('prenom')
+        contact = cleaned_data.get('contact')
+        email = cleaned_data.get('email')
+        adresse = cleaned_data.get('adresse')
+        sexe = cleaned_data.get('sexe')
+        print(chercher_utilisateur(nom, prenom))
+        if chercher_utilisateur(nom, prenom):
+            self._errors["custom_errors"] = "Cet utilisateur exist déjà"
+        return cleaned_data
 
 

@@ -2458,7 +2458,8 @@ def create_personnel(request):
             return redirect('main:personnels')
         data['form'] = form
     else:
-        data['form'] = PersonnelForm()
+        personnel = Personnel.objects.all()[2]
+        data['form'] = PersonnelForm(instance=personnel)
         
     return render(request, 'employes/create_or_edit.html', context=data)
 
@@ -2473,8 +2474,7 @@ def update_personnel(request, id):
             return redirect('main:personnels')
         data['form'] = form
     else:
-        data['form'] = PersonnelForm(instance=personnel)
-        
+        data['form'] = PersonnelForm(instance=personnel)  
     return render(request, 'employes/create_or_edit.html', context=data)
 
 @login_required(login_url=settings.LOGIN_URL)
