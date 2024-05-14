@@ -920,12 +920,12 @@ class Personnel(Utilisateur):
         Classe Personnel, représentant les membres du personnel. Elle hérite de la classe Utilisateur
     """
     TYPE_CHOICES = [
-        ('Enseignant', 'Enseignant'),
-        ("Comptable", "Comptable"),
-        ("Directeur des études", "Directeur des études"),
-        ("Gardien", "Gardien"),
         ("Agent d'entretien", "Agent d'entretien"),
+        ("Gardien", "Gardien"),
+        ("Comptable", "Comptable"),
         ("Stagiaire", "Stagiaire"),
+        ('Enseignant', 'Enseignant'),
+        ("Directeur des études", "Directeur des études"),
     ]
     
     qualification_professionnel = models.CharField(
@@ -1009,6 +1009,26 @@ class Personnel(Utilisateur):
         if not self.id:
             self.user = create_auth_user(self.prenom, self.nom, self.email)  
         super().save()
+    
+    def get_enseignant(self):
+        try:
+            return self.enseignant
+        except Exception as e:
+            return None
+        
+    def bind_enseignant(self, type_enseignant, speliatite_enseignant):
+        if type_enseignant and speliatite_enseignant:
+            try:
+                enseignant = self.enseignant
+                enseignant.type = type_enseignant
+                enseignant.specialite = speliatite_enseignant
+                enseignant.save()
+            except Exception as e:
+                Enseignant.objects.get_or_create(type=type_enseignant, specialite=speliatite_enseignant, personnel=self)
+    
+    def assign_groups(self, groups):
+        self.user.groups.set(groups)
+        self.user.save()
 
     def update_conge_counts(self):
         """
@@ -1089,19 +1109,6 @@ class Personnel(Utilisateur):
         return int(total_deductions_cnss)
 
 class Enseignant(models.Model):
-
-    
-
-    class Meta:
-        verbose_name = _("")
-        verbose_name_plural = _("s")
-
-    def __str__(self):
-        return self.name
-
-    def get_absolute_url(self):
-        return reverse("_detail", kwargs={"pk": self.pk})
-
     """
     Cette classe hérite de la classe Personnel, elle représente les enseignants.
     """    
@@ -1131,7 +1138,7 @@ class Enseignant(models.Model):
 
         **Nullable:** true
     """
-    personnel=models.ForeignKey("Personnel", verbose_name=_("Personnel"), on_delete=models.CASCADE,null=True,blank=True)
+    personnel=models.OneToOneField(Personnel, on_delete=models.CASCADE)
     
     """
         Identifiant d'un personnel lié à un enseigant
@@ -1139,13 +1146,6 @@ class Enseignant(models.Model):
         **Type:** Personnel
 
     """
-    # def save(self, *args, **kwargs):
-    #     if not self.id:
-    #         super().save(*args, **kwargs)  
-    #         group = Group.objects.get(name="enseignant")
-    #         self.user.groups.add(group)
-    #     else:
-    #         super().save(*args, **kwargs)
 
     def niveaux(self):
         """
@@ -1168,7 +1168,6 @@ class Enseignant(models.Model):
 
     def __str__(self):
         return f'{super().__str__()}'
-        # return f'{self.user.username}'
 
 class Tuteur(models.Model):
     """

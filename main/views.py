@@ -15,6 +15,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from main.helpers import *
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth import authenticate, login, logout, get_user_model
+from django.contrib.auth.models import Group
 from .resources import EtudiantResource, EnseignantResource
 from tablib import Dataset
 from .custom_permission_required import evaluation_permission, evaluation_upload_permission, show_recapitulatif_note_permission
@@ -2451,30 +2452,54 @@ def personnels(request):
 @login_required(login_url=settings.LOGIN_URL)
 def create_personnel(request):
     data = {}
+    roles = Group.objects.all()
     if request.method == "POST":
         form = PersonnelForm(request.POST)
+        form.fields['roles'].queryset = roles
         if form.is_valid():
-            form.save()
+            personnel = form.save()
+            inputs_data = form.clean()
+            type_enseignant = inputs_data.get('type')
+            speliatite_enseignant = inputs_data.get('specialite')
+            groups = inputs_data.get('roles')
+            personnel.assign_groups(groups)
+            personnel.bind_enseignant(type_enseignant, speliatite_enseignant)
             return redirect('main:personnels')
         data['form'] = form
     else:
-        personnel = Personnel.objects.all()[2]
-        data['form'] = PersonnelForm(instance=personnel)
+        data['form'] = PersonnelForm()  
+        data['form'].fields['roles'].queryset = roles
         
     return render(request, 'employes/create_or_edit.html', context=data)
+
 
 @login_required(login_url=settings.LOGIN_URL)
 def update_personnel(request, id):
     data = {}
     personnel = get_object_or_404(Personnel, pk=id)
+    enseignant = personnel.get_enseignant()
+    roles = Group.objects.all()
     if request.method == "POST":
         form = PersonnelForm(request.POST, instance=personnel)
+        form.fields['roles'].queryset = roles
         if form.is_valid():
-            form.save()
+            personnel = form.save()
+            inputs_data = form.clean()
+            type_enseignant = inputs_data.get('type')
+            speliatite_enseignant = inputs_data.get('specialite')
+            groups = inputs_data.get('roles')
+            personnel.assign_groups(groups)
+            personnel.bind_enseignant(type_enseignant, speliatite_enseignant)
             return redirect('main:personnels')
         data['form'] = form
     else:
         data['form'] = PersonnelForm(instance=personnel)  
+        data['form'].fields['roles'].queryset = roles
+        data['form'].fields['roles'].initial = list(personnel.user.groups.values_list('pk', flat=True))
+        if enseignant:
+            data['form'].fields['type'].initial = enseignant.type
+            data['form'].fields['specialite'].initial = enseignant.specialite
+        
     return render(request, 'employes/create_or_edit.html', context=data)
 
 @login_required(login_url=settings.LOGIN_URL)

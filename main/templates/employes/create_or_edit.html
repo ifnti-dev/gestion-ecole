@@ -115,12 +115,12 @@
             <span class="text-danger">{{ form.specialite.errors }}</span>
           </div>
         </div>
-        
+
         <div class="form-row mb-3">
           <div class="col-md-6">
             {{ form.qualification_professionnel.label_tag }}
             {{ form.qualification_professionnel }}
-            <span class="text-danger">{{ form.dernierdiplome.errors }}</span>
+            <span class="text-danger">{{ form.qualification_professionnel.errors }}</span>
           </div>
           <div class="col-md-6">
             {{ form.dernierdiplome.label_tag }}
@@ -128,16 +128,12 @@
             <span class="text-danger">{{ form.dernierdiplome.errors }}</span>
           </div>
         </div>
+
         <div class="form-row mb-3">
           <div class="col-md-6">
-            {{ form.qualification_professionnel.label_tag }}
-            {{ form.qualification_professionnel }}
-            <span class="text-danger">{{ form.dernierdiplome.errors }}</span>
-          </div>
-          <div class="col-md-6">
-            {{ form.dernierdiplome.label_tag }}
-            {{ form.dernierdiplome }}
-            <span class="text-danger">{{ form.dernierdiplome.errors }}</span>
+            {{ form.roles.label_tag }}
+            {{ form.roles }}
+            <span class="text-danger">{{ form.roles.errors }}</span>
           </div>
         </div>
         <button class="btn btn-primary btn-block" type="submit"><i class="fas fa-database"></i> Enrégistrer &nbsp;&nbsp;&nbsp;<span></span></button>
