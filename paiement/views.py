@@ -221,9 +221,8 @@ def comptable_list(request):
 
     """
     current_annee = AnneeUniversitaire.static_get_current_annee_universitaire()
-    group = Group.objects.get(name="comptable")
-    comptables = Personnel.objects.filter(is_active=True,user__groups__name="comptable")
-    print( c for c in comptables)
+    comptables = Personnel.objects.filter(user__is_active=True,user__groups__name="comptable")
+    
     
     context = {
         "comptables": comptables,
@@ -491,9 +490,9 @@ def irpp_mensuel(request,id_annee_selectionnee):
     Cette vue récupère IRPP pour un mois donnée,
     puis  renvoie l'irpp sous form de json.
     """
-    salaires = Salaire.objects.filter(annee_universitaire=id_annee_selectionnee)
-    total_irpp = sum(salaire.irpp + salaire.tcs for salaire in salaires)    
-    total_irpp_by_month = Salaire.objects.values('date_debut__month').annotate(total_irpp=Sum('irpp'))
+    salaires = VersmentSalaire.objects.filter(annee_universitaire=id_annee_selectionnee)
+    total_irpp = sum(VersmentSalaire.irpp + salaire.tcs for salaire in salaires)    
+    total_irpp_by_month = VersmentSalaire.objects.values('date_debut__month').annotate(total_irpp=Sum('irpp'))
     MONTH_NAMES = {
     1: "Janvier",
     2: "Février",

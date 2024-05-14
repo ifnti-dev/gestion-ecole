@@ -21,7 +21,6 @@ import math
 
 def create_auth_user(nom, prenom, email):
     username = (prenom + nom).lower()
-    print(username)
     username = username.replace(" ", "")
     year = date.today().year
     password = 'ifnti' + str(year) + '!'
@@ -442,7 +441,7 @@ class Etudiant(Utilisateur):
         **Valeur par défaut:** Décision du conseil
     """
 
-    photo_passport = models.ImageField(upload_to="etudiant/photo_passports", null=True, blank=True, verbose_name="Photo passport")
+    photo_passport = models.ImageField(storage="photo_passport", null=True, blank=True, verbose_name="Photo passport")
 
     """
         Photo de profil
@@ -925,9 +924,8 @@ class Personnel(Utilisateur):
         ("Directeur des études", "Directeur des études"),
         ("Gardien", "Gardien"),
         ("Agent d'entretien", "Agent d'entretien"),
-        ("Stagiaire", "Stagiaire"),
+        ('Stagiaire', 'Stagiaire'),
     ]
-    
     qualification_professionnel = models.CharField(
         max_length=30,choices=TYPE_CHOICES, verbose_name="Qualification professionnelle")
     """
@@ -965,7 +963,8 @@ class Personnel(Utilisateur):
 
         **Valeur par défaut:** 0
     """
-    dernierdiplome = models.ImageField(null=True, blank=True, verbose_name="Dernier diplome")
+    dernierdiplome = models.ImageField(
+        null=True, blank=True, verbose_name="Dernier diplome")
     """
         Dernier diplome obtenu par le membre du employé
 
@@ -1006,6 +1005,7 @@ class Personnel(Utilisateur):
         Fonction rattachant l'employé à un utilisateur lors de sa sauvegarde.
 
         """
+        print(f'----{self.id}----')
         if not self.id:
             self.user = create_auth_user(self.prenom, self.nom, self.email)  
         super().save()
@@ -1037,6 +1037,7 @@ class Personnel(Utilisateur):
             salaire.calculer_salaire_brut_mensuel() for salaire in salaires)
         return int(total_salaire_brut_annuel)
 
+
     def calculer_irpp_tcs_annuel(self):
         """
         Fonction calculant la cumulation annuelle de l'IRPP (Import sur le Revenu des Personnes Physiques) et de la TCS (Taxe Complémentaire sur le Salaire).
@@ -1053,23 +1054,7 @@ class Personnel(Utilisateur):
         total_irpp_tcs_annuel = Decimal(
             total_irpp_annuel) + Decimal(total_tcs_annuel)
         return int(total_irpp_tcs_annuel)
-    
-    def calculer_irpp_tcs_mensuel(self,date_debut):
-        """
-        Fonction calculant la cumulation mensuel de l'IRPP (Import sur le Revenu des Personnes Physiques) et de la TCS (Taxe Complémentaire sur le Salaire).
 
-        :return: Somme entre le IRPP annuel et le TCS annuel del'employé
-
-        :retype: Decimal
-        """
-
-        salaires = Salaire.objects.filter(date_debut=date_debut)
-        total_irpp_mensuel = sum(salaire.calculer_irpp_mensuel()
-                                for salaire in salaires)
-        total_tcs_mensuel = sum(salaire.tcs for salaire in salaires)
-        total_irpp_tcs_mensuel = Decimal(
-            total_irpp_mensuel) + Decimal(total_tcs_mensuel)
-        return int(total_irpp_tcs_mensuel)
 
     def calcule_deductions_cnss_annuel(self):
         """
@@ -1088,20 +1073,7 @@ class Personnel(Utilisateur):
 
         return int(total_deductions_cnss)
 
-class Enseignant(models.Model):
-
-    
-
-    class Meta:
-        verbose_name = _("")
-        verbose_name_plural = _("s")
-
-    def __str__(self):
-        return self.name
-
-    def get_absolute_url(self):
-        return reverse("_detail", kwargs={"pk": self.pk})
-
+class Enseignant(Personnel):
     """
     Cette classe hérite de la classe Personnel, elle représente les enseignants.
     """    
@@ -1115,7 +1087,8 @@ class Enseignant(models.Model):
     
     CHOIX_TYPE = (('Vacataire', 'Vacataire'), ('Permanent', 'Permanent'))
 
-    type = models.CharField(null=True, blank=True, max_length=9, choices=CHOIX_TYPE)
+    type = models.CharField(null=True, blank=True,
+                            max_length=9, choices=CHOIX_TYPE)
     """
         Définit le type d'enseignant qu'est l'employé: Vacataire ou Permanent
 
@@ -1123,7 +1096,9 @@ class Enseignant(models.Model):
 
         **Nullable:** true
     """
-    specialite = models.CharField(max_length=300, verbose_name="Spécialité", blank=True, null=True)
+    specialite = models.CharField(
+        max_length=300, verbose_name="Spécialité", blank=True, null=True)
+
     """
         Définit la spécialitée de l'enseignant
 
@@ -1131,21 +1106,14 @@ class Enseignant(models.Model):
 
         **Nullable:** true
     """
-    personnel=models.ForeignKey("Personnel", verbose_name=_("Personnel"), on_delete=models.CASCADE,null=True,blank=True)
-    
-    """
-        Identifiant d'un personnel lié à un enseigant
 
-        **Type:** Personnel
-
-    """
-    # def save(self, *args, **kwargs):
-    #     if not self.id:
-    #         super().save(*args, **kwargs)  
-    #         group = Group.objects.get(name="enseignant")
-    #         self.user.groups.add(group)
-    #     else:
-    #         super().save(*args, **kwargs)
+    def save(self, *args, **kwargs):
+        if not self.id:
+            super().save(*args, **kwargs)  
+            group = Group.objects.get(name="enseignant")
+            self.user.groups.add(group)
+        else:
+            super().save(*args, **kwargs)
 
     def niveaux(self):
         """
@@ -1243,6 +1211,7 @@ class Tuteur(models.Model):
 
     def __str__(self):
         return self.nom + " " + self.prenom
+
 
 class Ue(models.Model):
     codeUE = models.CharField(max_length=50, verbose_name="Code de l'UE")
@@ -1668,6 +1637,7 @@ class Evaluation(models.Model):
     def __str__(self):
         return f'{self.matiere}-{self.libelle}-{self.semestre}'
 
+
 class Competence(models.Model):
     """
         Classe compétence
@@ -1708,6 +1678,7 @@ class Competence(models.Model):
         **Type:** string
 
     """
+
 
 class AnneeUniversitaire(models.Model):
     """
@@ -1809,6 +1780,7 @@ class AnneeUniversitaire(models.Model):
 
     def __str__(self):
         return f'{self.annee}-{self.annee + 1}'
+
 
 class Semestre(models.Model):
     """
@@ -2028,6 +2000,8 @@ class Parametre(models.Model):
     logo_institut = models.ImageField(upload_to='logo_institut', null=True, blank=True)
     directeur_des_etudes = models.CharField(max_length=255, null=True, blank=True)
 
+
+
 class CorrespondanceMaquette(models.Model):
     """
         Classe permettant de faire les correspondances entre différentes maquettes. Cette classe à étét mise en place pour fair e la correpondance entre les UEs et Matières de l'IFNTI d'avant 2023 et celles post-2023.
@@ -2131,6 +2105,7 @@ class Note(models.Model):
         """
         return str(self.id) + " " + str(self.evaluation) + " " + str(self.valeurNote)
 
+
 class Frais(models.Model):
     """
         Classe correpsondant aux Frais de scolarité chaque année
@@ -2163,6 +2138,7 @@ class Frais(models.Model):
     def __str__(self):
         return "Année universitaire: " + str(self.annee_universitaire) + "  Frais d'inscription : " + str(self.montant_inscription) + "     " + " Frais de scolarité : " + str(self.montant_scolarite)
 
+
 class CompteEtudiant(models.Model):
     """
         Classe représentant le compte de paiement de l'étudiant
@@ -2194,6 +2170,7 @@ class CompteEtudiant(models.Model):
 
     def __str__(self):
         return str(self.etudiant.nom) + str(self.etudiant.prenom) + "  Solde - " + str(self.annee_universitaire) + " : " + str(self.solde)
+
 
 class Paiement(models.Model):
     """
@@ -2317,6 +2294,7 @@ class CompteBancaire(models.Model):
         Renvoie une représentation en chaîne de caractères de l'objet CompteBancaire.
         """
         return "Solde actuel : " + str(self.solde_bancaire)
+
 
 class VersmentSalaire(models.Model):
     """
@@ -2710,6 +2688,7 @@ class VersmentSalaire(models.Model):
     def __str__(self):
         return str(self.personnel.nom)
 
+
 class Fournisseur(models.Model):
     """
     Modèle représentant les paiements effectués aux fournisseurs de service.
@@ -2802,6 +2781,7 @@ class Fournisseur(models.Model):
             self.annee_universitaire = AnneeUniversitaire.static_get_current_annee_universitaire()
         super(Fournisseur, self).save(*args, **kwargs)
 
+
 class Information(models.Model):
     """
     Modèle pour enregistrer les informations relatives aux attestations de service des enseignants.
@@ -2878,6 +2858,7 @@ class Information(models.Model):
 
     def __str__(self):
         return str(self.enseignant.nom) + " " + str(self.numeroSecurite) + " " + str(self.discipline.libelle)
+
 
 class FicheDePaie(models.Model):
     """
@@ -3064,6 +3045,7 @@ class FicheDePaie(models.Model):
         self.montantEnLettre = num2words(difference, lang='fr')
         super(FicheDePaie, self).save(*args, **kwargs)
 
+
 class Charge(models.Model):
     """
     Modèle représentant les fiches de prise en charge des frais pour le personnel.
@@ -3189,6 +3171,7 @@ class Charge(models.Model):
         self.montantEnLettre = num2words(total, lang='fr')
         super(Charge, self).save(*args, **kwargs)
 
+
 class Conge(models.Model):
     """
     Modèle représentant les demandes de congé du personnel.
@@ -3298,4 +3281,3 @@ class Conge(models.Model):
 
     def __str__(self):
         return str(self.personnel.nom) + "  " + str(self.personnel.prenom) + "  " + str(self.nombre_de_jours_de_conge)
-

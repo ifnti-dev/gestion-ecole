@@ -36,11 +36,11 @@
                                 <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#exampleModalCenter_{{ comptable.id }}">
                                     <i class="fa fa-eye"></i>
                                 </button>
-                                <button type="button" class="btn btn-sm btn-warning">
+                                {% comment %} <button type="button" class="btn btn-sm btn-warning">
                                     <a style="color: white;" href="{% url 'paiement:edit_comptable' comptable.id %}">
                                         <i class="far fa-edit"></i>
                                     </a>
-                                </button>
+                                </button> {% endcomment %}
                             </div>
                         </td> 
                     </tr>
