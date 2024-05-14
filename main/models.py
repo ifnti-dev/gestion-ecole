@@ -1102,8 +1102,7 @@ class Enseignant(Personnel):
     
     CHOIX_TYPE = (('Vacataire', 'Vacataire'), ('Permanent', 'Permanent'))
 
-    type = models.CharField(null=True, blank=True,
-                            max_length=9, choices=CHOIX_TYPE)
+    type = models.CharField(null=True, blank=True, max_length=9, choices=CHOIX_TYPE)
     """
         Définit le type d'enseignant qu'est l'employé: Vacataire ou Permanent
 
@@ -1111,9 +1110,7 @@ class Enseignant(Personnel):
 
         **Nullable:** true
     """
-    specialite = models.CharField(
-        max_length=300, verbose_name="Spécialité", blank=True, null=True)
-
+    specialite = models.CharField(max_length=300, verbose_name="Spécialité", blank=True, null=True)
     """
         Définit la spécialitée de l'enseignant
 
