@@ -1,12 +1,12 @@
 {% load static %}
 <header id="page-header" class="">
-    <div class="content-header">
+    <div class="content-header headers1">
         <div class="d-flex align-items-center">
             <button type="button" class="btn btn-sm btn-dual mr-2 d-lg-none" data-toggle="layout" data-action="sidebar_toggle">
                 <i class="fa fa-fw fa-bars"></i>
             </button>
-            <button type="button" class="btn btn-sm btn-dual mr-2 d-none d-lg-inline-block" data-toggle="layout" data-action="sidebar_mini_toggle">
-                <i class="fa fa-fw fa-ellipsis-v"></i>
+            <button type="button" class="dics btn btn-sm btn-dual mr-2 d-none d-lg-inline-block" data-toggle="layout" data-action="sidebar_mini_toggle">
+                <i class="fa fa-fw fa-ellipsis-v text-white"></i>
             </button>
         </div>
         <div class="d-flex align-items-center">
@@ -14,7 +14,7 @@
                 {% csrf_token %}
                 <div class="form-row">
                     <input type="text" name="origin_path" value="{{ request.path }}" hidden>
-                    <select id="annee-universitaire" name="annee_universitaire" class="form-control col-md-8 mr-3">
+                    <select id="annee-universitaire" name="annee_universitaire" class="form-control col-md-8 mr-3 dicss">
                         <option value="">Année universitaire</option>
                         {% for annee_univ in annees_universitaire %}
                         <option value="{{ annee_univ.id }}" {% if annee_univ.id == id_annee_selectionnee %}selected{% endif %}>{{ annee_univ }}</option>
@@ -23,7 +23,7 @@
                 </div>
             </form>
 
-            <div class="dropdown d-inline-block ml-2">
+            <div class="dropdown d-inline-block ml-2 dicss">
                 <button type="button" class="btn btn-sm btn-dual d-flex align-items-center" id="page-header-user-dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <img class="rounded-circle" src="{%static 'assets/media/avatars/avatar1.jpg' %}" alt="" style="width: 21px;">
                     <span class="d-none d-sm-inline-block ml-2">   {{ user.username}}</span>
@@ -32,8 +32,8 @@
                 <div class="dropdown-menu dropdown-menu-md dropdown-menu-right p-0 border-0" aria-labelledby="page-header-user-dropdown">
                     <div class="p-3 text-center  primary-bg-glace rounded-top">
                         <img class="img-avatar img-avatar48 img-avatar-thumb" src="{%static 'assets/media/avatars/avatar1.jpg' %}" alt="">
-                        <p class="mt-2 mb-0 text-white font-w500">{{   user.first_name}} {{   user.last_name}} </p>
-                        <p class="mb-0 text-white-50 font-size-sm">{{   user.groups.all.0 }}</p>
+                        <p class="mt-2 mb-0 text-black font-w500">{{   user.first_name}} {{   user.last_name}} </p>
+                        <p class="mb-0 text-blue font-size-sm">{{   user.groups.all.0 }}</p>
                     </div>
                     <div class="p-2">
                         <a class="dropdown-item d-flex align-items-center justify-content-between" href="{% url 'main:profil' %}">
@@ -51,10 +51,6 @@
             </div>
         </div>
 
-       
-
-        
-        
     </div>
     <div id="page-header-search" class="overlay-header">
         <div class="content-header  bg-chart-orange-color">

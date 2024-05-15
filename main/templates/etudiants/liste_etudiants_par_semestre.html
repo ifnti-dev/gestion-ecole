@@ -15,10 +15,10 @@
             <i class="fas fa-plus"></i> Ajout Étudiant
         </a>
     </div>
-    <div class="block-content block-content-full">
+    <div class="block-content block-content-full ">
         <form action="{% url 'main:passage_etudiants' %}" method="post" onsubmit="return confirmPassageEtudiants();">
             {% csrf_token %}
-        <table class="table table-bordered table-striped table-vcenter js-dataTable-full-pagination">
+        <table class="table table-bordered table-striped table-vcenter js-dataTable-full-pagination ">
             <thead>
                 <tr>
                     <th class="text-center" style="width: 30%;">Nom & Prénoms</th>
