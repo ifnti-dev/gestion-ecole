@@ -21,6 +21,7 @@ import math
 
 def create_auth_user(nom, prenom, email):
     username = (prenom + nom).lower()
+    print(username)
     username = username.replace(" ", "")
     year = date.today().year
     password = 'ifnti' + str(year) + '!'
@@ -441,7 +442,7 @@ class Etudiant(Utilisateur):
         **Valeur par défaut:** Décision du conseil
     """
 
-    photo_passport = models.ImageField(storage="photo_passport", null=True, blank=True, verbose_name="Photo passport")
+    photo_passport = models.ImageField(upload_to="etudiant/photo_passports", null=True, blank=True, verbose_name="Photo passport")
 
     """
         Photo de profil
@@ -891,7 +892,7 @@ class Etudiant(Utilisateur):
 
         """
         str_sem = "|".join([sem.id for sem in self.semestres.all()])
-        return self.user.username
+        return self.full_name()
 
     def create_compte_etudiant(self):
         """
@@ -918,6 +919,24 @@ class Personnel(Utilisateur):
     """
         Classe Personnel, représentant les membres du personnel. Elle hérite de la classe Utilisateur
     """
+    TYPE_CHOICES = [
+        ("Agent d'entretien", "Agent d'entretien"),
+        ("Gardien", "Gardien"),
+        ("Comptable", "Comptable"),
+        ("Stagiaire", "Stagiaire"),
+        ('Enseignant', 'Enseignant'),
+        ("Directeur des études", "Directeur des études"),
+    ]
+    
+    qualification_professionnel = models.CharField(
+        max_length=30,choices=TYPE_CHOICES, verbose_name="Qualification professionnelle")
+    """
+        Qualification professionelle de l'employé
+
+        **Type:** string
+
+    """
+    
     numero_cnss = models.CharField(
         max_length=30, verbose_name="Numéro CNSS", default=0)
     """
@@ -946,8 +965,7 @@ class Personnel(Utilisateur):
 
         **Valeur par défaut:** 0
     """
-    dernierdiplome = models.ImageField(
-        null=True, blank=True, verbose_name="Dernier diplome")
+    dernierdiplome = models.ImageField(null=True, blank=True, verbose_name="Dernier diplome")
     """
         Dernier diplome obtenu par le membre du employé
 
@@ -988,10 +1006,29 @@ class Personnel(Utilisateur):
         Fonction rattachant l'employé à un utilisateur lors de sa sauvegarde.
 
         """
-        print(f'----{self.id}----')
         if not self.id:
             self.user = create_auth_user(self.prenom, self.nom, self.email)  
         super().save()
+    
+    def get_enseignant(self):
+        try:
+            return self.enseignant
+        except Exception as e:
+            return None
+        
+    def bind_enseignant(self, type_enseignant, speliatite_enseignant):
+        if type_enseignant and speliatite_enseignant:
+            try:
+                enseignant = self.enseignant
+                enseignant.type = type_enseignant
+                enseignant.specialite = speliatite_enseignant
+                enseignant.save()
+            except Exception as e:
+                Enseignant.objects.get_or_create(type=type_enseignant, specialite=speliatite_enseignant, personnel=self)
+    
+    def assign_groups(self, groups):
+        self.user.groups.set(groups)
+        self.user.save()
 
     def update_conge_counts(self):
         """
@@ -1015,11 +1052,10 @@ class Personnel(Utilisateur):
         :retype: Decimal
 
         """
-        salaires = Salaire.objects.filter(personnel=self)
+        salaires = VersmentSalaire.objects.filter(personnel=self)
         total_salaire_brut_annuel = sum(
             salaire.calculer_salaire_brut_mensuel() for salaire in salaires)
         return int(total_salaire_brut_annuel)
-
 
     def calculer_irpp_tcs_annuel(self):
         """
@@ -1030,7 +1066,7 @@ class Personnel(Utilisateur):
         :retype: Decimal
         """
 
-        salaires = Salaire.objects.filter(personnel=self)
+        salaires = VersmentSalaire.objects.filter(personnel=self)
         total_irpp_annuel = sum(salaire.calculer_irpp_mensuel()
                                 for salaire in salaires)
         total_tcs_annuel = sum(salaire.tcs for salaire in salaires)
@@ -1055,7 +1091,6 @@ class Personnel(Utilisateur):
             total_irpp_mensuel) + Decimal(total_tcs_mensuel)
         return int(total_irpp_tcs_mensuel)
 
-
     def calcule_deductions_cnss_annuel(self):
         """
         Fonction calculant la déduction annuelle de la CNSS sur le salaire de l'employé
@@ -1065,7 +1100,7 @@ class Personnel(Utilisateur):
         :retype: Decimal
         """
 
-        salaires = Salaire.objects.filter(personnel=self)
+        salaires = VersmentSalaire.objects.filter(personnel=self)
 
         total_deductions_cnss = sum(
             salaire.calculer_deductions_cnss() for salaire in salaires)
@@ -1073,7 +1108,7 @@ class Personnel(Utilisateur):
 
         return int(total_deductions_cnss)
 
-class Enseignant(Personnel):
+class Enseignant(models.Model):
     """
     Cette classe hérite de la classe Personnel, elle représente les enseignants.
     """    
@@ -1087,8 +1122,7 @@ class Enseignant(Personnel):
     
     CHOIX_TYPE = (('Vacataire', 'Vacataire'), ('Permanent', 'Permanent'))
 
-    type = models.CharField(null=True, blank=True,
-                            max_length=9, choices=CHOIX_TYPE)
+    type = models.CharField(null=True, blank=True, max_length=9, choices=CHOIX_TYPE)
     """
         Définit le type d'enseignant qu'est l'employé: Vacataire ou Permanent
 
@@ -1096,9 +1130,7 @@ class Enseignant(Personnel):
 
         **Nullable:** true
     """
-    specialite = models.CharField(
-        max_length=300, verbose_name="Spécialité", blank=True, null=True)
-
+    specialite = models.CharField(max_length=300, verbose_name="Spécialité", blank=True, null=True)
     """
         Définit la spécialitée de l'enseignant
 
@@ -1106,14 +1138,14 @@ class Enseignant(Personnel):
 
         **Nullable:** true
     """
+    personnel=models.OneToOneField(Personnel, on_delete=models.CASCADE)
+    
+    """
+        Identifiant d'un personnel lié à un enseigant
 
-    def save(self, *args, **kwargs):
-        if not self.id:
-            super().save(*args, **kwargs)  
-            group = Group.objects.get(name="enseignant")
-            self.user.groups.add(group)
-        else:
-            super().save(*args, **kwargs)
+        **Type:** Personnel
+
+    """
 
     def niveaux(self):
         """
@@ -1136,44 +1168,6 @@ class Enseignant(Personnel):
 
     def __str__(self):
         return f'{super().__str__()}'
-        # return f'{self.user.username}'
-
-
-class DirecteurDesEtudes(Personnel):
-    """
-        Cette classe hérite de la classe Personnel, elle correspont au Directeur des Études.
-    """
-
-    def save(self, *args, **kwargs):
-        if not self.id:
-            super().save(*args, **kwargs) 
-            group_comptable = Group.objects.get(name="comptable")
-            self.user.groups.add(group_comptable)
-        else:
-            super().save(*args, **kwargs)
-            
-        if self.is_active:
-            # Désactiver les autres directeurs des études
-            DirecteurDesEtudes.objects.exclude(
-                pk=self.pk).update(is_active=False)
-
-        return super().save(*args, **kwargs)
-
-class Comptable(Personnel):
-    """
-    Cette classe hérite de la classe Personnel, elle représente les comptables.
-    """
-    
-    pass
-
-    def save(self, *args, **kwargs):
-        if not self.id:
-            super().save(*args, **kwargs) 
-            group_comptable = Group.objects.get(name="comptable")
-            self.user.groups.add(group_comptable)
-        else:
-            super().save(*args, **kwargs)
-        
 
 class Tuteur(models.Model):
     """
@@ -1249,7 +1243,6 @@ class Tuteur(models.Model):
     def __str__(self):
         return self.nom + " " + self.prenom
 
-
 class Ue(models.Model):
     codeUE = models.CharField(max_length=50, verbose_name="Code de l'UE")
     """
@@ -1270,6 +1263,7 @@ class Ue(models.Model):
         ("Maths", "Maths"),
         ("Organisation", "Organisation"),
     ]
+    
     TYPES_NIVEAU = [
         ("1", "Licence"),
         ("2", "Master"),
@@ -1673,7 +1667,6 @@ class Evaluation(models.Model):
     def __str__(self):
         return f'{self.matiere}-{self.libelle}-{self.semestre}'
 
-
 class Competence(models.Model):
     """
         Classe compétence
@@ -1714,7 +1707,6 @@ class Competence(models.Model):
         **Type:** string
 
     """
-
 
 class AnneeUniversitaire(models.Model):
     """
@@ -1816,7 +1808,6 @@ class AnneeUniversitaire(models.Model):
 
     def __str__(self):
         return f'{self.annee}-{self.annee + 1}'
-
 
 class Semestre(models.Model):
     """
@@ -2036,8 +2027,6 @@ class Parametre(models.Model):
     logo_institut = models.ImageField(upload_to='logo_institut', null=True, blank=True)
     directeur_des_etudes = models.CharField(max_length=255, null=True, blank=True)
 
-
-
 class CorrespondanceMaquette(models.Model):
     """
         Classe permettant de faire les correspondances entre différentes maquettes. Cette classe à étét mise en place pour fair e la correpondance entre les UEs et Matières de l'IFNTI d'avant 2023 et celles post-2023.
@@ -2141,7 +2130,6 @@ class Note(models.Model):
         """
         return str(self.id) + " " + str(self.evaluation) + " " + str(self.valeurNote)
 
-
 class Frais(models.Model):
     """
         Classe correpsondant aux Frais de scolarité chaque année
@@ -2174,7 +2162,6 @@ class Frais(models.Model):
     def __str__(self):
         return "Année universitaire: " + str(self.annee_universitaire) + "  Frais d'inscription : " + str(self.montant_inscription) + "     " + " Frais de scolarité : " + str(self.montant_scolarite)
 
-
 class CompteEtudiant(models.Model):
     """
         Classe représentant le compte de paiement de l'étudiant
@@ -2206,7 +2193,6 @@ class CompteEtudiant(models.Model):
 
     def __str__(self):
         return str(self.etudiant.nom) + str(self.etudiant.prenom) + "  Solde - " + str(self.annee_universitaire) + " : " + str(self.solde)
-
 
 class Paiement(models.Model):
     """
@@ -2252,7 +2238,7 @@ class Paiement(models.Model):
 
     """
     comptable = models.ForeignKey(
-        'Comptable', on_delete=models.CASCADE, verbose_name="Comptable")
+        'Personnel', on_delete=models.CASCADE, verbose_name="Comptable")
     """
         Total à solder par l'étudiant au cours de l'année scolaire
 
@@ -2290,9 +2276,6 @@ class Paiement(models.Model):
 
     def __str__(self):
         return str(self.dateversement) + " : " + str(self.etudiant.nom) + "  " + str(self.etudiant.prenom) + "  " + str(self.montant)
-
-
-    
 
 class CompteBancaire(models.Model):
     """
@@ -2334,26 +2317,9 @@ class CompteBancaire(models.Model):
         """
         return "Solde actuel : " + str(self.solde_bancaire)
 
-
-class Salaire(models.Model):
+class VersmentSalaire(models.Model):
     """
     Modèle représentant les détails du salaire d'un personnel.
-    """
-    TYPE_CHOICES = [
-        ('Enseignant', 'Enseignant'),
-        ("Comptable", "Comptable"),
-        ("Directeur des études", "Directeur des études"),
-        ("Gardien", "Gardien"),
-        ("Agent d'entretien", "Agent d'entretien"),
-        ('Stagiaire', 'Stagiaire'),
-    ]
-    qualification_professionnel = models.CharField(
-        max_length=30, choices=TYPE_CHOICES, verbose_name="Qualification professionnelle")
-    """
-        Qualification professionelle de l'employé
-
-        **Type:** string
-
     """
     date_debut = models.DateField(verbose_name="Date de début", null=True)
     """
@@ -2580,10 +2546,14 @@ class Salaire(models.Model):
 
     def calculer_total_A(self):
         total_A = self.calculer_salaire_brut_annuel()
+        print("total A: ")
+        print(total_A)
         return total_A
 
     def calculer_total_B(self):
         total_B = Decimal(self.calculer_salaire_brut_annuel()) * Decimal(0.04)
+        print("total B: ")
+        print(total_B)
         return total_B
 
     def calculer_total_C(self):
@@ -2602,14 +2572,20 @@ class Salaire(models.Model):
 
     def calculer_semi_net(self):
         G41 = self.calculer_total_C()
+        print("total C: ")
+        print(G41)
         G42 = self.calculer_total_D()
-        
+        print("total D: ")
+        print(G42)
         try:
             semi_net = float(G41) - float(G42)
-            semi_net = float(format(1.25555, '.2f') )
+            print("semi_net: ")
+            print(semi_net)
+            semi_net = float(format(semi_net, '.2f') )
         except Exception as e:
-            semi_net = float(format(1.25555, '.2f') )
-
+            print(e)
+            semi_net = float(format(semi_net, '.2f') )
+        
         return semi_net
 
     def calculer_charges_de_familles(self):
@@ -2629,7 +2605,9 @@ class Salaire(models.Model):
 
     def calculer_net_taxable(self):
         G43 = self.calculer_semi_net()
+        print("G43  = ",G43)
         G44 = self.calculer_charges_de_familles()
+        print("G44  = ",G44)
         net_taxable = G43 - G44
         return net_taxable
 
@@ -2639,6 +2617,7 @@ class Salaire(models.Model):
 
     def calculer_net_imposable_arrondi(self):
         G50 = self.calculer_net_imposable()
+        print("G50 = ",G50)
         net_imposable_arrondi = round(G50, -3)
         net_imposable_arrondi_str = "{:.0f}".format(net_imposable_arrondi)
         return int(net_imposable_arrondi_str)
@@ -2652,22 +2631,32 @@ class Salaire(models.Model):
             :retype: Decimal
         """
         G51 = self.calculer_net_imposable_arrondi()
+        print("G51 = ",G51)
         if G51 < 900000 or G51 == 900000:
             irpp = G51 * 0
+            print("irpp1= ",irpp)
         elif G51 < 3000000 or G51 == 3000000:
             irpp = (G51 - 900000) * 0.03 + 0
+            print("irpp2= ",irpp)
         elif G51 < 6000000 or G51 == 6000000:
             irpp = (G51 - 3000000) * 0.1 + 63000
+            print("irpp3= ",irpp)
         elif G51 < 9000000 or G51 == 9000000:
             irpp = (G51 - 6000000) * 0.15 + 363000
+            print("irpp4= ",irpp)
         elif G51 < 12000000 or G51 == 12000000:
             irpp = (G51 - 9000000) * 0.2 + 813000
+            print("irpp5= ",irpp)
         elif G51 < 15000000 or G51 == 15000000:
             irpp = (G51 - 12000000) * 0.25 + 1413000
+            print("irpp5= ",irpp)
         elif G51 < 20000000 or G51 == 20000000:
             irpp = (G51 - 15000000) * 0.3 + 2163000
+            print("irpp6= ",irpp)
         else:
             irpp = (G51 - 20000000) * 0.35 + 3663000
+            print("irpp7= ",irpp)
+        print("irpp_ann= ",irpp)
         return irpp
 
     def calculer_irpp_mensuel(self):
@@ -2679,6 +2668,7 @@ class Salaire(models.Model):
             :retype: Decimal
         """
         irpp_mensuel = self.calculer_irpp_annuel() / 12
+        print("irpp_mensuel: ",irpp_mensuel)
         return irpp_mensuel
 
     def calculer_deductions_cnss(self):
@@ -2702,6 +2692,8 @@ class Salaire(models.Model):
 
         tcs = Decimal(self.tcs)
         irpp = self.calculer_irpp_mensuel()
+        print("irpp : ")
+        print(irpp)
         self.irpp = Decimal(irpp)
         prime_forfaitaire = self.prime_forfaitaire
         acomptes = self.acomptes
@@ -2712,11 +2704,10 @@ class Salaire(models.Model):
         salaire_net = salaire_brut - deductions
         pret = salaire_net - acomptes
         self.salaire_net_a_payer = pret + prime_forfaitaire
-        super(Salaire, self).save(*args, **kwargs)
+        super(VersmentSalaire, self).save(*args, **kwargs)
 
     def __str__(self):
         return str(self.personnel.nom)
-
 
 class Fournisseur(models.Model):
     """
@@ -2810,7 +2801,6 @@ class Fournisseur(models.Model):
             self.annee_universitaire = AnneeUniversitaire.static_get_current_annee_universitaire()
         super(Fournisseur, self).save(*args, **kwargs)
 
-
 class Information(models.Model):
     """
     Modèle pour enregistrer les informations relatives aux attestations de service des enseignants.
@@ -2830,16 +2820,7 @@ class Information(models.Model):
         **Nullable:** true
 
     """
-    directeur = models.ForeignKey(
-        'DirecteurDesEtudes', on_delete=models.CASCADE, verbose_name="Directeur des études", null=True)
-    """
-        Directeur des études asscocié à l'information
-
-        **Type:** string
-
-        **Nullable:** true
-
-    """
+  
     numeroSecurite = models.IntegerField(
         verbose_name="Numéro de sécurité sociale")
     """
@@ -2896,7 +2877,6 @@ class Information(models.Model):
 
     def __str__(self):
         return str(self.enseignant.nom) + " " + str(self.numeroSecurite) + " " + str(self.discipline.libelle)
-
 
 class FicheDePaie(models.Model):
     """
@@ -3083,7 +3063,6 @@ class FicheDePaie(models.Model):
         self.montantEnLettre = num2words(difference, lang='fr')
         super(FicheDePaie, self).save(*args, **kwargs)
 
-
 class Charge(models.Model):
     """
     Modèle représentant les fiches de prise en charge des frais pour le personnel.
@@ -3209,7 +3188,6 @@ class Charge(models.Model):
         self.montantEnLettre = num2words(total, lang='fr')
         super(Charge, self).save(*args, **kwargs)
 
-
 class Conge(models.Model):
     """
     Modèle représentant les demandes de congé du personnel.
@@ -3319,3 +3297,4 @@ class Conge(models.Model):
 
     def __str__(self):
         return str(self.personnel.nom) + "  " + str(self.personnel.prenom) + "  " + str(self.nombre_de_jours_de_conge)
+

@@ -3,7 +3,7 @@ import os
 from django import forms
 from decimal import Decimal
 from django.http import HttpResponse, JsonResponse
-from paiement.forms import ComptableForm, FicheDePaieForm, PersonnelForm, PaiementForm, FournisseurForm, FraisForm, CompteBancaireForm, SalaireForm, ChargeForm, StagiairesForm
+from paiement.forms import  FicheDePaieForm, PersonnelForm, PaiementForm, FournisseurForm, FraisForm, CompteBancaireForm, VersmentSalaireForm, ChargeForm, StagiairesForm
 from django.db.models import Sum
 from num2words import num2words
 import datetime
@@ -172,17 +172,17 @@ def create_comptable(request, id=0):
     """
     if request.method == "GET":
         if id == 0:
-            form = ComptableForm()
+            form = PersonnelForm()
         else:
-            comptable = Comptable.objects.get(pk=id)
-            form = ComptableForm(instance=comptable)   
+            comptable = PersonnelForm.objects.get(pk=id)
+            form = PersonnelForm(instance=comptable)   
         return render(request, 'comptables/create_comptable.html', {'form': form})
     else:
         if id == 0:
-            form = ComptableForm(request.POST)
+            form = PersonnelForm(request.POST)
         else:
-            comptable = Comptable.objects.get(pk=id)
-            form = ComptableForm(request.POST,instance= comptable)
+            comptable = Personnel.objects.get(pk=id)
+            form = PersonnelForm(request.POST,instance= comptable)
         if form.is_valid():
             form.save()
             return redirect('paiement:comptable_list')
@@ -203,7 +203,7 @@ def comptable_detail(request, id):
     Cette vue récupère les informations détaillées d'un comptable spécifique,
     puis les renvoie au template 'comptables/comptable_detail.html' pour affichage.
     """
-    comptable = get_object_or_404(Comptable, id=id)
+    comptable = get_object_or_404(Personnel, id=id)
     return render(request, 'comptables/comptable_detail.html', {'comptable': comptable})
 
 
@@ -221,7 +221,9 @@ def comptable_list(request):
 
     """
     current_annee = AnneeUniversitaire.static_get_current_annee_universitaire()
-    comptables = Comptable.objects.filter(is_active=True)
+    comptables = Personnel.objects.filter(user__is_active=True,user__groups__name="comptable")
+    
+    
     context = {
         "comptables": comptables,
     }
@@ -242,7 +244,7 @@ def comptables_suspendu(request):
 
     """
     annee_universitaire_courante = AnneeUniversitaire.static_get_current_annee_universitaire()
-    comptables = Comptable.objects.filter(is_active=False)
+    comptables = Personnel.objects.filter(is_active=False,user__groups__name="comptable")
     context = {
         "comptables": comptables,
         "annee_universitaire_courante": annee_universitaire_courante,
@@ -281,6 +283,7 @@ def liste_paiements(request, id_annee_selectionnee):
     return render(request, 'paiements/liste_paiements.html', context)
 
 
+#ajouter un controle de permisssion pour verifier que le user faisant cette operation est un comptable
 @login_required(login_url=settings.LOGIN_URL)
 def enregistrer_paiement(request, id=0):
     """
@@ -310,7 +313,9 @@ def enregistrer_paiement(request, id=0):
             form = PaiementForm(instance=paiement) 
             
         #recuperons le montant d'inscription qui sera injecté dans le script js de template une fois accessible
+        
         frais_scolaire=Frais.objects.get(annee_universitaire=annee_selectionnee)
+
         frais_inscription=frais_scolaire.montant_inscription  
         return render(request, 'paiements/enregistrer_paiement.html', {'form': form,'frais_inscription':frais_inscription}) 
     else:
@@ -324,8 +329,8 @@ def enregistrer_paiement(request, id=0):
             form = PaiementForm(request.POST,instance= paiement)
         if form.is_valid():
             paiement = form.save(commit=False)
-            print(paiement)
-            comptable = Comptable.objects.get(user=request.user)
+            print(paiement.etudiant)
+            comptable = Personnel.objects.get(user=request.user)
             paiement.comptable = comptable
 
             compte_universite = CompteBancaire.objects.first()
@@ -485,9 +490,9 @@ def irpp_mensuel(request,id_annee_selectionnee):
     Cette vue récupère IRPP pour un mois donnée,
     puis  renvoie l'irpp sous form de json.
     """
-    salaires = Salaire.objects.filter(annee_universitaire=id_annee_selectionnee)
-    total_irpp = sum(salaire.irpp + salaire.tcs for salaire in salaires)    
-    total_irpp_by_month = Salaire.objects.values('date_debut__month').annotate(total_irpp=Sum('irpp'))
+    salaires = VersmentSalaire.objects.filter(annee_universitaire=id_annee_selectionnee)
+    total_irpp = sum(VersmentSalaire.irpp + salaire.tcs for salaire in salaires)    
+    total_irpp_by_month = VersmentSalaire.objects.values('date_debut__month').annotate(total_irpp=Sum('irpp'))
     MONTH_NAMES = {
     1: "Janvier",
     2: "Février",
@@ -533,11 +538,11 @@ def compte_bancaire(request, id_annee_selectionnee):
     montant_total_paiements = paiements_annee.aggregate(Sum('montant'))['montant__sum'] or 0
 
     ##########
-    salaires=Salaire.objects.filter(annee_universitaire=id_annee_selectionnee)
+    salaires=VersmentSalaire.objects.filter(annee_universitaire=id_annee_selectionnee)
     
-    salaires_anpe =Salaire.objects.filter(annee_universitaire=id_annee_selectionnee,qualification_professionnel='Stagiaire')
+    salaires_anpe =VersmentSalaire.objects.filter(annee_universitaire=id_annee_selectionnee,personnel__qualification_professionnel='Stagiaire')
     ### salaires_ifnti est une liste des salaires des enseignants d'ifnti sauf le stagiaire
-    salaires_ifnti = Salaire.objects.filter(annee_universitaire=id_annee_selectionnee).exclude(qualification_professionnel='Stagiaire')
+    salaires_ifnti = VersmentSalaire.objects.filter(annee_universitaire=id_annee_selectionnee).exclude(personnel__qualification_professionnel='Stagiaire')
        
     total_salaire_brut = sum(salaire.personnel.salaireBrut + salaire.prime_efficacite + salaire.prime_qualite + salaire.frais_travaux_complementaires+ salaire.prime_anciennete for salaire in salaires)
       
@@ -615,7 +620,7 @@ def etat_compte_bancaire(request, id_annee_selectionnee, compte_bancaire_id):
     etudiants_annee = Etudiant.objects.filter(semestres__in=semestres_annee)
     paiements_frais_scolaires = Paiement.objects.filter(compte_bancaire=compte_bancaire, etudiant__in=etudiants_annee)
     
-    salaires = Salaire.objects.filter(annee_universitaire=id_annee_selectionnee)
+    salaires = VersmentSalaire.objects.filter(annee_universitaire=id_annee_selectionnee)
     montant_total_paiements = paiements_frais_scolaires.aggregate(Sum('montant'))['montant__sum'] or 0
     fournisseurs = Fournisseur.objects.filter(annee_universitaire=id_annee_selectionnee)
     fiches_de_paies = FicheDePaie.objects.filter(annee_universitaire=id_annee_selectionnee)
@@ -818,7 +823,7 @@ def les_bulletins_de_paye(request, id_annee_selectionnee):
     puis les renvoie au template 'salaires/bulletins_de_paye.html' pour affichage.
     """
     annee_universitaire = get_object_or_404(AnneeUniversitaire, pk=id_annee_selectionnee)
-    bulletins = Salaire.objects.filter(annee_universitaire=annee_universitaire, qualification_professionnel__in=['Enseignant', 'Comptable', 'Directeur des études', 'Gardien', 'Agent d\'entretien'])
+    bulletins = VersmentSalaire.objects.filter(annee_universitaire=annee_universitaire, personnel__qualification_professionnel__in=['Enseignant', 'Comptable', 'Directeur des études', 'Gardien', 'Agent d\'entretien'])
     context = {
         'annee_universitaire': annee_universitaire,
         'bulletins': bulletins,
@@ -841,7 +846,7 @@ def les_bulletins_de_paye_stagiaire(request, id_annee_selectionnee):
     puis les renvoie au template 'salaires/bulletins_de_paye.html' pour affichage.
     """
     annee_universitaire = get_object_or_404(AnneeUniversitaire, pk=id_annee_selectionnee)
-    bulletins = Salaire.objects.filter(annee_universitaire=annee_universitaire, qualification_professionnel='Stagiaire')
+    bulletins = VersmentSalaire.objects.filter(annee_universitaire=annee_universitaire, personnel__qualification_professionnel='Stagiaire')
     context = {
         'annee_universitaire': annee_universitaire,
         'bulletins': bulletins,
@@ -871,21 +876,21 @@ def enregistrer_bulletin(request, id=0):
     """
     if request.method == "GET":
         if id == 0:
-            form = SalaireForm()
+            form = VersmentSalaireForm()
         else:
-            bulletin = Salaire.objects.get(pk=id)
-            form = SalaireForm(instance=bulletin)   
+            bulletin = VersmentSalaire.objects.get(pk=id)
+            form = VersmentSalaireForm(instance=bulletin)   
         return render(request, 'salaires/enregistrer_bulletin.html', {'form': form})
     else:
         if id == 0:
-            form = SalaireForm(request.POST)
+            form = VersmentSalaireForm(request.POST)
         else:
-            bulletin = Salaire.objects.get(pk=id)
+            bulletin = VersmentSalaire.objects.get(pk=id)
             compte_universite = bulletin.compte_bancaire
             compte_universite.solde_bancaire += bulletin.salaire_net_a_payer + bulletin.tcs + (Decimal(bulletin.frais_prestations_familiale_salsalaire) * Decimal(bulletin.personnel.salaireBrut) + Decimal(bulletin.frais_prestations_familiales) * Decimal(bulletin.personnel.salaireBrut) + Decimal(bulletin.frais_risques_professionnel) * Decimal(bulletin.personnel.salaireBrut) + Decimal(bulletin.frais_pension_vieillesse_emsalaire) * Decimal(bulletin.personnel.salaireBrut))
             print(bulletin.salaire_net_a_payer + bulletin.tcs + (Decimal(bulletin.frais_prestations_familiale_salsalaire) * Decimal(bulletin.personnel.salaireBrut) + Decimal(bulletin.frais_prestations_familiales) * Decimal(bulletin.personnel.salaireBrut) + Decimal(bulletin.frais_risques_professionnel) * Decimal(bulletin.personnel.salaireBrut) + Decimal(bulletin.frais_pension_vieillesse_emsalaire) * Decimal(bulletin.personnel.salaireBrut)))
             compte_universite.save()
-            form = SalaireForm(request.POST, instance=bulletin)
+            form = VersmentSalaireForm(request.POST, instance=bulletin)
         if form.is_valid():
             bulletin = form.save(commit=False)
             date_debut = bulletin.date_debut
@@ -927,7 +932,7 @@ def delete_bulletin(request):
     """
     if request.method == 'GET':
         bulletin_id = request.GET.get('id')
-        bulletin = get_object_or_404(Salaire, id=bulletin_id)
+        bulletin = get_object_or_404(VersmentSalaire, id=bulletin_id)
         bulletin.delete()
     id_annee_selectionnee = AnneeUniversitaire.static_get_current_annee_universitaire().id
     return redirect('paiement:bulletins_de_paye', id_annee_selectionnee=id_annee_selectionnee)
@@ -991,7 +996,7 @@ def bulletin_de_paye(request, id):
 
     """
 
-    bulletin = get_object_or_404(Salaire, id=id)
+    bulletin = get_object_or_404(VersmentSalaire, id=id)
     salaireDeBase = int(bulletin.personnel.salaireBrut)
     prime_efficacite = int(bulletin.prime_efficacite)
     prime_qualite = int(bulletin.prime_qualite)
@@ -1481,19 +1486,19 @@ def enregistrer_bulletin_stagiaire(request, id=0):
         if id == 0:
             form = StagiairesForm()
         else:
-            bulletin = Salaire.objects.get(pk=id)
+            bulletin = VersmentSalaire.objects.get(pk=id)
             form = StagiairesForm(instance=bulletin)   
         return render(request, 'salaires/enregistrer_bulletin_stagiaire.html', {'form': form})
     else:
         if id == 0:
             form = StagiairesForm(request.POST)
         else:
-            bulletin = Salaire.objects.get(pk=id)
+            bulletin = VersmentSalaire.objects.get(pk=id)
             compte_universite = bulletin.compte_bancaire
             compte_universite.solde_bancaire += bulletin.salaire_net_a_payer + (Decimal(bulletin.frais_risques_professionnel) * Decimal(bulletin.personnel.salaireBrut))
             print(bulletin.salaire_net_a_payer + (Decimal(bulletin.frais_risques_professionnel) * Decimal(bulletin.personnel.salaireBrut)))
             compte_universite.save()
-            form = SalaireForm(request.POST, instance=bulletin)
+            form = VersmentSalaireForm(request.POST, instance=bulletin)
         if form.is_valid():
             bulletin = form.save(commit=False)
             qualification_professionnelle = 'Stagiaire'
@@ -1526,7 +1531,7 @@ def enregistrer_bulletin_stagiaire(request, id=0):
 
 @login_required(login_url=settings.LOGIN_URL)
 def bulletin_de_paye_stagiaire(request, id):
-    bulletin = get_object_or_404(Salaire, id=id)
+    bulletin = get_object_or_404(VersmentSalaire, id=id)
     salaireDeBase = int(bulletin.personnel.salaireBrut)
     prime_efficacite = int(bulletin.prime_efficacite)
     prime_qualite = int(bulletin.prime_qualite)
@@ -1622,7 +1627,7 @@ def delete_bulletin_stagiaire(request):
     """
     if request.method == 'GET':
         bulletin_id = request.GET.get('id')
-        bulletin = get_object_or_404(Salaire, id=bulletin_id)
+        bulletin = get_object_or_404(VersmentSalaire, id=bulletin_id)
         bulletin.delete()
     id_annee_selectionnee = AnneeUniversitaire.static_get_current_annee_universitaire().id
     return redirect('paiement:bulletins_de_paye_stagiaire', id_annee_selectionnee=id_annee_selectionnee)
@@ -1639,26 +1644,18 @@ def option_impression_frais_scolarite_par_semestre(request):
         visualisation du pdf dans le navigateur
     """
 
-    recupmax = 0
-    recupmin = 0
-    
-
     recupmin_max = request.POST.get('min_max')
     separtion_chaine = recupmin_max.split("-")
     recupmin = separtion_chaine[0]
     recupmax = separtion_chaine[1]
-
-
-    
-
     recupsemestre = request.POST.getlist('semestres')
+
+
 
     recuperation_montant_frais_scolarite_min, recuperation_montant_frais_scolarite_max = recupmin,recupmax
     montant_frais_scolarites = CompteEtudiant.objects.filter(solde__gte=recuperation_montant_frais_scolarite_min, solde__lte=recuperation_montant_frais_scolarite_max,)
 
     buildcontext = {}
-
-
 
     #recuperation du montant d'inscription
     recup_montant_inscription = Frais.objects.all()
@@ -1667,7 +1664,6 @@ def option_impression_frais_scolarite_par_semestre(request):
         recup_frais_scolarite = i.montant_scolarite
 
     
-
     # montant_frais_scolarites.filter(etudiant__semestres = semestre)
     id_annee_selectionnee = request.session["id_annee_selectionnee"]
 
@@ -1681,9 +1677,6 @@ def option_impression_frais_scolarite_par_semestre(request):
                 data.append(compteEtudiant)
 
         
-            
-
-
         buildcontext[semestre.__str__()] = data
 
     #context pour l'affichage des semestres

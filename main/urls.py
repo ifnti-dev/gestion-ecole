@@ -108,8 +108,12 @@ urlpatterns = [
      path('create_ue/', views.create_ue, name='create_ue'),
      path('update_ue/<int:id>/', views.create_ue, name='update_ue'),
 
+     path('personnels/',views.personnels, name='personnels'),
+     path('create_personnel/', views.create_personnel, name='create_personnel'),
+     path('update_personnel/<int:id>/',views.update_personnel, name='update_personnel'),
+     path('delete_personnel/<int:id>/',views.delete_personnel, name='delete_personnel'),
 
-                    #### Enseignant ####
+     #### Enseignant ####
      path('enseignants/',views.enseignants, name='enseignants'),
      path('create_enseignant/', views.create_enseignant, name='create_enseignant'),
      path('enseignant_suspendu/', views.enseignant_inactif,name='enseignant_suspendu'),
@@ -149,6 +153,4 @@ urlpatterns = [
 
 
      #Table de paramètre globale
-
-
 ]

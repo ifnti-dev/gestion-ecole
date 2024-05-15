@@ -38,11 +38,16 @@ Enregistrement d'un paiement
           </div>
           <div class="col-md-6">
             {{ form.etudiant.label_tag }}
-            {{ form.etudiant }}
+            {{ form.etudiant}}
             <span class="text-danger">{{ form.etudiant.errors }}</span>
           </div>
+         
         </div>
-
+        {% comment %} <select class="js-select2 form-control" id="example-select2-multiple" name="example-select2-multiple" style="width: 100%;" data-placeholder="Choose many.." multiple>
+          <option></option><!-- Required for data-placeholder attribute to work with Select2 plugin -->
+          <option value="{{ form.etudiant }}" selected>{{ form.etudiant }}</option>
+          
+      </select> {% endcomment %}
         <br>
 
         <div class="form-row mb-3">        
@@ -80,9 +85,9 @@ Enregistrement d'un paiement
 {% block scripts %}
 <script>
   console.log("hello");
-  // frais_inscription est une variable défini depuis la vue et on l'utilise ici
+  // frais_inscription est une variable défini depuis la vue et qui contient le montant du frais_inscription
   let valeur= {% autoescape off %} {{frais_inscription}}{% endautoescape %};
-  
+  //valeur=parseFloat((valeur+"").replace(",","."));
   $('#id_type').on("change",function(){
    // console.log( $('#id_type').val())
     if($('#id_type').val()=="Frais d'inscription"){
