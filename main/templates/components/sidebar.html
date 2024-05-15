@@ -20,24 +20,6 @@
                     </a>
                 </li>
                 <hr>
-
-
-
-                <!-- <li class="nav-main-item">
-                    <a class="nav-main-link nav-main-link-submenu" data-toggle="submenu" aria-haspopup="true" aria-expanded="false" href="#">
-                        <i class="nav-main-link-icon si si-grid"></i>
-                        <span class="nav-main-link-name">Tables</span>
-                    </a>
-                    <ul class="nav-main-submenu">
-                        <li class="nav-main-item">
-                            <a class="nav-main-link" href="be_tables_styles.html">
-                                <span class="nav-main-link-name">Styles</span>
-                            </a>
-                        </li>
-                    </ul>
-                </li> -->
-
-
                 {% if is_comptable %}
 
                 <a class="nav-main-link text-white" href="{% url 'main:personnels' %}">
@@ -45,7 +27,6 @@
                     <span class="nav-main-link-name ifnhover">Employées</span>
                 </a>
                 <a class="nav-main-link text-white" href="{% url 'main:etudiants' %}">
-                    <!-- <i class="nav-main-link-icon fa fa-user-graduate"></i> -->
                     <i class="nav-main-link-icon fa fa-users"></i>
                     <span class="nav-main-link-name ifnhover">Etudiants</span>
                 </a>
@@ -175,12 +156,6 @@
                             </a>
                         </li>
         
-                        <!-- <li class="">
-                            <a class="nav-main-link" href="{% url 'main:liste_des_etudiants_suspendu' %}">
-                                <i class="nav-main-link-icon fa fa-calendar"></i>
-                                <span class="nav-main-link-name text-capitalize">Etudiants suspendus</span>
-                            </a>
-                        </li> -->
                     </ul>
                 </li>
 
@@ -188,22 +163,14 @@
 
                 {% if is_directeur_des_etudes %}
 
-                
-                <!-- {% comment %} <li class="nav-main-item">
-                    <a class="nav-main-link nav-main-link-submenu" data-toggle="submenu" aria-haspopup="true" aria-expanded="false" href="#">
-                        <i class="nav-main-link-icon si si-layers"></i>
-                        <span class="nav-main-link-name">Page Packs</span>
-                    </a>
-                    <ul class="nav-main-submenu">
-                        <li class="nav-main-item">
-                            <a class="nav-main-link nav-main-link-submenu" data-toggle="submenu" aria-haspopup="true" aria-expanded="false" href="#">
-                                <i class="nav-main-link-icon si si-bag"></i>
-                                <span class="nav-main-link-name">e-Commerce</span>
-                            </a>
-                        </li>
-                    </ul>
-                </li> 
-                {% endcomment %}  -->
+
+               
+
+                <a class="nav-main-link text-white" href="{% url 'main:liste_des_tuteurs' %}">
+                    <i class="nav-main-link-icon fa fa-user"></i>
+                    <span class="nav-main-link-name ifnhover">Tuteurs</span>
+                </a>
+
 
                 <li class="ntem nav-main-item">
                     <a class="nav-main-link nav-main-link-submenu" data-toggle="submenu" aria-haspopup="true" aria-expanded="false" href="#">
@@ -226,13 +193,7 @@
                             </a>
                         </li>
         
-                        <li class="compte ">
-                            <a class="nav-main-link" href="{% url 'main:liste_des_tuteurs' %}">
-                                <i class="nav-main-link-icon si si-energy"></i>
-                                <span class="nav-main-link-name text-capitalize">Tuteurs</span>
-                            </a>
-                        </li>
-        
+                        
                         <!-- <li class="">
                             <a class="nav-main-link" href="{% url 'main:liste_des_etudiants_suspendu' %}">
                                 <i class="nav-main-link-icon si si-energy"></i>
@@ -283,6 +244,9 @@
                     </ul>
                 </li>
                 {% endif %}
+
+
+                <!-- TODO:dans la partie Employes, mettre Enseignants et Comptables dans le menu Employes -->
 
 
                 {% if is_etudiant or is_enseignant or is_comptable or is_directeur_des_etudes %}
@@ -437,27 +401,32 @@
                                 <span class="nav-main-link-name text-capitalize">Certificat de travail</span>
                             </a>
                         </li>
-        
-                        <li class="nav-main-item">
-                            <a class="compte  nav-main-link" href="{% url 'main:enseignants' %}">
-                                <i class="nav-main-link-icon si si-energy"></i>
-                                <span class="nav-main-link-name text-capitalize">Enseignants</span>
+
+
+                        <hr>
+
+                        <li class="ntem nav-main-item">
+                            <a class="nav-main-link nav-main-link-submenu" data-toggle="submenu" aria-haspopup="true" aria-expanded="false" href="#">
+                                <i class="nav-main-link-icon fa fa-user-graduate"></i>
+                                <span class="nav-main-link-name" style="color: white;">Employes</span>
                             </a>
-                            <!-- <a class="nav-main-link" href="{% url 'main:enseignant_suspendu' %}">
-                                <i class="nav-main-link-icon si si-energy"></i>
-                                <span class="nav-main-link-name text-capitalize">Enseignants suspendus</span>
-                            </a> -->
-        
-                            <a class="nav-main-link compte" href="{% url 'paiement:comptable_list' %}">
-                                <i class="nav-main-link-icon si si-energy"></i>
-                                <span class="nav-main-link-name text-capitalize">Comptables</span>
-                            </a>
-        
-                            <!-- <a class="nav-main-link" href="{% url 'paiement:comptables_suspendu' %}">
-                                <i class="nav-main-link-icon si si-energy"></i>
-                                <span class="nav-main-link-name text-capitalize">Comptables suspendus</span>
-                            </a> -->
-        
+
+                            <ul class="nav-main-submenu">
+                                <li class="nav-main-item">
+                                    <a class="compte  nav-main-link" href="{% url 'main:enseignants' %}">
+                                        <i class="nav-main-link-icon si si-energy"></i>
+                                        <span class="nav-main-link-name text-capitalize" style="color: white;">Enseignants</span>
+                                    </a>
+                                </li>
+
+                                <li class="nav-main-item">
+                                    <a class="nav-main-link compte" href="{% url 'paiement:comptable_list' %}">
+                                        <i class="nav-main-link-icon si si-energy"></i>
+                                        <span class="nav-main-link-name text-capitalize" style="color: white;">Comptables</span>
+                                    </a>
+                                </li>
+                            </ul>
+
                         </li>
                     </ul>
                 </li>
@@ -514,41 +483,39 @@
                                 <span class="nav-main-link-name text-capitalize">Fournisseurs</span>
                             </a>
                         </li>
-        
-                        <li class="nav-main-item">
-                            <a class="nav-main-link nav-main-link-submenu" data-toggle="submenu" aria-haspopup="true" aria-expanded="false" href="#">
-                                <i class="nav-main-link-icon fa fa-credit-card" style="color: silver;"></i>
-                                <span class="nav-main-link-name">Compte bancaire</span>
-                            </a>
-        
-                            <ul class="nav-main-submenu">
-                                <li class="compte">
-                                    <a class="nav-main-link" href="{% url 'paiement:compte_bancaire' id_annee_selectionnee %}">
-                                        <i class="nav-main-link-icon si si-energy"></i>
-                                        <span class="nav-main-link-name text-capitalize">Solde bancaire</span>
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-        
-
-                        <li class="nav-main-item">
-                            <a class="nav-main-link nav-main-link-submenu" data-toggle="submenu" aria-haspopup="true" aria-expanded="false" href="#">
-                                <i class="nav-main-link-icon si si-grid"></i>
-                                <span class="nav-main-link-name">Congés</span>
-                            </a>
-
-                            <ul  class="nav-main-submenu">
-                                <li class="compte">
-                                    <a class="nav-main-link" href="{% url 'conges:demandes_en_attentes' id_annee_selectionnee %}">
-                                        <i class="nav-main-link-icon si si-energy"></i>
-                                        <span class="nav-main-link-name text-capitalize">Afficher</span>
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
                     </ul>
                     
+                </li>
+
+                <li class="nav-main-item">
+                    <a class="nav-main-link nav-main-link-submenu" data-toggle="submenu" aria-haspopup="true" aria-expanded="false" href="#">
+                        <i class="nav-main-link-icon fa fa-credit-card" style="color: silver;"></i>
+                        <span class="nav-main-link-name">Compte bancaire</span>
+                    </a>
+
+                    <ul class="nav-main-submenu">
+                        <li class="compte">
+                            <a class="nav-main-link" href="{% url 'paiement:compte_bancaire' id_annee_selectionnee %}">
+                                <i class="nav-main-link-icon si si-energy"></i>
+                                <span class="nav-main-link-name text-capitalize">Bilan de compte</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <li class="nav-main-item">
+                    <a class="nav-main-link nav-main-link-submenu" data-toggle="submenu" aria-haspopup="true" aria-expanded="false" href="#">
+                        <i class="nav-main-link-icon si si-grid"></i>
+                        <span class="nav-main-link-name">Congés</span>
+                    </a>
+                    <ul  class="nav-main-submenu">
+                        <li class="compte">
+                            <a class="nav-main-link" href="{% url 'conges:demandes_en_attentes' id_annee_selectionnee %}">
+                                <i class="nav-main-link-icon si si-energy"></i>
+                                <span class="nav-main-link-name text-capitalize">Afficher</span>
+                            </a>
+                        </li>
+                    </ul>
                 </li>
                 {% endif %}
 
