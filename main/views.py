@@ -354,31 +354,38 @@ def liste_etudiants_par_semestre(request, id_annee_selectionnee):
     if 'semestre' in request.GET:
         semestre_id = request.GET.get('semestre')
         semestres_selected = semestres.filter(pk=semestre_id)
+    
+    try:
+        programme = Programme.objects.get(semestre=semestres_selected[0])
+  
 
-    # Filtrer les étudiants en fonction des semestres sélectionnés et qui sont actifs
-    etudiants = Etudiant.objects.filter(
-        semestres__in=semestres_selected, is_active=True).distinct()
+        # Filtrer les étudiants en fonction des semestres sélectionnés et qui sont actifs
+        etudiants = Etudiant.objects.filter(
+            semestres__in=semestres_selected, is_active=True).distinct()
 
-    # Initialiser une liste pour les étudiants insuffisants
-    etudiants_insuffisants = []
+        # Initialiser une liste pour les étudiants insuffisants
+        etudiants_insuffisants = []
+        print("---------------------------------------------------")
+        print(etudiants)
+        # Calculer les crédits obtenus par chaque étudiant pour le semestre sélectionné
+        for etudiant in etudiants:
+            credits_obtenus = etudiant.credits_obtenus_semestre(
+                programme=programme)  # Utiliser le premier semestre sélectionné
+            # Créer un attribut pour stocker les crédits obtenus
+            etudiant.credits_obtenus = credits_obtenus
 
-    # Calculer les crédits obtenus par chaque étudiant pour le semestre sélectionné
-    for etudiant in etudiants:
-        credits_obtenus = etudiant.credits_obtenus_semestre(
-            semestres_selected[0])  # Utiliser le premier semestre sélectionné
-        # Créer un attribut pour stocker les crédits obtenus
-        etudiant.credits_obtenus = credits_obtenus
-
-    # Récupérer le semestre actuel de chaque étudiant dans l'année universitaire
-    for etudiant in etudiants:
-        semestres_etudiant = etudiant.semestres.filter(
-            annee_universitaire=annee_universitaire)
-        if semestres_etudiant.exists():
-            semestre_actuel = semestres_etudiant.latest('libelle')
-            etudiant.semestre_actuel = semestre_actuel
-        else:
-            etudiant.semestre_actuel = None
-
+        # Récupérer le semestre actuel de chaque étudiant dans l'année universitaire
+        for etudiant in etudiants:
+            semestres_etudiant = etudiant.semestres.filter(
+                annee_universitaire=annee_universitaire)
+            if semestres_etudiant.exists():
+                semestre_actuel = semestres_etudiant.latest('libelle')
+                etudiant.semestre_actuel = semestre_actuel
+            else:
+                etudiant.semestre_actuel = None
+    except Exception as e:
+        etudiants=[]
+        etudiants_insuffisants=[]
     # Construire le contexte pour le rendu de la page
     data = {
         'etudiants': etudiants,
@@ -1377,7 +1384,7 @@ def releve_notes_details_all(request, id_semestre):
 
     semestre = get_object_or_404(Semestre, id=id_semestre)
     etudiants = semestre.etudiant_set.all()
-    etudiants  = etudiants.order_by('nom')
+    etudiants = etudiants.order_by('nom')
     # nbre_colonnes = 2
 
     colonnes = '|c|c|'
@@ -1392,8 +1399,6 @@ def releve_notes_details_all(request, id_semestre):
 
     # récupération du nombre de matières par ue
 
-    
-
     context = {}
     context['semestre'] = semestre
     context['annee'] = semestre.annee_universitaire
@@ -1407,24 +1412,25 @@ def releve_notes_details_all(request, id_semestre):
 
         colonnes_partie_1 = '|l|l|'
         colonnes_partie_1 += 'c|' * 6
-        for i in range(0,3):
+        for i in range(0, 3):
             nbre_matieres_partie_1 = len(semestre_ues[i].matiere_set.all())
             colonnes_partie_1 += 'c|' * nbre_matieres_partie_1
             nbre_colonnes_partie_1 += nbre_matieres_partie_1
 
         lignes_releve_partie_1 = []
-        
+
         for etudiant in etudiants:
             ligne = {}
             ligne['etudiant'] = etudiant
             ues = []
-            for i in range(0,3):
+            for i in range(0, 3):
                 matieres = []
                 nbre_matieres_ue = len(semestre_ues[i].matiere_set.all())
                 for matiere in semestre_ues[i].matiere_set.all():
                     matieres.append({'matiere': matiere, 'moyenne_matiere': round(
-                    etudiant.moyenne_etudiant_matiere(matiere, semestre)[0], 2)})
-                ues.append({'ue': semestre_ues[i], 'moyenne': round(etudiant.moyenne_etudiant_ue(semestre_ues[i], semestre)[0], 2), 'matieres_ue': matieres, 'nbre_matieres': nbre_matieres_ue + 2, 'a_valide': etudiant.moyenne_etudiant_ue(semestre_ues[i], semestre)[1]})
+                        etudiant.moyenne_etudiant_matiere(matiere, semestre)[0], 2)})
+                ues.append({'ue': semestre_ues[i], 'moyenne': round(etudiant.moyenne_etudiant_ue(semestre_ues[i], semestre)[
+                           0], 2), 'matieres_ue': matieres, 'nbre_matieres': nbre_matieres_ue + 2, 'a_valide': etudiant.moyenne_etudiant_ue(semestre_ues[i], semestre)[1]})
             ligne['ues'] = ues
             lignes_releve_partie_1.append(ligne)
 
@@ -1436,11 +1442,9 @@ def releve_notes_details_all(request, id_semestre):
             'nbre_lignes': len(lignes_releve_partie_1)
         }
 
-
         # deuxième partie
 
         if nbre_ues > 3:
-
 
             nbre_colonnes_partie_2 = 3
 
@@ -1450,7 +1454,7 @@ def releve_notes_details_all(request, id_semestre):
                 nbre_matieres_partie_2 = len(semestre_ues[i].matiere_set.all())
                 colonnes_partie_2 += 'c|' * nbre_matieres_partie_2
                 nbre_colonnes_partie_2 += nbre_matieres_partie_2
-               
+
             lignes_releve_partie_2 = []
             for etudiant in etudiants:
                 ligne = {}
@@ -1462,33 +1466,23 @@ def releve_notes_details_all(request, id_semestre):
                     credits_semestre = -1
                     for matiere in semestre_ues[i].matiere_set.all():
                         matieres.append({'matiere': matiere, 'moyenne_matiere': round(
-                        etudiant.moyenne_etudiant_matiere(matiere, semestre)[0], 2)})
-                        credits_semestre = etudiant.credits_obtenus_semestre(semestre)
-                    ues.append({'ue': semestre_ues[i], 'moyenne': round(etudiant.moyenne_etudiant_ue(semestre_ues[i], semestre)[0], 2), 'matieres_ue': matieres, 'nbre_matieres': nbre_matieres_ue + 2, 'a_valide': etudiant.moyenne_etudiant_ue(semestre_ues[i], semestre)[1], 'credits_semestre': credits_semestre})
+                            etudiant.moyenne_etudiant_matiere(matiere, semestre)[0], 2)})
+                        credits_semestre = etudiant.credits_obtenus_semestre(
+                            semestre)
+                    ues.append({'ue': semestre_ues[i], 'moyenne': round(etudiant.moyenne_etudiant_ue(semestre_ues[i], semestre)[0], 2), 'matieres_ue': matieres,
+                               'nbre_matieres': nbre_matieres_ue + 2, 'a_valide': etudiant.moyenne_etudiant_ue(semestre_ues[i], semestre)[1], 'credits_semestre': credits_semestre})
                 ligne['ues'] = ues
                 lignes_releve_partie_2.append(ligne)
 
             context['partie_2'] = {
                 'nbre_ues': nbre_ues - 3,
-                'nbre_colonnes': nbre_colonnes_partie_2 + (nbre_ues - 3) * 2 ,
+                'nbre_colonnes': nbre_colonnes_partie_2 + (nbre_ues - 3) * 2,
                 'colonnes': colonnes_partie_2,
                 'lignes': lignes_releve_partie_2,
                 'nbre_lignes': len(lignes_releve_partie_2)
             }
-        
 
-    #if nbre_ues > 6 and nbre_ues < 13:
-
-
-
-
-
-
-
-
-
-
-
+    # if nbre_ues > 6 and nbre_ues < 13:
 
     # for ue in semestre_ues:
     #     # ajout des colonnes correspondant aux matières
@@ -1541,6 +1535,9 @@ def releve_notes_details_all(request, id_semestre):
         response = HttpResponse(pdf_preview, content_type='application/pdf')
         response['Content-Disposition'] = 'inline;filename=pdf_file.pdf'
         return response
+
+
+
 
 
 @login_required(login_url=settings.LOGIN_URL)
