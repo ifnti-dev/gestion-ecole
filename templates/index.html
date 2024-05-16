@@ -36,7 +36,7 @@
 
 
 
-        <link rel="stylesheet" href="{% static 'assets/css/ifnti.css' %}">
+        <!-- <link rel="stylesheet" href="{% static 'assets/css/ifnti.css' %}"> -->
         <link rel="stylesheet" id="css-main" href="{% static 'assets/css/oneui.css' %}">
         <title>GESTION IFNTI</title>
         <style>
@@ -186,7 +186,7 @@
                             <h1 class="flex-sm-fill h3 my-2">
                                 {% block content_title %} {% endblock content_title %}<small
                                     class="d-block d-sm-inline-block mt-2 mt-sm-0 font-size-base font-w400 text-muted">{% block content_title_description %}
-                                    {% endblock content_title_description %}</small>
+                                {% endblock content_title_description %}</small>
                             </h1>
                             <div>
                                 {% block backURl %} {% endblock backURl %}

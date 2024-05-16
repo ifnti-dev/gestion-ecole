@@ -29,13 +29,13 @@ paperheight=21cm
 \newcommand\BackgroundPicCorps{
 \put(0,0){
 \parbox[b][\paperheight]{\paperwidth}{
-\includegraphics[width=\paperwidth,height=\paperheight]{carte_graphique6.png}
+\includegraphics[width=\paperwidth,height=\paperheight]{\VAR{image_path}carte_graphique6.png}
 }}}
 
 \newcommand\BackgroundPicVerso{
 \put(0,0){
 \parbox[b][\paperheight]{\paperwidth}{
-\includegraphics[width=\paperwidth,height=\paperheight]{carte_graphique_verso2.png}
+\includegraphics[width=\paperwidth,height=\paperheight]{\VAR{image_path}carte_graphique_verso2.png}
 }}}
 
 \begin{document}
@@ -51,15 +51,15 @@ paperheight=21cm
 %\resizebox{0.75\textwidth}{!}{
 \begin{tabular}{lll}
 
-\multirow {8}{7cm}{\includegraphics[width=7cm]{images_cartes/\VAR{etudiant.id}.png}}
+\multirow {8}{7cm}{\includegraphics[width=7cm]{\VAR{image_path}images_cartes/\VAR{etudiant.contact}.png}}
    		& N\textdegree étudiant : & \VAR{ etudiant.id } \\ 
   		& Nom : & \VAR{ etudiant.nom } \\ 
  		& Prénom :  & \VAR{ etudiant.prenom }\\ 
- 		& Né le : & \VAR{ date_naissance }\\ 
+ 		& Né le : & \VAR{ other_information.date_naissance }\\ 
  		& A: & \VAR{ etudiant.lieunaissance } \\ 
  		& Sexe : & \VAR{ etudiant.sexe } \\ 
- 		& Adresse : & \VAR{ etudiant.adresse }\\ 
- 		& Tél : & \VAR{ etudiant.contact}\\ 
+ 		& Adresse : & \VAR{ other_information.adresse }\\ 
+ 		& Tél : & \VAR{ other_information.tel}\\ 
 
 \end{tabular} %}
 %\end{table}
@@ -81,10 +81,8 @@ Informatique des organisations\\
 Sokodé, le \today\\
 \vspace{0cm}
 Le Directeur des études\\
-\vspace{-0.9cm}
-
-
-\vspace{3.5cm}
+\includegraphics[scale=0.15]{\VAR{image_path}koumoi_signature.png}\\
+\vspace{0cm}
 Sani KOUMOI MOUHAMAM\\
 \end{center}
 \end{minipage}
@@ -114,7 +112,7 @@ Site web: https://www.ifnti.com\\
 %\vfill
 
 \noindent
-Année Academique {\color{blue} \VAR{annee}} \hspace{1cm} Niveau {\color{blue} \VAR{niveau}}\\
+Année Academique {\color{blue} 2023-2024} \hspace{1cm} Niveau {\color{blue} \VAR{other_information.niveau}}\\
 
 \vspace{-0.25cm}
 %\vfill
@@ -128,7 +126,7 @@ Année Academique {\color{blue} \VAR{annee}} \hspace{1cm} Niveau {\color{blue} \
 
 \noindent
 \begin{tabular}{ccc}
-Personne à prévenir : & \VAR{etudiant.personnePrevenir} & (\VAR{etudiant.contact})
+Personne à prévenir : & \VAR{other_information.person_a_prev} 
 \end{tabular}
 
 \vspace{1cm}

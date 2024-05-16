@@ -4,10 +4,10 @@ from django import forms
 from django.http import HttpResponse, HttpResponseForbidden, HttpResponseNotFound
 from main.pdfMaker import generate_pdf
 from django.conf import settings
-from main.forms import EnseignantForm, EtudiantForm, EvaluationForm, InformationForm, ProgrammeForm, NoteForm, TuteurForm, UeForm, MatiereForm
+from main.forms import EnseignantForm, EtudiantForm, EvaluationForm, InformationForm, PersonnelForm, ProgrammeForm, NoteForm, TuteurForm, UeForm, MatiereForm
 from scripts.mail_utils import send_email_task
 from scripts.utils import load_notes_from_evaluation, pre_load_evaluation_template_data
-from .models import Domaine, Enseignant, Evaluation, DirecteurDesEtudes, Personnel, Information, Matiere, Etudiant, Competence, Note, Comptable, Parcours, Programme, Semestre, Ue, AnneeUniversitaire, Tuteur
+from .models import Domaine, Enseignant, Evaluation, Personnel, Information, Matiere, Etudiant, Competence, Note, Parcours, Programme, Semestre, Ue, AnneeUniversitaire, Tuteur
 from cahier_de_texte.models import Seance
 from planning.models import Planning, SeancePlannifier
 
@@ -15,6 +15,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from main.helpers import *
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth import authenticate, login, logout, get_user_model
+from django.contrib.auth.models import Group
 from .resources import EtudiantResource, EnseignantResource
 from tablib import Dataset
 from .custom_permission_required import evaluation_permission, evaluation_upload_permission, show_recapitulatif_note_permission
@@ -43,55 +44,63 @@ def dashboard(request):
     annee_selectionnee = get_object_or_404(
         AnneeUniversitaire, pk=id_annee_selectionnee)
     semestres = annee_selectionnee.get_semestres()
-    if request.user.groups.all().first().name in ['directeur_des_etudes', 'comptable','secretaire']:
+    if request.user.groups.all().first().name in ['directeur_des_etudes', 'comptable', 'secretaire']:
         tous_les_etudiants = Etudiant.objects.all()
-        etudiants = tous_les_etudiants.filter(semestres__in=semestres).distinct()
-        #etudiants_sans_context = 
-        
+        etudiants = tous_les_etudiants.filter(
+            semestres__in=semestres).distinct()
+        # etudiants_sans_context =
+
         tous_les_enseignants = Enseignant.objects.all()
-        enseignants = tous_les_enseignants.filter(matiere__ue__programme__semestre__in=semestres).distinct()
-        
+        enseignants = tous_les_enseignants.filter(
+            matiere__ue__programme__semestre__in=semestres).distinct()
+
         toutes_les_matieres = Matiere.objects.all()
-        matieres = toutes_les_matieres.filter(ue__programme__semestre__in=semestres).distinct()
-        
+        matieres = toutes_les_matieres.filter(
+            ue__programme__semestre__in=semestres).distinct()
+
         toutes_les_ues = Ue.objects.all()
-        ues = toutes_les_ues.filter(programme__semestre__in=semestres).distinct()
+        ues = toutes_les_ues.filter(
+            programme__semestre__in=semestres).distinct()
         ues_non_utilise = toutes_les_ues.filter(programme=None)
-        
+
         data = {
             'nb_etudiants': etudiants.count(),
             'nb_enseignants': enseignants.count(),
             'nb_matieres': matieres.count(),
             'nb_ues': ues.count(),
-            'ues_non_utilise' : ues_non_utilise,
-            'nb_ues_non_utilise' : ues_non_utilise.count(),
+            'ues_non_utilise': ues_non_utilise,
+            'nb_ues_non_utilise': ues_non_utilise.count(),
         }
 
         return render(request, 'dashboard.html', context=data)
-    
-    elif request.user.groups.all().first().name =='etudiant' :
+
+    elif request.user.groups.all().first().name == 'etudiant':
         etudiant = get_object_or_404(Etudiant, user=request.user)
-        semestres=etudiant.semestres.filter(annee_universitaire=annee_selectionnee)
-        event_data=[]
+        semestres = etudiant.semestres.filter(
+            annee_universitaire=annee_selectionnee)
+        event_data = []
         for semestre in semestres:
             planning = Planning.objects.filter(semestre=semestre)
-            
-            for plan in planning :
-                seances=SeancePlannifier.objects.filter(planning=plan)
-                event_data = [{'title': seance.intitule, 'start': seance.date_heure_debut , 'end':seance.date_heure_fin ,'url': '/planning/seance/' + str(seance.id) + ''} for seance in seances]
-                event_data = json.dumps(event_data, default=datetime_serializer)
 
-        context={'event_data':event_data}
+            for plan in planning:
+                seances = SeancePlannifier.objects.filter(planning=plan)
+                event_data = [{'title': seance.intitule, 'start': seance.date_heure_debut,
+                               'end': seance.date_heure_fin, 'url': '/planning/seance/' + str(seance.id) + ''} for seance in seances]
+                event_data = json.dumps(
+                    event_data, default=datetime_serializer)
+
+        context = {'event_data': event_data}
         return render(request, 'dashboard.html', context)
 
-    elif request.user.groups.all().first().name =='enseignant' :
+    elif request.user.groups.all().first().name == 'enseignant':
 
         enseignant = get_object_or_404(Enseignant, user=request.user)
 
-        seances=SeancePlannifier.objects.filter(professeur=enseignant)
-        event_data = [{'title': seance.intitule, 'start': seance.date_heure_debut , 'end':seance.date_heure_fin ,'url': '/planning/seance/' + str(seance.id) + ''} for seance in seances]
+        seances = SeancePlannifier.objects.filter(professeur=enseignant)
+        event_data = [{'title': seance.intitule, 'start': seance.date_heure_debut,
+                       'end': seance.date_heure_fin, 'url': '/planning/seance/' + str(seance.id) + ''} for seance in seances]
         event_data = json.dumps(event_data, default=datetime_serializer)
-        context={'event_data':event_data}
+        context = {'event_data': event_data}
         return render(request, 'dashboard.html', context)
 
 
@@ -102,9 +111,10 @@ def change_annee_universitaire(request):
         :param request: L'objet de requête Django.
         :return: Une redirection HTTP sur l'URL précédente avec l'année scolaire selectionnée .
     """
-    
+
     if request.POST:
-        request.session["id_annee_selectionnee"] = request.POST.get('annee_universitaire')
+        request.session["id_annee_selectionnee"] = request.POST.get(
+            'annee_universitaire')
         return redirect(request.POST.get('origin_path'))
 
 
@@ -152,7 +162,6 @@ def etudiants(request):
         if etat_id != "" and etat_id != "__all__":
             etat_id = int(etat_id)
             etats_selected = [bool(etat_id)]
-            
 
     # Logique pour filtrer les étudiants en fonction du rôle de l'utilisateur
     if role:
@@ -160,13 +169,13 @@ def etudiants(request):
             niveau = "Mes camarades"
             if role.name == "enseignant":
                 niveau = "Nos Étudiants"
-            
+
         elif role.name in ["directeur_des_etudes", "secretaire", "comptable"]:
             niveau = "Nos Étudiants"
-            
+
         elif role.name == "comptable":
             niveau = "Nos Étudiants"
-            
+
         etudiants = Etudiant.objects.filter(
             is_active__in=etats_selected, semestres__in=semestres_selected).distinct()
 
@@ -175,7 +184,7 @@ def etudiants(request):
         semestres_selected = semestres_selected.get()
     except:
         semestres_selected = semestres.first()
-        
+
     etats_selected = {'id': etat_id}
 
     # Construire une liste temporaire d'étudiants avec des informations de niveau
@@ -196,7 +205,6 @@ def etudiants(request):
 
     # Rendre la page avec le contexte
     return render(request, 'etudiants/etudiants.html', context=data)
-
 
 
 @login_required(login_url=settings.LOGIN_URL)
@@ -277,17 +285,17 @@ def create_etudiant(request, id=0):
         # Gestion de la requête POST
         if id == 0:
             # Création d'un nouvel étudiant à partir des données POST
-            form = EtudiantForm(request.POST)
+            form = EtudiantForm(request.POST, request.FILES)
         else:
             # Modification d'un étudiant existant avec les données POST
             etudiant = Etudiant.objects.get(pk=id)
-            form = EtudiantForm(request.POST, instance=etudiant)
+            form = EtudiantForm(request.POST, request.FILES, instance=etudiant)
 
         if form.is_valid():
             # Sauvegarde de l'étudiant pour générer un ID
             etudiant = form.save(commit=False)
             etudiant.save()
-          
+
             # Trouver l'année universitaire en cours
             annee_universitaire_courante = AnneeUniversitaire.objects.get(
                 annee_courante=True)
@@ -354,31 +362,38 @@ def liste_etudiants_par_semestre(request, id_annee_selectionnee):
     if 'semestre' in request.GET:
         semestre_id = request.GET.get('semestre')
         semestres_selected = semestres.filter(pk=semestre_id)
+    
+    try:
+        programme = Programme.objects.get(semestre=semestres_selected[0])
+  
 
-    # Filtrer les étudiants en fonction des semestres sélectionnés et qui sont actifs
-    etudiants = Etudiant.objects.filter(
-        semestres__in=semestres_selected, is_active=True).distinct()
+        # Filtrer les étudiants en fonction des semestres sélectionnés et qui sont actifs
+        etudiants = Etudiant.objects.filter(
+            semestres__in=semestres_selected, is_active=True).distinct()
 
-    # Initialiser une liste pour les étudiants insuffisants
-    etudiants_insuffisants = []
+        # Initialiser une liste pour les étudiants insuffisants
+        etudiants_insuffisants = []
+        print("---------------------------------------------------")
+        print(etudiants)
+        # Calculer les crédits obtenus par chaque étudiant pour le semestre sélectionné
+        for etudiant in etudiants:
+            credits_obtenus = etudiant.credits_obtenus_semestre(
+                programme=programme)  # Utiliser le premier semestre sélectionné
+            # Créer un attribut pour stocker les crédits obtenus
+            etudiant.credits_obtenus = credits_obtenus
 
-    # Calculer les crédits obtenus par chaque étudiant pour le semestre sélectionné
-    for etudiant in etudiants:
-        credits_obtenus = etudiant.credits_obtenus_semestre(
-            semestres_selected[0])  # Utiliser le premier semestre sélectionné
-        # Créer un attribut pour stocker les crédits obtenus
-        etudiant.credits_obtenus = credits_obtenus
-
-    # Récupérer le semestre actuel de chaque étudiant dans l'année universitaire
-    for etudiant in etudiants:
-        semestres_etudiant = etudiant.semestres.filter(
-            annee_universitaire=annee_universitaire)
-        if semestres_etudiant.exists():
-            semestre_actuel = semestres_etudiant.latest('libelle')
-            etudiant.semestre_actuel = semestre_actuel
-        else:
-            etudiant.semestre_actuel = None
-
+        # Récupérer le semestre actuel de chaque étudiant dans l'année universitaire
+        for etudiant in etudiants:
+            semestres_etudiant = etudiant.semestres.filter(
+                annee_universitaire=annee_universitaire)
+            if semestres_etudiant.exists():
+                semestre_actuel = semestres_etudiant.latest('libelle')
+                etudiant.semestre_actuel = semestre_actuel
+            else:
+                etudiant.semestre_actuel = None
+    except Exception as e:
+        etudiants=[]
+        etudiants_insuffisants=[]
     # Construire le contexte pour le rendu de la page
     data = {
         'etudiants': etudiants,
@@ -570,27 +585,28 @@ def matieres(request):
     :param request: L'objet de requête Django.
     :return: Une réponse HTTP redirigeant vers la liste des tuteurs après la création ou la modification.
     """
-   
+
     id_annee_selectionnee = request.session.get("id_annee_selectionnee")
-    annee_universitaire = get_object_or_404(AnneeUniversitaire, pk=id_annee_selectionnee)
+    annee_universitaire = get_object_or_404(
+        AnneeUniversitaire, pk=id_annee_selectionnee)
     niveau = "IFNTI"
     semestres = annee_universitaire.semestre_set.all()
     semestres_selected = semestres
     ue_id = "-1"
-    
+
     if request.method == "POST":
         semestre_id = request.POST.get('semestre')
         ue_id = request.POST.get('ue')
-        if semestre_id != "" :
+        if semestre_id != "":
             semestres_selected = semestres.filter(pk=semestre_id)
-    
+
     programme = semestres_selected[0].programme_set.first()
 
     if programme:
         ues = programme.ues.all().prefetch_related('matiere_set')
     else:
         ues = []
-    
+
     matieres = set()
     matieres_ids = ""
     if ue_id == "-1":
@@ -598,7 +614,8 @@ def matieres(request):
             _matieres = ue.matiere_set.all()
             for matiere in _matieres:
                 matieres_ids += f"{matiere.id};"
-                matiere.nb_evaluations = matiere.count_evaluations(annee_universitaire, semestres_selected)
+                matiere.nb_evaluations = matiere.count_evaluations(
+                    annee_universitaire, semestres_selected)
             matieres.update(_matieres)
         ue = None
         request.session['matieres'] = matieres_ids
@@ -607,12 +624,13 @@ def matieres(request):
         if ue:
             matieres = ue.matiere_set.all()
             for matiere in matieres:
-                matiere.nb_evaluations = matiere.count_evaluations(annee_universitaire, semestres_selected)        
+                matiere.nb_evaluations = matiere.count_evaluations(
+                    annee_universitaire, semestres_selected)
     try:
         semestres_selected = semestres_selected.get()
     except:
         semestres_selected = semestres_selected[0]
-        
+
     try:
         selected_ue = ue.id
     except:
@@ -626,7 +644,7 @@ def matieres(request):
         'selected_semestre': semestres_selected,
         'selected_ue': selected_ue,
     }
-    
+
     return render(request, 'matieres/matieres.html', context=data)
 
 
@@ -662,8 +680,10 @@ def create_matiere(request, id=0):
     :return: Une réponse HTTP redirigeant vers le formulaire de crétion ou de modification d'une matière.
     """
     id_annee_selectionnee = request.session.get('id_annee_selectionnee')
-    annee_universitaire = get_object_or_404(AnneeUniversitaire, pk=id_annee_selectionnee)
-    ues = Ue.objects.filter(programme__semestre__annee_universitaire=annee_universitaire)
+    annee_universitaire = get_object_or_404(
+        AnneeUniversitaire, pk=id_annee_selectionnee)
+    ues = Ue.objects.filter(
+        programme__semestre__annee_universitaire=annee_universitaire)
     if request.method == "GET":
         if id == 0:
             form = MatiereForm()
@@ -683,18 +703,22 @@ def create_matiere(request, id=0):
             form = MatiereForm(request.POST, instance=matiere)
             form.set_ue(ues)
             message = "a été mis a jour"
-            
+
         if form.is_valid():
             matiere = form.save()
-            messages.success(request, f"La matière {matiere.libelle} {message} !")
+            messages.success(
+                request, f"La matière {matiere.libelle} {message} !")
             return redirect('main:matieres_etudiant')
         return render(request, 'matieres/create_matiere.html', {'form': form})
 
+
 def delete_matiere(request, id_matiere):
     matiere = get_object_or_404(Matiere, pk=id_matiere)
-    messages.success(request, f"La matière {matiere.libelle} a été supprimer !")
+    messages.success(
+        request, f"La matière {matiere.libelle} a été supprimer !")
     matiere.delete()
     return redirect('main:matieres_etudiant')
+
 
 def ues_etudiants(request):
     """
@@ -740,14 +764,16 @@ def ues_etudiants(request):
 def ues(request):
     """
     Affiche la liste des Unités d'Enseignement (UE) associées à l'année universitaire courante.
-    
+
     :param request: L'objet de requête Django.
     :return: Une réponse HTTP avec la liste des UE pour l'année universitaire courante.
     """
     id_annee_selectionnee = request.session.get('id_annee_selectionnee')
-    annee_universitaire = get_object_or_404(AnneeUniversitaire, pk=id_annee_selectionnee)
+    annee_universitaire = get_object_or_404(
+        AnneeUniversitaire, pk=id_annee_selectionnee)
 
-    ues = Ue.objects.filter(programme__semestre__annee_universitaire=annee_universitaire)
+    ues = Ue.objects.filter(
+        programme__semestre__annee_universitaire=annee_universitaire)
 
     # Rendre la page avec la liste des UE pour l'année universitaire courante
     return render(request, 'ues/ues.html', {'ues': ues})
@@ -815,25 +841,6 @@ def create_ue(request, id=0):
             return redirect('main:ues')
 
 
-# @login_required(login_url=settings.LOGIN_URL)
-# @permission_required("main.view_etudiant")
-# def etudiants_par_niveau(request, niveau):
-#     semestres = set()
-#     if niveau == 1:
-#         semestres_names = ['S1', 'S2']
-#     elif niveau == 2:
-#         semestres_names = ['S3', 'S4']
-#     elif niveau == 3:
-#         semestres_names = ['S5', 'S6']
-
-#     etudiants, semestres = Etudiant.get_Ln(semestres=semestres_names)
-#     semestres = list(semestres)
-#     data = {}
-#     data['niveau'] = f'L{niveau}'
-#     if etudiants and semestres:
-#         data['etudiants'] = etudiants
-#         data['semestres'] = semestres
-#     return render(request, 'etudiants/listln.html', data)
 
 
 """
@@ -871,7 +878,7 @@ def carte_etudiant(request, id, niveau):
     etudiant = get_object_or_404(Etudiant, id=id)
     in_format = "%Y-%m-%d"
     out_format = "%d-%m-%Y"
-   
+
     if etudiant.datenaissance:
         date_formatee = datetime.strptime(
             str(etudiant.datenaissance), in_format).strftime(out_format)
@@ -926,7 +933,7 @@ def carte_etudiant_all(request, niveau):
         etudiant.niveau, _ = etudiant.get_niveau_annee(annee_universitaire)
         in_format = "%Y-%m-%d"
         out_format = "%d-%m-%Y"
-        
+
         if etudiant.datenaissance:
             date_formatee = datetime.strptime(
                 str(etudiant.datenaissance), in_format).strftime(out_format)
@@ -934,22 +941,20 @@ def carte_etudiant_all(request, niveau):
             date_formatee = 'None'
 
         etudiant.datenaissance = date_formatee
-    
-    nbre_pages = len(etudiants) // 9
 
+    nbre_pages = len(etudiants) // 9
 
     # ajout des étudiants dans le dictionnaire
     context = {'etudiants': etudiants, 'annee': str(
         annee_universitaire.annee) + '-' + str(annee_universitaire.annee + 1), 'niveau': "niveau",  'nbre_pages': nbre_pages}
-
-
 
     for etudiant in etudiants:
         latex_input = 'carte_etudiant'
         latex_ouput = 'generated_carte_etudiant'
         pdf_file = 'carte_etudiant_' + str(etudiant.id)
 
-        temp_context = {'etudiant': etudiant, 'niveau': niveau, 'annee': str(annee_universitaire.annee) + '-' + str(annee_suiv)}
+        temp_context = {'etudiant': etudiant, 'niveau': niveau, 'annee': str(
+            annee_universitaire.annee) + '-' + str(annee_suiv)}
 
         # génération du pdf
         generate_pdf(temp_context, latex_input, latex_ouput, pdf_file)
@@ -967,8 +972,8 @@ def carte_etudiant_all(request, niveau):
         response = HttpResponse(pdf_preview, content_type='application/pdf')
         response['Content-Disposition'] = 'inline;filename=pdf_file.pdf'
         return response
-
-
+    
+  
 @login_required(login_url=settings.LOGIN_URL)
 # methode générant le diplome de l'étudiant
 def diplome_etudiant(request, id):
@@ -980,15 +985,12 @@ def diplome_etudiant(request, id):
     :return: Une réponse HTTP affichant le pdf du diplome étudiant généré.
     """
 
-
     if request.user.groups.all().first().name not in ['directeur_des_etudes']:
         return render(request, 'errors_pages/403.html')
 
-
     date_deliberation = datetime.now()
-    date_deliberation = str(date_deliberation.day) + '-' + str(date_deliberation.month) + '-' + str(date_deliberation.year)
-    
-
+    date_deliberation = str(date_deliberation.day) + '-' + \
+        str(date_deliberation.month) + '-' + str(date_deliberation.year)
 
     etudiant = get_object_or_404(Etudiant, id=id)
     in_format = "%Y-%m-%d"
@@ -999,7 +1001,7 @@ def diplome_etudiant(request, id):
             str(etudiant.datenaissance), in_format).strftime(out_format)
     else:
         date_formatee = 'None'
-
+    etudiant.datenaissance = date_formatee
 
     id_annee_selectionnee = request.session["id_annee_selectionnee"]
     annee_universitaire = get_object_or_404(
@@ -1042,8 +1044,8 @@ def diplome_etudiant_all(request):
     in_format = "%Y-%m-%d"
     out_format = "%d-%m-%Y"
     date_deliberation = datetime.now()
-    date_deliberation = date_deliberation.day() + '-' + date_deliberation.month() + '-' + date_deliberation.year()
-    
+    date_deliberation = date_deliberation.day() + '-' + date_deliberation.month() + \
+        '-' + date_deliberation.year()
 
     # récupération des étudiants de chaque semestres
     for semestre in semestres:
@@ -1101,7 +1103,7 @@ def certificat_scolaire(request, id, niveau):
 
     in_format = "%Y-%m-%d"
     out_format = "%d-%m-%Y"
-    
+
     if etudiant.datenaissance:
         date_formatee = datetime.strptime(
             str(etudiant.datenaissance), in_format).strftime(out_format)
@@ -1238,7 +1240,7 @@ def releve_notes_semestre(request, id_semestre):
                 {'ue': ue, 'moyenne': round(
                     moyenne, 2), 'validation': validation, 'anneeValidation': anneeValidation, 'matieres_libelles': matieres_libelles}
             )
-            
+
             # calcul de nombre de crédits obtenus
             if validation:
                 credits_obtenus += ue.nbreCredits
@@ -1377,7 +1379,7 @@ def releve_notes_details_all(request, id_semestre):
 
     semestre = get_object_or_404(Semestre, id=id_semestre)
     etudiants = semestre.etudiant_set.all()
-    etudiants  = etudiants.order_by('nom')
+    etudiants = etudiants.order_by('nom')
     # nbre_colonnes = 2
 
     colonnes = '|c|c|'
@@ -1392,8 +1394,6 @@ def releve_notes_details_all(request, id_semestre):
 
     # récupération du nombre de matières par ue
 
-    
-
     context = {}
     context['semestre'] = semestre
     context['annee'] = semestre.annee_universitaire
@@ -1407,24 +1407,25 @@ def releve_notes_details_all(request, id_semestre):
 
         colonnes_partie_1 = '|l|l|'
         colonnes_partie_1 += 'c|' * 6
-        for i in range(0,3):
+        for i in range(0, 3):
             nbre_matieres_partie_1 = len(semestre_ues[i].matiere_set.all())
             colonnes_partie_1 += 'c|' * nbre_matieres_partie_1
             nbre_colonnes_partie_1 += nbre_matieres_partie_1
 
         lignes_releve_partie_1 = []
-        
+
         for etudiant in etudiants:
             ligne = {}
             ligne['etudiant'] = etudiant
             ues = []
-            for i in range(0,3):
+            for i in range(0, 3):
                 matieres = []
                 nbre_matieres_ue = len(semestre_ues[i].matiere_set.all())
                 for matiere in semestre_ues[i].matiere_set.all():
                     matieres.append({'matiere': matiere, 'moyenne_matiere': round(
-                    etudiant.moyenne_etudiant_matiere(matiere, semestre)[0], 2)})
-                ues.append({'ue': semestre_ues[i], 'moyenne': round(etudiant.moyenne_etudiant_ue(semestre_ues[i], semestre)[0], 2), 'matieres_ue': matieres, 'nbre_matieres': nbre_matieres_ue + 2, 'a_valide': etudiant.moyenne_etudiant_ue(semestre_ues[i], semestre)[1]})
+                        etudiant.moyenne_etudiant_matiere(matiere, semestre)[0], 2)})
+                ues.append({'ue': semestre_ues[i], 'moyenne': round(etudiant.moyenne_etudiant_ue(semestre_ues[i], semestre)[
+                           0], 2), 'matieres_ue': matieres, 'nbre_matieres': nbre_matieres_ue + 2, 'a_valide': etudiant.moyenne_etudiant_ue(semestre_ues[i], semestre)[1]})
             ligne['ues'] = ues
             lignes_releve_partie_1.append(ligne)
 
@@ -1436,11 +1437,9 @@ def releve_notes_details_all(request, id_semestre):
             'nbre_lignes': len(lignes_releve_partie_1)
         }
 
-
         # deuxième partie
 
         if nbre_ues > 3:
-
 
             nbre_colonnes_partie_2 = 3
 
@@ -1450,7 +1449,7 @@ def releve_notes_details_all(request, id_semestre):
                 nbre_matieres_partie_2 = len(semestre_ues[i].matiere_set.all())
                 colonnes_partie_2 += 'c|' * nbre_matieres_partie_2
                 nbre_colonnes_partie_2 += nbre_matieres_partie_2
-               
+
             lignes_releve_partie_2 = []
             for etudiant in etudiants:
                 ligne = {}
@@ -1462,33 +1461,23 @@ def releve_notes_details_all(request, id_semestre):
                     credits_semestre = -1
                     for matiere in semestre_ues[i].matiere_set.all():
                         matieres.append({'matiere': matiere, 'moyenne_matiere': round(
-                        etudiant.moyenne_etudiant_matiere(matiere, semestre)[0], 2)})
-                        credits_semestre = etudiant.credits_obtenus_semestre(semestre)
-                    ues.append({'ue': semestre_ues[i], 'moyenne': round(etudiant.moyenne_etudiant_ue(semestre_ues[i], semestre)[0], 2), 'matieres_ue': matieres, 'nbre_matieres': nbre_matieres_ue + 2, 'a_valide': etudiant.moyenne_etudiant_ue(semestre_ues[i], semestre)[1], 'credits_semestre': credits_semestre})
+                            etudiant.moyenne_etudiant_matiere(matiere, semestre)[0], 2)})
+                        credits_semestre = etudiant.credits_obtenus_semestre(
+                            semestre)
+                    ues.append({'ue': semestre_ues[i], 'moyenne': round(etudiant.moyenne_etudiant_ue(semestre_ues[i], semestre)[0], 2), 'matieres_ue': matieres,
+                               'nbre_matieres': nbre_matieres_ue + 2, 'a_valide': etudiant.moyenne_etudiant_ue(semestre_ues[i], semestre)[1], 'credits_semestre': credits_semestre})
                 ligne['ues'] = ues
                 lignes_releve_partie_2.append(ligne)
 
             context['partie_2'] = {
                 'nbre_ues': nbre_ues - 3,
-                'nbre_colonnes': nbre_colonnes_partie_2 + (nbre_ues - 3) * 2 ,
+                'nbre_colonnes': nbre_colonnes_partie_2 + (nbre_ues - 3) * 2,
                 'colonnes': colonnes_partie_2,
                 'lignes': lignes_releve_partie_2,
                 'nbre_lignes': len(lignes_releve_partie_2)
             }
-        
 
-    #if nbre_ues > 6 and nbre_ues < 13:
-
-
-
-
-
-
-
-
-
-
-
+    # if nbre_ues > 6 and nbre_ues < 13:
 
     # for ue in semestre_ues:
     #     # ajout des colonnes correspondant aux matières
@@ -1541,6 +1530,9 @@ def releve_notes_details_all(request, id_semestre):
         response = HttpResponse(pdf_preview, content_type='application/pdf')
         response['Content-Disposition'] = 'inline;filename=pdf_file.pdf'
         return response
+
+
+
 
 
 @login_required(login_url=settings.LOGIN_URL)
@@ -1616,16 +1608,17 @@ def recapitulatifs_des_notes_par_etudiant(request, id_semestre):
     }
     return render(request, 'evaluations/recapitulatifs_des_notes_etudiant.html', context=data)
 
+
 @show_recapitulatif_note_permission("show_recapitulatif")
 def recapitulatifs_des_notes_par_matiere(request, id_semestre, id_matiere):
     id_annee = request.session.get("id_annee_selectionnee")
     annee_selectionnee = get_object_or_404(AnneeUniversitaire, pk=id_annee)
-    
+
     semestre = get_object_or_404(Semestre, pk=id_semestre)
-    
+
     if semestre.annee_universitaire.id == annee_selectionnee.id:
         matiere = get_object_or_404(Matiere, pk=id_matiere)
-        
+
         etudiants = []
         _etudiants = semestre.etudiant_set.all()
         for etudiant in _etudiants:
@@ -1637,7 +1630,7 @@ def recapitulatifs_des_notes_par_matiere(request, id_semestre, id_matiere):
                 'moyenne': moyenne,
                 'a_valider': a_valider,
             })
-        
+
         data = {
             'evaluations': matiere.evaluation_set.all(),
             'etudiants': etudiants,
@@ -1646,8 +1639,9 @@ def recapitulatifs_des_notes_par_matiere(request, id_semestre, id_matiere):
         }
 
         return render(request, 'evaluations/recapitulatifs_des_notes.html', context=data)
-    
+
     return HttpResponseNotFound(render(request, 'errors_pages/404.html'))
+
 
 @login_required(login_url=settings.LOGIN_URL)
 def evaluations_etudiant(request, id_matiere, id_etudiant):
@@ -1660,13 +1654,14 @@ def evaluations_etudiant(request, id_matiere, id_etudiant):
     annee_selectionnee = get_object_or_404(
         AnneeUniversitaire, pk=id_annee_selectionnee)
     semestres_etudiants = list(etudiant.semestres.all())
-    semestres_matiere = matiere.get_semestres(annee_universitaire=annee_selectionnee, type="__all__")
+    semestres_matiere = matiere.get_semestres(
+        annee_universitaire=annee_selectionnee, type="__all__")
     etudiant_dans_classe = True
     if len(semestres_etudiants) > len(semestres_matiere):
         etudiant_dans_classe = semestres_matiere in semestres_etudiants
     else:
         etudiant_dans_classe = semestres_etudiants in semestres_matiere
-    
+
     if not etudiant_dans_classe:
         return HttpResponseForbidden(render(request, 'errors_pages/403.html'))
 
@@ -1685,7 +1680,7 @@ def evaluations_etudiant(request, id_matiere, id_etudiant):
             note = evaluation.note_set.get(etudiant=etudiant).valeurNote
         except Exception as e:
             note = -1
-        
+
         data = {
             'id': evaluation.id,
             'date': evaluation.date,
@@ -1701,11 +1696,11 @@ def evaluations_etudiant(request, id_matiere, id_etudiant):
     matiere_ids = matiere_ids.split(";")
     matiere_ids.remove('')
     matieres = Matiere.objects.filter(pk__in=matiere_ids)
-    
+
     data = {
         'annee_courrante': '',
         'matiere': matiere,
-        'matieres' : matieres,
+        'matieres': matieres,
         'evaluations': evaluations_dict,
         'semestres': semestres,
         'selected_semestre': semestre,
@@ -1731,26 +1726,28 @@ def evaluations(request, id_matiere):
             annee_universitaire=annee_selectionnee, libelle="S1")
         if semestre:
             semestre = semestre.get()
-            
-    
+
     if 'type' in request.GET and request.GET.get('type') in ['0', '1']:
         selected_type = request.GET.get('type')
         types_evaluations = [bool(int(selected_type))]
     else:
         selected_type = ""
         types_evaluations = [True, False]
-    
+
     semestres = [semestre]
 
-    evaluations = Evaluation.objects.filter(matiere=matiere, semestre__in=semestres, rattrapage__in=types_evaluations)
-    semestres = matiere.get_semestres(annee_universitaire=annee_selectionnee, type='__all__')
-    url_path = "/main/evaluations/upload/" + str(matiere.id) + "/" + str(semestre.id) + "/"
+    evaluations = Evaluation.objects.filter(
+        matiere=matiere, semestre__in=semestres, rattrapage__in=types_evaluations)
+    semestres = matiere.get_semestres(
+        annee_universitaire=annee_selectionnee, type='__all__')
+    url_path = "/main/evaluations/upload/" + \
+        str(matiere.id) + "/" + str(semestre.id) + "/"
 
     matiere_ids = request.session.get('matieres')
     matiere_ids = matiere_ids.split(";")
     matiere_ids.remove('')
     matieres = Matiere.objects.filter(pk__in=matiere_ids)
-    
+
     data = {
         'matiere': matiere,
         'matieres': matieres,
@@ -1761,6 +1758,7 @@ def evaluations(request, id_matiere):
         'url_path': url_path,
     }
     return render(request, 'evaluations/index.html', data)
+
 
 @login_required(login_url=settings.LOGIN_URL)
 @evaluation_permission('main.add_evaluation')
@@ -1777,7 +1775,8 @@ def createNotesByEvaluation(request, id_matiere, rattrapage, id_semestre):
         else:
             if not matiere.is_available_to_add_evaluation(semestre):
                 return redirect('main:evaluations', id_matiere=matiere.id)
-            etudiants = semestre.etudiant_set.filter(is_active=True).order_by("nom")
+            etudiants = semestre.etudiant_set.filter(
+                is_active=True).order_by("nom")
 
         NoteFormSet = forms.inlineformset_factory(
             parent_model=Evaluation,
@@ -1789,7 +1788,7 @@ def createNotesByEvaluation(request, id_matiere, rattrapage, id_semestre):
             validate_min=True,
         )
 
-        if request.method == 'POST' :
+        if request.method == 'POST':
             evaluation_form = EvaluationForm(request.POST)
             evaluation_form.set_max_ponderation(
                 matiere.ponderation_restante(semestre=semestre))
@@ -1809,15 +1808,16 @@ def createNotesByEvaluation(request, id_matiere, rattrapage, id_semestre):
                 a été saisi. Veuillez les consulter !
                 Merci.
                 """
-                
-                emails = [ etudiant.email for etudiant in etudiants ]
-                
+
+                emails = [etudiant.email for etudiant in etudiants]
+
                 send_email_task.delay(
                     subject="Assignation de note des étudiants",
                     message=message,
                     email_address=emails,
                 )
-                messages.success(request, f"L 'évaluation {evaluation.libelle} a été ajouter.")
+                messages.success(
+                    request, f"L 'évaluation {evaluation.libelle} a été ajouter.")
                 return redirect('main:evaluations', id_matiere=matiere.id)
         else:
             queryset = Note.objects.none()
@@ -1832,10 +1832,11 @@ def createNotesByEvaluation(request, id_matiere, rattrapage, id_semestre):
             'matiere': matiere,
             'ponderation_possible': matiere.ponderation_restante(semestre),
             'rattrapage': rattrapage,
-            'semestre' : semestre,
+            'semestre': semestre,
         }
         return render(request, 'notes/create_or_edit_note.html', context=data)
     return redirect('main:evaluations', id_matiere=matiere.id)
+
 
 @login_required(login_url=settings.LOGIN_URL)
 @evaluation_permission('main.edit_evaluation')
@@ -1847,7 +1848,7 @@ def editeNoteByEvaluation(request, id):
     evaluation = get_object_or_404(Evaluation, pk=id)
     matiere = evaluation.matiere
     semestre = evaluation.semestre
-    
+
     if evaluation.rattrapage:
         etudiants = matiere.get_etudiants_en_rattrapage()
         nouveaux_etudiants = []
@@ -1857,7 +1858,7 @@ def editeNoteByEvaluation(request, id):
         nouveaux_etudiants = etudiants.difference(etudiants_dans_evaluation)
         for etudiant in nouveaux_etudiants:
             Note.objects.create(evaluation=evaluation, etudiant=etudiant)
-    
+
     NoteFormSet = forms.inlineformset_factory(
         parent_model=Evaluation,
         model=Note,
@@ -1882,8 +1883,9 @@ def editeNoteByEvaluation(request, id):
             for note in notes:
                 note.evaluation = evaluation
                 note.save()
-                
-            messages.success(request, f"L 'évaluation {evaluation.libelle} a été mise à jours.")
+
+            messages.success(
+                request, f"L 'évaluation {evaluation.libelle} a été mise à jours.")
             return redirect('main:evaluations', id_matiere=matiere.id)
     else:
         evaluation_form = EvaluationForm(instance=evaluation)
@@ -1891,18 +1893,19 @@ def editeNoteByEvaluation(request, id):
         initial_etudiant_note_data = [
             {'etudiant': etudiant.id, 'etudiant_full_name': etudiant.full_name()} for etudiant in nouveaux_etudiants]
         notes_queryset = evaluation.note_set.all().order_by('etudiant__nom')
-        note_form_set = NoteFormSet(instance=evaluation, queryset=notes_queryset)
+        note_form_set = NoteFormSet(
+            instance=evaluation, queryset=notes_queryset)
         for form in note_form_set:
             etudiant = Etudiant.objects.filter(
                 id=form.initial['etudiant']).get()
             form.initial['etudiant_full_name'] = etudiant.full_name()
-        
+
     data = {
         'evaluation_form': evaluation_form,
         'notes_formset': note_form_set,
         'matiere': matiere,
         'rattrapage': evaluation.rattrapage,
-        'semestre' : evaluation.semestre,
+        'semestre': evaluation.semestre,
         'ponderation_possible': matiere.ponderation_restante(semestre=semestre)+evaluation.ponderation,
     }
 
@@ -1922,9 +1925,11 @@ def deleteEvaluation(request, id):
     """
     evaluation = get_object_or_404(Evaluation, pk=id)
     matiere = evaluation.matiere
-    messages.success(request, f"L 'évaluation {evaluation.libelle} a été suprimmer.")
+    messages.success(
+        request, f"L 'évaluation {evaluation.libelle} a été suprimmer.")
     evaluation.delete()
     return redirect('main:evaluations', id_matiere=matiere.id)
+
 
 @login_required(login_url=settings.LOGIN_URL)
 @evaluation_upload_permission('main.upload_evaluation')
@@ -1943,12 +1948,15 @@ def uploadEvaluation(request, id_matiere, id_semestre):
             except Exception as e:
                 messages.error(request, e)
         return redirect('main:evaluations', id_matiere=id_matiere)
-        
+
     file_name = pre_load_evaluation_template_data(matiere, semestre)
     with open(file_name, 'rb') as file:
-        response = HttpResponse(file.read(), content_type="application/force-download")
-        response['Content-Disposition'] = 'attachment; filename="{}"'.format(os.path.basename(file_name))
+        response = HttpResponse(
+            file.read(), content_type="application/force-download")
+        response['Content-Disposition'] = 'attachment; filename="{}"'.format(
+            os.path.basename(file_name))
         return response
+
 
 @login_required(login_url=settings.LOGIN_URL)
 def affectation_matieres_professeur(request):
@@ -1977,6 +1985,7 @@ def affectation_matieres_professeur(request):
         context = {'enseignants': enseignants_filtrer,
                    'matieres': matieres_filtrer}
         return render(request, "matieres/affectation_professeur.html", context)
+
 
 @login_required(login_url=settings.LOGIN_URL)
 def liste_matieres_professeur(request):
@@ -2090,7 +2099,6 @@ def edit_profil(request):
         user = request.user
         return render(request, "connexion/edit_profil.html", {"utilisateur": user, 'page_is_not_profil': False, })
 
-
 @login_required(login_url=settings.LOGIN_URL)
 def changer_mdp(request):
     old = request.POST.get("old_password")
@@ -2111,27 +2119,26 @@ def changer_mdp(request):
             "message": "Ancien mot de passe incorrect", "type": "erreur"}
     return render(request, "connexion/edit_profil.html", {"notification": notification,  'page_is_not_profil': False, })
 
-
 def login_view(request):
     if request.method == "POST":
         username = request.POST.get('username')
         password = request.POST.get('password')
         user = authenticate(request, username=username, password=password)
         if user:
-            user_groups  = user.groups.all()
-            is_etudiant =  bool(user_groups.filter(name="etudiant"))
-            is_directeur_des_etudes = bool(user_groups.filter(name="directeur_des_etudes"))
+            user_groups = user.groups.all()
+            is_etudiant = bool(user_groups.filter(name="etudiant"))
+            is_directeur_des_etudes = bool(
+                user_groups.filter(name="directeur_des_etudes"))
             is_enseignant = bool(user_groups.filter(name="enseignant"))
             is_secretaire = bool(user_groups.filter(name="secretaire"))
             is_comptable = bool(user_groups.filter(name="comptable"))
-            
+
             request.session['is_directeur_des_etudes'] = is_directeur_des_etudes
             request.session['is_etudiant'] = is_etudiant
             request.session['is_enseignant'] = False if is_directeur_des_etudes else is_enseignant
             request.session['is_secretaire'] = False if is_directeur_des_etudes else is_secretaire
             request.session['is_comptable'] = False if is_directeur_des_etudes else is_comptable
-            
-            
+
             has_model = False
             if is_etudiant:
                 try:
@@ -2146,7 +2153,7 @@ def login_view(request):
                 try:
                     personnel = user.personnel
                     id_auth_model = personnel.id
-                    
+
                     if is_enseignant:
                         id_auth_model = Enseignant.objects.get(user=user).id
                         request.session['profile_path'] = f'main/detail_etudiant/{id_auth_model}/'
@@ -2154,50 +2161,50 @@ def login_view(request):
                     has_model = True
                 except Exception as e:
                     pass
-            if has_model or (user.is_superuser and is_directeur_des_etudes):  
+            if has_model or (user.is_superuser and is_directeur_des_etudes):
                 login(request, user)
                 return redirect('/')
             return render(request, "connexion/login.html", {'error': 'Identifiants invalides'})
-                
+
         return render(request, "connexion/login.html", {'error': 'Identifiants invalides'})
 
     return render(request, "connexion/login.html")
 
-
 def recuperation_mdp(request):
     if request.method == "POST":
         username_or_email = request.POST.get('username_or_email')
-       
+
         notification = {
             "message": "Cet utilisateur n'existe pas", "type": "erreur"}
 
-        users = get_user_model().objects.filter(username=username_or_email) | get_user_model().objects.filter(email=username_or_email)
+        users = get_user_model().objects.filter(
+            username=username_or_email) | get_user_model().objects.filter(email=username_or_email)
 
-       
         if not users:
             messages.error(request, "Votre identifiant est invalide !")
             return redirect('main:reminder')
         user = users.first()
-        
+
         password = get_user_model().objects.make_random_password()
         user.set_password(password)
         user.save()
-        
+
         message = f"""
         Bonjour M. {user.first_name} {user.last_name}, votre mot de passe a été modier par
         ce qui suit : {password}. Une fois que vous serez connecté a votre compte n'oublier pas le
         modifier.
         Bonne journnée :) ! 
         """
-        
-        messages.success(request, "Mot de passe modifier ! Un mail vous a été envoyé sur votre compte outlook ! ")
-        
+
+        messages.success(
+            request, "Mot de passe modifier ! Un mail vous a été envoyé sur votre compte outlook ! ")
+
         send_email_task.delay(
             subject="Alert récupération de mot de passe !",
             message=message,
             email_address=[user.email],
         )
-        
+
         return redirect('main:reminder')
 
     return render(request, "connexion/reminder.html")
@@ -2205,14 +2212,14 @@ def recuperation_mdp(request):
 @login_required(login_url=settings.LOGIN_URL)
 def change_role(request, id_role):
     user = request.user
-    user_groups  = user.groups.all()
+    user_groups = user.groups.all()
     role = user_groups.get(id=id_role)
-  
+
     is_directeur_des_etudes = role.name == "directeur_des_etudes"
     is_enseignant = role.name == "enseignant"
     is_secretaire = role.name == "secretaire"
     is_comptable = role.name == "comptable"
-    
+
     request.session['is_directeur_des_etudes'] = is_directeur_des_etudes
     request.session['is_enseignant'] = False if is_directeur_des_etudes else is_enseignant
     request.session['is_secretaire'] = False if is_directeur_des_etudes else is_secretaire
@@ -2225,7 +2232,6 @@ def logout_view(request):
     return render(request, "connexion/login.html")
 
     ##### Enseignant #####
-
 
 @login_required(login_url=settings.LOGIN_URL)
 def create_enseignant(request, id=0):
@@ -2249,7 +2255,6 @@ def create_enseignant(request, id=0):
 
         else:
             return render(request, "enseignants/create_enseignant.html", {'form': form})
-
 
 # Cette vue permet d'importer les données enseignants via un fichier excel de foemat xlsx
 def importer_les_enseignants(request):
@@ -2302,14 +2307,13 @@ def importer_les_enseignants(request):
             return render(request, 'etudiants/message_erreur.html', {'message': "Erreur lors de l importation du fichier Excel."})
     return render(request, 'enseignants/importer.html')
 
-
 @login_required(login_url=settings.LOGIN_URL)
 def enseignants(request):
     id_annee_selectionnee = request.session.get("id_annee_selectionnee")
     role = get_user_role(request)
     annee_universitaire = get_object_or_404(
         AnneeUniversitaire, pk=id_annee_selectionnee)
-    enseignants = Enseignant.objects.filter(is_active=True)
+    enseignants = Enseignant.objects.filter(personnel__user__is_active=True)
     data = {}
     etats = [{'id': 1, 'value': 'Actif'}, {'id': 0, 'value': 'Suspendue'}]
     etats_selected = [True, False]
@@ -2342,10 +2346,10 @@ def enseignants(request):
             niveau = "Nos Enseignants"
             if semestre_id == "__all__":
                 enseignants = Enseignant.objects.filter(
-                    is_active__in=etats_selected)
+                    personnel__user__is_active__in=etats_selected)
             else:
                 enseignants = Enseignant.objects.filter(
-                    is_active__in=etats_selected, matiere__ue__programme__semestre__in=semestres_selected).distinct()
+                    personnel__user__is_active__in=etats_selected, matiere__ue__programme__semestre__in=semestres_selected).distinct()
 
     semestres_selected = {'id': semestre_id}
     etats_selected = {'id': etat_id}
@@ -2361,18 +2365,15 @@ def enseignants(request):
 
     return render(request, 'enseignants/enseignants.html', context=data)
 
-
 @login_required(login_url=settings.LOGIN_URL)
 def enseignant_inactif(request):
     enseignants = Enseignant.objects.filter(is_active=False)
     return render(request, 'enseignants/enseignants.html', {'enseignants': enseignants})
 
-
 @login_required(login_url=settings.LOGIN_URL)
 def enseignant_detail(request, id):
     enseignant = Enseignant.objects.get(id=id)
     return render(request, 'enseignants/enseignant_detail.html', {'enseignant': enseignant})
-
 
 @login_required(login_url=settings.LOGIN_URL)
 def certificat_travail(request, id):
@@ -2394,7 +2395,6 @@ def certificat_travail(request, id):
         response['Content-Disposition'] = 'inline;filename=pdf_file.pdf'
         return response
 
-
 @login_required(login_url=settings.LOGIN_URL)
 def liste_informations_enseignants(request):
     informations_enseignants = Information.objects.all()
@@ -2402,7 +2402,6 @@ def liste_informations_enseignants(request):
         'informations_enseignants': informations_enseignants,
     }
     return render(request, 'informations/information_list.html', context)
-
 
 @login_required(login_url=settings.LOGIN_URL)
 def enregistrer_informations(request, id=0):
@@ -2440,19 +2439,83 @@ def enregistrer_informations(request, id=0):
         else:
             return render(request, "informations/enregistrer_informations.html", {'form': form})
 
-
 @login_required(login_url=settings.LOGIN_URL)
 # Cette vue affiche la liste des semestre courants
 def semestres(request):
-    
+
     id_annee_selectionnee = request.session.get('id_annee_selectionnee')
-    annee_selectionnee = get_object_or_404(AnneeUniversitaire, pk=id_annee_selectionnee)
-    
+    annee_selectionnee = get_object_or_404(
+        AnneeUniversitaire, pk=id_annee_selectionnee)
+
     semestres = Semestre.objects.filter(annee_universitaire=annee_selectionnee)
     context = {
         "semestres": semestres,
     }
     return render(request, 'semestres/semestres.html', context)
+
+@login_required(login_url=settings.LOGIN_URL)
+def personnels(request):
+    listespersonnelles = Personnel.objects.all()
+    print(listespersonnelles)
+    return render(request, "employes/index.html", {'listespersonnelles' : listespersonnelles})
+
+@login_required(login_url=settings.LOGIN_URL)
+def create_personnel(request):
+    data = {}
+    roles = Group.objects.all()
+    if request.method == "POST":
+        form = PersonnelForm(request.POST)
+        form.fields['roles'].queryset = roles
+        if form.is_valid():
+            personnel = form.save()
+            inputs_data = form.clean()
+            type_enseignant = inputs_data.get('type')
+            speliatite_enseignant = inputs_data.get('specialite')
+            groups = inputs_data.get('roles')
+            personnel.assign_groups(groups)
+            personnel.bind_enseignant(type_enseignant, speliatite_enseignant)
+            return redirect('main:personnels')
+        data['form'] = form
+    else:
+        data['form'] = PersonnelForm()  
+        data['form'].fields['roles'].queryset = roles
+        
+    return render(request, 'employes/create_or_edit.html', context=data)
+
+@login_required(login_url=settings.LOGIN_URL)
+def update_personnel(request, id):
+    data = {}
+    personnel = get_object_or_404(Personnel, pk=id)
+    enseignant = personnel.get_enseignant()
+    roles = Group.objects.all()
+    if request.method == "POST":
+        form = PersonnelForm(request.POST, instance=personnel)
+        form.fields['roles'].queryset = roles
+        if form.is_valid():
+            personnel = form.save()
+            inputs_data = form.clean()
+            type_enseignant = inputs_data.get('type')
+            speliatite_enseignant = inputs_data.get('specialite')
+            groups = inputs_data.get('roles')
+            personnel.assign_groups(groups)
+            personnel.bind_enseignant(type_enseignant, speliatite_enseignant)
+            return redirect('main:personnels')
+        data['form'] = form
+    else:
+        data['form'] = PersonnelForm(instance=personnel)  
+        data['form'].fields['roles'].queryset = roles
+        data['form'].fields['roles'].initial = list(personnel.user.groups.values_list('pk', flat=True))
+        if enseignant:
+            data['form'].fields['type'].initial = enseignant.type
+            data['form'].fields['specialite'].initial = enseignant.specialite
+        
+    return render(request, 'employes/create_or_edit.html', context=data)
+
+@login_required(login_url=settings.LOGIN_URL)
+def delete_personnel(request, id):
+    personnel = get_object_or_404(Personnel, pk=id)
+    personnel.delete()
+    return redirect('main:personnels')
 
 
 @login_required(login_url=settings.LOGIN_URL)
@@ -2597,7 +2660,7 @@ def importer_data(request):
         etudiant = request.FILES['file']
 
         imported_data = list(dataset.load(etudiant.read(), format='xlsx'))
-        
+
         all_annees = AnneeUniversitaire.objects.all().prefetch_related('semestre_set')
 
         for data in imported_data[1:112]:
@@ -2725,4 +2788,6 @@ def importer_data(request):
         messages.success(request, "Donnée importer avec succes !")
         return redirect('main:create_etudiant')
 
-    #return render(request, 'etudiants/importer.html')
+
+    # return render(request, 'etudiants/importer.html')
+

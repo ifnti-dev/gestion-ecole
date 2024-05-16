@@ -23,3 +23,4 @@ furo
 sphinx-rtd-theme
 celery
 redis
+openpyxl

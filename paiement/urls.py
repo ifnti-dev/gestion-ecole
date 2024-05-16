@@ -5,7 +5,7 @@ app_name = 'paiement'
 
 urlpatterns = [
 
-        ##cherifa##
+        
         #delete_frais_scolarite
         path('delete_frais_scolarite/<int:id>/',views.delete_frais_scolarite,name="delete_frais_scolarite"),
    
@@ -16,6 +16,7 @@ urlpatterns = [
     path('etat_compte_bancaire/<int:id_annee_selectionnee>/<int:compte_bancaire_id>/', views.etat_compte_bancaire, name='etat_compte_bancaire'),
     path('compte_bancaire/<int:id_annee_selectionnee>/', views.compte_bancaire, name='compte_bancaire'),
     path('create_compte/', views.create_compte, name='create_compte'),
+    path('irpp_mensuel/<int:id_annee_selectionnee>/', views.irpp_mensuel, name='irpp_mensuel'),
 
 
                              #### Frais ####
@@ -32,7 +33,7 @@ urlpatterns = [
 
 
                             #### Comptable ####
-    path('create_comptable/', views.create_comptable, name='create_comptable'),
+#   path('create_comptable/', views.create_comptable, name='create_comptable'),
     path('comptable_detail/(?P<id>[0-9]+)\\Z/', views.comptable_detail, name='comptable_detail'),
     path('edit_comptable/(?P<id>[0-9]+)\\Z/', views.create_comptable, name='edit_comptable'),
     path('comptable_list/', views.comptable_list, name='comptable_list'),
