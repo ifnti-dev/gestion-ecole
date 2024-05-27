@@ -240,6 +240,19 @@ def pre_load_evaluation_template_data(matiere, semestre):
 @transaction.atomic
 def export_evaluation_data(matiere, semestre):
     path = 'media/excel_templates/evaluation.xlsx'
+    wb = openpyxl.load_workbook(filename="media/excel_templates/evaluations.xlsx")
+    
+    #
+    for index, sublist in enumerate(table):
+    # Créer une nouvelle feuille de calcul avec un nom unique
+        sheet_name = f'Sheet{index + 1}'
+        sheet = wb.create_sheet(title=sheet_name)
+    
+    
+    
+    
+    
+    
     
     # wb = openpyxl.load_workbook(filename="media/excel_templates/evaluations.xlsx")
     # ws = wb.active
