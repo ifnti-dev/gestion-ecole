@@ -2723,22 +2723,23 @@ def importer_data(request):
         all_annees = AnneeUniversitaire.objects.all().prefetch_related('semestre_set')
 
         for data in imported_data[1:112]:
+            print(data[27])
+
             etudiant = Etudiant(
                 anneeentree=data[0],
                 nom=data[2],
                 prenom=data[3],
-                # datenaissance=data[4],
+                datenaissance=data[4],
                 lieunaissance=data[5],
                 sexe=data[6],
                 anneebac2=data[7],
                 contact=data[1],
                 email=data[29],
                 adresse=data[30],
-                user=data[32],
-                photo_passport=data[33],
-                id=data[34],
                 is_active=True,
             )
+            
+           
             try:
                 etudiant.save()
                 annee_universitaire = all_annees.get(
@@ -2752,23 +2753,10 @@ def importer_data(request):
                     semestre_s2 = annee_universitaire.semestre_set.get(
                         libelle='S2')
                     etudiant.semestres.add(semestre_s1, semestre_s2)
-                elif semestres_data == "S3":
-                    # Si "S3"
-                    semestre_s1 = annee_universitaire.semestre_set.get(
-                        libelle='S1')
-                    semestre_s2 = annee_universitaire.semestre_set.get(
-                        libelle='S2')
-                    etudiant.semestres.add(semestre_s1, semestre_s2)
-
-                    annee_entree_plus_un = etudiant.anneeentree + 1
-                    annee_universitaire_plus_un = all_annees.get(
-                        annee=annee_entree_plus_un)
-
-                    semestre_s3 = annee_universitaire_plus_un.semestre_set.get(
-                        libelle='S3')
-                    etudiant.semestres.add(semestre_s3)
                 elif semestres_data == "L2":
                     # Si "L2"
+                    # ajout des semestres de L1(S1 et S2)
+
                     semestre_s1 = annee_universitaire.semestre_set.get(
                         libelle='S1')
                     semestre_s2 = annee_universitaire.semestre_set.get(
@@ -2778,45 +2766,22 @@ def importer_data(request):
                     annee_entree_plus_un = etudiant.anneeentree + 1
                     annee_universitaire_plus_un = all_annees.get(
                         annee=annee_entree_plus_un)
-
+                    # ajout des semestres de L2(S3 et S4)
                     semestre_s3 = annee_universitaire_plus_un.semestre_set.get(
                         libelle='S3')
                     semestre_s4 = annee_universitaire_plus_un.semestre_set.get(
                         libelle='S4')
-                    etudiant.semestres.add(semestre_s3, semestre_s4)
-                elif semestres_data == "S5":
-                    # Si "S5"
-                    semestre_s1 = annee_universitaire.semestre_set.get(
-                        libelle='S1')
-                    semestre_s2 = annee_universitaire.semestre_set.get(
-                        libelle='S2')
-                    etudiant.semestres.add(semestre_s1, semestre_s2)
-
-                    annee_entree_plus_un = etudiant.anneeentree + 1
-                    annee_universitaire_plus_un = all_annees.get(
-                        annee=annee_entree_plus_un)
-
-                    semestre_s3 = annee_universitaire_plus_un.semestre_set.get(
-                        libelle='S3')
-                    semestre_s4 = annee_universitaire_plus_un.semestre_set.get(
-                        libelle='S4')
-                    etudiant.semestres.add(semestre_s3, semestre_s4)
-
-                    annee_entree_plus_deux = etudiant.anneeentree + 2
-                    annee_universitaire_plus_deux = all_annees.get(
-                        annee=annee_entree_plus_deux)
-
-                    semestre_s5 = annee_universitaire_plus_deux.semestre_set.get(
-                        libelle='S5')
-                    etudiant.semestres.add(semestre_s5)
+                    etudiant.semestres.add(semestre_s3,semestre_s4)
+                    
                 elif semestres_data == "L3":
                     # Si "L3"
+                    #ajout des semestres de L1(S1 et S2)
                     semestre_s1 = annee_universitaire.semestre_set.get(
                         libelle='S1')
                     semestre_s2 = annee_universitaire.semestre_set.get(
                         libelle='S2')
                     etudiant.semestres.add(semestre_s1, semestre_s2)
-
+                    # ajout des semestres de L2
                     annee_entree_plus_un = etudiant.anneeentree + 1
                     annee_universitaire_plus_un = all_annees.get(
                         annee=annee_entree_plus_un)
@@ -2826,7 +2791,8 @@ def importer_data(request):
                     semestre_s4 = annee_universitaire_plus_un.semestre_set.get(
                         libelle='S4')
                     etudiant.semestres.add(semestre_s3, semestre_s4)
-
+                    
+                    #ajout des semestres de L3(S5 et S6)
                     annee_entree_plus_deux = etudiant.anneeentree + 2
                     annee_universitaire_plus_deux = all_annees.get(
                         annee=annee_entree_plus_deux)
@@ -2841,6 +2807,8 @@ def importer_data(request):
                     semestre_s1_courant = annee_universitaire.semestre_set.get(
                         libelle='S1')
                     etudiant.semestres.add(semestre_s1_courant)
+                    
+                
             except Exception as e:
                 pass
 
