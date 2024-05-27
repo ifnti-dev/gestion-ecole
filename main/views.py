@@ -6,7 +6,7 @@ from main.pdfMaker import generate_pdf
 from django.conf import settings
 from main.forms import EnseignantForm, EtudiantForm, EvaluationForm, InformationForm, PersonnelForm, ProgrammeForm, NoteForm, TuteurForm, UeForm, MatiereForm
 from scripts.mail_utils import send_email_task
-from scripts.utils import load_notes_from_evaluation, pre_load_evaluation_template_data
+from scripts.utils import export_evaluation_data, load_notes_from_evaluation, pre_load_evaluation_template_data
 from .models import Domaine, Enseignant, Evaluation, Personnel, Information, Matiere, Etudiant, Competence, Note, Parcours, Programme, Semestre, Ue, AnneeUniversitaire, Tuteur
 from cahier_de_texte.models import Seance
 from planning.models import Planning, SeancePlannifier
@@ -24,7 +24,7 @@ from django.core.cache import cache
 from django.core import serializers
 from django.core.mail import send_mail
 from django.conf import settings
-
+from openpyxl import Workbook
 
 def datetime_serializer(obj):
     if isinstance(obj, datetime):
@@ -32,6 +32,22 @@ def datetime_serializer(obj):
     raise TypeError("Type not serializable")
 
 
+
+@login_required(login_url=settings.LOGIN_URL)
+def export_excel_evaluation(request, id_matiere, id_semestre):
+    
+    matiere = get_object_or_404(Matiere, id=id_matiere)
+    semestre = get_object_or_404(Semestre, id=id_semestre)
+    
+    
+    path=export_evaluation_data(matiere, semestre)
+    file_name = path
+    with open(file_name, 'rb') as file:
+        response = HttpResponse(
+            file.read(), content_type="application/force-download")
+        response['Content-Disposition'] = 'attachment; filename="{}"'.format(os.path.basename(file_name))
+        return response
+    
 @login_required(login_url=settings.LOGIN_URL)
 def dashboard(request):
     """
@@ -1187,7 +1203,7 @@ def releve_notes(request, id, id_semestre):
     #     context['directeur'] = request.user.utilisateur.nom + ' ' + request.user.prenom
 
     # nom des fichiers d'entrée et de sortie
-
+    print("Hello Releve de notes")
     latex_input = 'releve_notes'
     latex_ouput = 'generated_releve_notes'
     pdf_file = 'pdf_releve_notes'
@@ -1265,6 +1281,7 @@ def releve_notes_semestre(request, id_semestre):
     context['semestre'] = semestre
 
     # nom des fichiers d'entrée et de sortie
+    print("Hello Releve de notes semestre")
 
     latex_input = 'releve_notes_semestre'
     latex_ouput = 'generated_releve_notes_semestre'
@@ -1621,6 +1638,8 @@ def recapitulatifs_des_notes_par_matiere(request, id_semestre, id_matiere):
 
         etudiants = []
         _etudiants = semestre.etudiant_set.all()
+        print('etudiants : ')
+        print(_etudiants)
         for etudiant in _etudiants:
             moyenne, a_valider, _ = etudiant.moyenne_etudiant_matiere(
                 matiere, semestre)
