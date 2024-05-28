@@ -7,7 +7,7 @@ from django.conf import settings
 from main.forms import EnseignantForm, EtudiantForm, EvaluationForm, InformationForm, PersonnelForm, ProgrammeForm, NoteForm, TuteurForm, UeForm, MatiereForm
 from scripts.mail_utils import send_email_task
 from scripts.utils import export_evaluation_data, load_notes_from_evaluation, pre_load_evaluation_template_data
-from .models import Domaine, Enseignant, Evaluation, Personnel, Information, Matiere, Etudiant, Competence, Note, Parcours, Programme, Semestre, Ue, AnneeUniversitaire, Tuteur
+from .models import Domaine, Enseignant, Evaluation, Personnel, Information, Matiere, Etudiant, Competence, Note, Parcours, Programme, Semestre, Ue, AnneeUniversitaire, Tuteur, Utilisateur
 from cahier_de_texte.models import Seance
 from planning.models import Planning, SeancePlannifier
 
@@ -2580,82 +2580,66 @@ def export(request):
     return response
 
 
-# Cette vue permet d'importer les données via un fichier excel
-def importer_les_donnees(request):
-    if request.method == 'POST':
-        if 'myfile' not in request.FILES:
-            return render(request, 'etudiants/message_erreur.html', {'message': "Aucun fichier sélectionné."})
-        etudiants_resource = EtudiantResource()
-        dataset = Dataset()
-        etudiant = request.FILES['myfile']
+#####
+def ajout_semestre_etudiant(niveau, promotion, annees):
+    annee_universitaire = annees.get(annee=promotion)
+    if niveau == "L1":
+        semestre_s1 = annee_universitaire.semestre_set.get(libelle='S1')
+        semestre_s2 = annee_universitaire.semestre_set.get(libelle='S2')
+        return semestre_s1, semestre_s2
+    return []
+    # elif niveau == "L2":
+    #     # Si "L2"
+    #     # ajout des semestres de L1(S1 et S2)
+    #     semestre_s1 = annee_universitaire.semestre_set.get(libelle='S1')
+    #     semestre_s2 = annee_universitaire.semestre_set.get(
+    #                         libelle='S2')
+    #     etudiant.semestres.add(semestre_s1, semestre_s2)
+    #     annee_entree_plus_un = etudiant.anneeentree + 1
+    #     annee_universitaire_plus_un = all_annees.get(annee=annee_entree_plus_un)
+    #     # ajout des semestres de L2(S3 et S4)
+    #     semestre_s3 = annee_universitaire_plus_un.semestre_set.get(
+    #     libelle='S3')                
+                
+    #     semestre_s4 = annee_universitaire_plus_un.semestre_set.get(
+    #     libelle='S4')
+    #     etudiant.semestres.add(semestre_s3,semestre_s4)
+    # elif niveau == "L3":
+    #     # Si "L3"
+    #     #ajout des semestres de L1(S1 et S2)
+    #     semestre_s1 = annee_universitaire.semestre_set.get(
+    #     libelle='S1')
+    #     semestre_s2 = annee_universitaire.semestre_set.get(
+    #                         libelle='S2')
+    #     etudiant.semestres.add(semestre_s1, semestre_s2)
+    #     # ajout des semestres de L2
+    #     annee_entree_plus_un = etudiant.anneeentree + 1
+    #     annee_universitaire_plus_un = all_annees.get(
+    #     annee=annee_entree_plus_un)
 
-        try:
-            imported_data = dataset.load(etudiant.read(), format='xlsx')
-            for data in imported_data:
-                etudiant = Etudiant(
-                    nom=data[0],
-                    prenom=data[1],
-                    sexe=data[2],
-                    datenaissance=data[3],
-                    lieunaissance=data[4],
-                    contact=data[5],
-                    email=data[6],
-                    adresse=data[7],
-                    prefecture=data[8],
-                    is_active=data[9],
-                    carte_identity=data[10],
-                    nationalite=data[11],
-                    user=data[12],
-                    photo_passport=data[13],
-                    id=data[14],
-                    seriebac1=data[15],
-                    seriebac2=data[16],
-                    anneeentree=data[17],
-                    anneebac1=data[18],
-                    anneebac2=data[19],
-                    etablissementSeconde=data[20],
-                    francaisSeconde=data[21],
-                    anglaisSeconde=data[22],
-                    mathematiqueSeconde=data[23],
-                    etablissementPremiere=data[24],
-                    francaisPremiere=data[25],
-                    anglaisPremiere=data[26],
-                    mathematiquePremiere=data[27],
-                    etablissementTerminale=data[28],
-                    francaisTerminale=data[29],
-                    anglaisTerminale=data[30],
-                    mathematiqueTerminale=data[31],
-                    delegue=data[32],
-                    passer_semestre_suivant=data[33],
-                    decision_conseil=data[34],
-                    profil=data[35]
-                )
-                etudiant.save()
+    #     semestre_s3 = annee_universitaire_plus_un.semestre_set.get(
+    #                         libelle='S3')
+    #     semestre_s4 = annee_universitaire_plus_un.semestre_set.get(
+    #     libelle='S4')
+    #     etudiant.semestres.add(semestre_s3, semestre_s4)
+                        
+    #     #ajout des semestres de L3(S5 et S6)
+    #     annee_entree_plus_deux = etudiant.anneeentree + 2
+    #     annee_universitaire_plus_deux = all_annees.get(
+    #     annee=annee_entree_plus_deux)
 
-                # Trouvez l'année universitaire en cours
-                annee_universitaire_courante = AnneeUniversitaire.objects.get(
-                    annee_courante=True)
+    #     semestre_s5 = annee_universitaire_plus_deux.semestre_set.get(
+    #                         libelle='S5')
+    #     semestre_s6 = annee_universitaire_plus_deux.semestre_set.get(
+    #                         libelle='S6')
+    #     etudiant.semestres.add(semestre_s5, semestre_s6)
+    # else:
+    #     # Sinon, attachez l'étudiant au Semestre 1 (S1) de l'année universitaire en cours
+    #     semestre_s1_courant = annee_universitaire.semestre_set.get(
+    #                     libelle='S1')
+    #     etudiant.semestres.add(semestre_s1_courant)
 
-                # Attachez l'étudiant au Semestre 1 (S1) de l'année universitaire en cours
-                semestre_s1 = annee_universitaire_courante.semestre_set.get(
-                    libelle='S1')
-                etudiant.semestres.add(semestre_s1)
-
-                semestres_data = data[36:]
-                for semestre_data in semestres_data:
-                    try:
-                        semestre = Semestre.objects.get(libelle=semestre_data)
-                        etudiant.semestres.add(semestre)
-                    except Semestre.DoesNotExist:
-                        # Gérer cette situation si le semestre n'existe pas
-                        print(f"Le semestre '{semestre_data}' n'existe pas.")
-                return render(request, 'etudiants/message_erreur.html', {'message': "Données importées avec succès."})
-
-        except Exception as e:
-            return render(request, 'etudiants/message_erreur.html', {'message': "Erreur lors de l'importation du fichier Excel."})
-
-    return render(request, 'etudiants/importer.html')
-
+    
 
 # Cette vue permet d'importer les données etudiants via un fichier xlsx
 def importer_data(request):
@@ -2670,101 +2654,134 @@ def importer_data(request):
 
         imported_data = list(dataset.load(etudiant.read(), format='xlsx'))
 
-        all_annees = AnneeUniversitaire.objects.all().prefetch_related('semestre_set')
+        annees = AnneeUniversitaire.objects.all().prefetch_related('semestre_set')
 
+    
         for data in imported_data[1:112]:
-            print(data[27])
+            promotion=data[0]
+            nom=data[1]
+            prenom=data[2]
+            datenaissance=data[3]
+            lieunaissance=data[4]
+            sexe=data[5]
+            anneebac2=data[6]
+            contact=data[9]
+            adresse=data[10]
+            niveau = data[7]
+            is_active=True
 
-            etudiant = Etudiant(
-                anneeentree=data[0],
-                nom=data[2],
-                prenom=data[3],
-                datenaissance=data[4],
-                lieunaissance=data[5],
-                sexe=data[6],
-                anneebac2=data[7],
-                contact=data[1],
-                email=data[29],
-                adresse=data[30],
-                is_active=True,
-            )
+            if nom == None and prenom == None:
+                continue
             
-           
-            try:
-                etudiant.save()
-                annee_universitaire = all_annees.get(
-                    annee=etudiant.anneeentree)
+            #print(prenom, ";", nom)
+            username = (nom + prenom).lower()
+            username = username.replace(" ", "")
+            print(username)
+            print(datenaissance.__str__())
 
-                semestres_data = data[8]
-                if semestres_data == "L1":
-                    # Si "L1"
-                    semestre_s1 = annee_universitaire.semestre_set.get(
-                        libelle='S1')
-                    semestre_s2 = annee_universitaire.semestre_set.get(
-                        libelle='S2')
-                    etudiant.semestres.add(semestre_s1, semestre_s2)
-                elif semestres_data == "L2":
-                    # Si "L2"
-                    # ajout des semestres de L1(S1 et S2)
-
-                    semestre_s1 = annee_universitaire.semestre_set.get(
-                        libelle='S1')
-                    semestre_s2 = annee_universitaire.semestre_set.get(
-                        libelle='S2')
-                    etudiant.semestres.add(semestre_s1, semestre_s2)
-
-                    annee_entree_plus_un = etudiant.anneeentree + 1
-                    annee_universitaire_plus_un = all_annees.get(
-                        annee=annee_entree_plus_un)
-                    # ajout des semestres de L2(S3 et S4)
-                    semestre_s3 = annee_universitaire_plus_un.semestre_set.get(
-                        libelle='S3')
-                    semestre_s4 = annee_universitaire_plus_un.semestre_set.get(
-                        libelle='S4')
-                    etudiant.semestres.add(semestre_s3,semestre_s4)
-                    
-                elif semestres_data == "L3":
-                    # Si "L3"
-                    #ajout des semestres de L1(S1 et S2)
-                    semestre_s1 = annee_universitaire.semestre_set.get(
-                        libelle='S1')
-                    semestre_s2 = annee_universitaire.semestre_set.get(
-                        libelle='S2')
-                    etudiant.semestres.add(semestre_s1, semestre_s2)
-                    # ajout des semestres de L2
-                    annee_entree_plus_un = etudiant.anneeentree + 1
-                    annee_universitaire_plus_un = all_annees.get(
-                        annee=annee_entree_plus_un)
-
-                    semestre_s3 = annee_universitaire_plus_un.semestre_set.get(
-                        libelle='S3')
-                    semestre_s4 = annee_universitaire_plus_un.semestre_set.get(
-                        libelle='S4')
-                    etudiant.semestres.add(semestre_s3, semestre_s4)
-                    
-                    #ajout des semestres de L3(S5 et S6)
-                    annee_entree_plus_deux = etudiant.anneeentree + 2
-                    annee_universitaire_plus_deux = all_annees.get(
-                        annee=annee_entree_plus_deux)
-
-                    semestre_s5 = annee_universitaire_plus_deux.semestre_set.get(
-                        libelle='S5')
-                    semestre_s6 = annee_universitaire_plus_deux.semestre_set.get(
-                        libelle='S6')
-                    etudiant.semestres.add(semestre_s5, semestre_s6)
-                else:
-                    # Sinon, attachez l'étudiant au Semestre 1 (S1) de l'année universitaire en cours
-                    semestre_s1_courant = annee_universitaire.semestre_set.get(
-                        libelle='S1')
-                    etudiant.semestres.add(semestre_s1_courant)
-                    
-                
-            except Exception as e:
+            if datenaissance is None:
+                # datenaissance = datetime(2024, 12, 12)
                 pass
+            else:
+                datenaissance = datenaissance.__str__()
+                if "/" in datenaissance:
+                    datenaissance_array = datenaissance.split('/')
+                    datenaissance = datetime(int(datenaissance_array[2]), int(datenaissance_array[1]),int(datenaissance_array[0]))
+                    print("/")
+                    print(datenaissance_array)
+                else:
+                    datenaissance_array = datenaissance.split('-')
+                    datenaissance_array[2] = datenaissance_array[2][:2]
+                    datenaissance = datetime(int(datenaissance_array[0]), int(datenaissance_array[1]),int(datenaissance_array[2]))
+                    print(datenaissance_array)                
 
+            # return HttpResponse("o")
+            try:
+                etudiant = Etudiant.objects.get(user__username=username)
+                # etudiant = Etudiant.objects.get(user__username__contains=nom.lower())
+                semestres = ajout_semestre_etudiant(niveau, promotion, annees)
+                etudiant.semestres.set(semestres)
+                etudiant.save()
+                print(etudiant)
+            except Exception as e:
+                print("Etudiant n'existe pas. ")
+                print(e)
+            
+                etudiant = Etudiant.objects.create(
+                    anneeentree=promotion,
+                    nom=nom,
+                    prenom=prenom,
+                    datenaissance=datenaissance,
+                    lieunaissance=lieunaissance,
+                    sexe=sexe,
+                    anneebac2=anneebac2,
+                    contact=contact,
+                    adresse=adresse,
+                    is_active=is_active,
+                )
+                semestres = ajout_semestre_etudiant(niveau, promotion, annees)
+                etudiant.semestres.set(semestres)
+                print(semestres)   
+      
         messages.success(request, "Donnée importer avec succes !")
-        return redirect('main:create_etudiant')
+        return redirect('main:edudiants')
 
 
     # return render(request, 'etudiants/importer.html')
 
+# etudiant = Etudiant(
+#                 anneeentree=data[0],
+#                 nom=data[2],
+#                 prenom=data[3],
+#                 datenaissance=data[4],
+#                 lieunaissance=data[5],
+#                 sexe=data[6],
+#                 anneebac2=data[7],
+#                 contact=data[28],
+#                 email=data[29],
+#                 adresse=data[30],
+#                 is_active=True,
+#             )
+            
+            
+             
+#             try:
+#                 #check if etudiant already
+#                 un_etudiant=Etudiant.objects.filter(nom=etudiant.nom,prenom=etudiant.prenom,anneeentree=etudiant.anneeentree)
+#                 print("un_etu")
+#                 if un_etudiant==None :
+#                     print("yes none")
+#                     etudiant.save()
+#                     annee_universitaire = all_annees.get(
+#                         annee=etudiant.anneeentree)
+
+#                     semestres_data = data[8]
+#                     ajout_semestre_etudiant(semestres_data,annee_universitaire,etudiant,all_annees)
+ 
+                    
+                        
+#                 else:
+#                     #update
+                    
+#                     print("deja")
+#                     un_etudiant.anneeentree=data[0]
+#                     un_etudiant.nom=data[2]
+#                     un_etudiant.prenom=data[3]
+#                     un_etudiant.datenaissance=data[4]
+#                     un_etudiant.lieunaissance=data[5]
+#                     un_etudiant.sexe=data[6]
+#                     un_etudiant.anneebac2=data[7],
+#                     un_etudiant.contact=data[28]
+#                     un_etudiant.email=data[29]
+#                     un_etudiant.adresse=data[30]
+                   
+#                     un_etudiant.save()
+#                     annee_universitaire = all_annees.get(
+#                     annee=etudiant.anneeentree)
+
+#                     semestres_data = data[8]
+#                     ajout_semestre_etudiant(semestres_data,annee_universitaire,un_etudiant,all_annees)
+                    
+                
+#             except Exception as e:
+#                 pass
