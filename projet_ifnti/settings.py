@@ -121,7 +121,7 @@ DATABASES = {
     }
 }
 
-
+DATA_UPLOAD_MAX_NUMBER_FIELDS =100000
 # Email configuration
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
