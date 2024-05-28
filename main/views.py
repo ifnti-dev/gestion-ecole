@@ -6,7 +6,7 @@ from main.pdfMaker import generate_pdf
 from django.conf import settings
 from main.forms import EnseignantForm, EtudiantForm, EvaluationForm, InformationForm, PersonnelForm, ProgrammeForm, NoteForm, TuteurForm, UeForm, MatiereForm
 from scripts.mail_utils import send_email_task
-from scripts.utils import load_notes_from_evaluation, pre_load_evaluation_template_data
+from scripts.utils import export_evaluation_data, load_notes_from_evaluation, pre_load_evaluation_template_data
 from .models import Domaine, Enseignant, Evaluation, Personnel, Information, Matiere, Etudiant, Competence, Note, Parcours, Programme, Semestre, Ue, AnneeUniversitaire, Tuteur
 from cahier_de_texte.models import Seance
 from planning.models import Planning, SeancePlannifier
@@ -24,7 +24,7 @@ from django.core.cache import cache
 from django.core import serializers
 from django.core.mail import send_mail
 from django.conf import settings
-
+from openpyxl import Workbook
 
 def datetime_serializer(obj):
     if isinstance(obj, datetime):
@@ -32,6 +32,22 @@ def datetime_serializer(obj):
     raise TypeError("Type not serializable")
 
 
+
+@login_required(login_url=settings.LOGIN_URL)
+def export_excel_evaluation(request, id_matiere, id_semestre):
+    
+    matiere = get_object_or_404(Matiere, id=id_matiere)
+    semestre = get_object_or_404(Semestre, id=id_semestre)
+    
+    
+    path=export_evaluation_data(matiere, semestre)
+    file_name = path
+    with open(file_name, 'rb') as file:
+        response = HttpResponse(
+            file.read(), content_type="application/force-download")
+        response['Content-Disposition'] = 'attachment; filename="{}"'.format(os.path.basename(file_name))
+        return response
+    
 @login_required(login_url=settings.LOGIN_URL)
 def dashboard(request):
     """
@@ -1227,7 +1243,7 @@ def releve_notes(request, id, id_semestre):
     #     context['directeur'] = request.user.utilisateur.nom + ' ' + request.user.prenom
 
     # nom des fichiers d'entrée et de sortie
-
+    print("Hello Releve de notes")
     latex_input = 'releve_notes'
     latex_ouput = 'generated_releve_notes'
     pdf_file = 'pdf_releve_notes'
@@ -1305,6 +1321,7 @@ def releve_notes_semestre(request, id_semestre):
     context['semestre'] = semestre
 
     # nom des fichiers d'entrée et de sortie
+    print("Hello Releve de notes semestre")
 
     latex_input = 'releve_notes_semestre'
     latex_ouput = 'generated_releve_notes_semestre'
@@ -1661,6 +1678,8 @@ def recapitulatifs_des_notes_par_matiere(request, id_semestre, id_matiere):
 
         etudiants = []
         _etudiants = semestre.etudiant_set.all()
+        print('etudiants : ')
+        print(_etudiants)
         for etudiant in _etudiants:
             moyenne, a_valider, _ = etudiant.moyenne_etudiant_matiere(
                 matiere, semestre)
@@ -2704,22 +2723,23 @@ def importer_data(request):
         all_annees = AnneeUniversitaire.objects.all().prefetch_related('semestre_set')
 
         for data in imported_data[1:112]:
+            print(data[27])
+
             etudiant = Etudiant(
                 anneeentree=data[0],
                 nom=data[2],
                 prenom=data[3],
-                # datenaissance=data[4],
+                datenaissance=data[4],
                 lieunaissance=data[5],
                 sexe=data[6],
                 anneebac2=data[7],
                 contact=data[1],
                 email=data[29],
                 adresse=data[30],
-                user=data[32],
-                photo_passport=data[33],
-                id=data[34],
                 is_active=True,
             )
+            
+           
             try:
                 etudiant.save()
                 annee_universitaire = all_annees.get(
@@ -2733,23 +2753,10 @@ def importer_data(request):
                     semestre_s2 = annee_universitaire.semestre_set.get(
                         libelle='S2')
                     etudiant.semestres.add(semestre_s1, semestre_s2)
-                elif semestres_data == "S3":
-                    # Si "S3"
-                    semestre_s1 = annee_universitaire.semestre_set.get(
-                        libelle='S1')
-                    semestre_s2 = annee_universitaire.semestre_set.get(
-                        libelle='S2')
-                    etudiant.semestres.add(semestre_s1, semestre_s2)
-
-                    annee_entree_plus_un = etudiant.anneeentree + 1
-                    annee_universitaire_plus_un = all_annees.get(
-                        annee=annee_entree_plus_un)
-
-                    semestre_s3 = annee_universitaire_plus_un.semestre_set.get(
-                        libelle='S3')
-                    etudiant.semestres.add(semestre_s3)
                 elif semestres_data == "L2":
                     # Si "L2"
+                    # ajout des semestres de L1(S1 et S2)
+
                     semestre_s1 = annee_universitaire.semestre_set.get(
                         libelle='S1')
                     semestre_s2 = annee_universitaire.semestre_set.get(
@@ -2759,45 +2766,22 @@ def importer_data(request):
                     annee_entree_plus_un = etudiant.anneeentree + 1
                     annee_universitaire_plus_un = all_annees.get(
                         annee=annee_entree_plus_un)
-
+                    # ajout des semestres de L2(S3 et S4)
                     semestre_s3 = annee_universitaire_plus_un.semestre_set.get(
                         libelle='S3')
                     semestre_s4 = annee_universitaire_plus_un.semestre_set.get(
                         libelle='S4')
-                    etudiant.semestres.add(semestre_s3, semestre_s4)
-                elif semestres_data == "S5":
-                    # Si "S5"
-                    semestre_s1 = annee_universitaire.semestre_set.get(
-                        libelle='S1')
-                    semestre_s2 = annee_universitaire.semestre_set.get(
-                        libelle='S2')
-                    etudiant.semestres.add(semestre_s1, semestre_s2)
-
-                    annee_entree_plus_un = etudiant.anneeentree + 1
-                    annee_universitaire_plus_un = all_annees.get(
-                        annee=annee_entree_plus_un)
-
-                    semestre_s3 = annee_universitaire_plus_un.semestre_set.get(
-                        libelle='S3')
-                    semestre_s4 = annee_universitaire_plus_un.semestre_set.get(
-                        libelle='S4')
-                    etudiant.semestres.add(semestre_s3, semestre_s4)
-
-                    annee_entree_plus_deux = etudiant.anneeentree + 2
-                    annee_universitaire_plus_deux = all_annees.get(
-                        annee=annee_entree_plus_deux)
-
-                    semestre_s5 = annee_universitaire_plus_deux.semestre_set.get(
-                        libelle='S5')
-                    etudiant.semestres.add(semestre_s5)
+                    etudiant.semestres.add(semestre_s3,semestre_s4)
+                    
                 elif semestres_data == "L3":
                     # Si "L3"
+                    #ajout des semestres de L1(S1 et S2)
                     semestre_s1 = annee_universitaire.semestre_set.get(
                         libelle='S1')
                     semestre_s2 = annee_universitaire.semestre_set.get(
                         libelle='S2')
                     etudiant.semestres.add(semestre_s1, semestre_s2)
-
+                    # ajout des semestres de L2
                     annee_entree_plus_un = etudiant.anneeentree + 1
                     annee_universitaire_plus_un = all_annees.get(
                         annee=annee_entree_plus_un)
@@ -2807,7 +2791,8 @@ def importer_data(request):
                     semestre_s4 = annee_universitaire_plus_un.semestre_set.get(
                         libelle='S4')
                     etudiant.semestres.add(semestre_s3, semestre_s4)
-
+                    
+                    #ajout des semestres de L3(S5 et S6)
                     annee_entree_plus_deux = etudiant.anneeentree + 2
                     annee_universitaire_plus_deux = all_annees.get(
                         annee=annee_entree_plus_deux)
@@ -2822,6 +2807,8 @@ def importer_data(request):
                     semestre_s1_courant = annee_universitaire.semestre_set.get(
                         libelle='S1')
                     etudiant.semestres.add(semestre_s1_courant)
+                    
+                
             except Exception as e:
                 pass
 

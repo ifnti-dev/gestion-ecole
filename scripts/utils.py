@@ -238,6 +238,48 @@ def pre_load_evaluation_template_data(matiere, semestre):
     return path
 
 @transaction.atomic
+def export_evaluation_data(matiere, semestre):
+    path = 'media/excel_templates/evaluation.xlsx'
+    wb = openpyxl.load_workbook(filename="media/excel_templates/evaluations.xlsx")
+    
+    #
+    for index, sublist in enumerate(table):
+    # Créer une nouvelle feuille de calcul avec un nom unique
+        sheet_name = f'Sheet{index + 1}'
+        sheet = wb.create_sheet(title=sheet_name)
+    
+    
+    
+    
+    
+    
+    
+    # wb = openpyxl.load_workbook(filename="media/excel_templates/evaluations.xlsx")
+    # ws = wb.active
+    # ws['B1'].value = semestre.annee_universitaire.annee
+    # ws['B2'].value = semestre.libelle
+    # ws['B3'].value = matiere.libelle
+    # ws['B5'].value = ""
+    # ws['B6'].value = ""
+    # ws['B7'].value = ""
+    
+    # etudiants = matiere.get_etudiant_semestre(semestre).order_by("nom")
+    
+    # min_row = 10
+    # max_row = min_row + len(etudiants)
+    
+    # i = 0
+    # for row in ws.iter_rows(min_row=min_row, max_row=max_row-1, max_col=3):
+    #     row[0].value = etudiants[i].nom
+    #     row[1].value = etudiants[i].prenom
+    #     row[2].value = ""
+    #     i += 1
+    # wb.save(path)
+    
+    return path
+
+
+@transaction.atomic
 def load_notes_from_evaluation(path, matiere=None, semestre=None):
     # Charger le fichier excel des différentes notes d'une matière
     wb = openpyxl.load_workbook(path)

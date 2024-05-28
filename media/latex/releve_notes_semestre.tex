@@ -36,6 +36,7 @@
 	}}}
 
 \begin{document}
+\AddToShipoutPicture{\BackgroundPic} 
 
 \newcommand{\Col}[2]{%
 \boxput*(0,1){\colorbox{white}{#1}}%
@@ -44,16 +45,19 @@
 #2\end{Bflushleft}}}}
 
 
-\BLOCK{for releve_note in releves_notes}
+\begin{center}
+{\LARGE {\textbf{RELEVÉ DE NOTES POUR TOUS LES ÉTUDIANTS}}}
+\end{center}
 
+
+\BLOCK{for releve_note in releves_notes}
 \vspace{12cm}
 \begin{center}
 {\LARGE {\textbf{RELEVÉ DE NOTES}}}
 \end{center}
-
 \vspace{3cm}
 
-\AddToShipoutPicture{\BackgroundPic}
+
 
 \hspace{11.5cm}\begin{minipage}{0.3\textwidth}
 	\vspace{-9.5cm}
