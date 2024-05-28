@@ -56,7 +56,9 @@ urlpatterns = [
          views.recapitulatif_notes, name='recap_notes'),
 
 
-
+     ###export_excel_evaluation
+     path('export_excel_evaluation/<int:id_matiere>/<str:id_semestre>/', views.export_excel_evaluation, name='export_excel_evaluation'),
+     
     # Abdoul-Malik urls 
      path('recapitulatifs_des_notes_par_etudiant/<str:id_semestre>/',
           views.recapitulatifs_des_notes_par_etudiant, name='recapitulatifs_des_notes_par_etudiant'),
