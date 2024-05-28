@@ -20,7 +20,7 @@ from decimal import Decimal, ROUND_DOWN
 import math
 
 def create_auth_user(nom, prenom, email):
-    username = (prenom + nom).lower()
+    username = (nom+prenom).lower()
     print(username)
     username = username.replace(" ", "")
     year = date.today().year
@@ -499,7 +499,7 @@ class Etudiant(Utilisateur):
             else:
                 self.id = f"{self.nom[0]}{self.prenom[0]}{self.anneeentree}01"
             
-            self.user = create_auth_user(self.prenom, self.nom, self.email)  
+            self.user = create_auth_user(self.nom, self.prenom, self.email)  
             group_etudiant = Group.objects.get(name="etudiant")
             self.user.groups.add(group_etudiant)
         super().save()
