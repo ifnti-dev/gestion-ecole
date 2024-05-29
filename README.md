@@ -66,7 +66,7 @@ python3 manage.py runserver
 
 Ensuite l'application est accessible à l'adresse: `http://localhost:8000/main`
 
-### Identifiant de connexion
 
-Usernane : ifnti
-Password : ifnti
+```
+Problème de soumission
+```

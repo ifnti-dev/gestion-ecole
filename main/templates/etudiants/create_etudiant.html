@@ -36,7 +36,7 @@ Enregistrement d'un étudiant
               <!-- END Step Tabs -->
 
               <!-- Form -->
-              <form method="POST" id="form" onsubmit="showLoading()">
+              <form method="POST" id="form" onsubmit="showLoading()" enctype="multipart/form-data">
                   {% csrf_token %}
                   <!-- Wizard Progress Bar -->
                   <div class="block-content block-content-sm">
@@ -49,7 +49,7 @@ Enregistrement d'un étudiant
                   <!-- Steps Content -->
                   <div class="block-content block-content-full tab-content px-md-5" style="min-height: 300px;">
                       <!-- Step 1 -->
-                      <div class="tab-pane active" id="wizard-progress-step1" role="tabpanel">
+                      <div class="tab-pane active bg-white" id="wizard-progress-step1" role="tabpanel">
                         <div class="d-flex justify-content-end">
                           {% comment %} <a href="{% url 'main:importer_les_donnees' %}" class="btn btn-outline-primary">
                             <i class="fas fa-plus"></i> Importer
@@ -58,26 +58,30 @@ Enregistrement d'un étudiant
                             <i class="fas fa-plus"></i> Importer
                           </a>
                         </div>
-                        <div class="form-row mb-3 m-3">
-                          <div class="bg-body-light col-sm-12 p-3" style="width: 200px">
-                            <div class="fv-row">
+
+                        
+                        <div class="form-row mb-3 m-3 ">
+                          <!-- <div class="bg-body-light col-sm-12 p-3" style="width: 200px">
+                            <div class="fv-row ">
                                 <div class="dropzone dz-clickable">
                                     <div class="dz-message needsclick">
                                         <i class="ki-duotone ki-file-up fs-3x text-primary">
-                                            <span class="d-flex flex-column">
-                                                <img id="preview" src="{% if thumbnail %} /media/{{ form.thumbnail.value }} {% endif %}" alt="Aperçu de l'image" height="100%" />
-                                            </span>
-                                        </i>
-                                        <button id="deleteBtn" class="btn btn-danger" style="{% if not thumbnail %} display: none; {% endif %}">Supprimer</button>
+                                          <span class="d-flex flex-column ifntiimage">
+                                            <img id="preview" src="{% if thumbnail %} /media/etudiant/cartes{{ form.thumbnail.value }} {% endif %}" alt="Aperçu de l'image" height="100%" />
+                                          </span>
+                                        </i> 
+                                      <button id="deleteBtn" class="btn btn-danger" style="{% if not thumbnail %} display: none; {% endif %}">Supprimer</button>
                                         <div class="ms-4">
                                             <span class="fs-7 fw-semibold text-gray-400">cliquer pour charger un fihier</span>
-                                        </div>
+                                        </div> 
                                     </div>
                                 </div>
                             </div>
                               {{ form.profil }}
-                          </div>
+                          </div> -->
                         </div>
+
+
                         <div class="form-row mb-3">
                           <div class="col-md-6">
                             {{ form.nom.label_tag }}
@@ -130,7 +134,7 @@ Enregistrement d'un étudiant
                       </div>
                       <!-- END Step 1 -->
                       <!-- Step 2 -->
-                      <div class="tab-pane" id="wizard-progress-step2" role="tabpanel">
+                      <div class="tab-pane bg-white" id="wizard-progress-step2" role="tabpanel">
                         <div class="form-row mb-3">        
                           <div class="col-md-12 mb-3">
                             {{ form.adresse.label_tag }}
@@ -158,7 +162,7 @@ Enregistrement d'un étudiant
                       </div>
                       <!-- END Step 2 -->
                       <!-- Step 3 -->
-                      <div class="tab-pane" id="wizard-progress-step3" role="tabpanel">
+                      <div class="tab-pane bg-white" id="wizard-progress-step3" role="tabpanel">
                         <div class="form-row mb-3">
                           <div class="col-md-6">
                             {{ form.seriebac1.label_tag }}
@@ -220,7 +224,7 @@ Enregistrement d'un étudiant
                         </div>
                       </div>
                       <!-- END Step 3 -->
-                      <div class="tab-pane" id="wizard-progress-step4" role="tabpanel">
+                      <div class="tab-pane bg-white " id="wizard-progress-step4" role="tabpanel">
                         <div class="form-row mb-3">
                           <div class="col-md-6">
                             {{ form.francaisTerminale.label_tag }}
