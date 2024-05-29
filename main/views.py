@@ -1183,6 +1183,48 @@ def attestation_scolarite(request, id, niveau):
         return response
     
 
+
+
+#---------------------------------------------------------------------------------------------------------------------------------
+@login_required(login_url=settings.LOGIN_URL)
+def attestation_diplome(request, id, niveau):
+    id_annee_selectionnee = request.session["id_annee_selectionnee"]
+    annee_universitaire = get_object_or_404(
+        AnneeUniversitaire, pk=id_annee_selectionnee)
+
+    if request.user.groups.all().first().name not in ['directeur_des_etudes', 'secretaire']:
+        return render(request, 'errors_pages/403.html')
+
+    etudiant = get_object_or_404(Etudiant, id=id)
+
+    in_format = "%Y-%m-%d"
+    out_format = "%d-%m-%Y"
+
+    if etudiant.datenaissance:
+        date_formatee = datetime.strptime(
+            str(etudiant.datenaissance), in_format).strftime(out_format)
+    else:
+        date_formatee = 'None'
+
+    context = {'etudiant': etudiant, 'niveau': niveau,
+               'annee': annee_universitaire.annee, 'date_naissance': date_formatee}
+
+    # nom des fichiers d'entrée et de sortie
+    latex_input = 'template_attestation_diplome'
+    latex_ouput = 'generated_template_attestation_diplome'
+    pdf_file = 'pdf_template_attestation_diplome'
+
+    # génération du pdf
+    generate_pdf(context, latex_input, latex_ouput, pdf_file)
+
+    # visualisation du pdf dans le navigateur
+    with open('media/pdf/' + str(pdf_file) + '.pdf', 'rb') as f:
+        pdf_preview = f.read()
+        response = HttpResponse(pdf_preview, content_type='application/pdf')
+        response['Content-Disposition'] = 'inline;filename=pdf_file.pdf'
+        return response
+    
+
 #-------------------------------------------------------------------------------------------------------------------------------------
 
 @login_required(login_url=settings.LOGIN_URL)

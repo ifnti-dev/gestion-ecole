@@ -412,6 +412,10 @@
                                             <i class="fa fa-certificate mr-1" aria-hidden="true"></i> Attestation
                                         </a>
 
+                                        <a class="dropdown-item" href="{% url 'main:attestation_diplome' etudiant.etudiant.id etudiant.niveau %}">
+                                            <i class="fa fa-certificate mr-1" aria-hidden="true"></i> Attestation de Diplome
+                                        </a>
+
                                         {% endif %}
                                     </div>
                                 </div>
