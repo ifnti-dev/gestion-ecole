@@ -65,8 +65,3 @@ python3 manage.py runserver
 
 
 Ensuite l'application est accessible à l'adresse: `http://localhost:8000/main`
-
-
-```
-Problème de soumission
-```
