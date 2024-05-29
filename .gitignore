@@ -12,7 +12,8 @@ db.sqlite3
 **/.zip
 **/migrations/**
 docs/build/*
-**/media/** 
+**/media/out/** 
+**/media/pdf/** 
 # Backup files # 
 *.bak 
 

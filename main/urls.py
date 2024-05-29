@@ -155,6 +155,10 @@ urlpatterns = [
 
      path('attestation_scolarite/<str:id>/<str:niveau>',
          views.attestation_scolarite, name='attestation_scolarite'),
+     
+     
+     path('attestation_diplome/<str:id>/<str:niveau>',
+         views.attestation_diplome, name='attestation_diplome'),
 
 
      #Table de paramètre globale
