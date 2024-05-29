@@ -2,158 +2,157 @@
 {% load static %}
 {% block content %}
 
+    <style>
+        body {
+            position: relative;
+            background: #eee;
+            font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+            font-size: 14px;
+            color: #000;
+            margin: 0;
+            padding: 0;
+        }
 
-<style>
-    body {
-    position: relative;
-    background: #eee;
-    font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
-    font-size: 14px;
-    color: #000;
-    margin: 0;
-    padding: 0;
-}
+        .login {
+            width: 100%;
+            max-width: 60rem;
+            margin: auto;
+            margin-top: 5rem;
+            display: flex;
+            align-items: center;
+            flex-direction: column;
+        }
 
-.login {
-    width: 100%;
-    max-width: 60rem;
-    margin: auto;
-    margin-top: 5rem;
-    display: flex;
-    align-items: center;
-    flex-direction: column;
-}
+        .caro, .forms {
+            width: 100%;
+            max-width: 30rem;
+        }
 
-.caro, .forms {
-    width: 100%;
-    max-width: 30rem;
-}
+        swiper-container {
+            width: 100%;
+            height: 100%;
+        }
 
-swiper-container {
-    width: 100%;
-    height: 100%;
-}
+        swiper-slide {
+            text-align: center;
+            font-size: 18px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
 
-swiper-slide {
-    text-align: center;
-    font-size: 18px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
+        .imso {
+            padding: 20px;
+            overflow: hidden;
+        }
 
-.imso {
-    padding: 20px;
-    overflow: hidden;
-}
+        .imso .mages {
+            height: 100%;
+            width: 100%;
+            object-fit: cover;
+        }
 
-.imso .mages {
-    height: 100%;
-    width: 100%;
-    object-fit: cover;
-}
+        .logifnti {
+            margin: auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
 
-.logifnti {
-    margin: auto;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
+    /*----------------------------- Responsiveness ---------------------------*/
 
-/*----------------------------- Responsiveness ---------------------------*/
+        @media screen and (max-width: 320px) {
+            .login {
+                width: 90%;
+                margin-top: 1rem;
+                flex-direction: column;
+            }
+            .caro, .forms {
+                width: 100%;
+            }
+        } 
 
-@media screen and (max-width: 320px) {
-    .login {
-        width: 90%;
-        margin-top: 1rem;
-        flex-direction: column;
-    }
-    .caro, .forms {
-        width: 100%;
-    }
-} 
+        @media screen and (max-width: 375px) {
+            .login {
+                width: 90%;
+                margin-top: 1rem;
+                flex-direction: column;
+            }
+            .caro, .forms {
+                width: 100%;
+            }
+        }
 
-@media screen and (max-width: 375px) {
-    .login {
-        width: 90%;
-        margin-top: 1rem;
-        flex-direction: column;
-    }
-    .caro, .forms {
-        width: 100%;
-    }
-}
+        @media screen and (max-width: 425px) {
+            .login {
+                width: 90%;
+                margin-top: 1rem;
+                flex-direction: column;
+            }
+            .caro, .forms {
+                width: 100%;
+            }
+        }
 
-@media screen and (max-width: 425px) {
-    .login {
-        width: 90%;
-        margin-top: 1rem;
-        flex-direction: column;
-    }
-    .caro, .forms {
-        width: 100%;
-    }
-}
+        @media screen and (max-width: 768px) {
+            .login {
+                width: 90%;
+                margin-top: 1rem;
+                flex-direction: column;
+            }
+            .caro, .forms {
+                width: 100%;
+            }
+        }
 
-@media screen and (max-width: 768px) {
-    .login {
-        width: 90%;
-        margin-top: 1rem;
-        flex-direction: column;
-    }
-    .caro, .forms {
-        width: 100%;
-    }
-}
+        @media screen and (min-width: 769px) and (max-width: 1024px) {
+            .login {
+                width: 90%;
+                margin-top: 1rem;
+                flex-direction: row;
+                justify-content: space-between;
+            }
+            .caro, .forms {
+                width: 48%;
+            }
+        }
 
-@media screen and (min-width: 769px) and (max-width: 1024px) {
-    .login {
-        width: 90%;
-        margin-top: 1rem;
-        flex-direction: row;
-        justify-content: space-between;
-    }
-    .caro, .forms {
-        width: 48%;
-    }
-}
+        @media screen and (min-width: 1025px) and (max-width: 1280px) {
+            .login {
+                width: 90%;
+                margin-top: 1rem;
+                flex-direction: row;
+                justify-content: space-between;
+            }
+            .caro, .forms {
+                width: 48%;
+            }
+        }
 
-@media screen and (min-width: 1025px) and (max-width: 1280px) {
-    .login {
-        width: 90%;
-        margin-top: 1rem;
-        flex-direction: row;
-        justify-content: space-between;
-    }
-    .caro, .forms {
-        width: 48%;
-    }
-}
+        @media screen and (min-width: 1281px) and (max-width: 1536px) {
+            .login {
+                width: 90%;
+                margin-top: 1rem;
+                flex-direction: row;
+                justify-content: space-between;
+            }
+            .caro, .forms {
+                width: 48%;
+            }
+        }
 
-@media screen and (min-width: 1281px) and (max-width: 1536px) {
-    .login {
-        width: 90%;
-        margin-top: 1rem;
-        flex-direction: row;
-        justify-content: space-between;
-    }
-    .caro, .forms {
-        width: 48%;
-    }
-}
+        @media screen and (min-width: 1537px) {
+            .login {
+                max-width: 60rem;
+                flex-direction: row;
+                justify-content: space-between;
+            }
+            .caro, .forms {
+                width: 48%;
+            }
+        }
 
-@media screen and (min-width: 1537px) {
-    .login {
-        max-width: 60rem;
-        flex-direction: row;
-        justify-content: space-between;
-    }
-    .caro, .forms {
-        width: 48%;
-    }
-}
-
-</style>
+    </style>
 
     <div class="login shadow-lg p-3 mb-5 bg-body rounded">
         <div class="caro">
@@ -164,6 +163,12 @@ swiper-slide {
                 <swiper-slide>
                     <div class="imso">
                         <img class="mages" src="{% static '/assets/media/sliders/3.png' %}" alt="">
+                    </div>
+                </swiper-slide>
+
+                <swiper-slide>
+                    <div class="imso">
+                        <img class="mages" src="{% static '/assets/media/sliders/1.jpeg' %}" alt="">
                     </div>
                 </swiper-slide>
 
