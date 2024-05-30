@@ -550,7 +550,7 @@ class Etudiant(Utilisateur):
             :return: Retourne un tableau de dictionnaires, chaque dictionnaire composé du libellé de la matière, la moyenne obtenue et la validation.
             :retype: list[dict()] 
         """
-
+        
         result = []
         programmes = Programme.objects.filter(semestre=semestre)
         if not programmes:
@@ -585,8 +585,7 @@ class Etudiant(Utilisateur):
         """
         # Verifier si l'étudiant suis cette matiere
         # Récupérerer toute les évaluations de l'étuidant dans cette matière
-        evaluations = Evaluation.objects.filter(
-            matiere=matiere, semestre=semestre)
+        evaluations = Evaluation.objects.filter(matiere=matiere, semestre=semestre)
         if not evaluations:
             return []
 
@@ -616,16 +615,16 @@ class Etudiant(Utilisateur):
 
 
         """
+        print("::::: 2")
         # Verifier si l'étudiant suit cette matiere
         # Récupérerer toute les évaluations de l'étuidant dans cette matière
-        evaluations = Evaluation.objects.filter(
-            matiere=matiere, rattrapage=False, semestre=semestre)
-        if not evaluations:
+        all_evaluations = Evaluation.objects.filter(matiere=matiere, semestre=semestre)
+        if not all_evaluations:
             return 0, 0, semestre.annee_universitaire.annee
 
+        evaluations = all_evaluations.filter(rattrapage=False)
         # on récupère tous les rattrapages faits dans cette matière au cours des différentes années scolaires
-        rattrapages = Evaluation.objects.filter(
-            matiere=matiere, rattrapage=True)
+        rattrapages = all_evaluations.filter(rattrapage=True)
         # s'il il y'a eu des rattrapages alors on recherche les notes de l'étudiant au cours de ces rattrapages
         if rattrapages:
             for rattrapage in rattrapages:
@@ -642,6 +641,8 @@ class Etudiant(Utilisateur):
 
         note_ponderation = {}
         somme = 0
+        print(" ::::::: evaluations ::::::: ")
+
         for evaluation in evaluations:
             notes = evaluation.note_set.filter(etudiant=self)
             if notes:
@@ -649,6 +650,7 @@ class Etudiant(Utilisateur):
                 somme += note.valeurNote * evaluation.ponderation
                 note_ponderation[evaluation.libelle] = (
                     note, evaluation.ponderation)
+                
         moyenne = round(somme/100, 2)
         a_valide = moyenne >= matiere.minValue
         return moyenne, a_valide, semestre.annee_universitaire.annee
