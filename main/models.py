@@ -694,14 +694,18 @@ class Etudiant(Utilisateur):
                 a_valide = False
 
         moyenne = round(somme_note/somme_coef, 2)
-        # matiere_principale = ue.matiere_principacle()
-        # a_valide = moyenne >= matiere_principale.minValue
-        if ue.type == 'Technologie':
-            if moyenne < 12:
-                a_valide = False
+        matiere_principale = ue.matiere_principacle()
+        a_valide = moyenne >= matiere_principale.minValue
+        # if ue.type == 'Technologie':
+        #     if moyenne < 12:
+        #         a_valide = False
+        # else:
+        #     if moyenne < 10:
+        #         a_valide = False
+        if moyenne >= ue.minValue :
+            a_valide = True
         else:
-            if moyenne < 10:
-                a_valide = False
+            a_valide = False
         return moyenne, a_valide, anneeValidation
 
 
@@ -730,6 +734,7 @@ class Etudiant(Utilisateur):
             if a_valide_ue:
                 credits_obtenus += ue.nbreCredits
         return credits_obtenus
+
 
     @staticmethod
     def get_Ln(semestres, annee_universitaire=None):
@@ -1289,6 +1294,15 @@ class Ue(models.Model):
 
         **Type:** integer
     """
+    minValue = models.FloatField(
+        null=True,  verbose_name="Note de validation l'UE",  default="10")
+    """
+        Moyenne minimale pour valider la l'UE.
+
+        **Type:** float
+
+        **Valeur par défaut:** 7.0
+    """
     heures = models.DecimalField(
         blank=True, max_digits=4, decimal_places=1, validators=[MinValueValidator(1)])
     """
@@ -1375,7 +1389,7 @@ class Matiere(models.Model):
         **Valeur par défaut:** 1
     """
     minValue = models.FloatField(
-        null=True,  verbose_name="Valeur minimale",  default="7")
+        null=True,  verbose_name="Note de validation de la matière",  default="7")
     """
         Moyenne minimale pour valider la matière.
 
@@ -1575,9 +1589,13 @@ class Matiere(models.Model):
         semestres = self.get_semestres('__all__', '__all__')
         for semestre in semestres:
             for etudiant in semestre.etudiant_set.all():
-                _, a_valide, _ = etudiant.moyenne_etudiant_matiere(
-                    self, semestre)
-                if not a_valide:
+                _, a_valide_matiere, _ = etudiant.moyenne_etudiant_matiere(self, semestre)
+                if a_valide_matiere:
+                    _, a_valide_ue, _ = etudiant.moyenne_etudiant_ue(self.ue,semestre)
+                    if not a_valide_ue:
+                        etudiants.update([etudiant])
+                    pass
+                elif not a_valide_matiere:
                     etudiants.update([etudiant])
         return list(etudiants)
 

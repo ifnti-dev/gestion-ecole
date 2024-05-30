@@ -40,5 +40,4 @@ def generate_pdf(context, input_file, output_file, pdf_file) :
     mon_pdf.save_to("media/pdf/" + str(pdf_file) + '.pdf')
     
     '''FERMETURE DE CANAUX'''
-    
     fichier_in.close()
