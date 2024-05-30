@@ -29,7 +29,7 @@
     </style>
 
     <body class="">
-        <main class="vh-100 w-100 row flex-row-reverse m-0">
+        <!-- <main class="vh-100 w-100 row flex-row-reverse m-0">
             <div class="col-12 col-md-6 d-flex align-items-center justify-content-center p-0 ">
 
                 <img class="" style="width: 100%;  height: 460px;" src="{% static '/assets/media/sliders/1.jpeg' %}"
@@ -37,9 +37,12 @@
 
             </div>
             <div class=" h-100 col-12 col-md-6 d-flex align-items-center justify-content-center m-0 p-0">
-                {% block content %}
-                {% endblock content %}
+                
             </div>
+        </main> -->
+        <main>
+            {% block content %}
+            {% endblock content %}
         </main>
     </body>
     <script src="{% static 'assets/js/jquery-3.7.1.min.js' %}"></script>

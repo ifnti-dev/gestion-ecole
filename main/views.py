@@ -378,31 +378,38 @@ def liste_etudiants_par_semestre(request, id_annee_selectionnee):
     if 'semestre' in request.GET:
         semestre_id = request.GET.get('semestre')
         semestres_selected = semestres.filter(pk=semestre_id)
+    
+    try:
+        programme = Programme.objects.get(semestre=semestres_selected[0])
+  
 
-    # Filtrer les étudiants en fonction des semestres sélectionnés et qui sont actifs
-    etudiants = Etudiant.objects.filter(
-        semestres__in=semestres_selected, is_active=True).distinct()
+        # Filtrer les étudiants en fonction des semestres sélectionnés et qui sont actifs
+        etudiants = Etudiant.objects.filter(
+            semestres__in=semestres_selected, is_active=True).distinct()
 
-    # Initialiser une liste pour les étudiants insuffisants
-    etudiants_insuffisants = []
+        # Initialiser une liste pour les étudiants insuffisants
+        etudiants_insuffisants = []
+        print("---------------------------------------------------")
+        print(etudiants)
+        # Calculer les crédits obtenus par chaque étudiant pour le semestre sélectionné
+        for etudiant in etudiants:
+            credits_obtenus = etudiant.credits_obtenus_semestre(
+                programme=programme)  # Utiliser le premier semestre sélectionné
+            # Créer un attribut pour stocker les crédits obtenus
+            etudiant.credits_obtenus = credits_obtenus
 
-    # Calculer les crédits obtenus par chaque étudiant pour le semestre sélectionné
-    for etudiant in etudiants:
-        credits_obtenus = etudiant.credits_obtenus_semestre(
-            semestres_selected[0])  # Utiliser le premier semestre sélectionné
-        # Créer un attribut pour stocker les crédits obtenus
-        etudiant.credits_obtenus = credits_obtenus
-
-    # Récupérer le semestre actuel de chaque étudiant dans l'année universitaire
-    for etudiant in etudiants:
-        semestres_etudiant = etudiant.semestres.filter(
-            annee_universitaire=annee_universitaire)
-        if semestres_etudiant.exists():
-            semestre_actuel = semestres_etudiant.latest('libelle')
-            etudiant.semestre_actuel = semestre_actuel
-        else:
-            etudiant.semestre_actuel = None
-
+        # Récupérer le semestre actuel de chaque étudiant dans l'année universitaire
+        for etudiant in etudiants:
+            semestres_etudiant = etudiant.semestres.filter(
+                annee_universitaire=annee_universitaire)
+            if semestres_etudiant.exists():
+                semestre_actuel = semestres_etudiant.latest('libelle')
+                etudiant.semestre_actuel = semestre_actuel
+            else:
+                etudiant.semestre_actuel = None
+    except Exception as e:
+        etudiants=[]
+        etudiants_insuffisants=[]
     # Construire le contexte pour le rendu de la page
     data = {
         'etudiants': etudiants,
@@ -1136,7 +1143,89 @@ def certificat_scolaire(request, id, niveau):
         response = HttpResponse(pdf_preview, content_type='application/pdf')
         response['Content-Disposition'] = 'inline;filename=pdf_file.pdf'
         return response
+#---------------------------------------------------------------------------------------------------------------------------------
+@login_required(login_url=settings.LOGIN_URL)
+def attestation_scolarite(request, id, niveau):
+    id_annee_selectionnee = request.session["id_annee_selectionnee"]
+    annee_universitaire = get_object_or_404(
+        AnneeUniversitaire, pk=id_annee_selectionnee)
 
+    if request.user.groups.all().first().name not in ['directeur_des_etudes', 'secretaire']:
+        return render(request, 'errors_pages/403.html')
+
+    etudiant = get_object_or_404(Etudiant, id=id)
+
+    in_format = "%Y-%m-%d"
+    out_format = "%d-%m-%Y"
+
+    if etudiant.datenaissance:
+        date_formatee = datetime.strptime(
+            str(etudiant.datenaissance), in_format).strftime(out_format)
+    else:
+        date_formatee = 'None'
+
+    context = {'etudiant': etudiant, 'niveau': niveau,
+               'annee': annee_universitaire.annee, 'date_naissance': date_formatee}
+
+    # nom des fichiers d'entrée et de sortie
+    latex_input = 'template_attestation_scolarite'
+    latex_ouput = 'generated_template_attestation_scolaire'
+    pdf_file = 'pdf_template_attestation_scolaire'
+
+    # génération du pdf
+    generate_pdf(context, latex_input, latex_ouput, pdf_file)
+
+    # visualisation du pdf dans le navigateur
+    with open('media/pdf/' + str(pdf_file) + '.pdf', 'rb') as f:
+        pdf_preview = f.read()
+        response = HttpResponse(pdf_preview, content_type='application/pdf')
+        response['Content-Disposition'] = 'inline;filename=pdf_file.pdf'
+        return response
+    
+
+
+
+#---------------------------------------------------------------------------------------------------------------------------------
+@login_required(login_url=settings.LOGIN_URL)
+def attestation_diplome(request, id, niveau):
+    id_annee_selectionnee = request.session["id_annee_selectionnee"]
+    annee_universitaire = get_object_or_404(
+        AnneeUniversitaire, pk=id_annee_selectionnee)
+
+    if request.user.groups.all().first().name not in ['directeur_des_etudes', 'secretaire']:
+        return render(request, 'errors_pages/403.html')
+
+    etudiant = get_object_or_404(Etudiant, id=id)
+
+    in_format = "%Y-%m-%d"
+    out_format = "%d-%m-%Y"
+
+    if etudiant.datenaissance:
+        date_formatee = datetime.strptime(
+            str(etudiant.datenaissance), in_format).strftime(out_format)
+    else:
+        date_formatee = 'None'
+
+    context = {'etudiant': etudiant, 'niveau': niveau,
+               'annee': annee_universitaire.annee, 'date_naissance': date_formatee}
+
+    # nom des fichiers d'entrée et de sortie
+    latex_input = 'template_attestation_diplome'
+    latex_ouput = 'generated_template_attestation_diplome'
+    pdf_file = 'pdf_template_attestation_diplome'
+
+    # génération du pdf
+    generate_pdf(context, latex_input, latex_ouput, pdf_file)
+
+    # visualisation du pdf dans le navigateur
+    with open('media/pdf/' + str(pdf_file) + '.pdf', 'rb') as f:
+        pdf_preview = f.read()
+        response = HttpResponse(pdf_preview, content_type='application/pdf')
+        response['Content-Disposition'] = 'inline;filename=pdf_file.pdf'
+        return response
+    
+
+#-------------------------------------------------------------------------------------------------------------------------------------
 
 @login_required(login_url=settings.LOGIN_URL)
 # methode générant le relevé de notes de l'étudiant
@@ -1614,6 +1703,7 @@ def releve_notes_details_all(request, id_semestre):
         response = HttpResponse(pdf_preview, content_type='application/pdf')
         response['Content-Disposition'] = 'inline;filename=pdf_file.pdf'
         return response
+
 
 @login_required(login_url=settings.LOGIN_URL)
 def recapitulatif_notes(request, id_matiere, id_semestre):
