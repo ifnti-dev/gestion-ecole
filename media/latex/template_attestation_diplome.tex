@@ -1,0 +1,78 @@
+\documentclass[a4paper, 12pt]{article}
+\usepackage[french]{babel}
+\usepackage[OT1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[none]{hyphenat}
+
+\usepackage{fancyhdr}
+\pagestyle{fancyplain}
+\cfoot{\vspace{.5cm}Institut de formation aux normes et technologies de l'informatique\\300 BP 40, Sokodé TOGO -- Tél. : +228 90 91 81 41\\Agrément N\textdegree2019/064/MESR/SG/DES }
+
+\usepackage{eso-pic, graphicx}
+
+\graphicspath{ {\VAR{image_path}} }
+
+\newcommand\BackgroundPic{
+\put(0,0){
+\parbox[b][\paperheight]{\paperwidth}{
+\includegraphics[width=\paperwidth,height=\paperheight]{CharteGraphiqueDocumentPageDeGardeLogo}
+}}}
+
+
+\title{\vspace{-1cm}\textbf{ATTESTATION DE DIPLÔME}}
+\author{}
+\date{}
+
+
+\begin{document}
+
+\maketitle
+
+
+\AddToShipoutPicture*{\BackgroundPic}
+
+
+\vspace{-1cm}
+\textbf{
+    Le responsable l'Institut de Formation aux Normes et Technologies de l'Informatique (IFNTI) Sokodé, certifie que\\\large
+}
+
+\textbf{. Monsieur \VAR{etudiant.nom} \VAR{etudiant.prenom}},\\\vspace{-.4cm}
+
+% Matricule : \VAR{etudiant.id},\\\vspace{-.4cm}
+
+\textbf{. né\BLOCK{if etudiant.sexe == 'F'}e\BLOCK{endif} le \VAR{date_naissance} à \VAR{etudiant.lieunaissance},\\\vspace{-.3cm}}
+
+% \textbf{
+%     de nationalité \VAR{etudiant.nationalite},\\\normalsize
+% }
+
+\textbf{
+    a obtenu le \\
+}
+
+\begin{center}
+    \textbf{DIPLÔME DE LICENCE PROFESSIONEL}\\\vspace{-.3cm}
+\end{center}
+
+\textbf{de l'IFNTI}\\\vspace{-.3cm}\\
+
+\textbf{. Specialité:  INFORMATIQUE DES ORGANISATIONS}\\
+
+\textbf{. Mention : Bien}\\
+
+\textbf{. Date du jury \VAR{annee}-\VAR{annee + 1}.\\\normalsize}\\\vspace{-.3cm}\\
+
+\textbf{
+    \noindent Attestation délivrée à l'intéressé, à toutes fins utiles.\\
+}
+
+\null\hfill Sokodé, le \VAR{annee}
+
+\null\hfill Le Responsable de l'établissement\\
+
+
+\hspace{7cm} %\includegraphics[width=10cm]{signature_sab.png}
+
+\null\hfill Sani KOUMOI MOUHAMAM
+\end{document}

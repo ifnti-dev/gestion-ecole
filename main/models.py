@@ -20,7 +20,7 @@ from decimal import Decimal, ROUND_DOWN
 import math
 
 def create_auth_user(nom, prenom, email):
-    username = (prenom + nom).lower()
+    username = (nom+prenom).lower()
     print(username)
     username = username.replace(" ", "")
     year = date.today().year
@@ -499,7 +499,7 @@ class Etudiant(Utilisateur):
             else:
                 self.id = f"{self.nom[0]}{self.prenom[0]}{self.anneeentree}01"
             
-            self.user = create_auth_user(self.prenom, self.nom, self.email)  
+            self.user = create_auth_user(self.nom, self.prenom, self.email)  
             group_etudiant = Group.objects.get(name="etudiant")
             self.user.groups.add(group_etudiant)
         super().save()
@@ -550,7 +550,7 @@ class Etudiant(Utilisateur):
             :return: Retourne un tableau de dictionnaires, chaque dictionnaire composé du libellé de la matière, la moyenne obtenue et la validation.
             :retype: list[dict()] 
         """
-
+        
         result = []
         programmes = Programme.objects.filter(semestre=semestre)
         if not programmes:
@@ -585,8 +585,7 @@ class Etudiant(Utilisateur):
         """
         # Verifier si l'étudiant suis cette matiere
         # Récupérerer toute les évaluations de l'étuidant dans cette matière
-        evaluations = Evaluation.objects.filter(
-            matiere=matiere, semestre=semestre)
+        evaluations = Evaluation.objects.filter(matiere=matiere, semestre=semestre)
         if not evaluations:
             return []
 
@@ -616,16 +615,16 @@ class Etudiant(Utilisateur):
 
 
         """
+        print("::::: 2")
         # Verifier si l'étudiant suit cette matiere
         # Récupérerer toute les évaluations de l'étuidant dans cette matière
-        evaluations = Evaluation.objects.filter(
-            matiere=matiere, rattrapage=False, semestre=semestre)
-        if not evaluations:
+        all_evaluations = Evaluation.objects.filter(matiere=matiere, semestre=semestre)
+        if not all_evaluations:
             return 0, 0, semestre.annee_universitaire.annee
 
+        evaluations = all_evaluations.filter(rattrapage=False)
         # on récupère tous les rattrapages faits dans cette matière au cours des différentes années scolaires
-        rattrapages = Evaluation.objects.filter(
-            matiere=matiere, rattrapage=True)
+        rattrapages = all_evaluations.filter(rattrapage=True)
         # s'il il y'a eu des rattrapages alors on recherche les notes de l'étudiant au cours de ces rattrapages
         if rattrapages:
             for rattrapage in rattrapages:
@@ -642,6 +641,8 @@ class Etudiant(Utilisateur):
 
         note_ponderation = {}
         somme = 0
+        print(" ::::::: evaluations ::::::: ")
+
         for evaluation in evaluations:
             notes = evaluation.note_set.filter(etudiant=self)
             if notes:
@@ -649,6 +650,7 @@ class Etudiant(Utilisateur):
                 somme += note.valeurNote * evaluation.ponderation
                 note_ponderation[evaluation.libelle] = (
                     note, evaluation.ponderation)
+                
         moyenne = round(somme/100, 2)
         a_valide = moyenne >= matiere.minValue
         return moyenne, a_valide, semestre.annee_universitaire.annee
@@ -692,14 +694,18 @@ class Etudiant(Utilisateur):
                 a_valide = False
 
         moyenne = round(somme_note/somme_coef, 2)
-        # matiere_principale = ue.matiere_principacle()
-        # a_valide = moyenne >= matiere_principale.minValue
-        if ue.type == 'Technologie':
-            if moyenne < 12:
-                a_valide = False
+        matiere_principale = ue.matiere_principacle()
+        a_valide = moyenne >= matiere_principale.minValue
+        # if ue.type == 'Technologie':
+        #     if moyenne < 12:
+        #         a_valide = False
+        # else:
+        #     if moyenne < 10:
+        #         a_valide = False
+        if moyenne >= ue.minValue :
+            a_valide = True
         else:
-            if moyenne < 10:
-                a_valide = False
+            a_valide = False
         return moyenne, a_valide, anneeValidation
 
 
@@ -728,6 +734,7 @@ class Etudiant(Utilisateur):
             if a_valide_ue:
                 credits_obtenus += ue.nbreCredits
         return credits_obtenus
+
 
     @staticmethod
     def get_Ln(semestres, annee_universitaire=None):
@@ -1287,6 +1294,15 @@ class Ue(models.Model):
 
         **Type:** integer
     """
+    minValue = models.FloatField(
+        null=True,  verbose_name="Note de validation l'UE",  default="10")
+    """
+        Moyenne minimale pour valider la l'UE.
+
+        **Type:** float
+
+        **Valeur par défaut:** 7.0
+    """
     heures = models.DecimalField(
         blank=True, max_digits=4, decimal_places=1, validators=[MinValueValidator(1)])
     """
@@ -1373,7 +1389,7 @@ class Matiere(models.Model):
         **Valeur par défaut:** 1
     """
     minValue = models.FloatField(
-        null=True,  verbose_name="Valeur minimale",  default="7")
+        null=True,  verbose_name="Note de validation de la matière",  default="7")
     """
         Moyenne minimale pour valider la matière.
 
@@ -1573,9 +1589,13 @@ class Matiere(models.Model):
         semestres = self.get_semestres('__all__', '__all__')
         for semestre in semestres:
             for etudiant in semestre.etudiant_set.all():
-                _, a_valide, _ = etudiant.moyenne_etudiant_matiere(
-                    self, semestre)
-                if not a_valide:
+                _, a_valide_matiere, _ = etudiant.moyenne_etudiant_matiere(self, semestre)
+                if a_valide_matiere:
+                    _, a_valide_ue, _ = etudiant.moyenne_etudiant_ue(self.ue,semestre)
+                    if not a_valide_ue:
+                        etudiants.update([etudiant])
+                    pass
+                elif not a_valide_matiere:
                     etudiants.update([etudiant])
         return list(etudiants)
 

@@ -282,6 +282,9 @@ def liste_paiements(request, id_annee_selectionnee):
     }
     return render(request, 'paiements/liste_paiements.html', context)
 
+### verifier si c'est un comptable
+def is_comptable(personnel):
+    pass
 
 #ajouter un controle de permisssion pour verifier que le user faisant cette operation est un comptable
 @login_required(login_url=settings.LOGIN_URL)
@@ -330,6 +333,11 @@ def enregistrer_paiement(request, id=0):
         if form.is_valid():
             paiement = form.save(commit=False)
             print(paiement.etudiant)
+            
+            # group2 = Group.objects.get(name="comptable")
+            # personnel.user.groups.add(group2)
+            print("user connecté: ",request.user)
+            user_con=User.objects.get(username=request.user)
             comptable = Personnel.objects.get(user=request.user)
             paiement.comptable = comptable
 

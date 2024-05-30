@@ -10,11 +10,15 @@ from datetime import datetime, timedelta
 BASE_PATH = "media/excel_templates"
 
 def trim_str(string):
-    string = str(string).lower()
-    string = re.sub(r'\s+', '', string.strip())
-    string = re.sub(r'=', '', string)
-    print(string)
-    return string
+    try:
+        return float(string)
+    except Exception as e:
+        print(e)
+        string = str(string).lower()
+        string = re.sub(r'\s+', '', string.strip())
+        string = re.sub(r'=', '', string)
+        print(string)
+        return string
 
 def is_naturel(string):
     return string.isdecimal() and int(string) > 0
@@ -238,6 +242,48 @@ def pre_load_evaluation_template_data(matiere, semestre):
     return path
 
 @transaction.atomic
+def export_evaluation_data(matiere, semestre):
+    path = 'media/excel_templates/evaluation.xlsx'
+    wb = openpyxl.load_workbook(filename="media/excel_templates/evaluations.xlsx")
+    
+    #
+    for index, sublist in enumerate(table):
+    # Créer une nouvelle feuille de calcul avec un nom unique
+        sheet_name = f'Sheet{index + 1}'
+        sheet = wb.create_sheet(title=sheet_name)
+    
+    
+    
+    
+    
+    
+    
+    # wb = openpyxl.load_workbook(filename="media/excel_templates/evaluations.xlsx")
+    # ws = wb.active
+    # ws['B1'].value = semestre.annee_universitaire.annee
+    # ws['B2'].value = semestre.libelle
+    # ws['B3'].value = matiere.libelle
+    # ws['B5'].value = ""
+    # ws['B6'].value = ""
+    # ws['B7'].value = ""
+    
+    # etudiants = matiere.get_etudiant_semestre(semestre).order_by("nom")
+    
+    # min_row = 10
+    # max_row = min_row + len(etudiants)
+    
+    # i = 0
+    # for row in ws.iter_rows(min_row=min_row, max_row=max_row-1, max_col=3):
+    #     row[0].value = etudiants[i].nom
+    #     row[1].value = etudiants[i].prenom
+    #     row[2].value = ""
+    #     i += 1
+    # wb.save(path)
+    
+    return path
+
+
+@transaction.atomic
 def load_notes_from_evaluation(path, matiere=None, semestre=None):
     # Charger le fichier excel des différentes notes d'une matière
     wb = openpyxl.load_workbook(path)
@@ -254,16 +300,24 @@ def load_notes_from_evaluation(path, matiere=None, semestre=None):
         ws = sheet
         
         annee = str(ws['B1'].value)
-        if not semestre:
-            semestre = str(ws['B2'].value)
-            matiere = Matiere.objects.get(libelle=matiere)
-        if not matiere:
-            annee = AnneeUniversitaire.objects.get(annee=annee)
-            matiere = str(ws['B3'].value)
-            semestre = Semestre.objects.get(libelle=semestre, annee_universitaire__id=annee.id)
+        matiere = None
+        semestre = None
+        # if not semestre:
+        #     semestre = str(ws['B2'].value)
+        #     matiere = Matiere.objects.get(libelle=matiere)
+        # if not matiere:
+        #     annee = AnneeUniversitaire.objects.get(annee=annee)
+        #     matiere = str(ws['B3'].value)
+        #     semestre = Semestre.objects.get(libelle=semestre, annee_universitaire__id=annee.id)
         
-        rattrapage = str(ws['B4'].value).lower() != "oui"
-        print()
+        annee = AnneeUniversitaire.objects.get(annee=annee)
+        semestre = str(ws['B2'].value)
+        matiere = str(ws['B3'].value)
+        matiere = Matiere.objects.get(libelle=matiere)
+        semestre = Semestre.objects.get(libelle=semestre, annee_universitaire__id=annee.id)
+        
+       
+        rattrapage = False
         print(ws['B5'].value)
         evaluation_date = convert_serial_temporel_number_to_date(ws['B5'].value)
         evaluation_name = str(ws['B6'].value)
@@ -282,19 +336,27 @@ def load_notes_from_evaluation(path, matiere=None, semestre=None):
                 )
             
             etudiants = matiere.get_etudiant_semestre(semestre)
-        
+            print(etudiants)
+            print(matiere, " ", semestre)
             min_row = 10
             max_row = min_row + len(etudiants)
             
             for row in sheet.iter_rows(min_row=min_row, max_row=max_row-1, max_col=3, values_only=True):
-                etudiant = etudiants.get(nom__contains=row[0], prenom__contains=row[1])
+                nom = row[0]
+                prenom = row[1]
+                if nom==prenom==None:
+                    continue
+                username = (nom + prenom).lower()
+                username = username.replace(" ", "")
+                print(username)
+                etudiant = etudiants.get(user__username=username)
                 if Note.objects.filter(etudiant=etudiant, evaluation=evaluation):
                     continue
                 Note.objects.create(valeurNote=int(trim_str(row[2])), etudiant=etudiant, evaluation=evaluation)
-
         else:
             raise ValueError(f"Erreur de pondération pour l'évaluation : {evaluation_name} ")
-
+# mangbayét-nambénédicta
+# mangbayet-nambénédicta
 @transaction.atomic
 def pre_load_maquette(annees):
     path = 'media/excel_templates/maquette_general_[annee].xlsx'
@@ -303,7 +365,6 @@ def pre_load_maquette(annees):
     template_path = f"{BASE_PATH}/ues_matieres_tmp.xlsx"
     
     for annee in annees:
-    
         result_path = f"{folder_path}/maquette_general_{annee}.xlsx"
         
         wb = openpyxl.load_workbook(path)
@@ -466,7 +527,7 @@ def load_notes_from_matiere(path):
 def run():
     #clean_data_base()
     print("::::: Import begining :::::")
-    pre_load_maquette("media/excel_templates/maquette_general_[annee]2.xlsx")
+    
     # annee = AnneeUniversitaire.objects.filter(annee=2023).first()
     # semestres  = annee.semestre_set.all().prefetch_related('programme_set').prefetch_related('etudiant_set')
     # pre_load_note_ues_template_data(semestres)

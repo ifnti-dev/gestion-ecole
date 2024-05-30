@@ -6,8 +6,8 @@ from main.pdfMaker import generate_pdf
 from django.conf import settings
 from main.forms import EnseignantForm, EtudiantForm, EvaluationForm, InformationForm, PersonnelForm, ProgrammeForm, NoteForm, TuteurForm, UeForm, MatiereForm
 from scripts.mail_utils import send_email_task
-from scripts.utils import load_notes_from_evaluation, pre_load_evaluation_template_data
-from .models import Domaine, Enseignant, Evaluation, Personnel, Information, Matiere, Etudiant, Competence, Note, Parcours, Programme, Semestre, Ue, AnneeUniversitaire, Tuteur
+from scripts.utils import export_evaluation_data, load_notes_from_evaluation, pre_load_evaluation_template_data
+from .models import Domaine, Enseignant, Evaluation, Personnel, Information, Matiere, Etudiant, Competence, Note, Parcours, Programme, Semestre, Ue, AnneeUniversitaire, Tuteur, Utilisateur
 from cahier_de_texte.models import Seance
 from planning.models import Planning, SeancePlannifier
 
@@ -24,7 +24,7 @@ from django.core.cache import cache
 from django.core import serializers
 from django.core.mail import send_mail
 from django.conf import settings
-
+from openpyxl import Workbook
 
 def datetime_serializer(obj):
     if isinstance(obj, datetime):
@@ -32,6 +32,22 @@ def datetime_serializer(obj):
     raise TypeError("Type not serializable")
 
 
+
+@login_required(login_url=settings.LOGIN_URL)
+def export_excel_evaluation(request, id_matiere, id_semestre):
+    
+    matiere = get_object_or_404(Matiere, id=id_matiere)
+    semestre = get_object_or_404(Semestre, id=id_semestre)
+    
+    
+    path=export_evaluation_data(matiere, semestre)
+    file_name = path
+    with open(file_name, 'rb') as file:
+        response = HttpResponse(
+            file.read(), content_type="application/force-download")
+        response['Content-Disposition'] = 'attachment; filename="{}"'.format(os.path.basename(file_name))
+        return response
+    
 @login_required(login_url=settings.LOGIN_URL)
 def dashboard(request):
     """
@@ -362,31 +378,38 @@ def liste_etudiants_par_semestre(request, id_annee_selectionnee):
     if 'semestre' in request.GET:
         semestre_id = request.GET.get('semestre')
         semestres_selected = semestres.filter(pk=semestre_id)
+    
+    try:
+        programme = Programme.objects.get(semestre=semestres_selected[0])
+  
 
-    # Filtrer les étudiants en fonction des semestres sélectionnés et qui sont actifs
-    etudiants = Etudiant.objects.filter(
-        semestres__in=semestres_selected, is_active=True).distinct()
+        # Filtrer les étudiants en fonction des semestres sélectionnés et qui sont actifs
+        etudiants = Etudiant.objects.filter(
+            semestres__in=semestres_selected, is_active=True).distinct()
 
-    # Initialiser une liste pour les étudiants insuffisants
-    etudiants_insuffisants = []
+        # Initialiser une liste pour les étudiants insuffisants
+        etudiants_insuffisants = []
+        print("---------------------------------------------------")
+        print(etudiants)
+        # Calculer les crédits obtenus par chaque étudiant pour le semestre sélectionné
+        for etudiant in etudiants:
+            credits_obtenus = etudiant.credits_obtenus_semestre(
+                programme=programme)  # Utiliser le premier semestre sélectionné
+            # Créer un attribut pour stocker les crédits obtenus
+            etudiant.credits_obtenus = credits_obtenus
 
-    # Calculer les crédits obtenus par chaque étudiant pour le semestre sélectionné
-    for etudiant in etudiants:
-        credits_obtenus = etudiant.credits_obtenus_semestre(
-            semestres_selected[0])  # Utiliser le premier semestre sélectionné
-        # Créer un attribut pour stocker les crédits obtenus
-        etudiant.credits_obtenus = credits_obtenus
-
-    # Récupérer le semestre actuel de chaque étudiant dans l'année universitaire
-    for etudiant in etudiants:
-        semestres_etudiant = etudiant.semestres.filter(
-            annee_universitaire=annee_universitaire)
-        if semestres_etudiant.exists():
-            semestre_actuel = semestres_etudiant.latest('libelle')
-            etudiant.semestre_actuel = semestre_actuel
-        else:
-            etudiant.semestre_actuel = None
-
+        # Récupérer le semestre actuel de chaque étudiant dans l'année universitaire
+        for etudiant in etudiants:
+            semestres_etudiant = etudiant.semestres.filter(
+                annee_universitaire=annee_universitaire)
+            if semestres_etudiant.exists():
+                semestre_actuel = semestres_etudiant.latest('libelle')
+                etudiant.semestre_actuel = semestre_actuel
+            else:
+                etudiant.semestre_actuel = None
+    except Exception as e:
+        etudiants=[]
+        etudiants_insuffisants=[]
     # Construire le contexte pour le rendu de la page
     data = {
         'etudiants': etudiants,
@@ -1120,7 +1143,89 @@ def certificat_scolaire(request, id, niveau):
         response = HttpResponse(pdf_preview, content_type='application/pdf')
         response['Content-Disposition'] = 'inline;filename=pdf_file.pdf'
         return response
+#---------------------------------------------------------------------------------------------------------------------------------
+@login_required(login_url=settings.LOGIN_URL)
+def attestation_scolarite(request, id, niveau):
+    id_annee_selectionnee = request.session["id_annee_selectionnee"]
+    annee_universitaire = get_object_or_404(
+        AnneeUniversitaire, pk=id_annee_selectionnee)
 
+    if request.user.groups.all().first().name not in ['directeur_des_etudes', 'secretaire']:
+        return render(request, 'errors_pages/403.html')
+
+    etudiant = get_object_or_404(Etudiant, id=id)
+
+    in_format = "%Y-%m-%d"
+    out_format = "%d-%m-%Y"
+
+    if etudiant.datenaissance:
+        date_formatee = datetime.strptime(
+            str(etudiant.datenaissance), in_format).strftime(out_format)
+    else:
+        date_formatee = 'None'
+
+    context = {'etudiant': etudiant, 'niveau': niveau,
+               'annee': annee_universitaire.annee, 'date_naissance': date_formatee}
+
+    # nom des fichiers d'entrée et de sortie
+    latex_input = 'template_attestation_scolarite'
+    latex_ouput = 'generated_template_attestation_scolaire'
+    pdf_file = 'pdf_template_attestation_scolaire'
+
+    # génération du pdf
+    generate_pdf(context, latex_input, latex_ouput, pdf_file)
+
+    # visualisation du pdf dans le navigateur
+    with open('media/pdf/' + str(pdf_file) + '.pdf', 'rb') as f:
+        pdf_preview = f.read()
+        response = HttpResponse(pdf_preview, content_type='application/pdf')
+        response['Content-Disposition'] = 'inline;filename=pdf_file.pdf'
+        return response
+    
+
+
+
+#---------------------------------------------------------------------------------------------------------------------------------
+@login_required(login_url=settings.LOGIN_URL)
+def attestation_diplome(request, id, niveau):
+    id_annee_selectionnee = request.session["id_annee_selectionnee"]
+    annee_universitaire = get_object_or_404(
+        AnneeUniversitaire, pk=id_annee_selectionnee)
+
+    if request.user.groups.all().first().name not in ['directeur_des_etudes', 'secretaire']:
+        return render(request, 'errors_pages/403.html')
+
+    etudiant = get_object_or_404(Etudiant, id=id)
+
+    in_format = "%Y-%m-%d"
+    out_format = "%d-%m-%Y"
+
+    if etudiant.datenaissance:
+        date_formatee = datetime.strptime(
+            str(etudiant.datenaissance), in_format).strftime(out_format)
+    else:
+        date_formatee = 'None'
+
+    context = {'etudiant': etudiant, 'niveau': niveau,
+               'annee': annee_universitaire.annee, 'date_naissance': date_formatee}
+
+    # nom des fichiers d'entrée et de sortie
+    latex_input = 'template_attestation_diplome'
+    latex_ouput = 'generated_template_attestation_diplome'
+    pdf_file = 'pdf_template_attestation_diplome'
+
+    # génération du pdf
+    generate_pdf(context, latex_input, latex_ouput, pdf_file)
+
+    # visualisation du pdf dans le navigateur
+    with open('media/pdf/' + str(pdf_file) + '.pdf', 'rb') as f:
+        pdf_preview = f.read()
+        response = HttpResponse(pdf_preview, content_type='application/pdf')
+        response['Content-Disposition'] = 'inline;filename=pdf_file.pdf'
+        return response
+    
+
+#-------------------------------------------------------------------------------------------------------------------------------------
 
 @login_required(login_url=settings.LOGIN_URL)
 # methode générant le relevé de notes de l'étudiant
@@ -1180,7 +1285,7 @@ def releve_notes(request, id, id_semestre):
     #     context['directeur'] = request.user.utilisateur.nom + ' ' + request.user.prenom
 
     # nom des fichiers d'entrée et de sortie
-
+    print("Hello Releve de notes")
     latex_input = 'releve_notes'
     latex_ouput = 'generated_releve_notes'
     pdf_file = 'pdf_releve_notes'
@@ -1258,6 +1363,7 @@ def releve_notes_semestre(request, id_semestre):
     context['semestre'] = semestre
 
     # nom des fichiers d'entrée et de sortie
+    print("Hello Releve de notes semestre")
 
     latex_input = 'releve_notes_semestre'
     latex_ouput = 'generated_releve_notes_semestre'
@@ -1358,155 +1464,229 @@ def releve_notes_detail(request, id, id_semestre):
 
 
 # relevé de note détailé de tous les élèves du semestre
+# @login_required(login_url=settings.LOGIN_URL)
+# def releve_notes_details_all(request, id_semestre):
+#     """
+#     Génére le relevé de notes détaillé par matière des étudiants au cours d'un semestre.
+#     :param request: L'objet de requête Django.
+#     :param id_semestre: L'identifiant du semestre.
+
+#     :return: Une réponse HTTP affichant le pdf des relevés de notes générés.
+#     """
+#     if request.user.groups.all().first().name not in ['directeur_des_etudes', 'secretaire']:
+#         return render(request, 'errors_pages/403.html')
+
+   
+#     # template_data = {
+#     #     "data": [
+#     #         {
+#     #             "etudiant" : "",
+#     #             "ues": [
+#     #                 {
+#     #                     "matieres" : [
+#     #                         {
+#     #                             "matiere": "",
+#     #                             "moyenne": ""
+#     #                         }
+#     #                     ]
+#     #                 },
+#     #             ],
+#     #             "credit": "",
+#     #         }
+#     #     ]
+#     # }
+    
+#     template_data ={ "data": [] }
+    
+#     semestre = get_object_or_404(Semestre, id=id_semestre)
+#     etudiants = semestre.etudiant_set.all().order_by('nom')
+#     # ues = semestre.get_all_ues()
+#     # ues_matieres = { ue: ue.matiere_set.all() for ue in ues }
+        
+#     # for etudiant in etudiants:
+#     #     for ue in ues_matieres:
+#     #         for matiere in ues_matieres[ue]:
+#     #             print(matiere)
+#     #             moyenne_matiere = etudiant.moyenne_etudiant_matiere(matiere, semestre)
+#     #             print("Moyenne :::::::::::::::::::::::: ")
+#     #             print(moyenne_matiere)
+#     #             break
+#     #         break
+#     #     break
+        
+#     # return HttpResponse("Hello")
+   
+#     # nbre_colonnes = 2
+
+
+#     semestre_ues = semestre.get_all_ues()
+
+#     # colonnes += 'c|' * len(semestre_ues)
+
+#     # nbre_colonnes += len(semestre_ues)
+
+#     nbre_ues = len(semestre_ues)
+
+#     # récupération du nombre de matières par ue
+
+#     context = {}
+#     context['semestre'] = semestre
+#     context['annee'] = semestre.annee_universitaire
+
+#     # le tableau pouvant déborder il est divisé ici en trois parties
+#     if nbre_ues > 0 and nbre_ues < 8:
+
+#         # première partie
+
+#         nbre_colonnes_partie_1 = 2
+
+#         colonnes_partie_1 = '|l|l|'
+#         colonnes_partie_1 += 'c|' * 6
+#         for i in range(0, 3):
+#             nbre_matieres_partie_1 = len(semestre_ues[i].matiere_set.all())
+#             colonnes_partie_1 += 'c|' * nbre_matieres_partie_1
+#             nbre_colonnes_partie_1 += nbre_matieres_partie_1
+
+#         lignes_releve_partie_1 = []
+
+#         for etudiant in etudiants:
+#             ligne = {}
+#             ligne['etudiant'] = etudiant
+#             ues = []
+#             for i in range(0, 4):
+#                 matieres = []
+#                 nbre_matieres_ue = len(semestre_ues[i].matiere_set.all())
+#                 for matiere in semestre_ues[i].matiere_set.all():
+#                     matieres.append({'matiere': matiere, 'moyenne_matiere': round(
+#                         etudiant.moyenne_etudiant_matiere(matiere, semestre)[0], 2)})
+#                 ues.append({'ue': semestre_ues[i], 'moyenne': round(etudiant.moyenne_etudiant_ue(semestre_ues[i], semestre)[
+#                            0], 2), 'matieres_ue': matieres, 'nbre_matieres': nbre_matieres_ue + 2, 'a_valide': etudiant.moyenne_etudiant_ue(semestre_ues[i], semestre)[1]})
+#             ligne['ues'] = ues
+#             lignes_releve_partie_1.append(ligne)
+
+#         context['partie_1'] = {
+#             'nbre_ues': 4,
+#             'nbre_colonnes': nbre_colonnes_partie_1 + 6,
+#             'colonnes': colonnes_partie_1,
+#             'lignes': lignes_releve_partie_1,
+#             'nbre_lignes': len(lignes_releve_partie_1)
+#         }
+
+#         # deuxième partie
+
+#         # if nbre_ues > 3:
+
+#         #     nbre_colonnes_partie_2 = 3
+
+#         #     colonnes_partie_2 = '|l|l|c|'
+#         #     colonnes_partie_2 += 'c|' * 2 * (nbre_ues - 3)
+#         #     for i in range(3, nbre_ues):
+#         #         nbre_matieres_partie_2 = len(semestre_ues[i].matiere_set.all())
+#         #         colonnes_partie_2 += 'c|' * nbre_matieres_partie_2
+#         #         nbre_colonnes_partie_2 += nbre_matieres_partie_2
+
+#         #     lignes_releve_partie_2 = []
+#         #     for etudiant in etudiants:
+#         #         ligne = {}
+#         #         ligne['etudiant'] = etudiant
+#         #         ues = []
+#         #         for i in range(3, nbre_ues):
+#         #             matieres = []
+#         #             nbre_matieres_ue = len(semestre_ues[i].matiere_set.all())
+#         #             credits_semestre = -1
+#         #             for matiere in semestre_ues[i].matiere_set.all():
+#         #                 matieres.append({'matiere': matiere, 'moyenne_matiere': round(
+#         #                     etudiant.moyenne_etudiant_matiere(matiere, semestre)[0], 2)})
+#         #                 credits_semestre = etudiant.credits_obtenus_semestre(
+#         #                     semestre)
+#         #             ues.append({'ue': semestre_ues[i], 'moyenne': round(etudiant.moyenne_etudiant_ue(semestre_ues[i], semestre)[0], 2), 'matieres_ue': matieres,
+#         #                        'nbre_matieres': nbre_matieres_ue + 2, 'a_valide': etudiant.moyenne_etudiant_ue(semestre_ues[i], semestre)[1], 'credits_semestre': credits_semestre})
+#         #         ligne['ues'] = ues
+#         #         lignes_releve_partie_2.append(ligne)
+
+#         #     context['partie_2'] = {
+#         #         'nbre_ues': nbre_ues - 3,
+#         #         'nbre_colonnes': nbre_colonnes_partie_2 + (nbre_ues - 3) * 2,
+#         #         'colonnes': colonnes_partie_2,
+#         #         'lignes': lignes_releve_partie_2,
+#         #         'nbre_lignes': len(lignes_releve_partie_2)
+#         #     }
+
+#     # nom des fichiers d'entrée et de sortie
+
+#     latex_input = 'synthese_semestre_all'
+#     latex_ouput = 'generated_synthese_semestre_all'
+#     pdf_file = 'pdf_synthese_semestre_all'
+
+#     # génération du pdf
+#     generate_pdf(context, latex_input, latex_ouput, pdf_file)
+
+#     # visualisation du pdf dans le navigateur
+#     with open('media/pdf/' + str(pdf_file) + '.pdf', 'rb') as f:
+#         pdf_preview = f.read()
+#         response = HttpResponse(pdf_preview, content_type='application/pdf')
+#         response['Content-Disposition'] = 'inline;filename=pdf_file.pdf'
+#         return response
+
 @login_required(login_url=settings.LOGIN_URL)
 def releve_notes_details_all(request, id_semestre):
-    """
-    Génére le relevé de notes détaillé par matière des étudiants au cours d'un semestre.
-    :param request: L'objet de requête Django.
-    :param id_semestre: L'identifiant du semestre.
 
-    :return: Une réponse HTTP affichant le pdf des relevés de notes générés.
-    """
     if request.user.groups.all().first().name not in ['directeur_des_etudes', 'secretaire']:
         return render(request, 'errors_pages/403.html')
 
     semestre = get_object_or_404(Semestre, id=id_semestre)
     etudiants = semestre.etudiant_set.all()
-    etudiants = etudiants.order_by('nom')
-    # nbre_colonnes = 2
+
+    nbre_colonnes = 2
 
     colonnes = '|c|c|'
 
     semestre_ues = semestre.get_all_ues()
 
-    # colonnes += 'c|' * len(semestre_ues)
+    colonnes += 'c|' * len(semestre_ues)
 
-    # nbre_colonnes += len(semestre_ues)
+    nbre_colonnes += len(semestre_ues)
 
     nbre_ues = len(semestre_ues)
 
     # récupération du nombre de matières par ue
 
-    context = {}
-    context['semestre'] = semestre
-    context['annee'] = semestre.annee_universitaire
+    for ue in semestre_ues:
+        # ajout des colonnes correspondant aux matières
+        nbre_matieres = len(ue.matiere_set.all())
+        colonnes += 'c|' * nbre_matieres
+        nbre_colonnes += nbre_matieres
 
-    # le tableau pouvant déborder il est divisé ici en trois parties
-    if nbre_ues > 0 and nbre_ues < 8:
+    # récupératon des données pour chaque lignes du relevé
+    lignes_releve = []
+    # boucle sur chaque étudiant piour constituer la ligne associée à l'étudiant
+    for etudiant in etudiants:
+        ligne = {}
+        ligne['etudiant'] = etudiant
+        # tableau contenant l'ensemble des UEs de l'étudiant
+        ues = []
+        # boucle sur chaque UE suivies par l'étudiant pour calculersa mmoyenne et sa moyenne dans chaque matières
+        for ue in semestre_ues:
+            # tableau contenant l'ensemble des matières suivies par l'étudiant
+            matieres = []
+            nbre_matieres = len(ue.matiere_set.all())
+            for matiere in ue.matiere_set.all():
+                # récupération des matières de l'ue et la moyenne de l'étudiant dans celles-ci
+                matieres.append({'matiere': matiere, 'moyenne_matiere': round(
+                    etudiant.moyenne_etudiant_matiere(matiere, semestre)[0], 2)})
+            ues.append({'ue': ue, 'moyenne': round(etudiant.moyenne_etudiant_ue(ue, semestre)[
+                       0], 2), 'matieres_ue': matieres, 'nbre_matieres': nbre_matieres + 1})
+        ligne['ues'] = ues
+        lignes_releve.append(ligne)
 
-        # première partie
-
-        nbre_colonnes_partie_1 = 2
-
-        colonnes_partie_1 = '|l|l|'
-        colonnes_partie_1 += 'c|' * 6
-        for i in range(0, 3):
-            nbre_matieres_partie_1 = len(semestre_ues[i].matiere_set.all())
-            colonnes_partie_1 += 'c|' * nbre_matieres_partie_1
-            nbre_colonnes_partie_1 += nbre_matieres_partie_1
-
-        lignes_releve_partie_1 = []
-
-        for etudiant in etudiants:
-            ligne = {}
-            ligne['etudiant'] = etudiant
-            ues = []
-            for i in range(0, 3):
-                matieres = []
-                nbre_matieres_ue = len(semestre_ues[i].matiere_set.all())
-                for matiere in semestre_ues[i].matiere_set.all():
-                    matieres.append({'matiere': matiere, 'moyenne_matiere': round(
-                        etudiant.moyenne_etudiant_matiere(matiere, semestre)[0], 2)})
-                ues.append({'ue': semestre_ues[i], 'moyenne': round(etudiant.moyenne_etudiant_ue(semestre_ues[i], semestre)[
-                           0], 2), 'matieres_ue': matieres, 'nbre_matieres': nbre_matieres_ue + 2, 'a_valide': etudiant.moyenne_etudiant_ue(semestre_ues[i], semestre)[1]})
-            ligne['ues'] = ues
-            lignes_releve_partie_1.append(ligne)
-
-        context['partie_1'] = {
-            'nbre_ues': 3,
-            'nbre_colonnes': nbre_colonnes_partie_1 + 6,
-            'colonnes': colonnes_partie_1,
-            'lignes': lignes_releve_partie_1,
-            'nbre_lignes': len(lignes_releve_partie_1)
-        }
-
-        # deuxième partie
-
-        if nbre_ues > 3:
-
-            nbre_colonnes_partie_2 = 3
-
-            colonnes_partie_2 = '|l|l|c|'
-            colonnes_partie_2 += 'c|' * 2 * (nbre_ues - 3)
-            for i in range(3, nbre_ues):
-                nbre_matieres_partie_2 = len(semestre_ues[i].matiere_set.all())
-                colonnes_partie_2 += 'c|' * nbre_matieres_partie_2
-                nbre_colonnes_partie_2 += nbre_matieres_partie_2
-
-            lignes_releve_partie_2 = []
-            for etudiant in etudiants:
-                ligne = {}
-                ligne['etudiant'] = etudiant
-                ues = []
-                for i in range(3, nbre_ues):
-                    matieres = []
-                    nbre_matieres_ue = len(semestre_ues[i].matiere_set.all())
-                    credits_semestre = -1
-                    for matiere in semestre_ues[i].matiere_set.all():
-                        matieres.append({'matiere': matiere, 'moyenne_matiere': round(
-                            etudiant.moyenne_etudiant_matiere(matiere, semestre)[0], 2)})
-                        credits_semestre = etudiant.credits_obtenus_semestre(
-                            semestre)
-                    ues.append({'ue': semestre_ues[i], 'moyenne': round(etudiant.moyenne_etudiant_ue(semestre_ues[i], semestre)[0], 2), 'matieres_ue': matieres,
-                               'nbre_matieres': nbre_matieres_ue + 2, 'a_valide': etudiant.moyenne_etudiant_ue(semestre_ues[i], semestre)[1], 'credits_semestre': credits_semestre})
-                ligne['ues'] = ues
-                lignes_releve_partie_2.append(ligne)
-
-            context['partie_2'] = {
-                'nbre_ues': nbre_ues - 3,
-                'nbre_colonnes': nbre_colonnes_partie_2 + (nbre_ues - 3) * 2,
-                'colonnes': colonnes_partie_2,
-                'lignes': lignes_releve_partie_2,
-                'nbre_lignes': len(lignes_releve_partie_2)
-            }
-
-    # if nbre_ues > 6 and nbre_ues < 13:
-
-    # for ue in semestre_ues:
-    #     # ajout des colonnes correspondant aux matières
-    #     nbre_matieres = len(ue.matiere_set.all())
-    #     colonnes += 'c|' * nbre_matieres
-    #     nbre_colonnes += nbre_matieres
-
-    # # récupératon des données pour chaque lignes du relevé
-    # lignes_releve = []
-    # # boucle sur chaque étudiant pour constituer la ligne associée à l'étudiant
-    # for etudiant in etudiants:
-    #     ligne = {}
-    #     ligne['etudiant'] = etudiant
-    #     # tableau contenant l'ensemble des UEs de l'étudiant
-    #     ues = []
-    #     # boucle sur chaque UE suivies par l'étudiant pour calculersa mmoyenne et sa moyenne dans chaque matières
-    #     for ue in semestre_ues:
-    #         # tableau contenant l'ensemble des matières suivies par l'étudiant
-    #         matieres = []
-    #         nbre_matieres = len(ue.matiere_set.all())
-    #         for matiere in ue.matiere_set.all():
-    #             # récupération des matières de l'ue et la moyenne de l'étudiant dans celles-ci
-    #             matieres.append({'matiere': matiere, 'moyenne_matiere': round(
-    #                 etudiant.moyenne_etudiant_matiere(matiere, semestre)[0], 2)})
-    #         ues.append({'ue': ue, 'moyenne': round(etudiant.moyenne_etudiant_ue(ue, semestre)[
-    #                    0], 2), 'matieres_ue': matieres, 'nbre_matieres': nbre_matieres + 1})
-    #     ligne['ues'] = ues
-    #     lignes_releve.append(ligne)
-
-    # context = {
-    #     'nbre_ues': nbre_ues,
-    #     'nbre_colonnes': nbre_colonnes,
-    #     'colonnes': colonnes,
-    #     'lignes': lignes_releve,
-    #     'nbre_lignes': len(lignes_releve)
-    # }
+    context = {
+        'semestre' : "S1",
+        'nbre_ues': nbre_ues,
+        'nbre_colonnes': nbre_colonnes,
+        'colonnes': colonnes,
+        'lignes': lignes_releve,
+        'nbre_lignes': len(lignes_releve)
+    }
 
     # nom des fichiers d'entrée et de sortie
 
@@ -1611,6 +1791,8 @@ def recapitulatifs_des_notes_par_matiere(request, id_semestre, id_matiere):
 
         etudiants = []
         _etudiants = semestre.etudiant_set.all()
+        print('etudiants : ')
+        print(_etudiants)
         for etudiant in _etudiants:
             moyenne, a_valider, _ = etudiant.moyenne_etudiant_matiere(
                 matiere, semestre)
@@ -2561,82 +2743,66 @@ def export(request):
     return response
 
 
-# Cette vue permet d'importer les données via un fichier excel
-def importer_les_donnees(request):
-    if request.method == 'POST':
-        if 'myfile' not in request.FILES:
-            return render(request, 'etudiants/message_erreur.html', {'message': "Aucun fichier sélectionné."})
-        etudiants_resource = EtudiantResource()
-        dataset = Dataset()
-        etudiant = request.FILES['myfile']
+#####
+def ajout_semestre_etudiant(niveau, promotion, annees):
+    annee_universitaire = annees.get(annee=promotion)
+    if niveau == "L1":
+        semestre_s1 = annee_universitaire.semestre_set.get(libelle='S1')
+        semestre_s2 = annee_universitaire.semestre_set.get(libelle='S2')
+        return semestre_s1, semestre_s2
+    return []
+    # elif niveau == "L2":
+    #     # Si "L2"
+    #     # ajout des semestres de L1(S1 et S2)
+    #     semestre_s1 = annee_universitaire.semestre_set.get(libelle='S1')
+    #     semestre_s2 = annee_universitaire.semestre_set.get(
+    #                         libelle='S2')
+    #     etudiant.semestres.add(semestre_s1, semestre_s2)
+    #     annee_entree_plus_un = etudiant.anneeentree + 1
+    #     annee_universitaire_plus_un = all_annees.get(annee=annee_entree_plus_un)
+    #     # ajout des semestres de L2(S3 et S4)
+    #     semestre_s3 = annee_universitaire_plus_un.semestre_set.get(
+    #     libelle='S3')                
+                
+    #     semestre_s4 = annee_universitaire_plus_un.semestre_set.get(
+    #     libelle='S4')
+    #     etudiant.semestres.add(semestre_s3,semestre_s4)
+    # elif niveau == "L3":
+    #     # Si "L3"
+    #     #ajout des semestres de L1(S1 et S2)
+    #     semestre_s1 = annee_universitaire.semestre_set.get(
+    #     libelle='S1')
+    #     semestre_s2 = annee_universitaire.semestre_set.get(
+    #                         libelle='S2')
+    #     etudiant.semestres.add(semestre_s1, semestre_s2)
+    #     # ajout des semestres de L2
+    #     annee_entree_plus_un = etudiant.anneeentree + 1
+    #     annee_universitaire_plus_un = all_annees.get(
+    #     annee=annee_entree_plus_un)
 
-        try:
-            imported_data = dataset.load(etudiant.read(), format='xlsx')
-            for data in imported_data:
-                etudiant = Etudiant(
-                    nom=data[0],
-                    prenom=data[1],
-                    sexe=data[2],
-                    datenaissance=data[3],
-                    lieunaissance=data[4],
-                    contact=data[5],
-                    email=data[6],
-                    adresse=data[7],
-                    prefecture=data[8],
-                    is_active=data[9],
-                    carte_identity=data[10],
-                    nationalite=data[11],
-                    user=data[12],
-                    photo_passport=data[13],
-                    id=data[14],
-                    seriebac1=data[15],
-                    seriebac2=data[16],
-                    anneeentree=data[17],
-                    anneebac1=data[18],
-                    anneebac2=data[19],
-                    etablissementSeconde=data[20],
-                    francaisSeconde=data[21],
-                    anglaisSeconde=data[22],
-                    mathematiqueSeconde=data[23],
-                    etablissementPremiere=data[24],
-                    francaisPremiere=data[25],
-                    anglaisPremiere=data[26],
-                    mathematiquePremiere=data[27],
-                    etablissementTerminale=data[28],
-                    francaisTerminale=data[29],
-                    anglaisTerminale=data[30],
-                    mathematiqueTerminale=data[31],
-                    delegue=data[32],
-                    passer_semestre_suivant=data[33],
-                    decision_conseil=data[34],
-                    profil=data[35]
-                )
-                etudiant.save()
+    #     semestre_s3 = annee_universitaire_plus_un.semestre_set.get(
+    #                         libelle='S3')
+    #     semestre_s4 = annee_universitaire_plus_un.semestre_set.get(
+    #     libelle='S4')
+    #     etudiant.semestres.add(semestre_s3, semestre_s4)
+                        
+    #     #ajout des semestres de L3(S5 et S6)
+    #     annee_entree_plus_deux = etudiant.anneeentree + 2
+    #     annee_universitaire_plus_deux = all_annees.get(
+    #     annee=annee_entree_plus_deux)
 
-                # Trouvez l'année universitaire en cours
-                annee_universitaire_courante = AnneeUniversitaire.objects.get(
-                    annee_courante=True)
+    #     semestre_s5 = annee_universitaire_plus_deux.semestre_set.get(
+    #                         libelle='S5')
+    #     semestre_s6 = annee_universitaire_plus_deux.semestre_set.get(
+    #                         libelle='S6')
+    #     etudiant.semestres.add(semestre_s5, semestre_s6)
+    # else:
+    #     # Sinon, attachez l'étudiant au Semestre 1 (S1) de l'année universitaire en cours
+    #     semestre_s1_courant = annee_universitaire.semestre_set.get(
+    #                     libelle='S1')
+    #     etudiant.semestres.add(semestre_s1_courant)
 
-                # Attachez l'étudiant au Semestre 1 (S1) de l'année universitaire en cours
-                semestre_s1 = annee_universitaire_courante.semestre_set.get(
-                    libelle='S1')
-                etudiant.semestres.add(semestre_s1)
-
-                semestres_data = data[36:]
-                for semestre_data in semestres_data:
-                    try:
-                        semestre = Semestre.objects.get(libelle=semestre_data)
-                        etudiant.semestres.add(semestre)
-                    except Semestre.DoesNotExist:
-                        # Gérer cette situation si le semestre n'existe pas
-                        print(f"Le semestre '{semestre_data}' n'existe pas.")
-                return render(request, 'etudiants/message_erreur.html', {'message': "Données importées avec succès."})
-
-        except Exception as e:
-            return render(request, 'etudiants/message_erreur.html', {'message': "Erreur lors de l'importation du fichier Excel."})
-
-    return render(request, 'etudiants/importer.html')
-
+    
 
 # Cette vue permet d'importer les données etudiants via un fichier xlsx
 def importer_data(request):
@@ -2651,133 +2817,73 @@ def importer_data(request):
 
         imported_data = list(dataset.load(etudiant.read(), format='xlsx'))
 
-        all_annees = AnneeUniversitaire.objects.all().prefetch_related('semestre_set')
+        annees = AnneeUniversitaire.objects.all().prefetch_related('semestre_set')
 
+    
         for data in imported_data[1:112]:
-            etudiant = Etudiant(
-                anneeentree=data[0],
-                nom=data[2],
-                prenom=data[3],
-                # datenaissance=data[4],
-                lieunaissance=data[5],
-                sexe=data[6],
-                anneebac2=data[7],
-                contact=data[1],
-                email=data[29],
-                adresse=data[30],
-                user=data[32],
-                photo_passport=data[33],
-                id=data[34],
-                is_active=True,
-            )
-            try:
-                etudiant.save()
-                annee_universitaire = all_annees.get(
-                    annee=etudiant.anneeentree)
+            promotion=data[0]
+            nom=data[1]
+            prenom=data[2]
+            datenaissance=data[3]
+            lieunaissance=data[4]
+            sexe=data[5]
+            anneebac2=data[6]
+            contact=data[9]
+            adresse=data[10]
+            niveau = data[7]
+            is_active=True
 
-                semestres_data = data[8]
-                if semestres_data == "L1":
-                    # Si "L1"
-                    semestre_s1 = annee_universitaire.semestre_set.get(
-                        libelle='S1')
-                    semestre_s2 = annee_universitaire.semestre_set.get(
-                        libelle='S2')
-                    etudiant.semestres.add(semestre_s1, semestre_s2)
-                elif semestres_data == "S3":
-                    # Si "S3"
-                    semestre_s1 = annee_universitaire.semestre_set.get(
-                        libelle='S1')
-                    semestre_s2 = annee_universitaire.semestre_set.get(
-                        libelle='S2')
-                    etudiant.semestres.add(semestre_s1, semestre_s2)
+            if nom == None and prenom == None:
+                continue
+            
+            #print(prenom, ";", nom)
+            username = (nom + prenom).lower()
+            username = username.replace(" ", "")
+            print(username)
+            print(datenaissance.__str__())
 
-                    annee_entree_plus_un = etudiant.anneeentree + 1
-                    annee_universitaire_plus_un = all_annees.get(
-                        annee=annee_entree_plus_un)
-
-                    semestre_s3 = annee_universitaire_plus_un.semestre_set.get(
-                        libelle='S3')
-                    etudiant.semestres.add(semestre_s3)
-                elif semestres_data == "L2":
-                    # Si "L2"
-                    semestre_s1 = annee_universitaire.semestre_set.get(
-                        libelle='S1')
-                    semestre_s2 = annee_universitaire.semestre_set.get(
-                        libelle='S2')
-                    etudiant.semestres.add(semestre_s1, semestre_s2)
-
-                    annee_entree_plus_un = etudiant.anneeentree + 1
-                    annee_universitaire_plus_un = all_annees.get(
-                        annee=annee_entree_plus_un)
-
-                    semestre_s3 = annee_universitaire_plus_un.semestre_set.get(
-                        libelle='S3')
-                    semestre_s4 = annee_universitaire_plus_un.semestre_set.get(
-                        libelle='S4')
-                    etudiant.semestres.add(semestre_s3, semestre_s4)
-                elif semestres_data == "S5":
-                    # Si "S5"
-                    semestre_s1 = annee_universitaire.semestre_set.get(
-                        libelle='S1')
-                    semestre_s2 = annee_universitaire.semestre_set.get(
-                        libelle='S2')
-                    etudiant.semestres.add(semestre_s1, semestre_s2)
-
-                    annee_entree_plus_un = etudiant.anneeentree + 1
-                    annee_universitaire_plus_un = all_annees.get(
-                        annee=annee_entree_plus_un)
-
-                    semestre_s3 = annee_universitaire_plus_un.semestre_set.get(
-                        libelle='S3')
-                    semestre_s4 = annee_universitaire_plus_un.semestre_set.get(
-                        libelle='S4')
-                    etudiant.semestres.add(semestre_s3, semestre_s4)
-
-                    annee_entree_plus_deux = etudiant.anneeentree + 2
-                    annee_universitaire_plus_deux = all_annees.get(
-                        annee=annee_entree_plus_deux)
-
-                    semestre_s5 = annee_universitaire_plus_deux.semestre_set.get(
-                        libelle='S5')
-                    etudiant.semestres.add(semestre_s5)
-                elif semestres_data == "L3":
-                    # Si "L3"
-                    semestre_s1 = annee_universitaire.semestre_set.get(
-                        libelle='S1')
-                    semestre_s2 = annee_universitaire.semestre_set.get(
-                        libelle='S2')
-                    etudiant.semestres.add(semestre_s1, semestre_s2)
-
-                    annee_entree_plus_un = etudiant.anneeentree + 1
-                    annee_universitaire_plus_un = all_annees.get(
-                        annee=annee_entree_plus_un)
-
-                    semestre_s3 = annee_universitaire_plus_un.semestre_set.get(
-                        libelle='S3')
-                    semestre_s4 = annee_universitaire_plus_un.semestre_set.get(
-                        libelle='S4')
-                    etudiant.semestres.add(semestre_s3, semestre_s4)
-
-                    annee_entree_plus_deux = etudiant.anneeentree + 2
-                    annee_universitaire_plus_deux = all_annees.get(
-                        annee=annee_entree_plus_deux)
-
-                    semestre_s5 = annee_universitaire_plus_deux.semestre_set.get(
-                        libelle='S5')
-                    semestre_s6 = annee_universitaire_plus_deux.semestre_set.get(
-                        libelle='S6')
-                    etudiant.semestres.add(semestre_s5, semestre_s6)
-                else:
-                    # Sinon, attachez l'étudiant au Semestre 1 (S1) de l'année universitaire en cours
-                    semestre_s1_courant = annee_universitaire.semestre_set.get(
-                        libelle='S1')
-                    etudiant.semestres.add(semestre_s1_courant)
-            except Exception as e:
+            if datenaissance is None:
+                # datenaissance = datetime(2024, 12, 12)
                 pass
+            else:
+                datenaissance = datenaissance.__str__()
+                if "/" in datenaissance:
+                    datenaissance_array = datenaissance.split('/')
+                    datenaissance = datetime(int(datenaissance_array[2]), int(datenaissance_array[1]),int(datenaissance_array[0]))
+                    print("/")
+                    print(datenaissance_array)
+                else:
+                    datenaissance_array = datenaissance.split('-')
+                    datenaissance_array[2] = datenaissance_array[2][:2]
+                    datenaissance = datetime(int(datenaissance_array[0]), int(datenaissance_array[1]),int(datenaissance_array[2]))
+                    print(datenaissance_array)                
 
+            # return HttpResponse("o")
+            try:
+                etudiant = Etudiant.objects.get(user__username=username)
+                # etudiant = Etudiant.objects.get(user__username__contains=nom.lower())
+                semestres = ajout_semestre_etudiant(niveau, promotion, annees)
+                etudiant.semestres.set(semestres)
+                etudiant.save()
+                print(etudiant)
+            except Exception as e:
+                print("Etudiant n'existe pas. ")
+                print(e)
+                etudiant = Etudiant.objects.create(
+                    anneeentree=promotion,
+                    nom=nom,
+                    prenom=prenom,
+                    datenaissance=datenaissance,
+                    lieunaissance=lieunaissance,
+                    sexe=sexe,
+                    anneebac2=anneebac2,
+                    contact=contact,
+                    adresse=adresse,
+                    is_active=is_active,
+                )
+                semestres = ajout_semestre_etudiant(niveau, promotion, annees)
+                etudiant.semestres.set(semestres)
+                print(semestres)   
+      
         messages.success(request, "Donnée importer avec succes !")
-        return redirect('main:create_etudiant')
-
-
-    # return render(request, 'etudiants/importer.html')
-
+        return redirect('main:etudiants')

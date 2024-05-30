@@ -457,7 +457,7 @@ def imprimer(request,planningId):
 
     plannings=SeancePlannifier.objects.filter(planning=planns)
     for planning in plannings :
-        jour_n=(planns.semaine-1)*5 + planning.date_heure_debut.weekday() +1
+        jour_n=(planns.semaine-1)*5 + planning.date_heure_debut.weekday() +1 
         jour_n=str(jour_n)
         valeur_jour= str(planning.date_heure_debut.day)
         if len(valeur_jour) == 1 :
