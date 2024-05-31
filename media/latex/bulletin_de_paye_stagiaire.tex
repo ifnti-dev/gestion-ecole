@@ -81,9 +81,15 @@ Primes forfaitaires: & \VAR{prime_forfaitaire} FCFA  \\\\
 
 \vspace{1cm}
 
-\begin{flushright}
-Le Responsable d'établissement
-\end{flushright}
-
+\begin{minipage}[t]{0.5\textwidth} % Début de la première zone de texte
+    \raggedright % Alignement à gauche
+    \VAR{fiche_paie.enseignant.nom} \VAR{fiche_paie.enseignant.prenom}
+    \end{minipage} % Fin de la première zone de texte
+    \hfill % Espace flexible pour remplir l'espace entre les deux zones de texte
+    \begin{minipage}[t]{0.4\textwidth} % Début de la deuxième zone de texte
+    \raggedleft % Alignement à droite
+    Mr Sabirou Mohamed TEOURI
+      
+    \end{minipage} % Fin de la deuxième zone de texte
 
 \end{document}

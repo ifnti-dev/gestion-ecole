@@ -334,10 +334,8 @@ def enregistrer_paiement(request, id=0):
             paiement = form.save(commit=False)
             print(paiement.etudiant)
             
-            # group2 = Group.objects.get(name="comptable")
-            # personnel.user.groups.add(group2)
             print("user connecté: ",request.user)
-            user_con=User.objects.get(username=request.user)
+            
             comptable = Personnel.objects.get(user=request.user)
             paiement.comptable = comptable
 
@@ -831,7 +829,10 @@ def les_bulletins_de_paye(request, id_annee_selectionnee):
     puis les renvoie au template 'salaires/bulletins_de_paye.html' pour affichage.
     """
     annee_universitaire = get_object_or_404(AnneeUniversitaire, pk=id_annee_selectionnee)
-    bulletins = VersmentSalaire.objects.filter(annee_universitaire=annee_universitaire, personnel__qualification_professionnel__in=['Enseignant', 'Comptable', 'Directeur des études', 'Gardien', 'Agent d\'entretien'])
+    #bulletins = VersmentSalaire.objects.filter(annee_universitaire=annee_universitaire, personnel__qualification_professionnel__in=['Enseignant', 'Comptable', 'Directeur des études', 'Gardien', 'Agent d\'entretien'])
+    bulletins = VersmentSalaire.objects.filter(annee_universitaire=annee_universitaire).exclude(personnel__qualification_professionnel='Stagiaire')
+    print("liste des bulletins")
+    print(bulletins)
     context = {
         'annee_universitaire': annee_universitaire,
         'bulletins': bulletins,
@@ -957,7 +958,7 @@ def detail_bulletin(request, id):
     Cette vue récupère les informations détaillées d'un bulletin de paie d'un employé donnée,
     puis les renvoie au template 'salaires/detail_bulletin.html' pour affichage.
     """
-    bulletin = get_object_or_404(Salaire, id=id)
+    bulletin = get_object_or_404(VersmentSalaire, id=id)
     total_primes = bulletin.prime_efficacite + bulletin.prime_qualite + bulletin.frais_travaux_complementaires
     frais_prestations_familiale_salsalaire = bulletin.frais_prestations_familiale_salsalaire * bulletin.personnel.salaireBrut
     primes = (

@@ -1158,7 +1158,8 @@ class Enseignant(models.Model):
         return Matiere.objects.filter(enseignant=self, ue__programme__semmestre__in=semestres)
 
     def __str__(self):
-        return f'{self.personnel}'
+        #return f'{super().__st__()}'
+        return self.personnel.full_name()
 
 class Tuteur(models.Model):
     """
@@ -3049,7 +3050,8 @@ class FicheDePaie(models.Model):
     """
 
     def __str__(self):
-        return str(self.enseignant.nom) + "  " + str(self.enseignant.prenom) + "  " + str(self.dateDebut) + "-" + str(self.dateFin)
+        #str(self.enseignant.nom) + "  " + str(self.enseignant.prenom)
+        return  self.enseignant.personnel.full_name() + "  " + str(self.dateDebut) + "-" + str(self.dateFin)
 
     def save(self, *args, **kwargs):
         if not self.annee_universitaire:
