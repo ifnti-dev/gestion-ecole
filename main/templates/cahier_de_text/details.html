@@ -182,7 +182,7 @@
                     {% csrf_token %}
                     <div class="form-group">
                         <label for="teacherName">Nom d'utilisateur de l'enseignant</label>
-                        <input type="text" class="form-control" name="teacherName" id="teacherName" value="{{seance.matiere.enseignant.user}}" readonly>
+                        <input type="text" class="form-control" name="teacherName" id="teacherName" value="{{seance.matiere.enseignant.personnel.user}}" readonly>
                     </div>
                     <div class="form-group">
                         <label for="password">Mot de passe</label>
