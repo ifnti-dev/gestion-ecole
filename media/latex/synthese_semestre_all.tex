@@ -45,13 +45,13 @@ Nom & Prenom &
   \BLOCK{for matiere in lignes[0]['ues'][ue]['matieres_ue']}
     \rotatebox{90}{\parbox[c]{2.5cm}{\centering \VAR{matiere['matiere'].libelle} }}  & 
   \BLOCK{endfor} 
-\rotatebox{90}{\parbox[c]{2.5cm}{\centering \textbf{UE} }} & 
+\rotatebox{90}{\parbox[c]{2.5cm}{\centering \textbf{UE} }} & \rotatebox{90}{\parbox[c]{2.5cm}{\centering \textbf{Crédit} }} &
 \BLOCK{endfor} 
 
 \BLOCK{for matiere in lignes[0]['ues'][nbre_ues -1]['matieres_ue']}
 \rotatebox{90}{\parbox[c]{2.5cm}{\centering \VAR{matiere['matiere'].libelle} }}  & 
 \BLOCK{endfor} 
-\rotatebox{90}{\parbox[c]{2.5cm}{\centering \textbf{UE} }} \\
+\rotatebox{90}{\parbox[c]{2.5cm}{\centering \textbf{UE} }} & \rotatebox{90}{\parbox[c]{2.5cm}{\centering \textbf{Crédit} }} \\
 
 % ensuite ici on ferme en mettant un intervale de la valeur recuperer , qui par de cet valeur a cette valeur dans l'element cline
 \cline{\VAR{nbre_colonnes}-\VAR{nbre_colonnes}}
@@ -59,9 +59,10 @@ Nom & Prenom &
 %ici on fait une boucle pour compter le nombre d'eleve et pour chaque eleve , on genere une ligne de l'element hline qui prend le prenom , le nom , et la moyenne pour chaque matiere dans l'ordre 
 \hline 
 
+
 \BLOCK{for i in range(nbre_lignes)}
 
-  \VAR{lignes[i]['etudiant'].prenom} & \VAR{lignes[i]['etudiant'].nom} & 
+  \VAR{lignes[i]['etudiant'].nom} & \VAR{lignes[i]['etudiant'].prenom} & 
 
   \BLOCK{for ue in range(nbre_ues -1)}
 
@@ -69,16 +70,17 @@ Nom & Prenom &
       \VAR{matiere['moyenne_matiere']}  & 
     \BLOCK{endfor} 
 
-    \textbf{\VAR{lignes[i]['ues'][ue]['moyenne']}}  & 
-
+    \textbf{\VAR{lignes[i]['ues'][ue]['moyenne']}} &
+    
+     \textbf{\VAR{lignes[i]['ues'][ue]['credit']}} & 
+	
   \BLOCK{endfor}
 
   \BLOCK{for matiere in lignes[i]['ues'][nbre_ues -1]['matieres_ue']}
     \VAR{matiere['moyenne_matiere']}  & 
   \BLOCK{endfor} 
-
-  \textbf{\VAR{lignes[i]['ues'][nbre_ues -1]['moyenne']}}  \\
-
+  \textbf{\VAR{lignes[i]['ues'][nbre_ues -1]['moyenne']}}  & 
+  \textbf{\VAR{lignes[i]['ues'][nbre_ues -1]['credit']}}  \\
 \hline
 \BLOCK{endfor}
 

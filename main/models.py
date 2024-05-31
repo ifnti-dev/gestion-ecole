@@ -615,7 +615,6 @@ class Etudiant(Utilisateur):
 
 
         """
-        print("::::: 2")
         # Verifier si l'étudiant suit cette matiere
         # Récupérerer toute les évaluations de l'étuidant dans cette matière
         all_evaluations = Evaluation.objects.filter(matiere=matiere, semestre=semestre)
@@ -641,7 +640,6 @@ class Etudiant(Utilisateur):
 
         note_ponderation = {}
         somme = 0
-        print(" ::::::: evaluations ::::::: ")
 
         for evaluation in evaluations:
             notes = evaluation.note_set.filter(etudiant=self)
@@ -681,7 +679,6 @@ class Etudiant(Utilisateur):
         if not matieres:
             return 0.0, False, anneeValidation
 
-        a_valide = True
         for matiere in matieres:
             note, validation_matiere, annee = self.moyenne_etudiant_matiere(matiere, semestre)
             somme_note += float(note) * float(matiere.coefficient)
@@ -690,22 +687,9 @@ class Etudiant(Utilisateur):
             # il s'agit en réalité de l'année de la validation du dernier rattrapage
             if anneeValidation < annee:
                 anneeValidation = annee
-            if validation_matiere == False:
-                a_valide = False
 
         moyenne = round(somme_note/somme_coef, 2)
-        matiere_principale = ue.matiere_principacle()
-        a_valide = moyenne >= matiere_principale.minValue
-        # if ue.type == 'Technologie':
-        #     if moyenne < 12:
-        #         a_valide = False
-        # else:
-        #     if moyenne < 10:
-        #         a_valide = False
-        if moyenne >= ue.minValue :
-            a_valide = True
-        else:
-            a_valide = False
+        a_valide = moyenne >= ue.minValue
         return moyenne, a_valide, anneeValidation
 
 
@@ -1174,7 +1158,7 @@ class Enseignant(models.Model):
         return Matiere.objects.filter(enseignant=self, ue__programme__semmestre__in=semestres)
 
     def __str__(self):
-        return f'{super().__str__()}'
+        return f'{self.personnel}'
 
 class Tuteur(models.Model):
     """
@@ -1836,7 +1820,6 @@ class Semestre(models.Model):
     id = models.CharField(primary_key=True, blank=True, max_length=14)
     """
         Identifiant du semestre
-
         **Type:** string
     """
     CHOIX_SEMESTRE = [('S1', 'Semestre1'), ('S2', 'Semestre2'), ('S3', 'Semestre3'),
@@ -1844,9 +1827,7 @@ class Semestre(models.Model):
     libelle = models.CharField(max_length=30, choices=CHOIX_SEMESTRE)
     """
         Intitulé du semestre
-
         **Type:** string
-
     """
     credits = models.IntegerField(default=30)
     """
