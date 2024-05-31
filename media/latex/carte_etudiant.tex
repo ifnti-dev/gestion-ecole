@@ -55,11 +55,11 @@ paperheight=21cm
    		& N\textdegree étudiant : & \VAR{ etudiant.id } \\ 
   		& Nom : & \VAR{ etudiant.nom } \\ 
  		& Prénom :  & \VAR{ etudiant.prenom }\\ 
- 		& Né le : & \VAR{ other_information.date_naissance }\\ 
+ 		& Né le : & \VAR{ etudiant.date_naissance }\\ 
  		& A: & \VAR{ etudiant.lieunaissance } \\ 
  		& Sexe : & \VAR{ etudiant.sexe } \\ 
- 		& Adresse : & \VAR{ other_information.adresse }\\ 
- 		& Tél : & \VAR{ other_information.tel}\\ 
+ 		& Adresse : & \VAR{ etudiant.adresse }\\ 
+ 		& Tél : & \VAR{ etudiant.tel}\\ 
 
 \end{tabular} %}
 %\end{table}
@@ -112,7 +112,7 @@ Site web: https://www.ifnti.com\\
 %\vfill
 
 \noindent
-Année Academique {\color{blue} 2023-2024} \hspace{1cm} Niveau {\color{blue} \VAR{other_information.niveau}}\\
+Année Academique {\color{blue} 2023-2024} \hspace{1cm} Niveau {\color{blue} \VAR{etudiant.niveau}}\\
 
 \vspace{-0.25cm}
 %\vfill
@@ -126,7 +126,7 @@ Année Academique {\color{blue} 2023-2024} \hspace{1cm} Niveau {\color{blue} \VA
 
 \noindent
 \begin{tabular}{ccc}
-Personne à prévenir : & \VAR{other_information.person_a_prev} 
+Personne à prévenir : & \VAR{etudiant.person_a_prev} 
 \end{tabular}
 
 \vspace{1cm}
