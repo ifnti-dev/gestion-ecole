@@ -1363,8 +1363,6 @@ def releve_notes_semestre(request, id_semestre):
     context['semestre'] = semestre
 
     # nom des fichiers d'entrée et de sortie
-    print("Hello Releve de notes semestre")
-
     latex_input = 'releve_notes_semestre'
     latex_ouput = 'generated_releve_notes_semestre'
     pdf_file = 'pdf_releve_notes_semestre'
@@ -1729,16 +1727,14 @@ def evaluations(request, id_matiere):
     """
     id_annee_selectionnee = request.session["id_annee_selectionnee"]
     matiere = Matiere.objects.get(pk=id_matiere)
-    annee_selectionnee = get_object_or_404(
-        AnneeUniversitaire, pk=id_annee_selectionnee)
+    annee_selectionnee = get_object_or_404(AnneeUniversitaire, pk=id_annee_selectionnee)
+    semestres = matiere.get_semestres(annee_universitaire=annee_selectionnee, type='__all__')
+    
     if 'semestre' in request.GET and request.GET.get('semestre') != "":
         id = request.GET.get('semestre')
         semestre = get_object_or_404(Semestre, pk=id)
     else:
-        semestre = Semestre.objects.filter(
-            annee_universitaire=annee_selectionnee, libelle="S1")
-        if semestre:
-            semestre = semestre.get()
+        semestre = semestres[0]
 
     if 'type' in request.GET and request.GET.get('type') in ['0', '1']:
         selected_type = request.GET.get('type')
@@ -1746,13 +1742,12 @@ def evaluations(request, id_matiere):
     else:
         selected_type = ""
         types_evaluations = [True, False]
+    
 
     semestres = [semestre]
 
-    evaluations = Evaluation.objects.filter(
-        matiere=matiere, semestre__in=semestres, rattrapage__in=types_evaluations)
-    semestres = matiere.get_semestres(
-        annee_universitaire=annee_selectionnee, type='__all__')
+    evaluations = Evaluation.objects.filter(matiere=matiere, semestre__in=semestres, rattrapage__in=types_evaluations)
+    
     url_path = "/main/evaluations/upload/" + \
         str(matiere.id) + "/" + str(semestre.id) + "/"
 
@@ -1783,13 +1778,15 @@ def createNotesByEvaluation(request, id_matiere, rattrapage, id_semestre):
     annee_universitaire = AnneeUniversitaire.static_get_current_annee_universitaire()
     semestre = get_object_or_404(Semestre, pk=id_semestre)
     if matiere.dans_semestre(semestre):
-        if rattrapage:
-            etudiants = matiere.get_etudiants_en_rattrapage()
+        if not rattrapage and not matiere.is_available_to_add_evaluation(semestre):
+            return redirect('main:evaluations', id_matiere=matiere.id)
         else:
-            if not matiere.is_available_to_add_evaluation(semestre):
-                return redirect('main:evaluations', id_matiere=matiere.id)
-            etudiants = semestre.etudiant_set.filter(
-                is_active=True).order_by("nom")
+            etudiants = semestre.etudiant_set.filter(is_active=True).order_by("nom")
+            if rattrapage:
+                etudiants_qui_doivent_rattraper = matiere.get_etudiants_en_rattrapage()
+            else:
+                etudiants_qui_doivent_rattraper = []
+
 
         NoteFormSet = forms.inlineformset_factory(
             parent_model=Evaluation,
@@ -1822,23 +1819,25 @@ def createNotesByEvaluation(request, id_matiere, rattrapage, id_semestre):
                 Merci.
                 """
 
-                emails = [etudiant.email for etudiant in etudiants]
+                # emails = [etudiant.email for etudiant in etudiants]
 
-                send_email_task.delay(
-                    subject="Assignation de note des étudiants",
-                    message=message,
-                    email_address=emails,
-                )
+                # send_email_task.delay(
+                #     subject="Assignation de note des étudiants",
+                #     message=message,
+                #     email_address=emails,
+                # )
                 messages.success(
                     request, f"L 'évaluation {evaluation.libelle} a été ajouter.")
                 return redirect('main:evaluations', id_matiere=matiere.id)
         else:
             queryset = Note.objects.none()
             evaluation_form = EvaluationForm()
-            initial_etudiant_note_data = [
-                {'etudiant': etudiant.id, 'etudiant_full_name': etudiant.full_name()} for etudiant in etudiants]
-            note_form_set = NoteFormSet(
-                initial=initial_etudiant_note_data, queryset=queryset)
+            initial_etudiant_note_data = [{'etudiant': etudiant.id, 'etudiant_full_name': etudiant.full_name()} for etudiant in etudiants]
+            note_form_set = NoteFormSet(initial=initial_etudiant_note_data, queryset=queryset)
+            for form in note_form_set:
+                if form.initial.get('etudiant') in etudiants_qui_doivent_rattraper:
+                    form.fields['etudiant_full_name'].widget.attrs.update({'class':'form-control note_set-etudiant_full_name bg-danger'})
+            
         data = {
             'evaluation_form': evaluation_form,
             'notes_formset': note_form_set,
@@ -1846,7 +1845,9 @@ def createNotesByEvaluation(request, id_matiere, rattrapage, id_semestre):
             'ponderation_possible': matiere.ponderation_restante(semestre),
             'rattrapage': rattrapage,
             'semestre': semestre,
+            'etudiants_qui_doivent_rattraper' : etudiants_qui_doivent_rattraper,
         }
+        
         return render(request, 'notes/create_or_edit_note.html', context=data)
     return redirect('main:evaluations', id_matiere=matiere.id)
 
@@ -1861,16 +1862,17 @@ def editeNoteByEvaluation(request, id):
     evaluation = get_object_or_404(Evaluation, pk=id)
     matiere = evaluation.matiere
     semestre = evaluation.semestre
-
+    
+    etudiants = semestre.etudiant_set.filter(is_active=True)
     if evaluation.rattrapage:
-        etudiants = matiere.get_etudiants_en_rattrapage()
-        nouveaux_etudiants = []
+        etudiants_qui_doivent_rattraper = matiere.get_etudiants_en_rattrapage()
+        print(len(etudiants_qui_doivent_rattraper))
     else:
-        etudiants = semestre.etudiant_set.filter(is_active=True)
-        etudiants_dans_evaluation = evaluation.etudiants.all()
-        nouveaux_etudiants = etudiants.difference(etudiants_dans_evaluation)
-        for etudiant in nouveaux_etudiants:
-            Note.objects.create(evaluation=evaluation, etudiant=etudiant)
+        etudiants_qui_doivent_rattraper = []
+    etudiants_dans_evaluation = evaluation.etudiants.all()
+    nouveaux_etudiants = etudiants.difference(etudiants_dans_evaluation)
+    for etudiant in nouveaux_etudiants:
+        Note.objects.create(evaluation=evaluation, etudiant=etudiant)
 
     NoteFormSet = forms.inlineformset_factory(
         parent_model=Evaluation,
@@ -1909,9 +1911,11 @@ def editeNoteByEvaluation(request, id):
         note_form_set = NoteFormSet(
             instance=evaluation, queryset=notes_queryset)
         for form in note_form_set:
-            etudiant = Etudiant.objects.filter(
-                id=form.initial['etudiant']).get()
+            etudiant = Etudiant.objects.filter(id=form.initial.get('etudiant')).get()
             form.initial['etudiant_full_name'] = etudiant.full_name()
+            if form.initial.get('etudiant') in etudiants_qui_doivent_rattraper:
+                    form.fields['etudiant_full_name'].widget.attrs.update({'class':'form-control note_set-etudiant_full_name bg-danger'})
+            
 
     data = {
         'evaluation_form': evaluation_form,
