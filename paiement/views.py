@@ -497,21 +497,30 @@ def irpp_mensuel(request,id_annee_selectionnee):
     puis  renvoie l'irpp sous form de json.
     """
     salaires = VersmentSalaire.objects.filter(annee_universitaire=id_annee_selectionnee)
-    total_irpp = sum(VersmentSalaire.irpp + salaire.tcs for salaire in salaires)    
+
+    # Extraire les valeurs des TCS
+    salaire_tcs = [salaire.tcs for salaire in salaires]
+    # Calculer la somme totale des IRPP pour les salaires filtrés
+    total_irpp_db = salaires.aggregate(total_irpp=Sum('irpp'))['total_irpp'] or 0
+    # Calculer le total des TCS
+    total_tcs = sum(salaire_tcs)
+    # Additionner les deux totaux
+    total_irpp = total_irpp_db + total_tcs
+    # Calculer le total des IRPP par mois
     total_irpp_by_month = VersmentSalaire.objects.values('date_debut__month').annotate(total_irpp=Sum('irpp'))
     MONTH_NAMES = {
-    1: "Janvier",
-    2: "Février",
-    3: "Mars",
-    4: "Avril",
-    5: "Mai",
-    6: "Juin",
-    7: "Juillet",
-    8: "Août",
-    9: "Septembre",
-    10: "Octobre",
-    11: "Novembre",
-    12: "Décembre",
+        1: "Janvier",
+        2: "Février",
+        3: "Mars",
+        4: "Avril",
+        5: "Mai",
+        6: "Juin",
+        7: "Juillet",
+        8: "Août",
+        9: "Septembre",
+        10: "Octobre",
+        11: "Novembre",
+        12: "Décembre",
     }
     for item in total_irpp_by_month:
         month_number = item['date_debut__month']
