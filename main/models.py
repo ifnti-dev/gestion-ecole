@@ -633,8 +633,9 @@ class Etudiant(Utilisateur):
                 # par la suite on retourne alors la note minimale comme sa moyenne de la matière ainsi que l'année de validation
                 # l'année de validation servira à déterminer en quelle année l'étudiant à validé l'UE.
                 if note:
-                    if note.get().valeurNote >= matiere.minValue:
-                        moyenne_rattrapage = matiere.minValue
+                    valeur = note.get().valeurNote
+                    if valeur >= matiere.minValue:
+                        moyenne_rattrapage = valeur
                         a_valide_rattrapage = True
                         anneeValidation_rattrapage = rattrapage.semestre.annee_universitaire.annee
 
@@ -651,7 +652,7 @@ class Etudiant(Utilisateur):
                 
         moyenne = round(somme/100, 2)
         a_valide = moyenne >= matiere.minValue
-        
+        print(moyenne," - ", moyenne_rattrapage)
         if moyenne_rattrapage > moyenne:
             return moyenne_rattrapage, a_valide_rattrapage, anneeValidation_rattrapage
         return moyenne, a_valide, semestre.annee_universitaire.annee

@@ -1472,7 +1472,7 @@ def releve_notes_details_all(request, id_semestre):
 
     nbre_colonnes = 2
 
-    colonnes = '|c|c|'
+    colonnes = '|l|l|'
 
     semestre_ues = semestre.get_all_ues()
 
@@ -1488,7 +1488,7 @@ def releve_notes_details_all(request, id_semestre):
         # ajout des colonnes correspondant aux matières
         nbre_matieres = ue.matiere_set.all().count()
         colonnes += 'c|' * nbre_matieres
-        colonnes += 'c|'
+        colonnes += 'c|c|'
         nbre_colonnes += nbre_matieres+1
 
     # récupératon des données pour chaque lignes du relevé
@@ -1500,6 +1500,7 @@ def releve_notes_details_all(request, id_semestre):
         # tableau contenant l'ensemble des UEs de l'étudiant
         ues = []
         # boucle sur chaque UE suivies par l'étudiant pour calculersa mmoyenne et sa moyenne dans chaque matières
+        total_credit = 0
         for ue in semestre_ues:
             # tableau contenant l'ensemble des matières suivies par l'étudiant
             matieres = []
@@ -1507,18 +1508,19 @@ def releve_notes_details_all(request, id_semestre):
             for matiere in ue.matiere_set.all():
                 # récupération des matières de l'ue et la moyenne de l'étudiant dans celles-ci
                 moyenne, _, _ = etudiant.moyenne_etudiant_matiere(matiere, semestre)
-                matieres.append({'matiere': matiere, 'moyenne_matiere': round(moyenne, 2)})
+                matieres.append({'matiere': matiere, 'moyenne_matiere': format(moyenne, '.2f')})
             moyenne, a_valider, _ = etudiant.moyenne_etudiant_ue(ue, semestre)
             credit = ue.nbreCredits if a_valider else 0
+            total_credit += credit
             # credit = str(credit) + ":" + str(ue.minValue)
-            ues.append({'credit': credit, 'ue': ue, 'moyenne': round(moyenne, 2), 'matieres_ue': matieres, 'nbre_matieres': nbre_matieres + 2})
+            ues.append({'credit': credit, 'ue': ue, 'moyenne': format(moyenne, '.2f'), 'matieres_ue': matieres, 'nbre_matieres': nbre_matieres + 2, "total_credit": total_credit})
             
         ligne['ues'] = ues
         lignes_releve.append(ligne)
     print(colonnes)
     # return HttpResponse('Hello')
     context = {
-        'semestre' : "S1",
+        'semestre' : semestre,
         'nbre_ues': nbre_ues,
         'nbre_colonnes': nbre_colonnes,
         'colonnes': colonnes,
