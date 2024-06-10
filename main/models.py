@@ -562,8 +562,7 @@ class Etudiant(Utilisateur):
             matieres.update(ue.matiere_set.all())
 
         for matiere in matieres:
-            moyenne, a_valider, _ = self.moyenne_etudiant_matiere(
-                matiere, semestre)
+            moyenne, a_valider, _ = self.moyenne_etudiant_matiere(matiere, semestre)
             # print(moyenne, a_valider)
             result.append({
                 'matiere': matiere.libelle,
@@ -615,7 +614,6 @@ class Etudiant(Utilisateur):
 
 
         """
-        print("::::: 2")
         # Verifier si l'étudiant suit cette matiere
         # Récupérerer toute les évaluations de l'étuidant dans cette matière
         all_evaluations = Evaluation.objects.filter(matiere=matiere, semestre=semestre)
@@ -626,6 +624,8 @@ class Etudiant(Utilisateur):
         # on récupère tous les rattrapages faits dans cette matière au cours des différentes années scolaires
         rattrapages = all_evaluations.filter(rattrapage=True)
         # s'il il y'a eu des rattrapages alors on recherche les notes de l'étudiant au cours de ces rattrapages
+        moyenne_rattrapage, a_valide_rattrapage, anneeValidation_rattrapage = 0,0,0
+        
         if rattrapages:
             for rattrapage in rattrapages:
                 note = rattrapage.note_set.filter(etudiant=self)
@@ -633,15 +633,14 @@ class Etudiant(Utilisateur):
                 # par la suite on retourne alors la note minimale comme sa moyenne de la matière ainsi que l'année de validation
                 # l'année de validation servira à déterminer en quelle année l'étudiant à validé l'UE.
                 if note:
-                    if note.get().valeurNote >= matiere.minValue:
-                        moyenne = matiere.minValue
-                        a_valide = True
-                        anneeValidation = rattrapage.semestre.annee_universitaire.annee
-                        return moyenne, a_valide, anneeValidation
+                    valeur = note.get().valeurNote
+                    if valeur >= matiere.minValue:
+                        moyenne_rattrapage = valeur
+                        a_valide_rattrapage = True
+                        anneeValidation_rattrapage = rattrapage.semestre.annee_universitaire.annee
 
         note_ponderation = {}
         somme = 0
-        print(" ::::::: evaluations ::::::: ")
 
         for evaluation in evaluations:
             notes = evaluation.note_set.filter(etudiant=self)
@@ -653,6 +652,9 @@ class Etudiant(Utilisateur):
                 
         moyenne = round(somme/100, 2)
         a_valide = moyenne >= matiere.minValue
+        print(moyenne," - ", moyenne_rattrapage)
+        if moyenne_rattrapage > moyenne:
+            return moyenne_rattrapage, a_valide_rattrapage, anneeValidation_rattrapage
         return moyenne, a_valide, semestre.annee_universitaire.annee
 
     def moyenne_etudiant_ue(self, ue, semestre):
@@ -681,7 +683,6 @@ class Etudiant(Utilisateur):
         if not matieres:
             return 0.0, False, anneeValidation
 
-        a_valide = True
         for matiere in matieres:
             note, validation_matiere, annee = self.moyenne_etudiant_matiere(matiere, semestre)
             somme_note += float(note) * float(matiere.coefficient)
@@ -690,22 +691,9 @@ class Etudiant(Utilisateur):
             # il s'agit en réalité de l'année de la validation du dernier rattrapage
             if anneeValidation < annee:
                 anneeValidation = annee
-            if validation_matiere == False:
-                a_valide = False
 
         moyenne = round(somme_note/somme_coef, 2)
-        matiere_principale = ue.matiere_principacle()
-        a_valide = moyenne >= matiere_principale.minValue
-        # if ue.type == 'Technologie':
-        #     if moyenne < 12:
-        #         a_valide = False
-        # else:
-        #     if moyenne < 10:
-        #         a_valide = False
-        if moyenne >= ue.minValue :
-            a_valide = True
-        else:
-            a_valide = False
+        a_valide = moyenne >= ue.minValue
         return moyenne, a_valide, anneeValidation
 
 
@@ -1588,17 +1576,34 @@ class Matiere(models.Model):
 
         etudiants = set()
         semestres = self.get_semestres('__all__', '__all__')
+     
+        # for semestre in semestres:
+        #     for etudiant in semestre.etudiant_set.all().order_by('nom', 'prenom'):
+        #         _, a_valide_matiere, _ = etudiant.moyenne_etudiant_matiere(self, semestre)
+        #         if a_valide_matiere:
+        #             _ , a_valide_ue, _ = etudiant.moyenne_etudiant_ue(self.ue,semestre)
+        #             if not a_valide_ue:
+        #                 etudiants.update([etudiant.id])
+        #         elif not a_valide_matiere:
+        #             etudiants.update([etudiant.id])
+        
         for semestre in semestres:
-            for etudiant in semestre.etudiant_set.all():
-                _, a_valide_matiere, _ = etudiant.moyenne_etudiant_matiere(self, semestre)
-                if a_valide_matiere:
-                    _, a_valide_ue, _ = etudiant.moyenne_etudiant_ue(self.ue,semestre)
-                    if not a_valide_ue:
-                        etudiants.update([etudiant])
-                    pass
-                elif not a_valide_matiere:
-                    etudiants.update([etudiant])
-        return list(etudiants)
+            for etudiant in semestre.etudiant_set.all().order_by('nom', 'prenom'):
+                _ , a_valide_ue, _ = etudiant.moyenne_etudiant_ue(self.ue,semestre)
+                if a_valide_ue:
+                    _, a_valide_matiere, _ = etudiant.moyenne_etudiant_matiere(self, semestre)
+                    if not a_valide_matiere:
+                        print("::: Matiere :::")
+                        print(etudiant)
+                        etudiants.update([etudiant.id])
+                else:
+                    print("::: UE :::")
+                    print(etudiant)
+                    etudiants.update([etudiant.id])
+                    
+        etudiants_liste = list(etudiants)
+        # etudiants_liste.sort(key=lambda etudiant: (etudiant.nom, etudiant.prenom))
+        return etudiants_liste
 
     def get_etudiant_semestre(self, semestre):
         """
@@ -1837,7 +1842,6 @@ class Semestre(models.Model):
     id = models.CharField(primary_key=True, blank=True, max_length=14)
     """
         Identifiant du semestre
-
         **Type:** string
     """
     CHOIX_SEMESTRE = [('S1', 'Semestre1'), ('S2', 'Semestre2'), ('S3', 'Semestre3'),
@@ -1845,9 +1849,7 @@ class Semestre(models.Model):
     libelle = models.CharField(max_length=30, choices=CHOIX_SEMESTRE)
     """
         Intitulé du semestre
-
         **Type:** string
-
     """
     credits = models.IntegerField(default=30)
     """

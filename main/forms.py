@@ -58,7 +58,7 @@ class EvaluationForm(forms.ModelForm):
         return cleaned_data
 
 class NoteForm(forms.ModelForm):
-    etudiant = forms.CharField(max_length=255, widget=forms.TextInput(attrs={'autocomplete': 'off', 'hidden' : True}))
+    etudiant = forms.CharField(max_length=255, widget=forms.TextInput(attrs={'autocomplete': 'off', 'hidden' : True,}))
     etudiant_full_name = forms.CharField(max_length=255, widget=forms.TextInput(attrs={'class':'form-control note_set-etudiant_full_name','autocomplete': 'off', "value": ""}), required=False)
     
     class Meta:
