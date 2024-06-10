@@ -19,6 +19,7 @@ from datetime import timedelta
 from collections import defaultdict
 
 from django.conf import settings
+from datetime import datetime
 
 
 
@@ -433,45 +434,67 @@ def seance(request,seanceId):
     return render(request,'details.html',context)
 
 
+# ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# def french_day(day):
+#     # print(day)
+#     french_correspondance_days = {
+#         'Monday':'Lundi',
+#         'Tuesday' :'Mardi',
+#         'Wednesday' :'Mercredi',
+#         'Thursday' :'Jeudi',
+#         'Friday' :'Vendredi',
+#         'Saturday' :'Samedi'
+#     }
+#     return french_correspondance_days[day]
+# ---------------------------------------------------------------------------
 def french_day(day):
-    print(day)
-    french_correspondance_days = {'Monday':'Lundi','Tuesday' :'Mardi','Wednesday' :'Mercredi','Thursday' :'Jeudi','Friday' :'Vendredi','Saturday' :'Samedi'}
-    return french_correspondance_days[day]
+    days = {
+        'Monday': 'Lundi',
+        'Tuesday': 'Mardi',
+        'Wednesday': 'Mercredi',
+        'Thursday': 'Jeudi',
+        'Friday': 'Vendredi',
+        'Saturday': 'Samedi',
+        'Sunday': 'Dimanche'
+    }
+    return days.get(day.capitalize(), day)
 
 
 @login_required(login_url=settings.LOGIN_URL)
-def imprimer(request,planningId):
-    if request.user.groups.all().first().name not in ['directeur_des_etudes','secretaire']:
+def imprimer(request, planningId):
+    if request.user.groups.all().first().name not in ['directeur_des_etudes', 'secretaire']:
         return render(request, 'errors_pages/403.html')
     
     planns = Planning.objects.filter(id=planningId).first()
     days = []
-    timeslots=['']
-    tenues=[ 'Veste', 'Tricot' , 'Veste' , 'Tricot' ,'Bigarré' , 'Bigarré']
-    if planns.semestre.libelle == 'S1' or 'S2' :
-        niveau='L1 '+ planns.semestre.libelle + ' '+str(planns.semestre.annee_universitaire)
-    elif  planns.semestre.libelle == 'S3' or 'S4' :
-        niveau='L2 '+ planns.semestre.libelle + ' '+str(planns.semestre.annee_universitaire)
-    elif  planns.semestre.libelle == 'S5' or 'S6' :
-        niveau='L3 '+ planns.semestre.libelle + ' '+str(planns.semestre.annee_universitaire)
+    timeslots = ['']
+    tenues = ['Veste', 'Tricot', 'Veste', 'Tricot', 'Bigarré', 'Bigarré']
     
+    semestre_libelle = planns.semestre.libelle
+    annee_universitaire = planns.semestre.annee_universitaire
+
+    if semestre_libelle in ['S1', 'S2']:
+        niveau = f'L1 {semestre_libelle} {annee_universitaire}'
+    elif semestre_libelle in ['S3', 'S4']:
+        niveau = f'L2 {semestre_libelle} {annee_universitaire}'
+    elif semestre_libelle in ['S5', 'S6']:
+        niveau = f'L3 {semestre_libelle} {annee_universitaire}'
+    else:
+        niveau = f'Unknown {semestre_libelle} {annee_universitaire}'
+
     print(niveau)
 
-    plannings=SeancePlannifier.objects.filter(planning=planns)
-    for planning in plannings :
-        jour_n=(planns.semaine-1)*5 + planning.date_heure_debut.weekday() +1 
-        jour_n=str(jour_n)
-        valeur_jour= str(planning.date_heure_debut.day)
-        if len(valeur_jour) == 1 :
-            valeur_jour='0'+valeur_jour
-        valeur_mois=str(planning.date_heure_debut.month)
-        if len(valeur_mois) == 1 :
-            valeur_mois='0'+valeur_mois        
+    plannings = SeancePlannifier.objects.filter(planning=planns)
+    for planning in plannings:
+        jour_n = (planns.semaine - 1) * 5 + planning.date_heure_debut.weekday() + 1
+        jour_n = str(jour_n)
+        valeur_jour = str(planning.date_heure_debut.day).zfill(2)
+        valeur_mois = str(planning.date_heure_debut.month).zfill(2)
+
         jour = french_day(planning.date_heure_debut.strftime("%A"))
 
-        day = jour +' '+valeur_jour+'/'+valeur_mois+' - J'+jour_n 
-        
-        timeshot= str(planning.date_heure_debut.hour)+'h'+str(planning.date_heure_debut.minute)
+        day = f'{jour} {valeur_jour}/{valeur_mois} - J{jour_n}'
+        timeshot = f'{planning.date_heure_debut.hour}h{str(planning.date_heure_debut.minute).zfill(2)}'
 
         planning.day = day
         planning.timeshot = timeshot
@@ -481,36 +504,26 @@ def imprimer(request,planningId):
         if timeshot not in timeslots:
             timeslots.append(timeshot)
 
-
-    schedule = {}
-
-    for time in timeslots:
-        schedule[time] = {}
+    schedule = {time: {} for time in timeslots}
 
     for plan in plannings:
         time_slot = plan.timeshot  
         day = plan.day  
         activity = plan.intitule
-        professor = plan.professeur.nom if plan.professeur else "No Professor"
+        professor = plan.professeur.personnel.nom if plan.professeur else "No Professor"
 
-        if time_slot in schedule:
-            if day in schedule[time_slot]:
-                if activity in schedule[time_slot][day]:
-                    schedule[time_slot][day][activity].append({
-                        "professeur": professor
-                    })
-                else:
-                    schedule[time_slot][day][activity] = [{
-                        "professeur": professor
-                    }]
-            else:
-                schedule[time_slot][day] = {activity: [{
-                    "professeur": professor
-                }]}
-        else:
-            schedule[time_slot] = {day: {activity: [{
-                "professeur": professor
-            }]}}
+        if time_slot not in schedule:
+            schedule[time_slot] = {}
+        
+        if day not in schedule[time_slot]:
+            schedule[time_slot][day] = {}
+
+        if activity not in schedule[time_slot][day]:
+            schedule[time_slot][day][activity] = []
+
+        schedule[time_slot][day][activity].append({
+            "professeur": professor
+        })
 
     for timeslot in schedule:
         print("\nTime Slot:", timeslot)
@@ -520,26 +533,24 @@ def imprimer(request,planningId):
                 print(activity, ":")
                 for professor in schedule[timeslot][day][activity]:
                     print("\tProfessor:", professor["professeur"])
+    print(schedule)
 
+    context = {'planning': schedule, 'niveau': niveau, 'days': days, 'taille': 22.5 / len(days), 'tenues': tenues}          
 
-
-
-
-    context = {'planning': schedule,'niveau':niveau,'days':days,'taille':22.5/len(days),'tenues':tenues}          
-                    
     latex_input = 'planning_week'
-    latex_ouput = 'planning_week_'+str(planns.semaine)+'_'+str(planns.semestre.libelle)+'_'+str(planns.semestre.annee_universitaire)
-    pdf_file = 'planning_week_'+str(planns.semaine)+'_'+str(planns.semestre.libelle)+'_'+str(planns.semestre.annee_universitaire)
+    latex_output = f'planning_week_{planns.semaine}_{semestre_libelle}_{annee_universitaire}'
+    pdf_file = f'planning_week_{planns.semaine}_{semestre_libelle}_{annee_universitaire}'
 
     # génération du pdf
-    generate_pdf(context, latex_input, latex_ouput, pdf_file)
+    generate_pdf(context, latex_input, latex_output, pdf_file)
 
-    with open('media/pdf/' + str(pdf_file) + '.pdf', 'rb') as f:
+    with open(f'media/pdf/{pdf_file}.pdf', 'rb') as f:
         pdf_preview = f.read()
         response = HttpResponse(pdf_preview, content_type='application/pdf')
-        response['Content-Disposition'] = 'inline;filename=pdf_file.pdf'
+        response['Content-Disposition'] = f'inline;filename={pdf_file}.pdf'
         return response
 
+# -----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
 @login_required(login_url=settings.LOGIN_URL)
