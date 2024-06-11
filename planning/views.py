@@ -482,7 +482,6 @@ def imprimer(request, planningId):
     else:
         niveau = f'Unknown {semestre_libelle} {annee_universitaire}'
 
-    print(niveau)
 
     plannings = SeancePlannifier.objects.filter(planning=planns)
     for planning in plannings:
@@ -495,6 +494,7 @@ def imprimer(request, planningId):
 
         day = f'{jour} {valeur_jour}/{valeur_mois} - J{jour_n}'
         timeshot = f'{planning.date_heure_debut.hour}h{str(planning.date_heure_debut.minute).zfill(2)}'
+        # print(timeshot)
 
         planning.day = day
         planning.timeshot = timeshot
@@ -504,7 +504,9 @@ def imprimer(request, planningId):
         if timeshot not in timeslots:
             timeslots.append(timeshot)
 
-    schedule = {time: {} for time in timeslots}
+    #heures de la jours
+    ues_prof_matieres = {time: {} for time in timeslots}
+    # print(ues_prof_matieres)
 
     for plan in plannings:
         time_slot = plan.timeshot  
@@ -512,30 +514,42 @@ def imprimer(request, planningId):
         activity = plan.intitule
         professor = plan.professeur.personnel.nom if plan.professeur else "No Professor"
 
-        if time_slot not in schedule:
-            schedule[time_slot] = {}
+        if time_slot not in ues_prof_matieres:
+            ues_prof_matieres[time_slot] = {}
         
-        if day not in schedule[time_slot]:
-            schedule[time_slot][day] = {}
+        if day not in ues_prof_matieres[time_slot]:
+            ues_prof_matieres[time_slot][day] = {}
 
-        if activity not in schedule[time_slot][day]:
-            schedule[time_slot][day][activity] = []
+        if activity not in ues_prof_matieres[time_slot][day]:
+            ues_prof_matieres[time_slot][day][activity] = []
 
-        schedule[time_slot][day][activity].append({
+        ues_prof_matieres[time_slot][day][activity].append({
             "professeur": professor
         })
 
-    for timeslot in schedule:
-        print("\nTime Slot:", timeslot)
-        for day in schedule[timeslot]:
-            print("Day:", day)
-            for activity in schedule[timeslot][day]:
-                print(activity, ":")
-                for professor in schedule[timeslot][day][activity]:
-                    print("\tProfessor:", professor["professeur"])
-    print(schedule)
+    # for timeslot in ues_prof_matieres:
+    #     # print("\nTime Slot:", timeslot)
+    #     for day in ues_prof_matieres[timeslot]:
+    #         # print("Day:", day)
+    #         for activity in ues_prof_matieres[timeslot][day]:
+    #             # print(activity, ":")
+    #             for professor in ues_prof_matieres[timeslot][day][activity]:
+    #                 # print("\tProfessor:", professor["professeur"])
+    #                 pass
 
-    context = {'planning': schedule, 'niveau': niveau, 'days': days, 'taille': 22.5 / len(days), 'tenues': tenues}          
+    
+
+    # for cle, valeur in ues_prof_matieres.items():
+    #     heurs  = cle
+    #     pr = valeur
+
+    #     print (heurs)
+    #     print(pr)
+
+
+    print(ues_prof_matieres)
+    context = {'planning': ues_prof_matieres, 'niveau': niveau, 'days': days, 'taille': 22.5 / len(days), 'tenues': tenues} 
+         
 
     latex_input = 'planning_week'
     latex_output = f'planning_week_{planns.semaine}_{semestre_libelle}_{annee_universitaire}'
