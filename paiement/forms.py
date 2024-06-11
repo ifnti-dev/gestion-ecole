@@ -2,7 +2,9 @@ from typing import Any, Dict
 import re
 from typing import Any, Dict
 from django import forms
-from django.db.models import Sum  
+from django.db.models import Sum
+from django.shortcuts import get_object_or_404
+from requests import request  
 from main.models import Paiement, FicheDePaie
 from .models import Evaluation, Note, Utilisateur, Frais, CompteEtudiant, CompteBancaire, Personnel, Enseignant, Etudiant, Matiere, AnneeUniversitaire, Ue, Tuteur, Semestre, VersmentSalaire, Fournisseur, Charge
 from django.core.exceptions import ValidationError
@@ -64,14 +66,14 @@ class PaiementForm(forms.ModelForm):
   
     class Meta:
         model = Paiement
-        fields = ['type', 'montant', 'dateversement','etudiant' ,'numerobordereau']
+        fields = ['type', 'montant', 'dateversement','etudiant' ,'numerobordereau','annee_universitaire']
         
         widgets = {
             'type': forms.Select(attrs={'class': 'form-control'}),
             'dateversement': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'etudiant':forms.Select(attrs={'class': 'form-control js-select2 col-md-12'}),
             'numerobordereau': forms.TextInput(attrs={'class': 'form-control'}),
-            
+            'annee_universitaire':forms.Select(attrs={'class': 'form-control'})
         }
 
     def clean(self):
@@ -80,19 +82,28 @@ class PaiementForm(forms.ModelForm):
         montant = cleaned_data.get('montant')
         annee_universitaire = cleaned_data.get('annee_universitaire')
         
+        # id_annee_selectionnee = request.session.get('id_annee_selectionnee')
+        # annee_universitaire = get_object_or_404( AnneeUniversitaire, pk=id_annee_selectionnee)
+        # print("annee_universitaire",annee_universitaire)
+        # Obtenez l'année universitaire courante
+        #annee_universitaire = AnneeUniversitaire.static_get_current_annee_universitaire()
+        #print("annee_universitaire",annee_universitaire)
+        print(montant)
+        print(etudiant)
         if etudiant and annee_universitaire :
             total_versements = Paiement.objects.filter(etudiant=etudiant, annee_universitaire=annee_universitaire).aggregate(Sum('montant'))['montant__sum'] or 0
             frais = Frais.objects.filter(annee_universitaire=annee_universitaire).first()
             print("ok")
+            print("montant etu",montant)
             if frais:
                 total_frais = frais.montant_inscription + frais.montant_scolarite
                 # modifier la validation
-                print("montant etu",montant)
+                print("total_frais",total_frais)
                 print("montant_total",total_versements)
                 
                 if  montant < frais.montant_scolarite :
-                    if montant and (montant + total_versements >=total_frais) :
-                        raise forms.ValidationError(f"L'étudiant a déjà versé une somme de : {total_versements} FCFA .Il lui reste {total_frais-total_versements} FCFA")
+                    if montant and (montant + total_versements >total_frais) :
+                        raise forms.ValidationError(f"L'étudiant a déjà versé une somme de {total_versements} FCFA. Il lui reste {total_frais - total_versements} FCFA à payer.")
                 else:
                     raise forms.ValidationError(f"Le Montant du frais de scolarité ne doit pas depassé {frais.montant_scolarite}")
 
@@ -100,6 +111,7 @@ class PaiementForm(forms.ModelForm):
                 raise forms.ValidationError("Les frais ne sont pas définis pour l'année universitaire sélectionnée.")
 
             return cleaned_data
+       
 
         
 
