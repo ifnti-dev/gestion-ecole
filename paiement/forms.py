@@ -101,9 +101,12 @@ class PaiementForm(forms.ModelForm):
                 print("total_frais",total_frais)
                 print("montant_total",total_versements)
                 
-                if  montant < frais.montant_scolarite :
-                    if montant and (montant + total_versements >total_frais) :
+                if  montant <= frais.montant_scolarite :
+                    if montant and (total_versements == total_frais) :
+                        raise forms.ValidationError(f"L'étudiant a déjà versé la totalité des frais: {total_versements} FCFA. ")
+                    if montant and (montant + total_versements >total_frais):
                         raise forms.ValidationError(f"L'étudiant a déjà versé une somme de {total_versements} FCFA. Il lui reste {total_frais - total_versements} FCFA à payer.")
+
                 else:
                     raise forms.ValidationError(f"Le Montant du frais de scolarité ne doit pas depassé {frais.montant_scolarite}")
 
