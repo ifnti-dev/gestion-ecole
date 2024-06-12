@@ -102,11 +102,14 @@
                             {% endfor %}
                            
                         </select>
+
                     </div>
+                    
                     <div class="form-group">
                         <label for="semaine">Semaine:</label>
-                        <input type="number" id="semaine" class="form-control" name="semaine" min="1">
+                            <input type="number" id="semaine" class="form-control" name="semaine" min="{{nouvelle_semaine }}" value="{{nouvelle_semaine }}">
                     </div>
+
                     <div class="form-group">
                         <label for="intervalle">Intervalle date:</label>
                         <input type="text" class="js-flatpickr form-control bg-white" id="intervalle" name="intervalle" placeholder="Select Date Range"  data-mode="range" >
@@ -154,6 +157,7 @@
                 }
                 
                 if (!intervalle.includes("to")) {
+                    
                     alert("Veuillez sélectionner un intervalle de dates valide.");
                     return false;
                 }
@@ -188,7 +192,6 @@
                     } else {
 
                         alert("Un planning de la semaine " +response.semaine +" du semestre "+ response.semestre +" a deja été enregistrer entre le "+ response.datedebut +" et le "+ response.datefin);
-
                     }
                 },
                 error: function (error) {

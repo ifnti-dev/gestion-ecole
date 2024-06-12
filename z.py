@@ -57,3 +57,4 @@ def nouveau_planning(request):
         return render(request, 'generer_planning.html', {'planification_json': planification_json,'semestre':semestre,'semaine':semaine,'datedebut':datedebut,'datefin':datefin,'intervalle':intervalle,'ues':ues})
     
 
+
