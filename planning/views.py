@@ -38,7 +38,15 @@ def index(request):
     else :
         plannings = Planning.objects.all()
 
-    context= {'semestres':semestres,'semestre_courant':semsestre_courant,'plannings':plannings}
+        dernier_planning = Planning.objects.all().last()
+
+
+
+    context= {
+        'semestres':semestres,
+        'nouvelle_semaine' : dernier_planning.semaine + 1,
+        'semestre_courant':semsestre_courant,
+        'plannings':plannings}
 
     return render(request, 'planning_list.html',context)
 
@@ -103,6 +111,7 @@ def nouveau_planning(request):
                 planification[str(ue)].append({'matieres': matieres})
 
             planification_json = json.dumps(planification)
+        
 
         return render(request, 'generer_planning.html', {
             'planification_json': planification_json,
