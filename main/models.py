@@ -729,7 +729,7 @@ class Etudiant(Utilisateur):
         for ue in programme.ues.all():
             # Calculer la moyenne de l'UE
             moyenne_ue, a_valide_ue, _ = self.moyenne_etudiant_ue(ue, semestre)
-
+            print("moyen ue",moyenne_ue)
             # Si l'étudiant a validé l'UE, ajouter les crédits de l'UE aux crédits obtenus
             if a_valide_ue:
                 credits_obtenus += ue.nbreCredits
@@ -2031,7 +2031,7 @@ class Programme(models.Model):
             :return: Une chaine de caractère correspondant au code du parcours.
             :retype: string
         """
-        return f'{self.parcours}-{self.ues}-{self.semestre}'
+        return f'{self.parcours}-{self.semestre}'
 
     def __str__(self):
         return self.generate_code()

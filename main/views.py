@@ -361,6 +361,7 @@ def liste_etudiants_par_semestre(request, id_annee_selectionnee):
 
     # Récupérer l'année universitaire actuelle
     current_annee = AnneeUniversitaire.static_get_current_annee_universitaire()
+    print("annee c",current_annee)
 
     # Initialiser des variables
     niveau = ""
@@ -377,11 +378,12 @@ def liste_etudiants_par_semestre(request, id_annee_selectionnee):
     # Vérifier si un semestre est spécifié dans la requête
     if 'semestre' in request.GET:
         semestre_id = request.GET.get('semestre')
+        print(semestre_id)
         semestres_selected = semestres.filter(pk=semestre_id)
     
     try:
         programme = Programme.objects.get(semestre=semestres_selected[0])
-  
+        print("program",programme)
 
         # Filtrer les étudiants en fonction des semestres sélectionnés et qui sont actifs
         etudiants = Etudiant.objects.filter(
@@ -390,24 +392,31 @@ def liste_etudiants_par_semestre(request, id_annee_selectionnee):
         # Initialiser une liste pour les étudiants insuffisants
         etudiants_insuffisants = []
         print("---------------------------------------------------")
-        print(etudiants)
-        # Calculer les crédits obtenus par chaque étudiant pour le semestre sélectionné
-        for etudiant in etudiants:
-            credits_obtenus = etudiant.credits_obtenus_semestre(
-                programme=programme)  # Utiliser le premier semestre sélectionné
-            # Créer un attribut pour stocker les crédits obtenus
-            etudiant.credits_obtenus = credits_obtenus
+        #print(etudiants)
+        print("---------------------------------------------------")
+       # Calculer les crédits obtenus par chaque étudiant pour le semestre sélectionné
+        # for etudiant in etudiants:
+        #     credits_obtenus = etudiant.credits_obtenus_semestre(
+        #         programme=programme)  # Utiliser le premier semestre sélectionné
+        #     print("credits_obtenus",credits_obtenus)
+        #     # Créer un attribut pour stocker les crédits obtenus
+        #     etudiant.credits_obtenus = credits_obtenus
 
         # Récupérer le semestre actuel de chaque étudiant dans l'année universitaire
         for etudiant in etudiants:
-            semestres_etudiant = etudiant.semestres.filter(
-                annee_universitaire=annee_universitaire)
+            semestres_etudiant = etudiant.semestres.filter(annee_universitaire=annee_universitaire, courant=True)
+            
             if semestres_etudiant.exists():
-                semestre_actuel = semestres_etudiant.latest('libelle')
+                semestre_actuel = semestres_etudiant.first()
+                print("semestre actuel",semestre_actuel)
+                credits_obtenus = etudiant.credits_obtenus_semestre(semestre=semestre_actuel)
+                print(etudiant, " : ", credits_obtenus)
+                etudiant.credits_obtenus = credits_obtenus
                 etudiant.semestre_actuel = semestre_actuel
             else:
                 etudiant.semestre_actuel = None
     except Exception as e:
+        print(e)
         etudiants=[]
         etudiants_insuffisants=[]
     # Construire le contexte pour le rendu de la page
@@ -421,6 +430,95 @@ def liste_etudiants_par_semestre(request, id_annee_selectionnee):
 
     # Rendre la page avec le contexte
     return render(request, 'etudiants/liste_etudiants_par_semestre.html', context=data)
+
+
+# def liste_etudiants_par_semestre(request, id_annee_selectionnee):
+#     """
+#     Affiche la liste des étudiants pour un semestre sélectionné dans une année universitaire donnée.
+
+#     :param request: L'objet de requête Django.
+#     :param id_annee_selectionnee: L'identifiant de l'année universitaire sélectionnée.
+#     :return: Une réponse HTTP avec la liste des étudiants et des informations associées.
+#     """
+
+#     # Récupérer le rôle de l'utilisateur
+#     role = get_user_role(request)
+
+#     # Récupérer l'objet AnneeUniversitaire en fonction de l'identifiant fourni
+#     annee_universitaire = get_object_or_404(
+#         AnneeUniversitaire, pk=id_annee_selectionnee)
+
+#     # Récupérer l'année universitaire actuelle
+#     current_annee = AnneeUniversitaire.static_get_current_annee_universitaire()
+#     print("annee c",current_annee)
+
+#     # Initialiser des variables
+#     niveau = ""
+#     data = {}
+#     semestre_id = None
+#     semestres_selected = None
+
+#     # Logique pour les directeurs des études
+#     if role.name == "directeur_des_etudes":
+#         niveau = "IFNTI"
+#         semestres = annee_universitaire.semestre_set.all()
+#         semestres_selected = semestres
+
+#     # Vérifier si un semestre est spécifié dans la requête
+#     if 'semestre' in request.GET:
+#         semestre_id = request.GET.get('semestre')
+#         print(semestre_id)
+#         semestres_selected = semestres.filter(pk=semestre_id)
+    
+#     try:
+#         programme = Programme.objects.get(semestre=semestres_selected[0])
+#         print("program",programme)
+
+#         # Filtrer les étudiants en fonction des semestres sélectionnés et qui sont actifs
+#         etudiants = Etudiant.objects.filter(
+#             semestres__in=semestres_selected, is_active=True).distinct()
+
+#         # Initialiser une liste pour les étudiants insuffisants
+#         etudiants_insuffisants = []
+#         print("---------------------------------------------------")
+#         #print(etudiants)
+#         print("---------------------------------------------------")
+#         # Calculer les crédits obtenus par chaque étudiant pour le semestre sélectionné
+#         for etudiant in etudiants:
+#             credits_obtenus = etudiant.credits_obtenus_semestre(
+#                 programme=programme)  # Utiliser le premier semestre sélectionné
+#             print("credits_obtenus",credits_obtenus)
+#             # Créer un attribut pour stocker les crédits obtenus
+#             etudiant.credits_obtenus = credits_obtenus
+
+#         # Récupérer le semestre actuel de chaque étudiant dans l'année universitaire
+#         for etudiant in etudiants:
+#             semestres_etudiant = etudiant.semestres.filter(
+#                 annee_universitaire=annee_universitaire)
+#             if semestres_etudiant.exists():
+#                 semestre_actuel = semestres_etudiant.latest('libelle')
+#                 print("semestre actuel",semestre_actuel)
+#                 etudiant.semestre_actuel = semestre_actuel
+#             else:
+#                 etudiant.semestre_actuel = None
+#     except Exception as e:
+#         etudiants=[]
+#         etudiants_insuffisants=[]
+#     # Construire le contexte pour le rendu de la page
+#     data = {
+#         'etudiants': etudiants,
+#         'semestres': semestres,
+#         'etudiants_insuffisants': etudiants_insuffisants,
+#         'niveau': niveau,
+#         'selected_semestre': semestres_selected
+#     }
+
+#     # Rendre la page avec le contexte
+#     return render(request, 'etudiants/liste_etudiants_par_semestre.html', context=data)
+
+
+
+
 
 
 @login_required(login_url=settings.LOGIN_URL)
