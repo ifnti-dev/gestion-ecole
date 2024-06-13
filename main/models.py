@@ -1914,7 +1914,7 @@ class Semestre(models.Model):
         return f'{self.libelle}-{self.annee_universitaire}'
 
     def __str__(self):
-        return f'{self.libelle} -{self.annee_universitaire}'
+        return f'{self.libelle}-{self.annee_universitaire}'
 
 class Domaine(models.Model):
     """

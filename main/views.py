@@ -35,13 +35,18 @@ def datetime_serializer(obj):
 
 @login_required(login_url=settings.LOGIN_URL)
 def export_excel_evaluation(request, id_matiere, id_semestre):
-    
+   
     matiere = get_object_or_404(Matiere, id=id_matiere)
     semestre = get_object_or_404(Semestre, id=id_semestre)
     
+    print("semestre",semestre)
+    print("mat",matiere)
+    #print(evaluations)
+    #return HttpResponse("ook")
     
     path=export_evaluation_data(matiere, semestre)
     file_name = path
+
     with open(file_name, 'rb') as file:
         response = HttpResponse(
             file.read(), content_type="application/force-download")
@@ -392,15 +397,7 @@ def liste_etudiants_par_semestre(request, id_annee_selectionnee):
         # Initialiser une liste pour les étudiants insuffisants
         etudiants_insuffisants = []
         print("---------------------------------------------------")
-        #print(etudiants)
-        print("---------------------------------------------------")
-       # Calculer les crédits obtenus par chaque étudiant pour le semestre sélectionné
-        # for etudiant in etudiants:
-        #     credits_obtenus = etudiant.credits_obtenus_semestre(
-        #         programme=programme)  # Utiliser le premier semestre sélectionné
-        #     print("credits_obtenus",credits_obtenus)
-        #     # Créer un attribut pour stocker les crédits obtenus
-        #     etudiant.credits_obtenus = credits_obtenus
+       
 
         # Récupérer le semestre actuel de chaque étudiant dans l'année universitaire
         for etudiant in etudiants:
