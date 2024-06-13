@@ -561,7 +561,7 @@ def imprimer(request, planningId):
     #     print(pr)
 
 
-    #print(ues_prof_matieres)
+    print(ues_prof_matieres)
     context = {'planning': ues_prof_matieres, 'niveau': niveau, 'days': days, 'taille': 22.5 / len(days), 'tenues': tenues} 
          
 
