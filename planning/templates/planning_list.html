@@ -8,11 +8,25 @@
     /* custom styles for the button */
     margin-left: auto;  /* This will push the button to the right */
 }
+.coleurs{
+    background: #1C74DC;
+}
+.semestres, .intervalles{
+    display: none;
+}
+.apparution{
+    display: block;
+}
+.ita{
+    font-style: italic;
+}
+
+
 </style>
-<div class="block block-rounded">
+<div class="block block-rounded shadow-sm w-auto px-2 bg-light">
 
     <div class="block-header p-4">
-        <h3 class="block-title">Liste des planning par semaine</h3>
+        <h3 class="block-title text-black text-lg-start">Liste des planning par semaine</h3>
         <div class="dropdown">
             <button type="button" class="btn btn-outline-primary" id="dropdown-default-primary" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 Filtrer par semestres
@@ -28,18 +42,20 @@
                 </form>
             </div>
         </div>
-        <a data-toggle="modal" data-target="#newPlanningModal" class="btn btn-outline-primary">
-            <i class="fas fa-plus"></i> Nouveau planning
-        </a> 
+        <div>
+            <a data-toggle="modal" data-target="#newPlanningModal" class="btn btn-outline-primary ml-2">
+                <i class="fas fa-plus"></i> Nouveau planning
+            </a> 
+        </div>
     </div>
-    <div class="block-content block-content-full">
-        <table class="table table-bordered table-striped table-vcenter js-dataTable-full-pagination">
-            <thead>
+    <div class="block-content block-content-full shadow-lg bg-dark-subtle ">
+        <table class="table table-bordered table-striped table-vcenter js-dataTable-full-pagination ">
+            <thead class="coleurs">
                 <tr>
-                    <th class="d-none d-sm-table-cell text-center">Semaine</th>
-                    <th class="d-none d-sm-table-cell text-center">Semestre</th>
-                    <th class="d-none d-sm-table-cell text-center">Intervalle date</th>
-                    <th style="width: 15%;">Actions</th>
+                    <th class="d-none d-sm-table-cell text-center text-white">Semaine</th>
+                    <th class="d-none d-sm-table-cell text-center text-white">Semestre</th>
+                    <th class="d-none d-sm-table-cell text-center text-white">Intervalle date</th>
+                    <th style="width: 15%;" class="text-white">Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -63,7 +79,7 @@
                                 <li class="nav-main-item">
                                     <a class="nav-main-link nav-main-link-name" data-toggle="" aria-haspopup="true" aria-expanded="false" href="edit/{{planning.id}}">
                                         <i class="fa fa-edit mr-1" aria-hidden="true"></i>
-                                        <span class="nav-main-link-name">Ajouter cours</span>
+                                        <span class="nav-main-link-name">Editer un  cours</span>
                                     </a>
                                 </li>
                                 <li class="nav-main-item">
@@ -100,17 +116,22 @@
                             {% for semestre in semestre_courant %}
                                 <option value="{{semestre.id}}">{{semestre.libelle}} - {{semestre.annee_universitaire}}</option>
                             {% endfor %}
-                           
                         </select>
+                        <p class="semestres text-danger ita">Veuillez sélectionner un semestre</p>
+
                     </div>
+                    
                     <div class="form-group">
                         <label for="semaine">Semaine:</label>
-                        <input type="number" id="semaine" class="form-control" name="semaine" min="1">
+                            <input type="number" id="semaine" class="form-control" name="semaine" min="{{nouvelle_semaine }}" value="{{nouvelle_semaine }}" readonly>
                     </div>
+
                     <div class="form-group">
                         <label for="intervalle">Intervalle date:</label>
                         <input type="text" class="js-flatpickr form-control bg-white" id="intervalle" name="intervalle" placeholder="Select Date Range"  data-mode="range" >
-                  </div>
+                    <p class="intervalles text-danger ita">Veuillez sélectionner un intervalle de dates valide.</p>
+                    </div>
+                 
                 </form>
             </div>
             <div class="modal-footer">
@@ -120,6 +141,7 @@
         </div>
     </div>
 </div>
+
 
 
 
@@ -139,9 +161,13 @@
                 var semaine = document.getElementById("semaine").value;
                 var intervalle = document.getElementById("intervalle").value;
 
+                let semestreText = document.querySelector('.semestres');
+                let intervalleText = document.querySelector('.intervalles');
+
                 // Validate each field
                 if (semestre == "") {
-                    alert("Veuillez sélectionner un semestre.");
+                    
+                    semestreText.classList.add('apparution');
                     return false; // Prevent form submission
                 }
                 
@@ -154,7 +180,7 @@
                 }
                 
                 if (!intervalle.includes("to")) {
-                    alert("Veuillez sélectionner un intervalle de dates valide.");
+                    intervalleText.classList.add('apparution');
                     return false;
                 }
 
@@ -188,7 +214,6 @@
                     } else {
 
                         alert("Un planning de la semaine " +response.semaine +" du semestre "+ response.semestre +" a deja été enregistrer entre le "+ response.datedebut +" et le "+ response.datefin);
-
                     }
                 },
                 error: function (error) {

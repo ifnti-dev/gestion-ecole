@@ -582,10 +582,12 @@ def load_notes_from_matiere(path):
 def run():
     #clean_data_base()
     print("::::: Import begining :::::")
-    
-    # annee = AnneeUniversitaire.objects.filter(annee=2023).first()
-    # semestres  = annee.semestre_set.all().prefetch_related('programme_set').prefetch_related('etudiant_set')
-    # pre_load_note_ues_template_data(semestres)
-
+    semestre = Semestre.objects.get(annee_universitaire__annee=2023, libelle="S1")
+    # print(semestre)
+    # matiere = Matiere.objects.get()
+    # Note.objects.filter(valeurNote=float("-1"))
+    # for note in notes:
+    #     print(note)
+    print("Hello")
 
 

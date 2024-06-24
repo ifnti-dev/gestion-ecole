@@ -3,26 +3,42 @@
 {% block content_title %} UEs {% endblock content_title %}
 
 {% block content %}
+
+<style>
+    .bout:hover{
+        cursor: pointer;
+        transition: 0.5s;
+        transform: scale(1.2);
+        background : #1873dca9;
+        color : white;
+    }
+</style>
+
+
 <div class="block block-rounded m-3">
-    <div class="block-header p-4">
-        <h3 class="block-title">{{ titre_section }} </h3>
-        <form action="" method="get" id="form-semestre" class="w-full">
-            <div class="form-group">
-                <select name="semestre" id="semestre" class="form-control" onchange="this.form.submit()">
-                    <option value="">Semestres</option>
-                    {% for semestre in semestres %}
-                    <option value="{{ semestre.id }}" {% if selected_semestre.id == semestre.id %}selected{% endif %}>{{ semestre }}</option>
-                    {% endfor %}
-                </select>
+    <div class="block-header p-4 d-flex  align-items-center">
+        <h3 class="p-2 rounded-pill">{{ titre_section }} </h3>
+        <div class="d-flex  align-items-center">
+            <form action="" method="get" id="form-semestre" class="w-full">
+                <div class="form-group">
+                    <select name="semestre" id="semestre" class="form-control bout shadow-lg" onchange="this.form.submit()">
+                        <option value="">Semestres</option>
+                        {% for semestre in semestres %}
+                        <option value="{{ semestre.id }}" {% if selected_semestre.id == semestre.id %}selected{% endif %}>{{ semestre }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </form>
+            {% if is_directeur_des_etudes or secretaire %}
+            <div class="form-group bg-info p-2 rounded ml-4 bout shadow-lg">
+                <a href="{% url 'main:create_ue' %}" class="text-white fs-2 ">
+                    <i class="fas fa-plus"></i> Ajout UE
+                </a>
             </div>
-        </form>
-        {% if is_directeur_des_etudes or secretaire %}
-        <a href="{% url 'main:create_ue' %}" class="btn btn-outline-primary ml-3">
-            <i class="fas fa-plus"></i> Ajout UE
-        </a>
-        {% endif %}
+            {% endif %}
+        </div>
     </div>
-    <div class="block-content block-content-full">
+    <div class="block-content block-content-full shadow-lg">
         <div class="table-responsive">
             <table class="table table-bordered table-striped table-vcenter js-dataTable-full-pagination">
                 <thead>

@@ -1458,8 +1458,6 @@ def releve_notes_semestre(request, id_semestre):
     context['semestre'] = semestre
 
     # nom des fichiers d'entrée et de sortie
-    print("Hello Releve de notes semestre")
-
     latex_input = 'releve_notes_semestre'
     latex_ouput = 'generated_releve_notes_semestre'
     pdf_file = 'pdf_releve_notes_semestre'
@@ -1528,7 +1526,7 @@ def releve_notes_detail(request, id, id_semestre):
 
     context = {
         'nbre_ues': nbre_ues,
-        'nbre_colonnes': nbre_colonnes,
+        'nbre_colonnes': nbre_colonnes+1,
         'colonnes': colonnes,
         'data_releve': data_releve,
         'etudiant': etudiant
@@ -1558,171 +1556,6 @@ def releve_notes_detail(request, id, id_semestre):
         return response
 
 
-# relevé de note détailé de tous les élèves du semestre
-# @login_required(login_url=settings.LOGIN_URL)
-# def releve_notes_details_all(request, id_semestre):
-#     """
-#     Génére le relevé de notes détaillé par matière des étudiants au cours d'un semestre.
-#     :param request: L'objet de requête Django.
-#     :param id_semestre: L'identifiant du semestre.
-
-#     :return: Une réponse HTTP affichant le pdf des relevés de notes générés.
-#     """
-#     if request.user.groups.all().first().name not in ['directeur_des_etudes', 'secretaire']:
-#         return render(request, 'errors_pages/403.html')
-
-   
-#     # template_data = {
-#     #     "data": [
-#     #         {
-#     #             "etudiant" : "",
-#     #             "ues": [
-#     #                 {
-#     #                     "matieres" : [
-#     #                         {
-#     #                             "matiere": "",
-#     #                             "moyenne": ""
-#     #                         }
-#     #                     ]
-#     #                 },
-#     #             ],
-#     #             "credit": "",
-#     #         }
-#     #     ]
-#     # }
-    
-#     template_data ={ "data": [] }
-    
-#     semestre = get_object_or_404(Semestre, id=id_semestre)
-#     etudiants = semestre.etudiant_set.all().order_by('nom')
-#     # ues = semestre.get_all_ues()
-#     # ues_matieres = { ue: ue.matiere_set.all() for ue in ues }
-        
-#     # for etudiant in etudiants:
-#     #     for ue in ues_matieres:
-#     #         for matiere in ues_matieres[ue]:
-#     #             print(matiere)
-#     #             moyenne_matiere = etudiant.moyenne_etudiant_matiere(matiere, semestre)
-#     #             print("Moyenne :::::::::::::::::::::::: ")
-#     #             print(moyenne_matiere)
-#     #             break
-#     #         break
-#     #     break
-        
-#     # return HttpResponse("Hello")
-   
-#     # nbre_colonnes = 2
-
-
-#     semestre_ues = semestre.get_all_ues()
-
-#     # colonnes += 'c|' * len(semestre_ues)
-
-#     # nbre_colonnes += len(semestre_ues)
-
-#     nbre_ues = len(semestre_ues)
-
-#     # récupération du nombre de matières par ue
-
-#     context = {}
-#     context['semestre'] = semestre
-#     context['annee'] = semestre.annee_universitaire
-
-#     # le tableau pouvant déborder il est divisé ici en trois parties
-#     if nbre_ues > 0 and nbre_ues < 8:
-
-#         # première partie
-
-#         nbre_colonnes_partie_1 = 2
-
-#         colonnes_partie_1 = '|l|l|'
-#         colonnes_partie_1 += 'c|' * 6
-#         for i in range(0, 3):
-#             nbre_matieres_partie_1 = len(semestre_ues[i].matiere_set.all())
-#             colonnes_partie_1 += 'c|' * nbre_matieres_partie_1
-#             nbre_colonnes_partie_1 += nbre_matieres_partie_1
-
-#         lignes_releve_partie_1 = []
-
-#         for etudiant in etudiants:
-#             ligne = {}
-#             ligne['etudiant'] = etudiant
-#             ues = []
-#             for i in range(0, 4):
-#                 matieres = []
-#                 nbre_matieres_ue = len(semestre_ues[i].matiere_set.all())
-#                 for matiere in semestre_ues[i].matiere_set.all():
-#                     matieres.append({'matiere': matiere, 'moyenne_matiere': round(
-#                         etudiant.moyenne_etudiant_matiere(matiere, semestre)[0], 2)})
-#                 ues.append({'ue': semestre_ues[i], 'moyenne': round(etudiant.moyenne_etudiant_ue(semestre_ues[i], semestre)[
-#                            0], 2), 'matieres_ue': matieres, 'nbre_matieres': nbre_matieres_ue + 2, 'a_valide': etudiant.moyenne_etudiant_ue(semestre_ues[i], semestre)[1]})
-#             ligne['ues'] = ues
-#             lignes_releve_partie_1.append(ligne)
-
-#         context['partie_1'] = {
-#             'nbre_ues': 4,
-#             'nbre_colonnes': nbre_colonnes_partie_1 + 6,
-#             'colonnes': colonnes_partie_1,
-#             'lignes': lignes_releve_partie_1,
-#             'nbre_lignes': len(lignes_releve_partie_1)
-#         }
-
-#         # deuxième partie
-
-#         # if nbre_ues > 3:
-
-#         #     nbre_colonnes_partie_2 = 3
-
-#         #     colonnes_partie_2 = '|l|l|c|'
-#         #     colonnes_partie_2 += 'c|' * 2 * (nbre_ues - 3)
-#         #     for i in range(3, nbre_ues):
-#         #         nbre_matieres_partie_2 = len(semestre_ues[i].matiere_set.all())
-#         #         colonnes_partie_2 += 'c|' * nbre_matieres_partie_2
-#         #         nbre_colonnes_partie_2 += nbre_matieres_partie_2
-
-#         #     lignes_releve_partie_2 = []
-#         #     for etudiant in etudiants:
-#         #         ligne = {}
-#         #         ligne['etudiant'] = etudiant
-#         #         ues = []
-#         #         for i in range(3, nbre_ues):
-#         #             matieres = []
-#         #             nbre_matieres_ue = len(semestre_ues[i].matiere_set.all())
-#         #             credits_semestre = -1
-#         #             for matiere in semestre_ues[i].matiere_set.all():
-#         #                 matieres.append({'matiere': matiere, 'moyenne_matiere': round(
-#         #                     etudiant.moyenne_etudiant_matiere(matiere, semestre)[0], 2)})
-#         #                 credits_semestre = etudiant.credits_obtenus_semestre(
-#         #                     semestre)
-#         #             ues.append({'ue': semestre_ues[i], 'moyenne': round(etudiant.moyenne_etudiant_ue(semestre_ues[i], semestre)[0], 2), 'matieres_ue': matieres,
-#         #                        'nbre_matieres': nbre_matieres_ue + 2, 'a_valide': etudiant.moyenne_etudiant_ue(semestre_ues[i], semestre)[1], 'credits_semestre': credits_semestre})
-#         #         ligne['ues'] = ues
-#         #         lignes_releve_partie_2.append(ligne)
-
-#         #     context['partie_2'] = {
-#         #         'nbre_ues': nbre_ues - 3,
-#         #         'nbre_colonnes': nbre_colonnes_partie_2 + (nbre_ues - 3) * 2,
-#         #         'colonnes': colonnes_partie_2,
-#         #         'lignes': lignes_releve_partie_2,
-#         #         'nbre_lignes': len(lignes_releve_partie_2)
-#         #     }
-
-#     # nom des fichiers d'entrée et de sortie
-
-#     latex_input = 'synthese_semestre_all'
-#     latex_ouput = 'generated_synthese_semestre_all'
-#     pdf_file = 'pdf_synthese_semestre_all'
-
-#     # génération du pdf
-#     generate_pdf(context, latex_input, latex_ouput, pdf_file)
-
-#     # visualisation du pdf dans le navigateur
-#     with open('media/pdf/' + str(pdf_file) + '.pdf', 'rb') as f:
-#         pdf_preview = f.read()
-#         response = HttpResponse(pdf_preview, content_type='application/pdf')
-#         response['Content-Disposition'] = 'inline;filename=pdf_file.pdf'
-#         return response
-
 @login_required(login_url=settings.LOGIN_URL)
 def releve_notes_details_all(request, id_semestre):
 
@@ -1730,11 +1563,11 @@ def releve_notes_details_all(request, id_semestre):
         return render(request, 'errors_pages/403.html')
 
     semestre = get_object_or_404(Semestre, id=id_semestre)
-    etudiants = semestre.etudiant_set.all()
+    etudiants = semestre.etudiant_set.all().order_by('nom', 'prenom')
 
     nbre_colonnes = 2
 
-    colonnes = '|c|c|'
+    colonnes = '|l|l|'
 
     semestre_ues = semestre.get_all_ues()
 
@@ -1748,9 +1581,10 @@ def releve_notes_details_all(request, id_semestre):
 
     for ue in semestre_ues:
         # ajout des colonnes correspondant aux matières
-        nbre_matieres = len(ue.matiere_set.all())
+        nbre_matieres = ue.matiere_set.all().count()
         colonnes += 'c|' * nbre_matieres
-        nbre_colonnes += nbre_matieres
+        colonnes += 'c|c|'
+        nbre_colonnes += nbre_matieres+1
 
     # récupératon des données pour chaque lignes du relevé
     lignes_releve = []
@@ -1761,21 +1595,27 @@ def releve_notes_details_all(request, id_semestre):
         # tableau contenant l'ensemble des UEs de l'étudiant
         ues = []
         # boucle sur chaque UE suivies par l'étudiant pour calculersa mmoyenne et sa moyenne dans chaque matières
+        total_credit = 0
         for ue in semestre_ues:
             # tableau contenant l'ensemble des matières suivies par l'étudiant
             matieres = []
             nbre_matieres = len(ue.matiere_set.all())
             for matiere in ue.matiere_set.all():
                 # récupération des matières de l'ue et la moyenne de l'étudiant dans celles-ci
-                matieres.append({'matiere': matiere, 'moyenne_matiere': round(
-                    etudiant.moyenne_etudiant_matiere(matiere, semestre)[0], 2)})
-            ues.append({'ue': ue, 'moyenne': round(etudiant.moyenne_etudiant_ue(ue, semestre)[
-                       0], 2), 'matieres_ue': matieres, 'nbre_matieres': nbre_matieres + 1})
+                moyenne, _, _ = etudiant.moyenne_etudiant_matiere(matiere, semestre)
+                matieres.append({'matiere': matiere, 'moyenne_matiere': format(moyenne, '.2f')})
+            moyenne, a_valider, _ = etudiant.moyenne_etudiant_ue(ue, semestre)
+            credit = ue.nbreCredits if a_valider else 0
+            total_credit += credit
+            # credit = str(credit) + ":" + str(ue.minValue)
+            ues.append({'credit': credit, 'ue': ue, 'moyenne': format(moyenne, '.2f'), 'matieres_ue': matieres, 'nbre_matieres': nbre_matieres + 2, "total_credit": total_credit})
+            
         ligne['ues'] = ues
         lignes_releve.append(ligne)
-
+    print(colonnes)
+    # return HttpResponse('Hello')
     context = {
-        'semestre' : "S1",
+        'semestre' : semestre,
         'nbre_ues': nbre_ues,
         'nbre_colonnes': nbre_colonnes,
         'colonnes': colonnes,
@@ -1798,6 +1638,7 @@ def releve_notes_details_all(request, id_semestre):
         response = HttpResponse(pdf_preview, content_type='application/pdf')
         response['Content-Disposition'] = 'inline;filename=pdf_file.pdf'
         return response
+
 
 
 @login_required(login_url=settings.LOGIN_URL)
@@ -1983,16 +1824,14 @@ def evaluations(request, id_matiere):
     """
     id_annee_selectionnee = request.session["id_annee_selectionnee"]
     matiere = Matiere.objects.get(pk=id_matiere)
-    annee_selectionnee = get_object_or_404(
-        AnneeUniversitaire, pk=id_annee_selectionnee)
+    annee_selectionnee = get_object_or_404(AnneeUniversitaire, pk=id_annee_selectionnee)
+    semestres = matiere.get_semestres(annee_universitaire=annee_selectionnee, type='__all__')
+    
     if 'semestre' in request.GET and request.GET.get('semestre') != "":
         id = request.GET.get('semestre')
         semestre = get_object_or_404(Semestre, pk=id)
     else:
-        semestre = Semestre.objects.filter(
-            annee_universitaire=annee_selectionnee, libelle="S1")
-        if semestre:
-            semestre = semestre.get()
+        semestre = semestres[0]
 
     if 'type' in request.GET and request.GET.get('type') in ['0', '1']:
         selected_type = request.GET.get('type')
@@ -2000,13 +1839,12 @@ def evaluations(request, id_matiere):
     else:
         selected_type = ""
         types_evaluations = [True, False]
+    
 
     semestres = [semestre]
 
-    evaluations = Evaluation.objects.filter(
-        matiere=matiere, semestre__in=semestres, rattrapage__in=types_evaluations)
-    semestres = matiere.get_semestres(
-        annee_universitaire=annee_selectionnee, type='__all__')
+    evaluations = Evaluation.objects.filter(matiere=matiere, semestre__in=semestres, rattrapage__in=types_evaluations)
+    
     url_path = "/main/evaluations/upload/" + \
         str(matiere.id) + "/" + str(semestre.id) + "/"
 
@@ -2037,13 +1875,15 @@ def createNotesByEvaluation(request, id_matiere, rattrapage, id_semestre):
     annee_universitaire = AnneeUniversitaire.static_get_current_annee_universitaire()
     semestre = get_object_or_404(Semestre, pk=id_semestre)
     if matiere.dans_semestre(semestre):
-        if rattrapage:
-            etudiants = matiere.get_etudiants_en_rattrapage()
+        if not rattrapage and not matiere.is_available_to_add_evaluation(semestre):
+            return redirect('main:evaluations', id_matiere=matiere.id)
         else:
-            if not matiere.is_available_to_add_evaluation(semestre):
-                return redirect('main:evaluations', id_matiere=matiere.id)
-            etudiants = semestre.etudiant_set.filter(
-                is_active=True).order_by("nom")
+            etudiants = semestre.etudiant_set.filter(is_active=True).order_by("nom")
+            if rattrapage:
+                etudiants_qui_doivent_rattraper = matiere.get_etudiants_en_rattrapage()
+            else:
+                etudiants_qui_doivent_rattraper = []
+
 
         NoteFormSet = forms.inlineformset_factory(
             parent_model=Evaluation,
@@ -2076,23 +1916,25 @@ def createNotesByEvaluation(request, id_matiere, rattrapage, id_semestre):
                 Merci.
                 """
 
-                emails = [etudiant.email for etudiant in etudiants]
+                # emails = [etudiant.email for etudiant in etudiants]
 
-                send_email_task.delay(
-                    subject="Assignation de note des étudiants",
-                    message=message,
-                    email_address=emails,
-                )
+                # send_email_task.delay(
+                #     subject="Assignation de note des étudiants",
+                #     message=message,
+                #     email_address=emails,
+                # )
                 messages.success(
                     request, f"L 'évaluation {evaluation.libelle} a été ajouter.")
                 return redirect('main:evaluations', id_matiere=matiere.id)
         else:
             queryset = Note.objects.none()
             evaluation_form = EvaluationForm()
-            initial_etudiant_note_data = [
-                {'etudiant': etudiant.id, 'etudiant_full_name': etudiant.full_name()} for etudiant in etudiants]
-            note_form_set = NoteFormSet(
-                initial=initial_etudiant_note_data, queryset=queryset)
+            initial_etudiant_note_data = [{'etudiant': etudiant.id, 'etudiant_full_name': etudiant.full_name()} for etudiant in etudiants]
+            note_form_set = NoteFormSet(initial=initial_etudiant_note_data, queryset=queryset)
+            for form in note_form_set:
+                if form.initial.get('etudiant') in etudiants_qui_doivent_rattraper:
+                    form.fields['etudiant_full_name'].widget.attrs.update({'class':'form-control note_set-etudiant_full_name bg-danger'})
+            
         data = {
             'evaluation_form': evaluation_form,
             'notes_formset': note_form_set,
@@ -2100,7 +1942,9 @@ def createNotesByEvaluation(request, id_matiere, rattrapage, id_semestre):
             'ponderation_possible': matiere.ponderation_restante(semestre),
             'rattrapage': rattrapage,
             'semestre': semestre,
+            'etudiants_qui_doivent_rattraper' : etudiants_qui_doivent_rattraper,
         }
+        
         return render(request, 'notes/create_or_edit_note.html', context=data)
     return redirect('main:evaluations', id_matiere=matiere.id)
 
@@ -2115,16 +1959,17 @@ def editeNoteByEvaluation(request, id):
     evaluation = get_object_or_404(Evaluation, pk=id)
     matiere = evaluation.matiere
     semestre = evaluation.semestre
-
+    
+    etudiants = semestre.etudiant_set.filter(is_active=True)
     if evaluation.rattrapage:
-        etudiants = matiere.get_etudiants_en_rattrapage()
-        nouveaux_etudiants = []
+        etudiants_qui_doivent_rattraper = matiere.get_etudiants_en_rattrapage()
+        print(len(etudiants_qui_doivent_rattraper))
     else:
-        etudiants = semestre.etudiant_set.filter(is_active=True)
-        etudiants_dans_evaluation = evaluation.etudiants.all()
-        nouveaux_etudiants = etudiants.difference(etudiants_dans_evaluation)
-        for etudiant in nouveaux_etudiants:
-            Note.objects.create(evaluation=evaluation, etudiant=etudiant)
+        etudiants_qui_doivent_rattraper = []
+    etudiants_dans_evaluation = evaluation.etudiants.all()
+    nouveaux_etudiants = etudiants.difference(etudiants_dans_evaluation)
+    for etudiant in nouveaux_etudiants:
+        Note.objects.create(evaluation=evaluation, etudiant=etudiant)
 
     NoteFormSet = forms.inlineformset_factory(
         parent_model=Evaluation,
@@ -2163,9 +2008,11 @@ def editeNoteByEvaluation(request, id):
         note_form_set = NoteFormSet(
             instance=evaluation, queryset=notes_queryset)
         for form in note_form_set:
-            etudiant = Etudiant.objects.filter(
-                id=form.initial['etudiant']).get()
+            etudiant = Etudiant.objects.filter(id=form.initial.get('etudiant')).get()
             form.initial['etudiant_full_name'] = etudiant.full_name()
+            if form.initial.get('etudiant') in etudiants_qui_doivent_rattraper:
+                    form.fields['etudiant_full_name'].widget.attrs.update({'class':'form-control note_set-etudiant_full_name bg-danger'})
+            
 
     data = {
         'evaluation_form': evaluation_form,

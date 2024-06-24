@@ -1,17 +1,30 @@
 {% extends '../index.html' %}
 {% block content %}
-<div class="block block-rounded m-5">
+<style>
+    .bout:hover{
+        cursor: pointer;
+        transition: 0.5s;
+        transform: scale(1.1);
+        background : #1873dca9;
+        color : white;
+    }
+</style>
+<div class="block block-rounded m-5 g-5 shadow-lg">
     <div class="block-header p-4">
         <h3 class="block-title">Liste des étudiants de {{ niveau }} </h3>
         <form action="" method="get" id="form-semestre" class="w-full mr-3">
-            <select name="semestre" id="semestre" class="form-control">
+            <select name="semestre" id="semestre" class="form-control bout shadow-sm">
                 <option value="">Semestres</option>
                 {% for semestre in semestres %}
                     <option value="{{ semestre.id }}" {% if selected_semestre.id == semestre.id %}selected{% endif %}>{{ semestre }}</option>
                 {% endfor %}
             </select>  
        </form>  
+<<<<<<< HEAD
         {% comment %} <a href="{% url 'main:create_etudiant' %}" class="btn btn-outline-primary">
+=======
+        <a href="{% url 'main:create_etudiant' %}" class="btn btn-outline-primary shadow-sm">
+>>>>>>> dev
             <i class="fas fa-plus"></i> Ajout Étudiant
         </a> {% endcomment %}
     </div>
@@ -73,7 +86,7 @@
             </tbody>
 
         </table>
-        <button type="submit" class="btn btn-outline-primary">            
+        <button type="submit" class="btn btn-outline-primary bout">            
             Enregistrer
         </button>
     </form>

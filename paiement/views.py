@@ -844,7 +844,9 @@ def les_bulletins_de_paye_stagiaire(request, id_annee_selectionnee):
     Cette vue récupère les bulletins de paie associés à l'année universitaire spécifiée,
     puis les renvoie au template 'salaires/bulletins_de_paye.html' pour affichage.
     """
+    id_annee_selectionnee = request.session.get('id_annee_selectionnee')
     annee_universitaire = get_object_or_404(AnneeUniversitaire, pk=id_annee_selectionnee)
+    print(VersmentSalaire.objects.filter(personnel__qualification_professionnel='Stagiaire'))
     bulletins = VersmentSalaire.objects.filter(annee_universitaire=annee_universitaire, personnel__qualification_professionnel='Stagiaire')
     context = {
         'annee_universitaire': annee_universitaire,

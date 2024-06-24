@@ -1,11 +1,23 @@
 {% extends '../index.html' %}
 {% block content_title %} Matières {% endblock content_title %}
 {% block content %}
+
+<style>
+    .bout:hover{
+        cursor: pointer;
+        transition: 0.5s;
+        transform: scale(1.2);
+        background : #1873dca9;
+        color : white;
+    }
+</style>
+
+
 <div class="block block-rounded m-3">
     <div class="block-header p-4">
         <h3 class="block-title">Liste des matières de {{ niveau }}</h3>
         {% if is_directeur_des_etudes or secretaire %}
-        <a href="{% url 'main:create_matiere' %}" class="btn btn-outline-primary ml-3">
+        <a href="{% url 'main:create_matiere' %}" class="btn btn-outline-primary ml-3 bout">
             <i class="fas fa-plus"></i> Ajout Matière
         </a> 
         {% endif %} 
@@ -35,7 +47,7 @@
         </div>
         {% endif %} 
     </div>
-    <div class="block-content block-content-full">
+    <div class="block-content block-content-full shadow-lg">
         <div class="table-responsive">
             <table class="table table-bordered table-striped table-vcenter js-dataTable-full-pagination">
                 <thead>
