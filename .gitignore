@@ -153,9 +153,9 @@ GitHub.sublime-settings
 
 
 # ignore generated PDF from application
-/media/pdf/*
-media/pdf/*
 
+media/pdf/*
+media/out/*
 # Ignore Django Migrations...
 **/migrations/**
 !**/migrations
@@ -165,3 +165,5 @@ main/migrations/0001_initial.py
 
 # Ignor Django Settings
 projet_ifnti/settings.py
+#Ignore folder export
+media/excel_templates/export/*

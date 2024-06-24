@@ -82,12 +82,6 @@ class PaiementForm(forms.ModelForm):
         montant = cleaned_data.get('montant')
         annee_universitaire = cleaned_data.get('annee_universitaire')
         
-        # id_annee_selectionnee = request.session.get('id_annee_selectionnee')
-        # annee_universitaire = get_object_or_404( AnneeUniversitaire, pk=id_annee_selectionnee)
-        # print("annee_universitaire",annee_universitaire)
-        # Obtenez l'année universitaire courante
-        #annee_universitaire = AnneeUniversitaire.static_get_current_annee_universitaire()
-        #print("annee_universitaire",annee_universitaire)
         print(montant)
         print(etudiant)
         if etudiant and annee_universitaire :
