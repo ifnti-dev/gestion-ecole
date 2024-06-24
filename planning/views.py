@@ -38,7 +38,7 @@ def index(request):
     else :
         plannings = Planning.objects.all()
 
-        dernier_planning = Planning.objects.all().last()
+    dernier_planning = Planning.objects.all().last()
 
     #condition  nécéssaire pour que nouvelle_semaine ne sorte pas une erreur quand il n'y a aucun planning
     if dernier_planning:
@@ -52,6 +52,7 @@ def index(request):
         'nouvelle_semaine' : nouvelle_semaine,
         'semestre_courant':semsestre_courant,
         'plannings':plannings}
+
 
     return render(request, 'planning_list.html',context)
 
@@ -520,7 +521,7 @@ def imprimer(request, planningId):
 
     #heures de la jours
     ues_prof_matieres = {time: {} for time in timeslots}
-    # print(ues_prof_matieres)
+    print(ues_prof_matieres)
 
     for plan in plannings:
         time_slot = plan.timeshot  
@@ -558,7 +559,7 @@ def imprimer(request, planningId):
     #     pr = valeur
 
     #     print (heurs)
-    #     print(pr)
+    #     print(pr)sdopipojdokop
 
 
     print(ues_prof_matieres)
