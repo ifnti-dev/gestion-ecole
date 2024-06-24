@@ -38,7 +38,7 @@ def index(request):
     else :
         plannings = Planning.objects.all()
 
-        dernier_planning = Planning.objects.all().last()
+    dernier_planning = Planning.objects.all().last()
 
     #condition  nécéssaire pour que nouvelle_semaine ne sorte pas une erreur quand il n'y a aucun planning
     if dernier_planning:
