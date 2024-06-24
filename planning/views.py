@@ -48,6 +48,7 @@ def index(request):
         'semestre_courant':semsestre_courant,
         'plannings':plannings}
 
+
     return render(request, 'planning_list.html',context)
 
 
@@ -515,7 +516,7 @@ def imprimer(request, planningId):
 
     #heures de la jours
     ues_prof_matieres = {time: {} for time in timeslots}
-    # print(ues_prof_matieres)
+    print(ues_prof_matieres)
 
     for plan in plannings:
         time_slot = plan.timeshot  
@@ -553,7 +554,7 @@ def imprimer(request, planningId):
     #     pr = valeur
 
     #     print (heurs)
-    #     print(pr)
+    #     print(pr)sdopipojdokop
 
 
     print(ues_prof_matieres)
