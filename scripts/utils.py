@@ -1,4 +1,5 @@
 import os
+from django.shortcuts import get_object_or_404
 import openpyxl
 import shutil 
 import re
@@ -243,20 +244,73 @@ def pre_load_evaluation_template_data(matiere, semestre):
 
 @transaction.atomic
 def export_evaluation_data(matiere, semestre):
-    path = 'media/excel_templates/evaluation.xlsx'
-    wb = openpyxl.load_workbook(filename="media/excel_templates/evaluations.xlsx")
+  
+    evaluations=Evaluation.objects.filter(matiere=matiere,semestre=semestre)
+    #print(evaluations)
+   
+    path = 'media/excel_templates/evaluations.xlsx'
+    result_path=f'media/excel_templates/export/evaluations_{matiere.id}_{semestre}.xlsx'
+    wb = openpyxl.load_workbook(filename=path)
+    source=wb.active
+    # source.title='evaluation_1'
+    source['B1'].value = semestre.annee_universitaire.annee
+    source['B2'].value = semestre.libelle
+    source['B3'].value = matiere.libelle
     
-    #
-    for index, sublist in enumerate(table):
-    # Créer une nouvelle feuille de calcul avec un nom unique
-        sheet_name = f'Sheet{index + 1}'
-        sheet = wb.create_sheet(title=sheet_name)
+    # evaluation_first=evaluations.first()
+    # source['B4'].value = "Non" if evaluation_first.rattrapage else "Oui"
+
+    # source['B5'].value =evaluation_first.date
+    # source['B6'].value = evaluation_first.libelle
+    # source['B7'].value = evaluation_first.ponderation
+    
+    #creation des feuilles
+    for i in range(evaluations.count()):
+        print("evalua: ",evaluations[i].libelle)
+        new_sheet=wb.copy_worksheet(source)
+        new_sheet.title=f'evaluation_{i+1}'
+        evaluation=evaluations[i]
+        new_sheet['B4'].value = "Non" if evaluation.rattrapage else "Oui"
+
+        new_sheet['B5'].value =evaluation.date
+        new_sheet['B6'].value = evaluation.libelle
+        new_sheet['B7'].value = evaluation.ponderation
+    #afficher les etudiants  
+        etudiants = matiere.get_etudiant_semestre(semestre).order_by("nom")
+      
+        min_row = 10
+        max_row = min_row + len(etudiants)
+        
+        i= 0
+        for row in new_sheet.iter_rows(min_row=min_row, max_row=max_row-1, max_col=3):
+            row[0].value = etudiants[i].nom
+            row[1].value = etudiants[i].prenom
+            
+            #recupere la note de l'etudiant dans l'evaluation de cette matiere
+            print(evaluation)
+            note=evaluation.note_set.filter(etudiant=etudiants[i]).first()
+            #notes=Note.objects.filter(etudiant=etudiants[i], evaluation__matiere=matiere,evaluation=evaluations[i])
+            print(note)
+            
+            row[2].value =  note.valeurNote
+            i+= 1
     
     
     
+    wb.save(result_path)
     
     
+    # wb = openpyxl.load_workbook(filename="media/excel_templates/evaluations.xlsx")
+    # ws = wb.active
+    # ws['B1'].value = semestre.annee_universitaire.annee
+    # ws['B2'].value = semestre.libelle
+    # ws['B3'].value = matiere.libelle
     
+    
+    # for index, sublist in enumerate(table):
+    # # Créer une nouvelle feuille de calcul avec un nom unique
+    #     sheet_name = f'Sheet{index + 1}'
+    #     sheet = wb.create_sheet(title=sheet_name)
     
     # wb = openpyxl.load_workbook(filename="media/excel_templates/evaluations.xlsx")
     # ws = wb.active
@@ -278,9 +332,9 @@ def export_evaluation_data(matiere, semestre):
     #     row[1].value = etudiants[i].prenom
     #     row[2].value = ""
     #     i += 1
-    # wb.save(path)
     
-    return path
+    
+    return result_path
 
 
 @transaction.atomic
@@ -298,63 +352,64 @@ def load_notes_from_evaluation(path, matiere=None, semestre=None):
         }
         
         ws = sheet
-        
-        annee = str(ws['B1'].value)
-        matiere = None
-        semestre = None
-        # if not semestre:
-        #     semestre = str(ws['B2'].value)
-        #     matiere = Matiere.objects.get(libelle=matiere)
-        # if not matiere:
-        #     annee = AnneeUniversitaire.objects.get(annee=annee)
-        #     matiere = str(ws['B3'].value)
-        #     semestre = Semestre.objects.get(libelle=semestre, annee_universitaire__id=annee.id)
-        
-        annee = AnneeUniversitaire.objects.get(annee=annee)
-        semestre = str(ws['B2'].value)
-        matiere = str(ws['B3'].value)
-        matiere = Matiere.objects.get(libelle=matiere)
-        semestre = Semestre.objects.get(libelle=semestre, annee_universitaire__id=annee.id)
-        
-       
-        rattrapage = False
-        print(ws['B5'].value)
-        evaluation_date = convert_serial_temporel_number_to_date(ws['B5'].value)
-        evaluation_name = str(ws['B6'].value)
-        evaluation_ponderation = int(str(ws['B7'].value))
-        
-        #evaluation_date = evaluation_date.date()
-        
-        if (matiere.ponderation_restante(semestre) - evaluation_ponderation) >= 0:
-            evaluation, _ = Evaluation.objects.get_or_create(
-                    libelle=evaluation_name, 
-                    ponderation=evaluation_ponderation,
-                    date=evaluation_date,
-                    semestre=semestre,
-                    matiere=matiere,
-                    rattrapage=rattrapage,
-                )
+        if sheet.title != "evaluation" :
+            print("sheet: ",sheet)
+            annee = str(ws['B1'].value)
+            matiere = None
+            semestre = None
+            # if not semestre:
+            #     semestre = str(ws['B2'].value)
+            #     matiere = Matiere.objects.get(libelle=matiere)
+            # if not matiere:
+            #     annee = AnneeUniversitaire.objects.get(annee=annee)
+            #     matiere = str(ws['B3'].value)
+            #     semestre = Semestre.objects.get(libelle=semestre, annee_universitaire__id=annee.id)
             
-            etudiants = matiere.get_etudiant_semestre(semestre)
-            print(etudiants)
-            print(matiere, " ", semestre)
-            min_row = 10
-            max_row = min_row + len(etudiants)
+            annee = AnneeUniversitaire.objects.get(annee=annee)
+            semestre = str(ws['B2'].value)
+            matiere = str(ws['B3'].value)
+            matiere = Matiere.objects.get(libelle=matiere)
+            semestre = Semestre.objects.get(libelle=semestre, annee_universitaire__id=annee.id)
             
-            for row in sheet.iter_rows(min_row=min_row, max_row=max_row-1, max_col=3, values_only=True):
-                nom = row[0]
-                prenom = row[1]
-                if nom==prenom==None:
-                    continue
-                username = (nom + prenom).lower()
-                username = username.replace(" ", "")
-                print(username)
-                etudiant = etudiants.get(user__username=username)
-                if Note.objects.filter(etudiant=etudiant, evaluation=evaluation):
-                    continue
-                Note.objects.create(valeurNote=int(trim_str(row[2])), etudiant=etudiant, evaluation=evaluation)
-        else:
-            raise ValueError(f"Erreur de pondération pour l'évaluation : {evaluation_name} ")
+        
+            rattrapage = False
+            print(ws['B5'].value)
+            evaluation_date = convert_serial_temporel_number_to_date(ws['B5'].value)
+            evaluation_name = str(ws['B6'].value)
+            evaluation_ponderation = float(str(ws['B7'].value))
+            
+            #evaluation_date = evaluation_date.date()
+            
+            if (matiere.ponderation_restante(semestre) - evaluation_ponderation) >= 0:
+                evaluation, _ = Evaluation.objects.get_or_create(
+                        libelle=evaluation_name, 
+                        ponderation=evaluation_ponderation,
+                        date=evaluation_date,
+                        semestre=semestre,
+                        matiere=matiere,
+                        rattrapage=rattrapage,
+                    )
+                
+                etudiants = matiere.get_etudiant_semestre(semestre)
+                print(etudiants)
+                print(matiere, " ", semestre)
+                min_row = 10
+                max_row = min_row + len(etudiants)
+                
+                for row in sheet.iter_rows(min_row=min_row, max_row=max_row-1, max_col=3, values_only=True):
+                    nom = row[0]
+                    prenom = row[1]
+                    if nom==prenom==None:
+                        continue
+                    username = (nom + prenom).lower()
+                    username = username.replace(" ", "")
+                    print(username)
+                    etudiant = etudiants.get(user__username=username)
+                    if Note.objects.filter(etudiant=etudiant, evaluation=evaluation):
+                        continue
+                    Note.objects.create(valeurNote=int(trim_str(row[2])), etudiant=etudiant, evaluation=evaluation)
+            else:
+                raise ValueError(f"Erreur de pondération pour l'évaluation : {evaluation_name} ")
 # mangbayét-nambénédicta
 # mangbayet-nambénédicta
 @transaction.atomic

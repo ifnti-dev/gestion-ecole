@@ -81,7 +81,7 @@ class NoteForm(forms.ModelForm):
 
 
 class EtudiantForm(forms.ModelForm):
-    datenaissance = DateField(widget=forms.SelectDateWidget(years=range(1900, 2006), attrs={'class': 'form-control'}), label="Date de naissance")
+    datenaissance = DateField(widget=forms.DateInput( attrs={'class': 'form-control',"type":"date"}), label="Date de naissance")
     class Meta:
         model = Etudiant
         fields = ['nom', 'prenom', 'contact', 'sexe', 'adresse', 'datenaissance', 'lieunaissance', 'profil', 'prefecture', 'is_active', 'seriebac1', 'seriebac2', 'anneebac1', 'anneebac2', 'etablissementSeconde', 'etablissementPremiere', 'etablissementTerminale', 'francaisSeconde', 'francaisPremiere','francaisTerminale', 'anglaisSeconde', 'anglaisPremiere', 'anglaisTerminale', 'mathematiqueSeconde', 'mathematiquePremiere', 'mathematiqueTerminale', 'semestres', 'photo_passport']
@@ -306,7 +306,9 @@ class PersonnelForm(forms.ModelForm):
 
 
 class EnseignantForm(forms.ModelForm):
-    datenaissance = DateField(widget=forms.SelectDateWidget(years=range(1990, 2006)), label='Date de naissance')
+    #datenaissance = DateField(widget=forms.SelectDateWidget(years=range(1990, 2006)), label='Date de naissance')
+    datenaissance = DateField(widget=forms.DateInput(attrs={"type":"date"}), label='Date de naissance')
+
     class Meta:
         model = Enseignant
         fields = ['type', 'specialite', "personnel"]
@@ -315,7 +317,6 @@ class EnseignantForm(forms.ModelForm):
             'specialite': forms.TextInput(attrs={'class': 'form-control'}),      
             'personnel': forms.Select(attrs={'class': 'form-control'}),
         }
-
     def clean(self):
         cleaned_data = super(EnseignantForm, self).clean()
         nom = cleaned_data.get('nom', '')

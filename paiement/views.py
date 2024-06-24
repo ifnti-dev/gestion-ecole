@@ -324,6 +324,7 @@ def enregistrer_paiement(request, id=0):
     else:
         if id == 0:
             form = PaiementForm(request.POST)
+            
         else:
             paiement = Paiement.objects.get(pk=id)
             compte_universite = paiement.compte_bancaire
@@ -332,26 +333,15 @@ def enregistrer_paiement(request, id=0):
             form = PaiementForm(request.POST,instance= paiement)
         if form.is_valid():
             paiement = form.save(commit=False)
-            print(paiement.etudiant)
-            
-            print("user connecté: ",request.user)
             
             comptable = Personnel.objects.get(user=request.user)
             paiement.comptable = comptable
-
             compte_universite = CompteBancaire.objects.first()
             paiement.compte_bancaire = compte_universite
-            ###
-            print( form.errors)
-            print("annee_selectionnee : ")
-            print(annee_selectionnee)
+            
             paiement.annee_universitaire=annee_selectionnee
             paiement.save()
-            print(paiement)
-            print(Paiement.objects.all())
-            #return HttpResponse("")
-     
-
+            
             etudiant = paiement.etudiant
             annee_universitaire = paiement.annee_universitaire
             compte_etudiant, created = CompteEtudiant.objects.get_or_create(
