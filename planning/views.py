@@ -40,11 +40,16 @@ def index(request):
 
         dernier_planning = Planning.objects.all().last()
 
+    #condition  nécéssaire pour que nouvelle_semaine ne sorte pas une erreur quand il n'y a aucun planning
+    if dernier_planning:
+        nouvelle_semaine = dernier_planning.semaine + 1
+    else:
+        nouvelle_semaine = 1
 
 
     context= {
         'semestres':semestres,
-        'nouvelle_semaine' : dernier_planning.semaine + 1,
+        'nouvelle_semaine' : nouvelle_semaine,
         'semestre_courant':semsestre_courant,
         'plannings':plannings}
 
