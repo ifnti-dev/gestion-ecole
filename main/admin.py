@@ -59,28 +59,20 @@ class UserImportExport(ImportExportModelAdmin):
 @admin.register(Evaluation)
 class EvaluationImportExport(ImportExportModelAdmin):
     pass
-class EnseignantAdmin(admin.ModelAdmin):
-    form = EnseignantForm
 
-#admin.site.register(Programme)
-#admin.site.register(Enseignant, EnseignantAdmin)
-#admin.site.register(Matiere)
-#admin.site.register(Etudiant)
-#admin.site.register(Competence)
-#admin.site.register(Note)
-#admin.site.register(Ue)
-#admin.site.register(Semestre)
-#admin.site.register(Comptable)
-#admin.site.register(Tuteur)
-#admin.site.register(Personnel)
-#admin.site.register(AnneeUniversitaire)
+@admin.register(Parcours)
+class ParcoursImportExport(ImportExportModelAdmin):
+    pass
+
+@admin.register(Domaine)
+class DomaineImportExport(ImportExportModelAdmin):
+    pass
+
 admin.site.register(Information)
 admin.site.register(Paiement)
 #admin.site.register(DirecteurDesEtudes)
 admin.site.register(Seance)
 admin.site.register(FicheDePaie)
-admin.site.register(Parcours)
-admin.site.register(Domaine)
 admin.site.register(Frais)
 admin.site.register(CompteBancaire)
 admin.site.register(CompteEtudiant)

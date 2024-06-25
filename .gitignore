@@ -9,10 +9,13 @@ __pycache__
 **.gitenv
 db.sqlite3
 
+db*
+
 **/.zip
 **/migrations/**
 docs/build/*
-**/media/** 
+**/media/out/** 
+**/media/pdf/** 
 # Backup files # 
 *.bak 
 
@@ -152,9 +155,9 @@ GitHub.sublime-settings
 
 
 # ignore generated PDF from application
-/media/pdf/*
-media/pdf/*
 
+media/pdf/*
+media/out/*
 # Ignore Django Migrations...
 **/migrations/**
 !**/migrations
@@ -164,3 +167,6 @@ main/migrations/0001_initial.py
 
 # Ignor Django Settings
 projet_ifnti/settings.py
+#Ignore folder export evaluation
+media/excel_templates/export/*
+*.sqlite3

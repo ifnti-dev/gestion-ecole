@@ -2,8 +2,18 @@
 {% block content_title %} Gestion de la maquette {% endblock content_title %}
 {% block content_title_description %}{% endblock content_title_description %}
 {% block content %}
+
+<style>
+    .bout:hover{
+        cursor: pointer;
+        transition: 0.5s;
+        transform: scale(1.2);
+        background : #1873dca9;
+        color : white;
+    }
+</style>
 <div class="block block-rounded">
-    <div class="block-header">
+    <div class="block-header mt-4">
         <select name="semestre" id="semestre" class="form-control col-md-2 mr-2">
             <option value="">Parcours</option>
             {% for parcours in list_parcours %}
@@ -28,7 +38,7 @@
             </form>
         </div>
     </div>
-    <div class="block-content block-content-full">
+    <div class="block-content block-content-full shadow-lg">
         <table class="table table-bordered table-striped table-vcenter js-dataTable-full-pagination">
             <thead>
                 <tr>

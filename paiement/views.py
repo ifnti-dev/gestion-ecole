@@ -282,6 +282,9 @@ def liste_paiements(request, id_annee_selectionnee):
     }
     return render(request, 'paiements/liste_paiements.html', context)
 
+### verifier si c'est un comptable
+def is_comptable(personnel):
+    pass
 
 #ajouter un controle de permisssion pour verifier que le user faisant cette operation est un comptable
 @login_required(login_url=settings.LOGIN_URL)
@@ -321,6 +324,7 @@ def enregistrer_paiement(request, id=0):
     else:
         if id == 0:
             form = PaiementForm(request.POST)
+            
         else:
             paiement = Paiement.objects.get(pk=id)
             compte_universite = paiement.compte_bancaire
@@ -329,23 +333,15 @@ def enregistrer_paiement(request, id=0):
             form = PaiementForm(request.POST,instance= paiement)
         if form.is_valid():
             paiement = form.save(commit=False)
-            print(paiement.etudiant)
+            
             comptable = Personnel.objects.get(user=request.user)
             paiement.comptable = comptable
-
             compte_universite = CompteBancaire.objects.first()
             paiement.compte_bancaire = compte_universite
-            ###
-            print( form.errors)
-            print("annee_selectionnee : ")
-            print(annee_selectionnee)
+            
             paiement.annee_universitaire=annee_selectionnee
             paiement.save()
-            print(paiement)
-            print(Paiement.objects.all())
-            #return HttpResponse("")
-     
-
+            
             etudiant = paiement.etudiant
             annee_universitaire = paiement.annee_universitaire
             compte_etudiant, created = CompteEtudiant.objects.get_or_create(
@@ -823,7 +819,10 @@ def les_bulletins_de_paye(request, id_annee_selectionnee):
     puis les renvoie au template 'salaires/bulletins_de_paye.html' pour affichage.
     """
     annee_universitaire = get_object_or_404(AnneeUniversitaire, pk=id_annee_selectionnee)
-    bulletins = VersmentSalaire.objects.filter(annee_universitaire=annee_universitaire, personnel__qualification_professionnel__in=['Enseignant', 'Comptable', 'Directeur des études', 'Gardien', 'Agent d\'entretien'])
+    #bulletins = VersmentSalaire.objects.filter(annee_universitaire=annee_universitaire, personnel__qualification_professionnel__in=['Enseignant', 'Comptable', 'Directeur des études', 'Gardien', 'Agent d\'entretien'])
+    bulletins = VersmentSalaire.objects.filter(annee_universitaire=annee_universitaire).exclude(personnel__qualification_professionnel='Stagiaire')
+    print("liste des bulletins")
+    print(bulletins)
     context = {
         'annee_universitaire': annee_universitaire,
         'bulletins': bulletins,
@@ -845,7 +844,9 @@ def les_bulletins_de_paye_stagiaire(request, id_annee_selectionnee):
     Cette vue récupère les bulletins de paie associés à l'année universitaire spécifiée,
     puis les renvoie au template 'salaires/bulletins_de_paye.html' pour affichage.
     """
+    id_annee_selectionnee = request.session.get('id_annee_selectionnee')
     annee_universitaire = get_object_or_404(AnneeUniversitaire, pk=id_annee_selectionnee)
+    print(VersmentSalaire.objects.filter(personnel__qualification_professionnel='Stagiaire'))
     bulletins = VersmentSalaire.objects.filter(annee_universitaire=annee_universitaire, personnel__qualification_professionnel='Stagiaire')
     context = {
         'annee_universitaire': annee_universitaire,
@@ -949,7 +950,7 @@ def detail_bulletin(request, id):
     Cette vue récupère les informations détaillées d'un bulletin de paie d'un employé donnée,
     puis les renvoie au template 'salaires/detail_bulletin.html' pour affichage.
     """
-    bulletin = get_object_or_404(Salaire, id=id)
+    bulletin = get_object_or_404(VersmentSalaire, id=id)
     total_primes = bulletin.prime_efficacite + bulletin.prime_qualite + bulletin.frais_travaux_complementaires
     frais_prestations_familiale_salsalaire = bulletin.frais_prestations_familiale_salsalaire * bulletin.personnel.salaireBrut
     primes = (

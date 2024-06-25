@@ -19,6 +19,7 @@ from datetime import timedelta
 from collections import defaultdict
 
 from django.conf import settings
+from datetime import datetime
 
 
 
@@ -37,7 +38,21 @@ def index(request):
     else :
         plannings = Planning.objects.all()
 
-    context= {'semestres':semestres,'semestre_courant':semsestre_courant,'plannings':plannings}
+    dernier_planning = Planning.objects.all().last()
+
+    #condition  nécéssaire pour que nouvelle_semaine ne sorte pas une erreur quand il n'y a aucun planning
+    if dernier_planning:
+        nouvelle_semaine = dernier_planning.semaine + 1
+    else:
+        nouvelle_semaine = 1
+
+
+    context= {
+        'semestres':semestres,
+        'nouvelle_semaine' : nouvelle_semaine,
+        'semestre_courant':semsestre_courant,
+        'plannings':plannings}
+
 
     return render(request, 'planning_list.html',context)
 
@@ -56,64 +71,67 @@ def verifier(request):
             return JsonResponse({"status": "reussite"})
         return JsonResponse({"datedebut": str(plan.datedebut),"datefin": str(plan.datefin),"semaine": str(plan.semaine),"semestre": str(plan.semestre)})
         
-
+#-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 @login_required(login_url=settings.LOGIN_URL)
 def nouveau_planning(request):
     if request.user.groups.all().first().name not in ['directeur_des_etudes','secretaire']:
         return render(request, 'errors_pages/403.html')
+    
     if request.method == 'POST':
-        semestreId=request.POST.get("semestre")
-        semaine=request.POST.get("semaine")
+        semestreId = request.POST.get("semestre")
+        semaine = request.POST.get("semaine")
 
         intervalle = request.POST.get("intervalle")
-        # Divise la chaîne en deux parties en utilisant 'to' comme délimiteur
         dates = intervalle.split('to')
-        # Récupère la date avant 'to' et la formate
-        datedebut = dates[0].strip()  # Supprime les espaces inutiles autour de la date
-
-        #datedebut =  + datedebut[:4]  # Change le format de aaaa-mm-jj à jj-mm-aaaa
-        # Récupère la date après 'to' et la formate
-        datefin = dates[1].strip()  # Supprime les espaces inutiles autour de la date
-        #datefin =   # Change le format de aaaa-mm-jj à jj-mm-aaaa
-        intervalle=datedebut[-2:] + '/' + datedebut[5:7] + ' au ' + datefin[-2:] + '/' + datefin[5:7] + '/' + datefin[:4]
+        datedebut = dates[0].strip()
+        datefin = dates[1].strip()
+        intervalle = datedebut[-2:] + '/' + datedebut[5:7] + ' au ' + datefin[-2:] + '/' + datefin[5:7] + '/' + datefin[:4]
 
         annee = AnneeUniversitaire.static_get_current_annee_universitaire().annee
-        semestre = Semestre.objects.filter(courant=True, pk__contains=annee,id=semestreId).first()
-        planification = defaultdict(list)
-        
-        ues = semestre.get_all_ues()
-        
-        for ue in ues:
-            print('plan1')
-            matieres_json = serialize('json', ue.matiere_set.all())
-            matieres = json.loads(matieres_json)
-            for matiere in matieres :
-                seances=Seance.objects.filter(semestre=semestre,matiere=matiere['pk'])
-                temps=0
-                for seance in seances:
-                    temps+=(seance.date_et_heure_fin - seance.date_et_heure_debut).total_seconds()
-                hours, remainder = divmod(temps, 3600)
-                minutes, _ = divmod(remainder, 60)
-                matiere['temps_effectuer']=str(int(hours))+'h '+str(int(minutes))+'min' 
+        semestre = Semestre.objects.filter(courant=True, pk__contains=annee, id=semestreId).first()
+        planification_json = ""  # Initialize the variable
+
+        if semestre:
+            planification = defaultdict(list)
+            ues = semestre.get_all_ues()
+            
+            for ue in ues:
+                matieres_json = serialize('json', ue.matiere_set.all())
+                matieres = json.loads(matieres_json)
                 
-                planning=Planning.objects.filter(semestre=semestre)
-                for plan in planning :
+                for matiere in matieres:
+                    seances = Seance.objects.filter(semestre=semestre, matiere=matiere['pk'])
+                    temps = sum((seance.date_et_heure_fin - seance.date_et_heure_debut).total_seconds() for seance in seances)
+                    hours, remainder = divmod(temps, 3600)
+                    minutes, _ = divmod(remainder, 60)
+                    matiere['temps_effectuer'] = f"{int(hours)}h {int(minutes)}min"
 
-                    plannings=SeancePlannifier.objects.filter(planning=plan ,matiere=matiere['pk'])
-                    temps_x=0
-                    for planning in plannings:
-                        temps_x+=(planning.date_heure_fin - planning.date_heure_debut).total_seconds()
-                    hours_x, remainder = divmod(temps_x, 3600)
-                    minutes_x, _ = divmod(remainder, 60)
-                    matiere['temps_plannifier']=str(int(hours_x))+'h '+str(int(minutes_x))+'min'                       
+                    planning = Planning.objects.filter(semestre=semestre)
+                    for plan in planning:
+                        plannings = SeancePlannifier.objects.filter(planning=plan, matiere=matiere['pk'])
+                        temps_x = sum((planning.date_heure_fin - planning.date_heure_debut).total_seconds() for planning in plannings)
+                        hours_x, remainder = divmod(temps_x, 3600)
+                        minutes_x, _ = divmod(remainder, 60)
+                        matiere['temps_plannifier'] = f"{int(hours_x)}h {int(minutes_x)}min"
 
-            planification[str(ue)].append({'matieres': matieres})
-            print('plan : ',planification)
+                planification[str(ue)].append({'matieres': matieres})
+
             planification_json = json.dumps(planification)
         
 
-        return render(request, 'generer_planning.html', {'planification_json': planification_json,'semestre':semestre,'semaine':semaine,'datedebut':datedebut,'datefin':datefin,'intervalle':intervalle,'ues':ues})
+        return render(request, 'generer_planning.html', {
+            'planification_json': planification_json,
+            'semestre': semestre,
+            'semaine': semaine,
+            'datedebut': datedebut,
+            'datefin': datefin,
+            'intervalle': intervalle,
+            'ues': ues if semestre else []
+        })
 
+    return render(request, 'some_default_template.html')  # Render a default template if not POST
+
+#--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 def datetime_serializer(obj):
     if isinstance(obj, datetime.datetime):
@@ -431,45 +449,67 @@ def seance(request,seanceId):
     return render(request,'details.html',context)
 
 
+# ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# def french_day(day):
+#     # print(day)
+#     french_correspondance_days = {
+#         'Monday':'Lundi',
+#         'Tuesday' :'Mardi',
+#         'Wednesday' :'Mercredi',
+#         'Thursday' :'Jeudi',
+#         'Friday' :'Vendredi',
+#         'Saturday' :'Samedi'
+#     }
+#     return french_correspondance_days[day]
+# ---------------------------------------------------------------------------
 def french_day(day):
-    print(day)
-    french_correspondance_days = {'Monday':'Lundi','Tuesday' :'Mardi','Wednesday' :'Mercredi','Thursday' :'Jeudi','Friday' :'Vendredi','Saturday' :'Samedi'}
-    return french_correspondance_days[day]
+    days = {
+        'Monday': 'Lundi',
+        'Tuesday': 'Mardi',
+        'Wednesday': 'Mercredi',
+        'Thursday': 'Jeudi',
+        'Friday': 'Vendredi',
+        'Saturday': 'Samedi',
+        'Sunday': 'Dimanche'
+    }
+    return days.get(day.capitalize(), day)
 
 
 @login_required(login_url=settings.LOGIN_URL)
-def imprimer(request,planningId):
-    if request.user.groups.all().first().name not in ['directeur_des_etudes','secretaire']:
+def imprimer(request, planningId):
+    if request.user.groups.all().first().name not in ['directeur_des_etudes', 'secretaire']:
         return render(request, 'errors_pages/403.html')
     
     planns = Planning.objects.filter(id=planningId).first()
     days = []
-    timeslots=['']
-    tenues=[ 'Veste', 'Tricot' , 'Veste' , 'Tricot' ,'Bigarré' , 'Bigarré']
-    if planns.semestre.libelle == 'S1' or 'S2' :
-        niveau='L1 '+ planns.semestre.libelle + ' '+str(planns.semestre.annee_universitaire)
-    elif  planns.semestre.libelle == 'S3' or 'S4' :
-        niveau='L2 '+ planns.semestre.libelle + ' '+str(planns.semestre.annee_universitaire)
-    elif  planns.semestre.libelle == 'S5' or 'S6' :
-        niveau='L3 '+ planns.semestre.libelle + ' '+str(planns.semestre.annee_universitaire)
+    timeslots = ['']
+    tenues = ['Veste', 'Tricot', 'Veste', 'Tricot', 'Bigarré', 'Bigarré']
     
-    print(niveau)
+    semestre_libelle = planns.semestre.libelle
+    annee_universitaire = planns.semestre.annee_universitaire
 
-    plannings=SeancePlannifier.objects.filter(planning=planns)
-    for planning in plannings :
-        jour_n=(planns.semaine-1)*5 + planning.date_heure_debut.weekday() +1 
-        jour_n=str(jour_n)
-        valeur_jour= str(planning.date_heure_debut.day)
-        if len(valeur_jour) == 1 :
-            valeur_jour='0'+valeur_jour
-        valeur_mois=str(planning.date_heure_debut.month)
-        if len(valeur_mois) == 1 :
-            valeur_mois='0'+valeur_mois        
+    if semestre_libelle in ['S1', 'S2']:
+        niveau = f'L1 {semestre_libelle} {annee_universitaire}'
+    elif semestre_libelle in ['S3', 'S4']:
+        niveau = f'L2 {semestre_libelle} {annee_universitaire}'
+    elif semestre_libelle in ['S5', 'S6']:
+        niveau = f'L3 {semestre_libelle} {annee_universitaire}'
+    else:
+        niveau = f'Unknown {semestre_libelle} {annee_universitaire}'
+
+
+    plannings = SeancePlannifier.objects.filter(planning=planns)
+    for planning in plannings:
+        jour_n = (planns.semaine - 1) * 5 + planning.date_heure_debut.weekday() + 1
+        jour_n = str(jour_n)
+        valeur_jour = str(planning.date_heure_debut.day).zfill(2)
+        valeur_mois = str(planning.date_heure_debut.month).zfill(2)
+
         jour = french_day(planning.date_heure_debut.strftime("%A"))
 
-        day = jour +' '+valeur_jour+'/'+valeur_mois+' - J'+jour_n 
-        
-        timeshot= str(planning.date_heure_debut.hour)+'h'+str(planning.date_heure_debut.minute)
+        day = f'{jour} {valeur_jour}/{valeur_mois} - J{jour_n}'
+        timeshot = f'{planning.date_heure_debut.hour}h{str(planning.date_heure_debut.minute).zfill(2)}'
+        # print(timeshot)
 
         planning.day = day
         planning.timeshot = timeshot
@@ -479,65 +519,67 @@ def imprimer(request,planningId):
         if timeshot not in timeslots:
             timeslots.append(timeshot)
 
-
-    schedule = {}
-
-    for time in timeslots:
-        schedule[time] = {}
+    #heures de la jours
+    ues_prof_matieres = {time: {} for time in timeslots}
+    print(ues_prof_matieres)
 
     for plan in plannings:
         time_slot = plan.timeshot  
         day = plan.day  
         activity = plan.intitule
-        professor = plan.professeur.nom if plan.professeur else "No Professor"
+        professor = plan.professeur.personnel.nom if plan.professeur else "No Professor"
 
-        if time_slot in schedule:
-            if day in schedule[time_slot]:
-                if activity in schedule[time_slot][day]:
-                    schedule[time_slot][day][activity].append({
-                        "professeur": professor
-                    })
-                else:
-                    schedule[time_slot][day][activity] = [{
-                        "professeur": professor
-                    }]
-            else:
-                schedule[time_slot][day] = {activity: [{
-                    "professeur": professor
-                }]}
-        else:
-            schedule[time_slot] = {day: {activity: [{
-                "professeur": professor
-            }]}}
+        if time_slot not in ues_prof_matieres:
+            ues_prof_matieres[time_slot] = {}
+        
+        if day not in ues_prof_matieres[time_slot]:
+            ues_prof_matieres[time_slot][day] = {}
 
-    for timeslot in schedule:
-        print("\nTime Slot:", timeslot)
-        for day in schedule[timeslot]:
-            print("Day:", day)
-            for activity in schedule[timeslot][day]:
-                print(activity, ":")
-                for professor in schedule[timeslot][day][activity]:
-                    print("\tProfessor:", professor["professeur"])
+        if activity not in ues_prof_matieres[time_slot][day]:
+            ues_prof_matieres[time_slot][day][activity] = []
+
+        ues_prof_matieres[time_slot][day][activity].append({
+            "professeur": professor
+        })
+
+    # for timeslot in ues_prof_matieres:
+    #     # print("\nTime Slot:", timeslot)
+    #     for day in ues_prof_matieres[timeslot]:
+    #         # print("Day:", day)
+    #         for activity in ues_prof_matieres[timeslot][day]:
+    #             # print(activity, ":")
+    #             for professor in ues_prof_matieres[timeslot][day][activity]:
+    #                 # print("\tProfessor:", professor["professeur"])
+    #                 pass
+
+    
+
+    # for cle, valeur in ues_prof_matieres.items():
+    #     heurs  = cle
+    #     pr = valeur
+
+    #     print (heurs)
+    #     print(pr)sdopipojdokop
 
 
+    print(ues_prof_matieres)
+    context = {'planning': ues_prof_matieres, 'niveau': niveau, 'days': days, 'taille': 22.5 / len(days), 'tenues': tenues} 
+         
 
-
-
-    context = {'planning': schedule,'niveau':niveau,'days':days,'taille':22.5/len(days),'tenues':tenues}          
-                    
     latex_input = 'planning_week'
-    latex_ouput = 'planning_week_'+str(planns.semaine)+'_'+str(planns.semestre.libelle)+'_'+str(planns.semestre.annee_universitaire)
-    pdf_file = 'planning_week_'+str(planns.semaine)+'_'+str(planns.semestre.libelle)+'_'+str(planns.semestre.annee_universitaire)
+    latex_output = f'planning_week_{planns.semaine}_{semestre_libelle}_{annee_universitaire}'
+    pdf_file = f'planning_week_{planns.semaine}_{semestre_libelle}_{annee_universitaire}'
 
     # génération du pdf
-    generate_pdf(context, latex_input, latex_ouput, pdf_file)
+    generate_pdf(context, latex_input, latex_output, pdf_file)
 
-    with open('media/pdf/' + str(pdf_file) + '.pdf', 'rb') as f:
+    with open(f'media/pdf/{pdf_file}.pdf', 'rb') as f:
         pdf_preview = f.read()
         response = HttpResponse(pdf_preview, content_type='application/pdf')
-        response['Content-Disposition'] = 'inline;filename=pdf_file.pdf'
+        response['Content-Disposition'] = f'inline;filename={pdf_file}.pdf'
         return response
 
+# -----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
 @login_required(login_url=settings.LOGIN_URL)

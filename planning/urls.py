@@ -18,7 +18,7 @@ urlpatterns = [
     path('modifier/', views.modifier, name='modifier'),
 
     path('details/<str:planningId>', views.details, name='afficher'),
-    path('imprimer/<str:planningId>', views.imprimer, name='imprimer'),
+    path('imprimer/<int:planningId>', views.imprimer, name='imprimer'),
     path('delete/<str:planningId>', views.effacer, name='supprimer'),
     path('edit/<str:planningId>',views.ajouter_cours,name='ajouter_cours')
 

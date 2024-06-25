@@ -532,7 +532,7 @@
                     <ul class="nav-main-submenu">
                         <li class="compte ">
                             {% for role in request.user.groups.all %}
-                                <a href="{% url 'main:change_role' role.id %}" class="text-white text-center trole">Utiliser le role <strong>{{ role.name }}</strong> </a> <br>
+                                <a href="{% url 'main:change_role' role.id %}" class="text-white text-center trole"><strong>{{ role.name }}</strong> </a> <br>
                             {% endfor %} 
                         </li>
                     </ul>
