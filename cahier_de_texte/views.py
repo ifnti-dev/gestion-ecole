@@ -77,10 +77,13 @@ def enregistrer_seance(request):
 
         
         return redirect("/cahier_de_texte/info_seance/" + str(seance.id) + "/" ) 
-
-    elif request.user.is_authenticated:
-        if request.user.groups.all().first().name not in ['etudiant']:
-            return render(request, 'errors_pages/403.html')
+    elif request.method == "GET":
+        dateActuelle=datetime.datetime.now().strftime("%Y-%m-%d")
+        heureActuelle=datetime.datetime.now().strftime("%H:%M")
+        groupes_name = [groupe.name for groupe in request.user.groups.all()]
+        if 'etudiant' not in groupes_name:
+            return render(request, 'errors_pages/403.html')        
+        
         user_connecte=get_object_or_404(get_user_model(),id=request.user.id)
         etudiant=get_object_or_404(Etudiant,user=user_connecte)
         print("ffff ",AnneeUniversitaire.static_get_current_annee_universitaire())
@@ -138,7 +141,7 @@ def modifier_seance(request, seance_id):
 def supprimer_seance(request, seance_id):
     seance = get_object_or_404(Seance, id=seance_id)
     seance.delete()
-    return redirect('/cahier_de_texte/')
+    return redirect('/cahier_de_texte/liste_seance_etudiant/')
 
 def changer_secretaire(request):
     etudiant_id = request.POST.get('secretaire')
@@ -228,7 +231,7 @@ def signature_prof(request):
     context = {"seance": seance, "notification": notification }
     print(username,user)
     if user :           
-        if seance.enseignant.user == user:
+        if seance.enseignant.personnel.user == user:
             print("c'est signer")
             seance.valider=True
             seance.commentaire=""

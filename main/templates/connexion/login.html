@@ -1,51 +1,263 @@
 {% extends 'auth.html' %}
 {% load static %}
 {% block content %}
-<div class="d-flex flex-column align-items-center justify-content-center w-100 bg-white py-2" style="height: 460px;">
-    <img src="{% static '/assets/media/logo.png' %}" alt="" width="50px">
-    <h1 class="mt-4">Se connecter</h1>
-    <div>
 
-        {% if error %}
-        <span class="text-danger">{{ error }}</span>
-        {% endif %}
+    <style>
+        body {
+            position: relative;
+            background: #eee;
+            font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+            font-size: 14px;
+            color: #000;
+            margin: 0;
+            padding: 0;
+        }
 
-        <form action="" method="post">
-            {% csrf_token %}
-            <div class="d-flex flex-column mt-4">
-                <label for="username" class="">Nom utilisateur</label>
-                <input class="form-control" name="username" type="text" id="username" placeholder="Nom utilisateur">
-            </div>
-            <div class="d-flex flex-column mt-4">
-                <label for="username" class="">Mot de passe</label>
-                <div class="input-group mb-2">
-                    <input class="form-control" name="password" type="password" id="password"
-                        placeholder="Mot de passe">
-                    <div class="input-group-prepend">
-                        <div class="input-group-text" id="show_password">
-                            <i class="fa fa-eye-slash" id="show_password_eyes"></i>
-                        </div>
+        .login {
+            width: 100%;
+            max-width: 60rem;
+            margin: auto;
+            margin-top: 5rem;
+            display: flex;
+            align-items: center;
+            flex-direction: column;
+        } 
+
+        .caro, .forms {
+            width: 100%;
+            max-width: 30rem;
+        }
+
+        swiper-container {
+            width: 100%;
+            height: 100%;
+        }
+
+        swiper-slide {
+            text-align: center;
+            font-size: 18px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .imso {
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        .imso .mages {
+            height: 100%;
+            width: 100%;
+            object-fit: cover;
+        }
+
+        .logifnti {
+            margin: auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+    /*----------------------------- Responsiveness ---------------------------*/
+
+        @media screen and (max-width: 320px) {
+            .login {
+                width: 90%;
+                margin-top: 1rem;
+                flex-direction: column;
+            }
+            .caro, .forms {
+                width: 100%;
+            }
+            .ifns{
+                background-color: #000;
+                width: 100%;
+                border : 2px solid dashed;
+                box-shadow: 5px 3px 2px black;
+            }
+        } 
+
+        @media screen and (max-width: 375px) {
+            .login {
+                width: 90%;
+                margin-top: 1rem;
+                flex-direction: column;
+            }
+            .caro, .forms {
+                width: 100%;
+            }
+            .ifns{
+                background-color: #000;
+                width: 100%;
+                border : 2px solid dashed;
+                box-shadow: 5px 3px 2px black;
+            }
+        }
+
+        @media screen and (max-width: 425px) {
+            .login {
+                width: 90%;
+                margin-top: 1rem;
+                flex-direction: column;
+            }
+            .caro, .forms {
+                width: 100%;
+            }
+            .ifns{
+                background-color: #000;
+                width: 100%;
+                border : 2px solid dashed;
+                box-shadow: 5px 3px 2px black;
+            }
+        }
+
+        @media screen and (max-width: 768px) {
+            .login {
+                width: 90%;
+                margin-top: 1rem;
+                flex-direction: column;
+            }
+            .caro, .forms {
+                width: 100%;
+            }
+            .ifns{
+                background-color: #000;
+                width: 100%;
+                border : 2px solid dashed;
+                box-shadow: 5px 3px 2px black;
+            }
+        }
+
+        @media screen and (min-width: 769px) and (max-width: 1024px) {
+            .login {
+                width: 90%;
+                margin-top: 1rem;
+                flex-direction: row;
+                justify-content: space-between;
+            }
+            .caro, .forms {
+                width: 48%;
+            }
+
+            
+        }
+
+        @media screen and (min-width: 1025px) and (max-width: 1280px) {
+            .login {
+                width: 90%;
+                margin-top: 1rem;
+                flex-direction: row;
+                justify-content: space-between;
+            }
+            .caro, .forms {
+                width: 48%;
+            }
+        }
+
+        @media screen and (min-width: 1281px) and (max-width: 1536px) {
+            .login {
+                width: 90%;
+                margin-top: 1rem;
+                flex-direction: row;
+                justify-content: space-between;
+            }
+            .caro, .forms {
+                width: 48%;
+            }
+        }
+
+        @media screen and (min-width: 1537px) {
+            .login {
+                max-width: 60rem;
+                flex-direction: row;
+                justify-content: space-between;
+            }
+            .caro, .forms {
+                width: 48%;
+            }
+        }
+
+    </style>
+
+    <div class="login shadow-lg p-3 mb-5 bg-body rounded">
+        <div class="caro">
+            
+            <swiper-container class="mySwiper" pagination="true" pagination-clickable="true" navigation="true" space-between="30"
+                loop="true">
+
+                <swiper-slide>
+                    <div class="imso">
+                        <img class="mages" src="{% static '/assets/media/sliders/3.png' %}" alt="">
                     </div>
+                </swiper-slide>
+
+                <swiper-slide>
+                    <div class="imso">
+                        <img class="mages" src="{% static '/assets/media/sliders/1.jpeg' %}" alt="">
+                    </div>
+                </swiper-slide>
+
+                <swiper-slide>
+                    <div class="imso">
+                        <img class="mages" src="{% static '/assets/media/sliders/4.png' %}" alt="">
+                    </div>
+                </swiper-slide>
+            </swiper-container>
+
+        </div>
+
+        <hr class="ifns">
+        <div class="forms">
+            <div>
+                <img class="logifnti" src="{% static '/assets/media/logo.png' %}" alt="" width="50px">
+                <h1 class="mt-4">Se connecter</h1>
+                <div>
+            
+                    {% if error %}
+                    <span class="text-danger">{{ error }}</span>
+                    {% endif %}
+            
+                    <form action="" method="post">
+                        {% csrf_token %}
+                        <div class="d-flex flex-column mt-4">
+                            <label for="username" class="">Nom utilisateur</label>
+                            <input class="form-control" name="username" type="text" id="username" placeholder="Nom utilisateur">
+                        </div>
+                        <div class="d-flex flex-column mt-4">
+                            <label for="username" class="">Mot de passe</label>
+                            <div class="input-group mb-2">
+                                <input class="form-control" name="password" type="password" id="password"
+                                    placeholder="Mot de passe">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text" id="show_password">
+                                        <i class="fa fa-eye-slash" id="show_password_eyes"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-row-reverse mt-2 mb-2">
+                            <span>
+                                <a href="{% url 'main:reminder' %}">
+                                    <small>Oups ! j'ai oublier mon mot de passe.</small>
+                                </a>
+                            </span>
+                        </div>
+                        <div class="mt-4">
+                            <button class="btn btn-primary w-100">Se connecter</button>
+                        </div>
+                    </form>
+                    {% comment %} <div>
+                        <hr class="">
+                        <a href="">
+                            <span></span>
+                            <button class="btn border">Outlook</button>
+                        </a>
+                    </div> {% endcomment %}
                 </div>
             </div>
-            <div class="d-flex flex-row-reverse mt-2 mb-2">
-                <span>
-                    <a href="{% url 'main:reminder' %}">
-                        <small>Oups ! j'ai oublier mon mot de passe.</small>
-                    </a>
-                </span>
-            </div>
-            <div class="mt-4">
-                <button class="btn btn-primary w-100">Se connecter</button>
-            </div>
-        </form>
-        {% comment %} <div>
-            <hr class="">
-            <a href="">
-                <span></span>
-                <button class="btn border">Outlook</button>
-            </a>
-        </div> {% endcomment %}
+        </div>
     </div>
-</div>
+
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-element-bundle.min.js"></script>
 {% endblock content %}

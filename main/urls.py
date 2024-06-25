@@ -56,7 +56,9 @@ urlpatterns = [
          views.recapitulatif_notes, name='recap_notes'),
 
 
-
+     ###export_excel_evaluation
+     path('export_excel_evaluation/<int:id_matiere>/<str:id_semestre>/', views.export_excel_evaluation, name='export_excel_evaluation'),
+     
     # Abdoul-Malik urls 
      path('recapitulatifs_des_notes_par_etudiant/<str:id_semestre>/',
           views.recapitulatifs_des_notes_par_etudiant, name='recapitulatifs_des_notes_par_etudiant'),
@@ -108,8 +110,12 @@ urlpatterns = [
      path('create_ue/', views.create_ue, name='create_ue'),
      path('update_ue/<int:id>/', views.create_ue, name='update_ue'),
 
+     path('personnels/',views.personnels, name='personnels'),
+     path('create_personnel/', views.create_personnel, name='create_personnel'),
+     path('update_personnel/<int:id>/',views.update_personnel, name='update_personnel'),
+     path('delete_personnel/<int:id>/',views.delete_personnel, name='delete_personnel'),
 
-                    #### Enseignant ####
+     #### Enseignant ####
      path('enseignants/',views.enseignants, name='enseignants'),
      path('create_enseignant/', views.create_enseignant, name='create_enseignant'),
      path('enseignant_suspendu/', views.enseignant_inactif,name='enseignant_suspendu'),
@@ -147,8 +153,13 @@ urlpatterns = [
 
      path('passage_etudiants/', views.passage_etudiants, name='passage_etudiants'),
 
+     path('attestation_scolarite/<str:id>/<str:niveau>',
+         views.attestation_scolarite, name='attestation_scolarite'),
+     
+     
+     path('attestation_diplome/<str:id>/<str:niveau>',
+         views.attestation_diplome, name='attestation_diplome'),
+
 
      #Table de paramètre globale
-
-
 ]

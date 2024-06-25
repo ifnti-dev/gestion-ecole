@@ -9,7 +9,7 @@ def verify_if_user_is_can_be_pass_to_evaluation_data(request, matiere):
     role = get_user_role(request)
     if role:
         if matiere.enseignant:
-            principale_id = matiere.ue.enseignant.user.id if matiere.ue.enseignant else -1
+            principale_id = matiere.ue.enseignant.personnel.user.id if matiere.ue.enseignant else -1
             return (role.name in ["directeur_des_etudes", "secretaire"] or (role.name == "enseignant" and (request.user.id == matiere.enseignant.user.id or principale_id == request.user.id)))
         else:
             messages.error(request, f"La matière {matiere.libelle} n'a pas d'enseignant ! ")

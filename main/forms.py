@@ -2,6 +2,8 @@ from typing import Any, Dict
 import re
 from typing import Any, Dict
 from django import forms
+
+from main.utils.forms_utils import chercher_utilisateur
 from .models import Evaluation, Information, Programme, Parcours, Note, Utilisateur, Personnel, Enseignant, Etudiant, Matiere, AnneeUniversitaire, Ue, Tuteur, Semestre
 from django.core.exceptions import ValidationError
 from django.forms import DateField
@@ -56,7 +58,7 @@ class EvaluationForm(forms.ModelForm):
         return cleaned_data
 
 class NoteForm(forms.ModelForm):
-    etudiant = forms.CharField(max_length=255, widget=forms.TextInput(attrs={'autocomplete': 'off', 'hidden' : True}))
+    etudiant = forms.CharField(max_length=255, widget=forms.TextInput(attrs={'autocomplete': 'off', 'hidden' : True,}))
     etudiant_full_name = forms.CharField(max_length=255, widget=forms.TextInput(attrs={'class':'form-control note_set-etudiant_full_name','autocomplete': 'off', "value": ""}), required=False)
     
     class Meta:
@@ -79,7 +81,7 @@ class NoteForm(forms.ModelForm):
 
 
 class EtudiantForm(forms.ModelForm):
-    datenaissance = DateField(widget=forms.SelectDateWidget(years=range(1900, 2006), attrs={'class': 'form-control'}), label="Date de naissance")
+    datenaissance = DateField(widget=forms.DateInput( attrs={'class': 'form-control',"type":"date"}), label="Date de naissance")
     class Meta:
         model = Etudiant
         fields = ['nom', 'prenom', 'contact', 'sexe', 'adresse', 'datenaissance', 'lieunaissance', 'profil', 'prefecture', 'is_active', 'seriebac1', 'seriebac2', 'anneebac1', 'anneebac2', 'etablissementSeconde', 'etablissementPremiere', 'etablissementTerminale', 'francaisSeconde', 'francaisPremiere','francaisTerminale', 'anglaisSeconde', 'anglaisPremiere', 'anglaisTerminale', 'mathematiqueSeconde', 'mathematiquePremiere', 'mathematiqueTerminale', 'semestres', 'photo_passport']
@@ -207,12 +209,13 @@ class ProgrammeForm(forms.ModelForm):
 class UeForm(forms.ModelForm):
     class Meta:
         model = Ue
-        fields = ['libelle', 'type', 'niveau', 'nbreCredits', 'heures', 'enseignant']
+        fields = ['libelle', 'type', 'niveau', 'nbreCredits','minValue', 'heures', 'enseignant']
         widgets = {
             'libelle': forms.TextInput(attrs={'class': 'form-control col-md-12'}),
             'type': forms.Select(attrs={'class': 'form-control col-md-12'}),       
             'niveau': forms.Select(attrs={'class': 'form-control col-md-12'}),       
             'nbreCredits': forms.TextInput(attrs={'class': 'form-control col-md-12'}),
+            'minValue': forms.TextInput(attrs={'class': 'form-control col-md-12'}),
             'heures': forms.TextInput(attrs={'class': 'form-control col-md-12'}),
             'enseignant': forms.Select(attrs={'class': 'form-control col-md-12'}),       
 
@@ -241,94 +244,6 @@ class MatiereForm(forms.ModelForm):
         }
 
 
-class EnseignantForm(forms.ModelForm):
-    datenaissance = DateField(widget=forms.SelectDateWidget(years=range(1990, 2006)), label='Date de naissance')
-    class Meta:
-        model = Enseignant
-        fields = ['nom', 'prenom', 'contact', 'sexe', 'email', 'adresse', 'datenaissance', 'lieunaissance', 'numero_cnss', 'nif', 'profil', 'salaireBrut', 'nombre_de_personnes_en_charge', 'dernierdiplome', 'is_active', 'type', 'specialite']
-        widgets = {
-            'nom': forms.TextInput(attrs={'class': 'form-control'}),
-            'prenom': forms.TextInput(attrs={'class': 'form-control'}),
-            'contact': forms.TextInput(attrs={'class': 'form-control'}),
-            'sexe': forms.Select(choices=Etudiant.SEXE_CHOISE, attrs={'class': 'form-control'}),
-            'email': forms.TextInput(attrs={'class': 'form-control'}),
-            'adresse': forms.TextInput(attrs={'class': 'form-control'}),
-            'datenaissance': DateField(widget=forms.SelectDateWidget(years=range(1900, 2006)), label="Date de naissance"),
-            'lieunaissance': forms.TextInput(attrs={'class': 'form-control'}),
-            'numero_cnss': forms.TextInput(attrs={'class': 'form-control'}),
-            'nif': forms.TextInput(attrs={'class': 'form-control'}),
-            'profil': forms.FileInput(attrs={'class': 'form-control'}),
-            'salaireBrut': forms.NumberInput(attrs={'class': 'form-control'}),
-            'nombre_de_personnes_en_charge': forms.NumberInput(attrs={'class': 'form-control'}),
-            'dernierdiplome': forms.FileInput(attrs={'class': 'form-control'}),
-            'is_active': forms.CheckboxInput(attrs={'class': 'form-control'}),
-            'type': forms.Select(attrs={'class': 'form-control'}),
-            'specialite': forms.TextInput(attrs={'class': 'form-control'})      
-
-        }
-
-    def clean(self):
-        cleaned_data = super(EnseignantForm, self).clean()
-        nom = cleaned_data.get('nom', '')
-        prenom = cleaned_data.get('prenom', '')
-        contact = cleaned_data.get('contact', '')
-        email = cleaned_data.get('email', '')
-        adresse = cleaned_data.get('adresse', '')
-        sexe = cleaned_data.get('sexe', '')
-
-        if nom.find(';') != -1 or nom.find('/') != -1 or nom.find('.') != -1 or nom.find(',') != -1 or nom.find(':') != -1 or nom.find('!') != -1 or nom.find('?') != -1 or nom.find('*') != -1 or nom.find('+') != -1 or nom.find('=') != -1 or nom.find('@') != -1 or nom.find('#') != -1 or nom.find('$') != -1 or nom.find('%') != -1 or nom.find('&') != -1 or nom.find('(') != -1 or nom.find(')') != -1 or nom.find('_') != -1 or nom.find('<') != -1 or nom.find('>') != -1 or nom.find('|') != -1 or nom.find('~') != -1 or nom.find('^') != -1 or nom.find('{') != -1 or nom.find('}') != -1 or nom.find('[') != -1 or nom.find(']') != -1 or nom.find('"') != -1 or nom.find('\\') != -1 or nom.find('`') != -1:
-            #forms.nom.errors = "Le nom ne doit pas contenir des caractères spéciaux"
-            #print(self._errors)
-            if not 'nom' in self._errors:
-                self._errors['nom'] = ErrorDict()
-            self._errors['nom'] = 'Le nom ne doit pas contenir des caractères spéciaux'
-
-        if nom.find('0') != -1 or nom.find('1') != -1 or nom.find('2') != -1 or nom.find('3') != -1 or nom.find('4') != -1 or nom.find('5') != -1 or nom.find('6') != -1 or nom.find('7') != -1 or nom.find('8') != -1 or nom.find('9') != -1:
-            if not 'nom' in self._errors:
-                self._errors['nom'] = ErrorDict()
-            self._errors['nom'] = 'Le nom ne doit pas contenir des chiffres'
-        
-        if prenom.find(';') != -1 or prenom.find('/') != -1 or prenom.find('.') != -1 or prenom.find(',') != -1 or prenom.find(':') != -1 or prenom.find('!') != -1 or prenom.find('?') != -1 or prenom.find('*') != -1 or prenom.find('+') != -1 or prenom.find('=') != -1 or prenom.find('@') != -1 or prenom.find('#') != -1 or prenom.find('$') != -1 or prenom.find('%') != -1 or prenom.find('&') != -1 or prenom.find('(') != -1 or prenom.find(')') != -1 or prenom.find('_') != -1 or prenom.find('<') != -1 or prenom.find('>') != -1 or prenom.find('|') != -1 or prenom.find('~') != -1 or prenom.find('^') != -1 or prenom.find('{') != -1 or prenom.find('}') != -1 or prenom.find('[') != -1 or prenom.find(']') != -1 or prenom.find('"') != -1 or prenom.find('\\') != -1 or prenom.find('`') != -1:
-            if not 'prenom' in self._errors:
-                self._errors['prenom'] = ErrorDict()
-            self._errors['prenom'] = 'Le prénom ne doit pas contenir des caractères spéciaux'
-
-        if prenom.find('0') != -1 or prenom.find('1') != -1 or prenom.find('2') != -1 or prenom.find('3') != -1 or prenom.find('4') != -1 or prenom.find('5') != -1 or prenom.find('6') != -1 or prenom.find('7') != -1 or prenom.find('8') != -1 or prenom.find('9') != -1:
-            if not 'prenom' in self._errors:
-                self._errors['prenom'] = ErrorDict()
-            self._errors['prenom'] = 'Le prénom ne doit pas contenir des chiffres'
-
-        if contact.find(';') != -1 or contact.find('/') != -1 or contact.find('.') != -1 or contact.find(',') != -1 or contact.find(':') != -1 or contact.find('!') != -1 or contact.find('?') != -1 or contact.find('*') != -1 or contact.find('`') != -1 or contact.find('=') != -1 or contact.find('@') != -1 or contact.find('#') != -1 or contact.find('$') != -1 or contact.find('%') != -1 or contact.find('&') != -1 or contact.find('(') != -1 or contact.find(')') != -1 or contact.find('_') != -1 or contact.find('<') != -1 or contact.find('>') != -1 or contact.find('|') != -1 or contact.find('~') != -1 or contact.find('^') != -1 or contact.find('{') != -1 or contact.find('}') != -1 or contact.find('[') != -1 or contact.find(']') != -1 or contact.find('"') != -1 or contact.find('\\') != -1 or contact.find(' ') != -1 or contact.find("'") != -1 :
-            if not 'contact' in self._errors:
-                self._errors['contact'] = ErrorDict()
-            self._errors['contact'] = 'Le contact ne doit pas contenir des caractères spéciaux'
-
-        if contact.find('a') != -1 or contact.find('b') != -1 or contact.find('c') != -1 or contact.find('d') != -1 or contact.find('e') != -1 or contact.find('f') != -1 or contact.find('g') != -1 or contact.find('h') != -1 or contact.find('i') != -1 or contact.find('j') != -1 or contact.find('k') != -1 or contact.find('l') != -1 or contact.find('m') != -1 or contact.find('n') != -1 or contact.find('o') != -1 or contact.find('p') != -1 or contact.find('q') != -1 or contact.find('r') != -1 or contact.find('s') != -1 or contact.find('t') != -1 or contact.find('u') != -1 or contact.find('v') != -1 or contact.find('w') != -1 or contact.find('x') != -1 or contact.find('y') != -1 or contact.find('z') != -1:
-            if not 'contact' in self._errors:
-                self._errors['contact'] = ErrorDict()
-            self._errors['contact'] = 'Le contact ne doit pas contenir des lettres'
-
-        if email.find(';') != -1 or email.find('/') != -1 or email.find(',') != -1 or email.find(':') != -1 or email.find('!') != -1 or email.find('?') != -1 or email.find('*') != -1 or email.find('+') != -1 or email.find('=') != -1 or email.find('#') != -1 or email.find('$') != -1 or email.find('%') != -1 or email.find('&') != -1 or email.find('(') != -1 or email.find(')') != -1 or email.find('_') != -1 or email.find('<') != -1 or email.find('>') != -1 or email.find('|') != -1 or email.find('~') != -1 or email.find('^') != -1 or email.find('{') != -1 or email.find('}') != -1 or email.find('[') != -1 or email.find(']') != -1 or email.find('"') != -1 or email.find('\\') != -1 or email.find(' ') != -1 or email.find("'") != -1 :
-            if not 'email' in self._errors:
-                self._errors['email'] = ErrorDict()
-            self._errors['email'] = 'L\'email ne doit pas contenir des caractères spéciaux'
-
-        if adresse.find(';') != -1 or adresse.find('/') != -1 or adresse.find(',') != -1 or adresse.find(':') != -1 or adresse.find('!') != -1 or adresse.find('?') != -1 or adresse.find('*') != -1 or adresse.find('+') != -1 or adresse.find('=') != -1 or adresse.find('#') != -1 or adresse.find('$') != -1 or adresse.find('%') != -1 or adresse.find('&') != -1 or adresse.find('(') != -1 or adresse.find(')') != -1 or adresse.find('_') != -1 or adresse.find('<') != -1 or adresse.find('>') != -1 or adresse.find('|') != -1 or adresse.find('~') != -1 or adresse.find('^') != -1 or adresse.find('{') != -1 or adresse.find('}') != -1 or adresse.find('[') != -1 or adresse.find(']') != -1 or adresse.find('"') != -1 or adresse.find('\\') != -1 or adresse.find("'") != -1 or adresse.find('@') != -1 :
-            if not 'adresse' in self._errors:
-                self._errors['adresse'] = ErrorDict()
-            self._errors['adresse'] = 'L\'adresse ne doit pas contenir des caractères spéciaux'
-
-        if sexe.find(';') != -1 or sexe.find('/') != -1 or sexe.find(',') != -1 or sexe.find(':') != -1 or sexe.find('!') != -1 or sexe.find('?') != -1 or sexe.find('*') != -1 or sexe.find('+') != -1 or sexe.find('=') != -1 or sexe.find('#') != -1 or sexe.find('$') != -1 or sexe.find('%') != -1 or sexe.find('&') != -1 or sexe.find('(') != -1 or sexe.find(')') != -1 or sexe.find('_') != -1 or sexe.find('<') != -1 or sexe.find('>') != -1 or sexe.find('|') != -1 or sexe.find('~') != -1 or sexe.find('^') != -1 or sexe.find('{') != -1 or sexe.find('}') != -1 or sexe.find('[') != -1 or sexe.find(']') != -1 or sexe.find('"') != -1 or sexe.find('\\') != -1 or sexe.find("'") != -1 or sexe.find('@') != -1 :
-            if not 'sexe' in self._errors:
-                self._errors['sexe'] = ErrorDict()
-            self._errors['sexe'] = 'Le sexe ne doit pas contenir des caractères spéciaux'
-
-        if sexe.find('0') != -1 or sexe.find('1') != -1 or sexe.find('2') != -1 or sexe.find('3') != -1 or sexe.find('4') != -1 or sexe.find('5') != -1 or sexe.find('6') != -1 or sexe.find('7') != -1 or sexe.find('8') != -1 or sexe.find('9') != -1 :
-            if not 'sexe' in self._errors:
-                self._errors['sexe'] = ErrorDict()
-            self._errors['sexe'] = 'Le sexe ne doit pas contenir des chiffres'
-
-
 class InformationForm(forms.ModelForm):
     class Meta:
         model = Information
@@ -345,14 +260,71 @@ class InformationForm(forms.ModelForm):
         }
 
 
-         
-        
-        
-        
+class PersonnelForm(forms.ModelForm):
+    custom_errors = forms.CharField(widget=forms.TextInput(attrs={"hidden": True}), required=False)
+    roles = forms.ModelMultipleChoiceField(queryset=None, widget=forms.SelectMultiple(attrs={'class': 'form-control js-select2'}))
+    
+    type = forms.CharField(widget=forms.Select(attrs={'class': 'form-control'}, choices=Enseignant.CHOIX_TYPE), required=False)
+    specialite = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}), required=False)
 
-        
+    
+    class Meta:
+        model = Personnel
+        fields = ['nom', 'prenom', 'contact', 'sexe', 'email', 'adresse', 'datenaissance', 'lieunaissance', 'numero_cnss', 'nif', 'profil', 'salaireBrut', 'nombre_de_personnes_en_charge', 'dernierdiplome', 'is_active','qualification_professionnel']
+        widgets = {
+            'nom': forms.TextInput(attrs={'class': 'form-control'}),
+            'prenom': forms.TextInput(attrs={'class': 'form-control'}),
+            'contact': forms.TextInput(attrs={'class': 'form-control'}),
+            'sexe': forms.Select(choices=Etudiant.SEXE_CHOISE, attrs={'class': 'form-control'}),
+            'email': forms.TextInput(attrs={'class': 'form-control'}),
+            'adresse': forms.TextInput(attrs={'class': 'form-control'}),
+            'datenaissance': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'lieunaissance': forms.TextInput(attrs={'class': 'form-control'}),
+            'contact': forms.TextInput(attrs={'class': 'form-control'}),
+            'email': forms.TextInput(attrs={'class': 'form-control'}),
+            'adresse': forms.TextInput(attrs={'class': 'form-control'}),
+            'prefecture': forms.TextInput(attrs={'class': 'form-control'}),
+            'numero_cnss': forms.NumberInput(attrs={'class': 'form-control'}),
+            'salaireBrut': forms.NumberInput(attrs={'class': 'form-control'}),
+            'dernierdiplome': forms.FileInput(attrs={'class': 'form-control'}),
+            'nombre_de_personnes_en_charge': forms.NumberInput(attrs={'class': 'form-control'}),
+            'nif': forms.NumberInput(attrs={'class': 'form-control'}),
+            'qualification_professionnel': forms.Select(attrs={'class': 'form-control'}, choices=Personnel.TYPE_CHOICES),
+        }
 
-        
+    def clean(self):
+        cleaned_data = super(PersonnelForm, self).clean()
+        nom = cleaned_data.get('nom')
+        prenom = cleaned_data.get('prenom')
+        contact = cleaned_data.get('contact')
+        email = cleaned_data.get('email')
+        adresse = cleaned_data.get('adresse')
+        sexe = cleaned_data.get('sexe')
+        if not self.instance and chercher_utilisateur(nom, prenom):
+            self._errors["custom_errors"] = "Cet utilisateur exist déjà"
+        return cleaned_data
 
-        
 
+class EnseignantForm(forms.ModelForm):
+    #datenaissance = DateField(widget=forms.SelectDateWidget(years=range(1990, 2006)), label='Date de naissance')
+    datenaissance = DateField(widget=forms.DateInput(attrs={"type":"date"}), label='Date de naissance')
+
+    class Meta:
+        model = Enseignant
+        fields = ['type', 'specialite', "personnel"]
+        widgets = {
+            'type': forms.Select(attrs={'class': 'form-control'}),
+            'specialite': forms.TextInput(attrs={'class': 'form-control'}),      
+            'personnel': forms.Select(attrs={'class': 'form-control'}),
+        }
+    def clean(self):
+        cleaned_data = super(EnseignantForm, self).clean()
+        nom = cleaned_data.get('nom', '')
+        prenom = cleaned_data.get('prenom', '')
+        contact = cleaned_data.get('contact', '')
+        email = cleaned_data.get('email', '')
+        adresse = cleaned_data.get('adresse', '')
+        sexe = cleaned_data.get('sexe', '')
+        return cleaned_data
+
+   

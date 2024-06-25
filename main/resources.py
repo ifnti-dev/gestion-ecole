@@ -1,5 +1,5 @@
 from import_export import resources
-from .models import Enseignant, Frais, CompteEtudiant, CompteBancaire, Salaire, Fournisseur, Charge, Conge, Evaluation, Domaine,Information, Parcours,Programme, Matiere, Etudiant, Competence, Note, Comptable, Semestre, Ue, AnneeUniversitaire, Personnel, Tuteur, Paiement, FicheDePaie, DirecteurDesEtudes
+from .models import Enseignant, Frais, CompteEtudiant, CompteBancaire, VersmentSalaire, Fournisseur, Charge, Conge, Evaluation, Domaine,Information, Parcours,Programme, Matiere, Etudiant, Competence, Note, Semestre, Ue, AnneeUniversitaire, Personnel, Tuteur, Paiement, FicheDePaie
 from cahier_de_texte.models import  Seance
 
 
@@ -15,13 +15,11 @@ class EnseignantResource(resources.ModelResource):
     class Meta:
         model = Enseignant
 
-class ComptableResource(resources.ModelResource):
-    class Meta:
-        model = Comptable
 
-class DirecteurDesEtudesResource(resources.ModelResource):
-    class Meta:
-        model = DirecteurDesEtudes
+
+# class DirecteurDesEtudesResource(resources.ModelResource):
+#     class Meta:
+#         model = DirecteurDesEtudes
 
 class EvaluationResource(resources.ModelResource):
     class Meta:
@@ -79,9 +77,9 @@ class CompteBancaireResource(resources.ModelResource):
     class Meta:
         model = CompteBancaire
 
-class SalaireResource(resources.ModelResource):
+class VersmentSalaireResource(resources.ModelResource):
     class Meta:
-        model = Salaire
+        model = VersmentSalaire
 
 class FournisseurResource(resources.ModelResource):
     class Meta:
@@ -110,7 +108,6 @@ def get_model_by_name(model_name):
         'anneeuniversitaire': AnneeUniversitaire,
         'domaine': Domaine,
         'enseignant': Enseignant,
-        'comptable': Comptable,
         'directeurdesetudes': DirecteurDesEtudes,
         'evaluation': Evaluation,
         'matiere': Matiere,
@@ -126,7 +123,7 @@ def get_model_by_name(model_name):
         'compteetudiant': CompteEtudiant,
         'paiement': Paiement,
         'comptebancaire': CompteBancaire,
-        'salaire': Salaire,
+        'VersmentSalaire': VersmentSalaire,
         'fournisseur': Fournisseur,
         'information': Information,
         'fichedepaie': FicheDePaie,
@@ -141,7 +138,6 @@ def get_resource_by_name(model_name):
         'anneeuniversitaire': AnneeUniversitaireResource,
         'domaine': DomaineResource,
         'enseignant': EnseignantResource,
-        'comptable': ComptableResource,
         'directeurdesetudes': DirecteurDesEtudesResource,
         'evaluation': EvaluationResource,
         'matiere': MatiereResource,
@@ -157,7 +153,7 @@ def get_resource_by_name(model_name):
         'compteetudiant': CompteEtudiantResource,
         'paiement': PaiementResource,
         'comptebancaire': CompteBancaireResource,
-        'salaire': SalaireResource,
+        'salaire': VersmentSalaireResource,
         'fournisseur': FournisseurResource,
         'information': InformationResource,
         'fichedepaie': FicheDePaieResource,

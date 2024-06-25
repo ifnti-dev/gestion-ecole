@@ -1,127 +1,59 @@
 {% extends 'index.html' %}
 
-<style>
-
-    .dropdown-submenu2 {
-        position: relative;
-    }
-
-    .dropdown-submenu2>.dropdown-menu2 {
-        top: 0;
-        left: 100%;
-        margin-top: -6px;
-        margin-left: -1px;
-        -webkit-border-radius: 0 6px 6px 6px;
-        -moz-border-radius: 0 6px 6px;
-        border-radius: 0 6px 6px 6px;
-    }
-
-    .dropdown-submenu2:hover>.dropdown-menu2 {
-        display: block;
-    }
-
-    .dropdown-submenu2>a:after {
-        display: block;
-        content: " ";
-        float: right;
-        width: 0;
-        height: 0;
-        border-color: transparent;
-        border-style: solid;
-        border-width: 5px 0 5px 5px;
-        border-left-color: #ccc;
-        margin-top: 5px;
-        margin-right: -10px;
-    }
-
-    .dropdown-submenu2:hover>a:after {
-        border-left-color: #fff;
-    }
-
-    .dropdown-submenu2.pull-left {
-        float: none;
-    }
-
-    .dropdown-submenu2.pull-left>.dropdown-menu2 {
-        left: -100%;
-        margin-left: 10px;
-        -webkit-border-radius: 6px 0 6px 6px;
-        -moz-border-radius: 6px 0 6px 6px;
-        border-radius: 6px 0 6px 6px;
-    }
-</style>
-
 {% block content %}
 
-<div class="block block-rounded m-5">
+<div class="block block-rounded m-3">
     <div class="block-header p-4">
-        <h3 class="block-title">Liste des semestres de l'année {{annee_universitaire_courante}} </h3>
+        <h3 class="block-title">Liste des semestres de l'année {{ annee_universitaire_courante }} </h3>
     </div>
-    <div class="block-content block-content-full">
-
-        <table class="table table-bordered table-striped table-vcenter js-dataTable-full-pagination">
-            <thead>
-                <tr>
-                    <th class="text-center" style="width: 15%;">Code</th>
-                    <th class="text-center" style="width: 15%;">Libéllé</th>
-                    <th class="text-center" style="width: 15%;">Crédit</th>
-                    <th class="text-center" style="width: 15%;">Courant</th>
-                    <th class="text-center" style="width: 15%;">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-
-
-
-                {% for semestre in semestres %}
-                <tr>
-                    <td class="text-center font-size-sm"> <a href="/planning/summary/{{semestre.id}}" target="_blank">{{semestre.id}}</a></td>
-                    <td class="font-w600 text-center font-size-sm">{{semestre.libelle}}</td>
-                    <td class="text-center d-none d-sm-table-cell font-size-sm">
-                        {{semestre.credits}}
-                    </td>
-
-                    {% if semestre.courant %}
-                    <td class="text-center text-success">
-                        Oui
-                    </td>
-                    {% endif %}
-                    {% if semestre.courant == False %}
-                    <td class="text-center text-danger">
-                        Non
-                    </td>
-                    {% endif %}
-                    <td class="text-center">
-                        {% comment %} Boutton permettant de regrouper les actions concernant chaque élève {% endcomment %}
-                        <button type="button" class="btn btn-secondary dropdown-toggle" id="dropdown-default-secondary" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <i class="fa fa-bars" aria-hidden="true"></i>
-                        </button>
-
-                            <div class="dropdown-menu font-size-sm" aria-labelledby="dropdown-default-secondary">
-
-                             <li class="nav-main-item">
-                                <a class="nav-main-link nav-main-link-name" data-toggle="" aria-haspopup="true" aria-expanded="false" href="{% url 'main:cloturer_semestre' semestre.id %}">
-                                    <i class="fa fa-id-card mr-1" aria-hidden="true"></i>
-                                    <span class="nav-main-link-name">Clôturer semestre</span>
-                                </a>                   
-                            </li>
-
-
-                            <li class="nav-main-item">
-                                <a class="nav-main-link nav-main-link-name" data-toggle="" aria-haspopup="true" aria-expanded="false" href="{% url 'main:reactiver_semestre' semestre.id %}">
-                                    <i class="fa fa-id-card mr-1" aria-hidden="true"></i>
-                                    <span class="nav-main-link-name">Activer semestre</span>
-                                </a>                   
-                            </li>
-                        </div>             
-                    </td>
-                </tr>
-                {% endfor %}
-
-            </tbody>
-        </table>
+    <div class="block-content block-content-full shadow-lg">
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped table-vcenter js-dataTable-full-pagination">
+                <thead>
+                    <tr>
+                        <th class="text-center" style="width: 15%;">Code</th>
+                        <th class="text-center" style="width: 20%;">Libellé</th>
+                        <th class="text-center" style="width: 15%;">Crédit</th>
+                        <th class="text-center" style="width: 15%;">Courant</th>
+                        <th class="text-center" style="width: 15%;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for semestre in semestres %}
+                    <tr>
+                        <td class="text-center font-size-sm"> <a href="/planning/summary/{{ semestre.id }}" target="_blank">{{ semestre.id }}</a></td>
+                        <td class="font-w600 text-center font-size-sm">{{ semestre.libelle }}</td>
+                        <td class="text-center d-none d-sm-table-cell font-size-sm">{{ semestre.credits }}</td>
+                        <td class="text-center font-size-sm {% if semestre.courant %}text-success{% else %}text-danger{% endif %}">
+                            {% if semestre.courant %}
+                            Oui
+                            {% else %}
+                            Non
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-secondary dropdown-toggle" id="dropdown-default-secondary" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <i class="fa fa-bars" aria-hidden="true"></i>
+                                </button>
+                                <div class="dropdown-menu font-size-sm" aria-labelledby="dropdown-default-secondary">
+                                    <a class="dropdown-item" href="{% url 'main:cloturer_semestre' semestre.id %}">
+                                        <i class="fa fa-id-card mr-1" aria-hidden="true"></i>
+                                        Clôturer semestre
+                                    </a>
+                                    <a class="dropdown-item" href="{% url 'main:reactiver_semestre' semestre.id %}">
+                                        <i class="fa fa-id-card mr-1" aria-hidden="true"></i>
+                                        Activer semestre
+                                    </a>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
-
 
 {% endblock %}

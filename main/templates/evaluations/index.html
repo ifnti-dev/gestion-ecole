@@ -17,6 +17,9 @@
         <button type="button" class="mr-3 btn btn-outline-primary" data-toggle="modal" data-target="#evaluation">
             <i class="fas fa-plus"></i> Importer
         </button>
+        <a href="{% url 'main:export_excel_evaluation' matiere.id  selected_semestre.id %}" class="mr-3 btn btn-outline-primary">
+            <i class="fas fa-plus"></i> Exporter
+        </a>
         <a href="{% url 'main:add_evaluation' matiere.id 0 selected_semestre.id %}" class="mr-3 btn btn-outline-primary">
             <i class="fas fa-plus"></i> evaluation
         </a>

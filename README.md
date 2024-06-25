@@ -31,7 +31,7 @@ SECRET_KEY=_mot_clé au choix
 pip install -r requirements.txt
 ```
 
-4.  Commenter dans le projet projet_ifnti,  dans le fichier urls.py , dans urlpatterns  tout
+4.  Dans le projet projet_ifnti,dans le fichier urls.py, commenter toutes les lignes de urlpatterns sauf celles ci-dessous:
 
 ```python
 urlpatterns = [
@@ -41,7 +41,7 @@ path('main/', include('main.urls')),
 ]
 ```
 
-6.  Pour la créer des migrations,  de l'utilisateur , lancé le fichier : `init_db.sh`
+5.  Pour la créer des migrations,  de l'utilisateur , lancé le fichier : `init_db.sh`
 
 ```txt
 Pour ce faire il faut : 
@@ -55,9 +55,9 @@ _lancer la commande a la racine du projet : ./init_db.sh
 ```python
 python3 manage.py runscript factory
 ```
+6. N'oubliez pas de décommenter ce que vous avez commenté dans après les migrations
 
-
-8.  Maintenant lancer le projet
+7.  Maintenant lancer le projet
 
 ```python
 python3 manage.py runserver
@@ -65,3 +65,15 @@ python3 manage.py runserver
 
 
 Ensuite l'application est accessible à l'adresse: `http://localhost:8000/main`
+
+
+## Comment importer les données
+
+- User
+- Personnel 
+- Enseigent
+- Ue
+- Matier
+- Evaluation
+- Parcours
+- Programmes

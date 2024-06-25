@@ -1,32 +1,44 @@
 {% extends '../index.html' %}
 {% block content_title %} Matières {% endblock content_title %}
 {% block content %}
-<div class="block block-rounded m-5">
+
+<style>
+    .bout:hover{
+        cursor: pointer;
+        transition: 0.5s;
+        transform: scale(1.2);
+        background : #1873dca9;
+        color : white;
+    }
+</style>
+
+
+<div class="block block-rounded m-3">
     <div class="block-header p-4">
         <h3 class="block-title">Liste des matières de {{ niveau }}</h3>
         {% if is_directeur_des_etudes or secretaire %}
-        <a href="{% url 'main:create_matiere' %}" class="btn btn-outline-primary ml-3">
+        <a href="{% url 'main:create_matiere' %}" class="btn btn-outline-primary ml-3 bout">
             <i class="fas fa-plus"></i> Ajout Matière
         </a> 
         {% endif %} 
     </div>
-    <div class="px-3 d-flex justify-content-between">
-        <form action="" method="post" id="form-semestre" class="row col-8">
+    <div class="px-3 d-flex justify-content-between flex-wrap">
+        <form action="" method="post" id="form-semestre" class="row col-12 col-md-8 mb-3">
             {% csrf_token %}
-            <select name="semestre" id="semestre" class="form-control col-3 col-md-2 mr-3" onchange="this.form.submit();">
+            <select name="semestre" id="semestre" class="form-control col-12 col-md-4 col-lg-3 mr-3 mb-3 mb-md-0" onchange="this.form.submit();">
                 {% for semestre in semestres %}
                     <option value="{{ semestre.id }}" {% if selected_semestre.id == semestre.id %}selected{% endif %}>{{ semestre.libelle }}</option>
                 {% endfor %}
             </select>
-            <select name="ue" id="ue" class="form-control col-3 col-md-2" onchange="this.form.submit();">
-                <option value="-1">Toutes Ues</option>
+            <select name="ue" id="ue" class="form-control col-12 col-md-4 col-lg-3 mb-3 mb-md-0" onchange="this.form.submit();">
+                <option value="-1">Toutes UEs</option>
                 {% for ue in ues %}
                     <option value="{{ ue.id }}" {% if selected_ue == ue.id %}selected{% endif %}>{{ ue.libelle }}</option>
                 {% endfor %}
             </select>
         </form> 
         {% if is_etudiant %}
-        <div class="col-4 col-md-4">
+        <div class="col-12 col-md-4">
             <a href="{% url 'main:recapitulatifs_des_notes_par_etudiant' selected_semestre.id %}">
                 <button class="mr-3 btn btn-outline-primary">
                     Récapitulatif
@@ -35,93 +47,87 @@
         </div>
         {% endif %} 
     </div>
-    <div class="block-content block-content-full">
-        <table class="table table-bordered table-striped table-vcenter js-dataTable-full-pagination">
-            <thead>
-                <tr>
-                    <th class="text-center">Code matière</th>
-                    <th class="text-center">Libéllé</th>
-                    <th class="text-center">Coefficient</th>
-                    <th class="text-center">Valeur minimale</th>
-                    <th class="text-center" style="width: 30%;">Enseignant</th>
-                    {% if is_etudiant %}
-                    <th class="text-center">Evaluations</th>
-                    {% endif %}
-                    {% if is_directeur_des_etudes or is_secretaire %}
-                    <th scope="col" class="" style="width: 15%;">Actions</th>
-                    {% endif %}
-                </tr>
-            </thead>
-            <tbody>
-                {% for matiere in matieres %}
-                <tr>
-                    <td class="text-center font-size-sm">{{matiere.codematiere}} </td>
-                    <td class="text-center font-size-sm">
-                        {% if matiere.enseignant.user.id == user.id  %}
-                        <a class="font-weight-bold text-info" href="{% url 'main:evaluations' matiere.id %}">
-                            {{matiere.libelle}}
-                        </a>
-                        {% else %}
-                        {{matiere.libelle}}
-                        {% endif %} 
-                    </td>                  
-                    <td class="text-center font-size-sm">{{matiere.coefficient}}</td>                  
-                    <td class="text-center font-size-sm">{{matiere.minValue}}</td>
-                    <td class="text-center font-size-sm">
-                        {% if matiere.enseignant %}
-                            {{matiere.enseignant}}
-                        {% else %}
-                            pas de prof
-                        {% endif %}                            
-                    </td> 
-                    {% if is_etudiant %}
-                    <td class="text-center font-size-sm">
-                        <a href="{% url 'main:evaluations_etudiant' matiere.id id_authenticate_user_model %}">voir ({{ matiere.nb_evaluations }})</a>
-                    </td>
-                    {% endif %}
-                    {% if is_directeur_des_etudes or is_secretaire %}
-                    <td style="text-align: center;"> 
-                        <button type="button" class="btn btn-secondary dropdown-toggle" id="dropdown-default-secondary" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <i class="fa fa-bars" aria-hidden="true"></i>
-                        </button>
-                        <div class="dropdown-menu font-size-sm" aria-labelledby="dropdown-default-secondary">
-                            {% if is_directeur_des_etudes or is_secretaire %}
-                            <li class="nav-main-item">
-                                <a href="{% url 'main:evaluations' matiere.id %}" class="nav-main-link nav-main-link-name" data-toggle="" aria-haspopup="true" aria-expanded="false">
-                                    <i class="fa fa-folder-open mr-1" aria-hidden="true"></i>
-                                    <span class="nav-main-link-name">Gestion evaluations</span>
-                                </a>                   
-                            </li>
-                            <li class="nav-main-item">
-                                <a href="{% url 'main:recapitulatifs_des_notes_par_matiere' selected_semestre.id matiere.id %}" class="nav-main-link nav-main-link-name" data-toggle="" aria-haspopup="true" aria-expanded="false">
-                                    <i class="fa fa-eye mr-1" aria-hidden="true"></i>
-                                    <span class="nav-main-link-name">Récapitulatif des notes</span>
-                                </a>                   
-                            </li>
-                            {% endif %}
-                            {% if is_directeur_des_etudes %}
-                            <li class="nav-main-item">
-                                <a class="nav-main-link nav-main-link-name" data-toggle="" aria-haspopup="true" aria-expanded="false" href="{% url 'main:update_matiere' matiere.id %}">
-                                    <i class="fa fa-edit mr-1" aria-hidden="true"></i>
-                                    <span class="nav-main-link-name">Edit</span>
-                                </a>                   
-                            </li>
-                            <li class="nav-main-item">
-                                <a class="nav-main-link nav-main-link-name"
-                                onclick="delete_object('/main/delete_matiere/{{ matiere.id }}/', 'une matière')"
-                                href="#">
-                                    <i class="fa fa-trash mr-1 text-danger"></i>
-                                    <span class="nav-main-link-name">Supprimer</span>
-                                </a>   
-                            </li>
-                            {% endif %}
-                        </div>                              
-                    </td> 
-                    {% endif %}
-                </tr>
-                {% endfor%}
-            </tbody>
-        </table>
+    <div class="block-content block-content-full shadow-lg">
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped table-vcenter js-dataTable-full-pagination">
+                <thead>
+                    <tr>
+                        <th class="text-center">Code matière</th>
+                        <th class="text-center">Libéllé</th>
+                        <th class="text-center">Coefficient</th>
+                        <th class="text-center">Valeur minimale</th>
+                        <th class="text-center">Enseignant</th>
+                        {% if is_etudiant %}
+                        <th class="text-center">Evaluations</th>
+                        {% endif %}
+                        {% if is_directeur_des_etudes or is_secretaire %}
+                        <th scope="col" class="text-center">Actions</th>
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for matiere in matieres %}
+                    <tr>
+                        <td class="text-center font-size-sm">{{ matiere.codematiere }}</td>
+                        <td class="text-center font-size-sm">
+                            {% if matiere.enseignant.user.id == user.id  %}
+                            <a class="font-weight-bold text-info" href="{% url 'main:evaluations' matiere.id %}">
+                                {{ matiere.libelle }}
+                            </a>
+                            {% else %}
+                            {{ matiere.libelle }}
+                            {% endif %} 
+                        </td>                  
+                        <td class="text-center font-size-sm">{{ matiere.coefficient }}</td>                  
+                        <td class="text-center font-size-sm">{{ matiere.minValue }}</td>
+                        <td class="text-center font-size-sm">
+                            {% if matiere.enseignant %}
+                                {{ matiere.enseignant }}
+                            {% else %}
+                                pas de prof
+                            {% endif %}                            
+                        </td> 
+                        {% if is_etudiant %}
+                        <td class="text-center font-size-sm">
+                            <a href="{% url 'main:evaluations_etudiant' matiere.id id_authenticate_user_model %}">voir ({{ matiere.nb_evaluations }})</a>
+                        </td>
+                        {% endif %}
+                        {% if is_directeur_des_etudes or is_secretaire %}
+                        <td class="text-center">
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-secondary dropdown-toggle" id="dropdown-default-secondary" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <i class="fa fa-bars" aria-hidden="true"></i>
+                                </button>
+                                <div class="dropdown-menu font-size-sm" aria-labelledby="dropdown-default-secondary">
+                                    {% if is_directeur_des_etudes or is_secretaire %}
+                                    <a href="{% url 'main:evaluations' matiere.id %}" class="dropdown-item">
+                                        <i class="fa fa-folder-open mr-1" aria-hidden="true"></i>
+                                        Gestion evaluations
+                                    </a>
+                                    <a href="{% url 'main:recapitulatifs_des_notes_par_matiere' selected_semestre.id matiere.id %}" class="dropdown-item">
+                                        <i class="fa fa-eye mr-1" aria-hidden="true"></i>
+                                        Récapitulatif des notes
+                                    </a>
+                                    {% endif %}
+                                    {% if is_directeur_des_etudes %}
+                                    <a href="{% url 'main:update_matiere' matiere.id %}" class="dropdown-item">
+                                        <i class="fa fa-edit mr-1" aria-hidden="true"></i>
+                                        Edit
+                                    </a>
+                                    <a href="#" class="dropdown-item" onclick="delete_object('/main/delete_matiere/{{ matiere.id }}/', 'une matière')">
+                                        <i class="fa fa-trash mr-1 text-danger"></i>
+                                        Supprimer
+                                    </a>
+                                    {% endif %}
+                                </div>
+                            </div>                             
+                        </td> 
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 {% endblock %}

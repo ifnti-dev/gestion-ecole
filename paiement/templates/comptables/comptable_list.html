@@ -5,54 +5,67 @@
 <div class="block block-rounded m-5">
     <div class="block-header p-4">
         <h3 class="block-title">Liste des Comptables</h3>
-        {% if is_admin or is_directeur_des_etudes %}           
+        {% comment %} {% if is_admin or is_directeur_des_etudes %}           
             <a href="{% url 'paiement:create_comptable'%}" class="btn btn-outline-primary">
                 <i class="fas fa-plus"></i> Ajouter
             </a>  
-        {% endif %}      
+        {% endif %}       {% endcomment %}
     </div>
 
     <div class="block-content block-content-full">
-        <!-- DataTables init on table by adding .js-dataTable-full-pagination class, functionality is initialized in js/pages/be_tables_datatables.min.js which was auto compiled from _es6/pages/be_tables_datatables.js -->
-        <table class="table table-bordered table-striped table-vcenter js-dataTable-full-pagination">
-            <thead>
-                <tr>
-                    <th class="text-center" style="width: 30%;">Nom & Prénoms</th>
-                    <th class="text-center" style="width: 80px;">Sexe</th>
-                    <th class="text-center" style="width: 15%;">Contact</th>
-                    <th class="text-center" style="width: 15%;">Email</th>
-                    <th class="text-center" style="width: 30%;">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for comptable in comptables %}
-                <tr>
-                    <td class="text-center font-size-sm">{{comptable.nom}} {{comptable.prenom}}</td>
-                    <td class="text-center font-size-sm">{{comptable.sexe}}</td>
-                    <td class="text-center font-size-sm">{{comptable.contact}}</td>
-                    <td class="text-center font-size-sm">{{comptable.email}}</td>
-                    <td style="text-align: center;">  
-
-                        <button type="button" class="bs-modal read-book btn btn-sm btn-primary">
-                            <a style="color: blanchedalmond;" href="{% url 'paiement:comptable_detail' comptable.id %}">
-                                <span class="fa fa-eye"></span>                
-                            </a>
-                        </button>
-                        
-                        <button type="button" class="update-book btn btn-sm btn-warning">
-                            <a  style="color: blanchedalmond;" href="{% url 'paiement:edit_comptable' comptable.id %}">
-                                <span><i class="far fa-edit"></i></span>
-                            </a>
-                        </button>                       
-
-                    </td> 
-                </tr>
-                {% endfor%}
-            </tbody>
-        </table>
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped table-vcenter js-dataTable-full-pagination">
+                <thead>
+                    <tr>
+                        <th class="text-center">Nom & Prénoms</th>
+                        <th class="text-center">Sexe</th>
+                        <th class="text-center">Contact</th>
+                        <th class="text-center">Email</th>
+                        <th class="text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for comptable in comptables %}
+                    <tr>
+                        <td class="text-center font-size-sm">{{comptable.nom}} {{comptable.prenom}}</td>
+                        <td class="text-center font-size-sm">{{comptable.sexe}}</td>
+                        <td class="text-center font-size-sm">{{comptable.contact}}</td>
+                        <td class="text-center font-size-sm">{{comptable.email}}</td>
+                        <td class="text-center">
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#exampleModalCenter_{{ comptable.id }}">
+                                    <i class="fa fa-eye"></i>
+                                </button>
+                                {% comment %} <button type="button" class="btn btn-sm btn-warning">
+                                    <a style="color: white;" href="{% url 'paiement:edit_comptable' comptable.id %}">
+                                        <i class="far fa-edit"></i>
+                                    </a>
+                                </button> {% endcomment %}
+                            </div>
+                        </td> 
+                    </tr>
+                    <div class="modal fade" id="exampleModalCenter_{{ comptable.id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLongTitle">{{comptable.nom}} {{comptable.prenom}}</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>Sexe: {{comptable.sexe}}</p>
+                                    <p>Contact: {{comptable.contact}}</p>
+                                    <p>Email: {{comptable.email}}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
-
-
 </div>
 
 {% endblock %}

@@ -10,6 +10,10 @@
                 <i class="fas fa-plus"></i> Ajouter
         </a>
         {% endif %}
+
+        
+
+
     </div>
 
     <div class="block-content block-content-full">
@@ -28,7 +32,7 @@
                     {% for fiche in fiches %}
                     <tr>
                         <td class="text-center font-size-sm">Du {{ fiche.dateDebut }} au {{ fiche.dateFin }}</td>
-                        <td class="text-center font-size-sm">{{ fiche.enseignant.nom }} {{ fiche.enseignant.prenom }}</td>
+                        <td class="text-center font-size-sm">{{ fiche.enseignant.personnel}} </td>
                         <td class="text-center font-size-sm">{{ fiche.nombreHeure }} H</td>
                         <td class="text-center font-size-sm">{{ fiche.difference }} FCFA</td>
                         <td style="text-align: center;">
