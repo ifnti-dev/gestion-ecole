@@ -717,7 +717,7 @@ class Etudiant(Utilisateur):
         for ue in programme.ues.all():
             # Calculer la moyenne de l'UE
             moyenne_ue, a_valide_ue, _ = self.moyenne_etudiant_ue(ue, semestre)
-
+            print("moyen ue",moyenne_ue)
             # Si l'étudiant a validé l'UE, ajouter les crédits de l'UE aux crédits obtenus
             if a_valide_ue:
                 credits_obtenus += ue.nbreCredits
@@ -1806,6 +1806,7 @@ class AnneeUniversitaire(models.Model):
             :return: Un objet AnneUniversitaire correspondant à l'année universitaire en cours
             :retype: AnneeUniversitaire
         """
+        
         current_date = timezone.now()
         virtual_current_university_date, created = AnneeUniversitaire.objects.get_or_create(annee_courante=True, defaults={'annee': current_date.year-1})
         if virtual_current_university_date.annee == current_date.year-1 and current_date.month >= 8:
@@ -1916,7 +1917,7 @@ class Semestre(models.Model):
         return f'{self.libelle}-{self.annee_universitaire}'
 
     def __str__(self):
-        return f'{self.libelle} -{self.annee_universitaire}'
+        return f'{self.libelle}-{self.annee_universitaire}'
 
 class Domaine(models.Model):
     """
@@ -2033,7 +2034,7 @@ class Programme(models.Model):
             :return: Une chaine de caractère correspondant au code du parcours.
             :retype: string
         """
-        return f'{self.parcours}-{self.ues}-{self.semestre}'
+        return f'{self.parcours}-{self.semestre}'
 
     def __str__(self):
         return self.generate_code()

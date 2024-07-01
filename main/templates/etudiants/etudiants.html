@@ -1,12 +1,21 @@
 {% extends '../index.html' %}
 {% block content %}
-<div class="block block-rounded m-5">
+<style>
+    .bout:hover{
+        cursor: pointer;
+        transition: 0.5s;
+        transform: scale(1.2);
+        background : #1873dca9;
+        color : white;
+    }
+</style>
+<div class="block block-rounded m-5 shadow-lg gap-5">
     <div class="block-header p-4">
         <h3 class="block-title">{{ niveau }} </h3>
         <form action="" method="post" id="form-semestre" class="d-flex mr-3">
             {% csrf_token %}
             {% if is_directeur_des_etudes %}
-            <select name="etat" id="etat" class="form-control mr-3">
+            <select name="etat" id="etat" class="form-control mr-3 bout">
                 <option value="__all__" {% if selected_etat.id == '__all__' %}selected{% endif %}>Tous</option>
                 {% for etat in etats %}
                 <option value="{{ etat.id }}" {% if selected_etat.id == etat.id %}selected{% endif %}>{{ etat.value }}
@@ -14,7 +23,7 @@
                 {% endfor %}
             </select>
             {% endif %}
-            <select name="semestre" id="semestre" class="form-control">
+            <select name="semestre" id="semestre" class="form-control bout">
                 <option value="">Semestres</option>
                 {% for semestre in semestres %}
                 <option value="{{ semestre.id }}" {% if selected_semestre.id == semestre.id %}selected{% endif %}>
@@ -31,7 +40,7 @@
     </div>
     <div class="block-header">
         {%  if is_secretaire or is_directeur_des_etudes %}
-        <button type="button" class="btn btn-secondary dropdown-toggle float-right" id="dropdown-default-secondary"
+        <button type="button" class="btn btn-secondary bout dropdown-toggle float-right" id="dropdown-default-secondary"
             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             Action groupées
         </button>
