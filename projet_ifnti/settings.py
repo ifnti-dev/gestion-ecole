@@ -62,6 +62,8 @@ INSTALLED_APPS = [
     'solo',
     'planning',
     'cahier_de_texte',
+    'rest_framework',
+    'api',
 ]
 
 
