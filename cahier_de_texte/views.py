@@ -11,6 +11,7 @@ from main.models import Enseignant, Matiere, Etudiant ,AnneeUniversitaire, Ue , 
 from cahier_de_texte.models import Seance
 from planning.models import *
 from django.contrib.auth import authenticate, login , get_user_model
+from django.contrib import messages
 
 import datetime
 
@@ -357,78 +358,37 @@ def imprimer(request):
     sousCategorisation = request.POST.get("sous_categorisation")
     pdf_paths = []
     #si on veut un affichage par matiere , ca met automatiquement la liste des matieres a true 
-    for semestre_id in semestres:
-        semestre = Semestre.objects.get(id=semestre_id)
-        if nuance(valider) :
-            seances_total = Seance.objects.filter(semestre=semestre,valider=nuance(valider)).order_by('date_et_heure_debut')
-            print(valider,nuance(valider),seances_total.count())
-        else :
-            seances_total = Seance.objects.filter(semestre=semestre).order_by('date_et_heure_debut')    
-            print(valider,nuance(valider),seances_total.count())
-        
-        ues = semestre.get_all_ues()
-        matieres_dict = {}
-        matieres=[]
-        etudiants=semestre.etudiant_set.all()
-        for ue in ues :                   
-            matieres += ue.matiere_set.all()
-
-        if sousCategorisation != 'parMatieres' :
-            context={'etudiants':etudiants,
-                     'semestre':semestre_id,
-                     'listeAbsence':listeAbsence,
-                     'ues':ues,
-                     'commentaires':commentaires,
-                     'listeUe':listeUe,
-                     'listeEtudiant':listeEtudiant,
-                     'listeMatiere':listeMatiere,
-                     'seances':seances_total,
-                     'matieres':matieres,
-                     'sousCategorisation':sousCategorisation
-                     }
-                                       
-            latex_input = 'cahier_de_texte'
-            latex_ouput = 'CDT_'+str(semestre_id)+'_'+str(datetime.datetime.now())
-            pdf_file = 'CDT_'+str(semestre_id)+'_'+str(datetime.datetime.now())
-
-            # génération du pdf
-            generate_pdf(context, latex_input, latex_ouput, pdf_file)
-            pdf_paths.append('media/pdf/' + pdf_file)
+    try:
+        for semestre_id in semestres:
+            semestre = Semestre.objects.get(id=semestre_id)
+            if nuance(valider) :
+                seances_total = Seance.objects.filter(semestre=semestre,valider=nuance(valider)).order_by('date_et_heure_debut')
+                print(valider,nuance(valider),seances_total.count())
+            else :
+                seances_total = Seance.objects.filter(semestre=semestre).order_by('date_et_heure_debut')    
+                print(valider,nuance(valider),seances_total.count())
             
-        else :                       
-            if nuance(HeureConsomme) :
-                for matiere in matieres :
-                    seances_prime = seances_total.filter(matiere=matiere).order_by('date_et_heure_debut')
-                    if seances_prime.count() >0:
-                        temps=0
-                        for seance in seances_prime:
-                            temps+=(seance.date_et_heure_fin - seance.date_et_heure_debut).total_seconds()
-                        hours, remainder = divmod(temps, 3600)
-                        minutes, _ = divmod(remainder, 60)
+            ues = semestre.get_all_ues()
+            matieres_dict = {}
+            matieres=[]
+            etudiants=semestre.etudiant_set.all()
+            for ue in ues :                   
+                matieres += ue.matiere_set.all()
 
-                        matiere_key = matiere.libelle
-                        if matiere_key not in matieres_dict:
-                            matieres_dict[matiere_key] = {"HeureConsomme": 0, "seances": []}
-
-                        matieres_dict[matiere_key]["HeureConsomme"] = str(int(hours))+'h '+str(int(minutes))+'min'
-                        matieres_dict[matiere_key]["HeurePrevues"] = str(int(matiere.heures))+'h00min'
-                        matieres_dict[matiere_key]["UE"] = matiere.ue
-                        matieres_dict[matiere_key]["Prof"] = matiere.enseignant
-                        matieres_dict[matiere_key]["seances"]=seances_prime
-                    
+            if sousCategorisation != 'parMatieres' :
                 context={'etudiants':etudiants,
-                         'semestre':semestre_id,
-                         'ues':ues,
-                         'matieres' : matieres,
-                         'listeEtudiant':listeEtudiant,
-                         'listeMatiere':listeMatiere,
-                         'listeAbsence':listeAbsence,
-                         'commentaires':commentaires,
-                         'listeUe':listeUe,
-                         'listeEtudiant':listeEtudiant,
-                         'seances':matieres_dict,
-                         'sousCategorisation':sousCategorisation
-                        }        
+                        'semestre':semestre_id,
+                        'listeAbsence':listeAbsence,
+                        'ues':ues,
+                        'commentaires':commentaires,
+                        'listeUe':listeUe,
+                        'listeEtudiant':listeEtudiant,
+                        'listeMatiere':listeMatiere,
+                        'seances':seances_total,
+                        'matieres':matieres,
+                        'sousCategorisation':sousCategorisation
+                        }
+                                        
                 latex_input = 'cahier_de_texte'
                 latex_ouput = 'CDT_'+str(semestre_id)+'_'+str(datetime.datetime.now())
                 pdf_file = 'CDT_'+str(semestre_id)+'_'+str(datetime.datetime.now())
@@ -436,19 +396,61 @@ def imprimer(request):
                 # génération du pdf
                 generate_pdf(context, latex_input, latex_ouput, pdf_file)
                 pdf_paths.append('media/pdf/' + pdf_file)
+                
+            else :                       
+                if nuance(HeureConsomme) :
+                    for matiere in matieres :
+                        seances_prime = seances_total.filter(matiere=matiere).order_by('date_et_heure_debut')
+                        if seances_prime.count() >0:
+                            temps=0
+                            for seance in seances_prime:
+                                temps+=(seance.date_et_heure_fin - seance.date_et_heure_debut).total_seconds()
+                            hours, remainder = divmod(temps, 3600)
+                            minutes, _ = divmod(remainder, 60)
 
-    if len(pdf_paths) > 1:
-            notification = {
-                "message": "Vos fichier pdf d'impression ont été génerer avec succes", "type": "succes"}
-            context = {"notification": notification }
-            return redirect("/cahier_de_texte/" ,context)
+                            matiere_key = matiere.libelle
+                            if matiere_key not in matieres_dict:
+                                matieres_dict[matiere_key] = {"HeureConsomme": 0, "seances": []}
 
-    pdf_paths = [pdf_path + '.pdf' for pdf_path in pdf_paths]
-    merged_pdf_content = b''.join([open(pdf_path, 'rb').read() for pdf_path in pdf_paths])
-    
-    response = HttpResponse(merged_pdf_content, content_type='application/pdf')
-    response['Content-Disposition'] = 'inline;filename=merged_pdfs.pdf'
-    return response
+                            matieres_dict[matiere_key]["HeureConsomme"] = str(int(hours))+'h '+str(int(minutes))+'min'
+                            matieres_dict[matiere_key]["HeurePrevues"] = str(int(matiere.heures))+'h00min'
+                            matieres_dict[matiere_key]["UE"] = matiere.ue
+                            matieres_dict[matiere_key]["Prof"] = matiere.enseignant
+                            matieres_dict[matiere_key]["seances"]=seances_prime
+                        
+                    context={'etudiants':etudiants,
+                            'semestre':semestre_id,
+                            'ues':ues,
+                            'matieres' : matieres,
+                            'listeEtudiant':listeEtudiant,
+                            'listeMatiere':listeMatiere,
+                            'listeAbsence':listeAbsence,
+                            'commentaires':commentaires,
+                            'listeUe':listeUe,
+                            'listeEtudiant':listeEtudiant,
+                            'seances':matieres_dict,
+                            'sousCategorisation':sousCategorisation
+                            }        
+                    latex_input = 'cahier_de_texte'
+                    latex_ouput = 'CDT_'+str(semestre_id)+'_'+str(datetime.datetime.now())
+                    pdf_file = 'CDT_'+str(semestre_id)+'_'+str(datetime.datetime.now())
+
+                    # génération du pdf
+                    generate_pdf(context, latex_input, latex_ouput, pdf_file)
+                    pdf_paths.append('media/pdf/' + pdf_file)
+
+        if len(pdf_paths) > 1:
+            messages.add_message(request, messages.SUCCESS, "Vos fichier pdf d'impression ont été génerer avec succes")
+            return redirect("/cahier_de_texte/")
+
+        pdf_paths = [pdf_path + '.pdf' for pdf_path in pdf_paths]
+        merged_pdf_content = b''.join([open(pdf_path, 'rb').read() for pdf_path in pdf_paths])
+        response = HttpResponse(merged_pdf_content, content_type='application/pdf')
+        response['Content-Disposition'] = 'inline;filename=merged_pdfs.pdf'
+        return response
+    except Exception as e:
+        messages.add_message(request, messages.ERROR, "Manques d'information pour générer le pdf")
+        return redirect("/cahier_de_texte/" )
         
                 
 

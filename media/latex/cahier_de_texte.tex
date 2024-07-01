@@ -138,47 +138,47 @@
 			\hline
 			
 			\BLOCK{for cour in seances[mat].seances}
-				\rule[-1ex]{0pt}{2.5ex}\underline{Date}: \linebreak \VAR{cour.date_et_heure_debut.day} - \VAR{cour.date_et_heure_debut.month} - \VAR{cour.date_et_heure_debut.year}
-				\linebreak    
+				\rule[-1ex]{0pt}{2.5ex}\underline{Date}: \vspace{1cm} \VAR{cour.date_et_heure_debut.day} - \VAR{cour.date_et_heure_debut.month} - \VAR{cour.date_et_heure_debut.year}
+				\vspace{1cm}    
 				\underline{Heure}:
-				\linebreak 
+				\vspace{1cm} 
 				\VAR{cour.date_et_heure_debut.hour}h:\VAR{cour.date_et_heure_debut.minute} - \VAR{cour.date_et_heure_fin.hour}h:\VAR{cour.date_et_heure_fin.minute} 
-				\linebreak
+				\vspace{1cm}
 				\underline{Auteur}:
-				\linebreak
+				\vspace{1cm}
 				\VAR{cour.auteur.prenom} \VAR{cour.auteur.nom}
-				\linebreak
+				\vspace{1cm}
 				\BLOCK{if listeAbsence =="on"}
 				\underline{Absents}:
-				\linebreak
+				\vspace{1cm}
 				\BLOCK{for eleve in cour.eleves_presents.all()}
 					\VAR{eleve.prenom} \VAR{eleve.nom}
 				\BLOCK{endfor}
 				\BLOCK{endif}
 			
 				&\underline{Intitulé}:
-				\linebreak
+				\vspace{1cm}
 				\VAR{cour.intitule}
-				\linebreak
+				\vspace{1cm}
 				\underline{Details Séance}:
-				\linebreak
+				\vspace{1cm}
 				\VAR{cour.description}
-				\linebreak
-				\linebreak
-				\linebreak
-				\linebreak
+				\vspace{1cm}
+				\vspace{1cm}
+				\vspace{1cm}
+				\vspace{1cm}
 				\underline{Validé par l'enseignant ?}: \BLOCK{if cour.valider} Oui \BLOCK{else} Non \BLOCK{endif}
 				&\underline{Matiere}:
-				\linebreak
+				\vspace{1cm}
 				\VAR{cour.matiere.codematiere}::\VAR{cour.matiere.libelle}
-				\linebreak    
+				\vspace{1cm}    
 				\underline{Enseignant}:
-				\linebreak
-				\VAR{cour.enseignant.prenom} \VAR{cour.enseignant.nom}
-				\linebreak
+				\vspace{1cm}
+				\VAR{cour.enseignant.personnel}
+				\vspace{1cm}
 				\BLOCK{if commentaires =="on"}
 				\underline{Commentaires Prof}:
-				\linebreak
+				\vspace{1cm}
 				\VAR{cour.commentaire}
 				\BLOCK{endif}
 
@@ -195,47 +195,47 @@
 		\LARGE\textbf{Date} & \LARGE \textbf{Description} & \LARGE \textbf{Autres} \\
 		\hline
 		\BLOCK{for cour in seances}
-			\rule[-1ex]{0pt}{2.5ex}\underline{Date}: \linebreak \VAR{cour.date_et_heure_debut.day} - \VAR{cour.date_et_heure_debut.month} - \VAR{cour.date_et_heure_debut.year}
-			\linebreak    
+			\rule[-1ex]{0pt}{2.5ex}\underline{Date}: \vspace{1cm} \VAR{cour.date_et_heure_debut.day} - \VAR{cour.date_et_heure_debut.month} - \VAR{cour.date_et_heure_debut.year}
+			\vspace{1cm}    
 			\underline{Heure}:
-			\linebreak 
+			\vspace{1cm} 
 			\VAR{cour.date_et_heure_debut.hour}h:\VAR{cour.date_et_heure_debut.minute} - \VAR{cour.date_et_heure_fin.hour}h:\VAR{cour.date_et_heure_fin.minute} 
-			\linebreak
+			\vspace{1cm}
 			\underline{Auteur}:
-			\linebreak
+			\vspace{1cm}
 			\VAR{cour.auteur.prenom} \VAR{cour.auteur.nom}
-			\linebreak
+			\vspace{1cm}
 			\BLOCK{if listeAbsence =="on"}
 			\underline{Absents}:
-			\linebreak
+			\vspace{1cm}
 			\BLOCK{for eleve in cour.eleves_presents.all()}
 				\VAR{eleve.prenom} \VAR{eleve.nom}
 			\BLOCK{endfor}
 			\BLOCK{endif}
 		
 			&\underline{Intitulé}:
-			\linebreak
+			\vspace{1cm}
 			\VAR{cour.intitule}
-			\linebreak
+			\vspace{1cm}
 			\underline{Details Séance}:
-			\linebreak
+			\vspace{1cm}
 			\VAR{cour.description}
-			\linebreak
-			\linebreak
-			\linebreak
-			\linebreak
+			\vspace{1cm}
+			\vspace{1cm}
+			\vspace{1cm}
+			\vspace{1cm}
 			\underline{Validé par l'enseignant ?}: \BLOCK{if cour.valider} Oui \BLOCK{else} Non \BLOCK{endif}
 			&\underline{Matiere}:
-			\linebreak
+			\vspace{1cm}
 			\VAR{cour.matiere.codematiere}::\VAR{cour.matiere.libelle}
-			\linebreak    
+			\vspace{1cm}    
 			\underline{Enseignant}:
-			\linebreak
+			\vspace{1cm}
 			\VAR{cour.enseignant.prenom} \VAR{cour.enseignant.nom}
-			\linebreak
+			\vspace{1cm}
 			\BLOCK{if commentaires =="on"}
 			\underline{Commentaires Prof}:
-			\linebreak
+			\vspace{1cm}
 			\VAR{cour.commentaire}
 			\BLOCK{endif}
 
