@@ -306,7 +306,7 @@ class PersonnelForm(forms.ModelForm):
 
 
 class EnseignantForm(forms.ModelForm):
-    datenaissance = DateField(widget=forms.SelectDateWidget(years=range(1990, 2006)), label='Date de naissance')
+    datenaissance = DateField(widget=forms.SelectDateWidget(years=range(1900, 2006)), label='Date de naissance')
     class Meta:
         model = Enseignant
         fields = ['type', 'specialite', "personnel"]
