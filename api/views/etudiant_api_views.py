@@ -12,3 +12,27 @@ def etudiant_list(request):
     #     serializer = EtudiantSerializer(etudiants, many=True)
     #     return JsonResponse(serializer.data, safe=False)
     return JsonResponse(data={}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@csrf_exempt
+def create_etudiant(request):
+    return JsonResponse(data={}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@csrf_exempt
+def detail_etudiant(request,pk):
+    return JsonResponse(data={}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@csrf_exempt
+def update_etudiant(request,pk):
+    return JsonResponse(data={}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@csrf_exempt
+def delete_etudiant(request,pk):
+    return JsonResponse(data={}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@csrf_exempt
+def get_niveauEtudiant(request,etudiant):
+    return JsonResponse(data={}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@csrf_exempt
+def enregistrer_seance(request):
+    return JsonResponse(data={}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
