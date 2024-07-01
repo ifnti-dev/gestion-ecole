@@ -292,11 +292,13 @@ def export_evaluation_data(matiere, semestre):
             #notes=Note.objects.filter(etudiant=etudiants[i], evaluation__matiere=matiere,evaluation=evaluations[i])
             print(note)
             
-            row[2].value =  note.valeurNote
+            # row[2].value =  note.valeurNote
             i+= 1
-    
-    
-    
+
+            try:
+                row[2].value =  note.valeurNote
+            except:
+                row[2].value =0
     wb.save(result_path)
     
     
