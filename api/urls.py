@@ -2,6 +2,9 @@ from django.urls import path
 from api.views.etudiant_api_views import etudiant_list
 from api.views.matiere_api_views import list_matiere,create_matiere,update_matiere,delete_matiere,detail_matiere
 from api.views import ue_api_views
+from api.views.programme_api_views import get_programme
+
+
 from api.views import personnel_api_views
 from api.views import enseignant_api_views
 
@@ -51,5 +54,7 @@ urlpatterns = [
     path("matiere/create/<int:id>/", create_matiere),
     path("matiere/update/<int:id>/", update_matiere),
     path("matiere/delete/<int:id>/", delete_matiere),
-    path("matiere/detail/<int:id>/", detail_matiere)
+    path("matiere/detail/<int:id>/", detail_matiere),
+    #-----api des programme------------
+    path("programmes/", get_programme)
 ]
