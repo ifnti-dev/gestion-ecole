@@ -24,3 +24,4 @@ sphinx-rtd-theme
 celery
 redis
 openpyxl
+djangorestframework
