@@ -10,7 +10,7 @@ def list_etudiant(request):
     return Response(data={}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @api_view()
-def create_etudiant(request,pk):
+def create_etudiant(request):
     return Response(data={}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @api_view()
