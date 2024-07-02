@@ -561,6 +561,30 @@ def imprimer(request, planningId):
     #     print (heurs)
     #     print(pr)sdopipojdokop
 
+#debut edouard test
+    tableau = []
+    # Parcourir le dictionnaire principal
+    for key1, value1 in ues_prof_matieres.items():
+        if isinstance(value1, dict):
+            # Parcourir le sous-dictionnaire
+            for key2, value2 in value1.items():
+                if isinstance(value2, dict):
+                    # Parcourir le sous-sous-dictionnaire
+                    for key3, value3 in value2.items():
+                        if isinstance(value3, list):
+                            # Parcourir la liste de dictionnaires
+                            for item in value3:
+                                for key4, value4 in item.items():
+                                    print(f"{key1} -> {key2} -> {key3} -> {key4}: {value4}")
+                        else:
+                            print(f"{key1} -> {key2} -> {key3}: {value3}")
+                else:
+                    print(f"{key1} -> {key2}: {value2}")
+        else:
+            print(f"{key1}: {value1}")
+        
+#fin edouard test
+
 
     print(ues_prof_matieres)
     context = {'planning': ues_prof_matieres, 'niveau': niveau, 'days': days, 'taille': 22.5 / len(days), 'tenues': tenues} 
