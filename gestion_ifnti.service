@@ -1,0 +1,13 @@
+[Unit]
+Description=app gestion ifnti
+After=network.target
+
+[Service]
+WorkingDirectory=/home/cherifa/Téléchargements/dowload/S6/ProjetEntreprise/gestion-ecole_haf/gestion-ecole_24_06/gestion-ecole
+ExecStart=/home/cherifa/Téléchargements/dowload/S6/ProjetEntreprise/gestion-ecole_haf/gestion-ecole_24_06/.venv/bin/gunicorn -w 4 projet_ifnti.wsgi:application
+Type=simple
+User=cherifa
+Group=cherifa
+
+[Install]
+WantedBy=default.target
