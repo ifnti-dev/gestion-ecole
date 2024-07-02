@@ -19,18 +19,21 @@ class UeApiViewsTest(TestCase):
 
     def test_create_ue(self):
         url = f"{BASE_URL}/ue/create"
-        response = requests.get(url)
-        self.assertEqual(response.status_code, status.HTTP_201_OK)
+        response = requests.post(url)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_update_ue(self):
         url = f"{BASE_URL}/ue/update/1"
-        response = requests.get(url)
-        self.assertEqual(response.status_code, status.HTTP_204_NOT_FOUND)
-       
-      
+        response = requests.put(url)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_delete_ue(self):
         url = f"{BASE_URL}/ue/delete/1"
+        response = requests.delete(url)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+    def test_detail_ue(self):
+        url = f"{BASE_URL}/ue/detail/1"
         response = requests.get(url)
         self.assertEqual(response.status_code, status.HTTP_204_NOT_FOUND)
 
