@@ -165,3 +165,39 @@ class EnseignantApiTest(TestCase):
         self.assertEqual(response.status_code,status.HTTP_200_OK)
 
 
+
+
+
+
+
+# Test des API du Model Etudiant 
+
+class EtudiantApiTest(TestCase):
+    def setUp(self):
+        pass
+    def test_create_etudiant(self):
+        url=f"{BASE_URL}/etudiant/create"
+        response=requests.get(url)
+        self.assertEqual(response.status_code,status.HTTP_200_OK)
+    
+    def test_update_etudiant(self):
+        url=f"{BASE_URL}/etudiant/update/2"
+        response=requests.get(url)
+        self.assertEqual(response.status_code,status.HTTP_200_OK)
+    
+
+    def test_delete_etudiant(self):
+        url=f"{BASE_URL}/etudiant/delete/2"
+        response=requests.get(url)
+        self.assertEqual(response.status_code,status.HTTP_200_OK)
+    
+    def test_list_etudiant(self):
+        url=f"{BASE_URL}/etudiants"
+        response=requests.get(url)
+        self.assertEqual(response.status_code,status.HTTP_200_OK)
+    
+    def test_detail_etudiant(self):
+        url=f"{BASE_URL}/etudiant/detail/2"
+        response=requests.get(url)
+        self.assertEqual(response.status_code,status.HTTP_200_OK)
+
