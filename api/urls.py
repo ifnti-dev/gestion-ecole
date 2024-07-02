@@ -1,11 +1,21 @@
 from django.urls import path
 from api.views.etudiant_api_views import etudiant_list
 from api.views import ue_api_views
-
-
+from api.views.personnel_api_views import *
 
 urlpatterns = [
     path("etudiant/", etudiant_list),
+
+
+    ############### Personnels urls###################################
+    path("personnels",list_personnel),
+    path("personnel/create",create_personnel),
+    path("personnel/delete/<int:pk>",delete_personnel),
+    path("personnel/update/<int:pk>",update_personnel),
+    path("personnel/detail/<int:pk>",detail_personnel),
+    path("personnel/form__demander_conge",form_demander_conge),
+    path("personnel/imprimer_demande_conge", imprimer_demande_conge),
+    path("personnel/accorder_conge", accorder_conge),
 
     #-----api des ues------------
     path("ues/", ue_api_views.list_ue),
