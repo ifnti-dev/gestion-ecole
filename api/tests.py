@@ -69,3 +69,19 @@ class MatiereApiViewsTest(TestCase):
         url = f"{BASE_URL}/matiere/detail/1"
         response = requests.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+
+
+class ProgrammeApiViewsTest(TestCase):
+    """
+    ProgrammeApiViewsTest contient les methodes de test du crud de programme_api_views
+    """
+
+    def setUp(self):
+        pass    
+
+
+    def test_get_programme(self):
+        url = f"{BASE_URL}/programmes"
+        response = requests.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
