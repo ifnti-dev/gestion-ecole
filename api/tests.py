@@ -17,9 +17,22 @@ class UeApiViewsTest(TestCase):
         response = requests.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    # def test_create_ue(self):
-    #     url = f"{BASE_URL}/ue/create"
-    #     response = 
+    def test_create_ue(self):
+        url = f"{BASE_URL}/ue/create"
+        response = requests.get(url)
+        self.assertEqual(response.status_code, status.HTTP_201_OK)
+
+    def test_update_ue(self):
+        url = f"{BASE_URL}/ue/update/1"
+        response = requests.get(url)
+        self.assertEqual(response.status_code, status.HTTP_204_NOT_FOUND)
+       
+      
+
+    def test_delete_ue(self):
+        url = f"{BASE_URL}/ue/delete/1"
+        response = requests.get(url)
+        self.assertEqual(response.status_code, status.HTTP_204_NOT_FOUND)
 
 
 class PersonnelTest(TestCase):
@@ -69,3 +82,4 @@ class PersonnelTest(TestCase):
         response=requests.get(url)
         self.assertEqual(response.status_code,status.HTTP_200_OK)
     
+
