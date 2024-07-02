@@ -73,7 +73,7 @@ class MatiereApiViewsTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
 
-class PersonnelTest(TestCase):
+class PersonnelApiTest(TestCase):
     """
     Test routes personnels
     """
@@ -120,4 +120,34 @@ class PersonnelTest(TestCase):
         response=requests.get(url)
         self.assertEqual(response.status_code,status.HTTP_200_OK)
     
+
+class EnseignantApiTest(TestCase):
+    def setUp(self):
+        pass
+    def test_create_enseignant(self):
+        url=f"{BASE_URL}/enseignant/create"
+        response=requests.get(url)
+        self.assertEqual(response.status_code,status.HTTP_200_OK)
+    
+    def test_update_enseignant(self):
+        url=f"{BASE_URL}/enseignant/update/2"
+        response=requests.get(url)
+        self.assertEqual(response.status_code,status.HTTP_200_OK)
+    
+
+    def test_delete_enseignant(self):
+        url=f"{BASE_URL}/enseignant/delete/2"
+        response=requests.get(url)
+        self.assertEqual(response.status_code,status.HTTP_200_OK)
+    
+    def test_list_enseignant(self):
+        url=f"{BASE_URL}/enseignants"
+        response=requests.get(url)
+        self.assertEqual(response.status_code,status.HTTP_200_OK)
+    
+    def test_detail_enseignant(self):
+        url=f"{BASE_URL}/enseignant/detail/2"
+        response=requests.get(url)
+        self.assertEqual(response.status_code,status.HTTP_200_OK)
+
 
