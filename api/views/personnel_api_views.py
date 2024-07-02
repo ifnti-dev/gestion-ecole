@@ -1,5 +1,5 @@
 from main.models import Personnel
-from ..serializers.personnel_serializer import PersonnelSerializer
+from api.serializers.personnel_serializer import PersonnelSerializer
 from django.http import JsonResponse
 from rest_framework import status 
 from rest_framework.decorators import api_view
