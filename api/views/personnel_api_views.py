@@ -5,7 +5,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 
 
-# @api_view()
+@api_view(['GET'])
 def list_personnel(request):
     """
         function to get the personnels
@@ -17,21 +17,27 @@ def create_personnel(request):
     """
     fucntion api to create a new personnel
     """
+    print("ok")
+    return JsonResponse(data={},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@api_view(['DELETE'])
+def delete_personnel(request,pk):
+    """
+        function to delete a personnel 
+    """
+    return JsonResponse(data={},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@api_view(['PUT'])
+def update_personnel(request,pk):
+    """
+        fucntion update personnel 
+    """
     return JsonResponse(data={},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @api_view(['GET'])
-def delete_personnel(request,id):
-    """
-        function to delete a personnel by id
-    """
-    return JsonResponse(data={"id":id},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+def detail_personnel(request,pk):
+    return JsonResponse(data={},status=status.HTTP_500_INTERNAL)
 
-@api_view(['GET'])
-def update_personnel(request,id):
-    """
-        fucntion update personnel by id
-    """
-    return JsonResponse(data={},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @api_view(['POST'])
 def form_demander_conge(request):
