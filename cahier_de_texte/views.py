@@ -318,16 +318,32 @@ def liste_seance(request):
         return render(request, "cahier_de_text/liste_seance.html", {"seances_en_attente": seances_en_attente, "seances_validees": seances_validees})
 
 @login_required(login_url="/main/connexion")
-def liste_seance_etudiant(request):
+def liste_seance_etudiant(request,matiere=None,signer=None):
+    matiere = request.GET.get('matiere')
+    signer = request.GET.get("signer")
     if request.user.is_authenticated:
         if request.user.groups.all().first().name not in ['etudiant']:
             return render(request, 'errors_pages/403.html')
+        
         user_connecte=get_object_or_404(get_user_model(),id=request.user.id)
         etudiant_connecte = get_object_or_404(Etudiant, user=user_connecte)
         semestres=Semestre.objects.filter(annee_universitaire_id=request.session.get("id_annee_selectionnee"))
-        seances_en_attente = Seance.objects.filter(auteur=etudiant_connecte, valider=False ,semestre__in=semestres)
-        seances_validees = Seance.objects.filter(auteur=etudiant_connecte,valider=True,semestre__in=semestres)
-        return render(request, "cahier_de_text/liste_seance_etudiant.html", {"seances_en_attente": seances_en_attente, "seances_validees": seances_validees})
+        matieres = Matiere.objects.all()
+        if matiere=="" or signer=="":
+            seances = Seance.objects.filter(auteur=etudiant_connecte,semestre__in=semestres)
+            return render(request, "cahier_de_text/liste_seance_etudiant.html", {"matieres": matieres, "seances_validees": seances})
+        if matiere is not None:
+            matiere = get_object_or_404(Matiere,id=matiere)
+            seances = Seance.objects.filter(auteur=etudiant_connecte,matiere=matiere, semestre__in=semestres)
+            return render(request, "cahier_de_text/liste_seance_etudiant.html", {"matieres": matieres, "seances_validees": seances})
+        
+        if signer is not None:
+            seances = Seance.objects.filter(auteur=etudiant_connecte,valider=signer, semestre__in=semestres)
+            return render(request, "cahier_de_text/liste_seance_etudiant.html", {"matieres": matieres, "seances_validees": seances})
+
+        
+        seances = Seance.objects.filter(auteur=etudiant_connecte,semestre__in=semestres)
+        return render(request, "cahier_de_text/liste_seance_etudiant.html", {"matieres": matieres, "seances_validees": seances})
 
 
 
