@@ -5,6 +5,13 @@ from api.serializers.etudiant_serializer import EtudiantSerializer
 from rest_framework import status 
 from rest_framework.decorators import api_view
 
+
+@api_view(["POST"])
+def importer_data_etudiants(request):
+    """_Cette vue permet d'importer les données etudiants via un fichier xlsx
+    """
+    return JsonResponse(data={},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 @api_view()
 def list_etudiant(request):
     return Response(data={}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -86,3 +93,4 @@ def imprimer(request):
 @api_view()    
 def carte_etudiant(request,id):
     return Response(data={},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
