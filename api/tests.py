@@ -19,10 +19,7 @@ class UeApiViewsTest(TestCase):
         response = requests.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    # def test_create_ue(self):
-    #     url = f"{BASE_URL}/ue/create"
-    #     response = 
-
+   
 
 class PersonnelApiTest(TestCase):
     """
@@ -75,55 +72,55 @@ class PersonnelApiTest(TestCase):
         response=requests.get(url)
         self.assertEqual(response.status_code,status.HTTP_200_OK)
 
-#     # def test_formulaire_demande_conges(self):
-#     #     url=f"{BASE_URL}/personnel/form__demander_conge"
-#     #     response=requests.get(url)
-#     #     self.assertEqual(response.status_code,status.HTTP_200_OK)
+    def test_formulaire_demande_conges(self):
+        url=f"{BASE_URL}/personnel/form__demander_conge"
+        response=requests.get(url)
+        self.assertEqual(response.status_code,status.HTTP_200_OK)
 
-#     # def test_imprimer_demande_conge(self):
-#     #     url=f"{BASE_URL}/personnel/imprimer_demande_conge"
-#     #     response=requests.get(url)
-#     #     self.assertEqual(response.status_code,status.HTTP_200_OK)
-    
-
-#     # def test_accorder_conge(self):
-#     #     url=f"{BASE_URL}/personnel/accorder_conge"
-#     #     response=requests.get(url)
-#     #     self.assertEqual(response.status_code,status.HTTP_200_OK)
-    
-# class EnseignantApiTest(TestCase):
-#     def setUp(self):
-#         pass
-#     def test_create_enseignant(self):
-#         url=f"{BASE_URL}/enseignant/create"
-#         response=requests.get(url)
-#         self.assertEqual(response.status_code,status.HTTP_200_OK)
-    
-#     def test_update_enseignant(self):
-#         url=f"{BASE_URL}/enseignant/update/2"
-#         response=requests.get(url)
-#         self.assertEqual(response.status_code,status.HTTP_200_OK)
+    def test_imprimer_demande_conge(self):
+        url=f"{BASE_URL}/personnel/imprimer_demande_conge"
+        response=requests.get(url)
+        self.assertEqual(response.status_code,status.HTTP_200_OK)
     
 
-#     def test_delete_enseignant(self):
-#         url=f"{BASE_URL}/enseignant/delete/2"
-#         response=requests.get(url)
-#         self.assertEqual(response.status_code,status.HTTP_200_OK)
+    def test_accorder_conge(self):
+        url=f"{BASE_URL}/personnel/accorder_conge"
+        response=requests.get(url)
+        self.assertEqual(response.status_code,status.HTTP_200_OK)
     
-#     def test_list_enseignant(self):
-#         url=f"{BASE_URL}/enseignants"
-#         response=requests.get(url)
-#         self.assertEqual(response.status_code,status.HTTP_200_OK)
+class EnseignantApiTest(TestCase):
+    def setUp(self):
+        pass
+    def test_create_enseignant(self):
+        url=f"{BASE_URL}/enseignant/create"
+        response=requests.get(url)
+        self.assertEqual(response.status_code,status.HTTP_200_OK)
     
-#     def test_detail_enseignant(self):
-#         url=f"{BASE_URL}/enseignant/detail/2"
-#         response=requests.get(url)
-#         self.assertEqual(response.status_code,status.HTTP_200_OK)
+    def test_update_enseignant(self):
+        url=f"{BASE_URL}/enseignant/update/2"
+        response=requests.get(url)
+        self.assertEqual(response.status_code,status.HTTP_200_OK)
+    
+
+    def test_delete_enseignant(self):
+        url=f"{BASE_URL}/enseignant/delete/2"
+        response=requests.get(url)
+        self.assertEqual(response.status_code,status.HTTP_200_OK)
+    
+    def test_list_enseignant(self):
+        url=f"{BASE_URL}/enseignants"
+        response=requests.get(url)
+        self.assertEqual(response.status_code,status.HTTP_200_OK)
+    
+    def test_detail_enseignant(self):
+        url=f"{BASE_URL}/enseignant/detail/2"
+        response=requests.get(url)
+        self.assertEqual(response.status_code,status.HTTP_200_OK)
 
     
-#     def test_detail_enseignant(self):
-#         url=f"{BASE_URL}/enseignant/detail/2"
-#         response=requests.get(url)
-#         self.assertEqual(response.status_code,status.HTTP_200_OK)
+    def test_detail_enseignant(self):
+        url=f"{BASE_URL}/enseignant/detail/2"
+        response=requests.get(url)
+        self.assertEqual(response.status_code,status.HTTP_200_OK)
 
     
