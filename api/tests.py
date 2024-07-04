@@ -99,3 +99,9 @@ class EnseignantApiTest(TestCase):
         self.assertEqual(response.status_code,status.HTTP_200_OK)
 
     
+    def test_detail_enseignant(self):
+        url=f"{BASE_URL}/enseignant/detail/2"
+        response=requests.get(url)
+        self.assertEqual(response.status_code,status.HTTP_200_OK)
+
+    

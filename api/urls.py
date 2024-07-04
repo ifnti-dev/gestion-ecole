@@ -25,11 +25,15 @@ urlpatterns = [
     path("enseignant/update/<int:pk>",enseignant_api_views.update_enseignant),
     path("enseignant/delete/<int:pk>",enseignant_api_views.delete_enseignant),
     path("enseignant/detail/<int:pk>",enseignant_api_views.detail_enseignant),
+
+
     path("enseignant/list_informations_enseignants",enseignant_api_views.list_informations_enseignants),
-    
-    path("enseignant/detail/<int:pk>",enseignant_api_views.detail_enseignant),
-    path("enseignant/detail/<int:pk>",enseignant_api_views.detail_enseignant),
-    path("enseignant/detail/<int:pk>",enseignant_api_views.detail_enseignant),
+    path("enseignant/enregistrer_informations",enseignant_api_views.enregistrer_informations),
+    # path("enseignant/get_semestres",enseignant_api_views.get_semestres),
+    # path("enseignant/reactiver_semestre/<int:pk>",enseignant_api_views.reactiver_semestre),
+   
+
+
 
 
 

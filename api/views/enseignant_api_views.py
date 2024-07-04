@@ -1,4 +1,4 @@
-from api.serializers import esneignant_serializer
+from api.serializers import enseignant_serializer
 from django.http import JsonResponse
 from rest_framework import status 
 from rest_framework.decorators import api_view
@@ -30,6 +30,23 @@ def detail_enseignant(request,pk):
 def get_certificat_travail_enseignant(requeste):
     return JsonResponse(data={},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+################################################################
 @api_view(["GET"])
 def list_informations_enseignants(request):
     return JsonResponse(data={},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@api_view(['POST'])
+def enregistrer_informations(request):
+    return JsonResponse(data={},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+
+@api_view(["GET"])
+def enseignant_inactif(request):
+    return JsonResponse(data={},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@api_view(["POST"])
+def importer_les_enseignants(request):
+        return JsonResponse(data={},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
