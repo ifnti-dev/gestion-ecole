@@ -450,18 +450,6 @@ def seance(request,seanceId):
 
 
 # ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-# def french_day(day):
-#     # print(day)
-#     french_correspondance_days = {
-#         'Monday':'Lundi',
-#         'Tuesday' :'Mardi',
-#         'Wednesday' :'Mercredi',
-#         'Thursday' :'Jeudi',
-#         'Friday' :'Vendredi',
-#         'Saturday' :'Samedi'
-#     }
-#     return french_correspondance_days[day]
-# ---------------------------------------------------------------------------
 def french_day(day):
     days = {
         'Monday': 'Lundi',
@@ -498,7 +486,7 @@ def imprimer(request, planningId):
         niveau = f'Unknown {semestre_libelle} {annee_universitaire}'
 
 
-    plannings = SeancePlannifier.objects.filter(planning=planns)
+    plannings = SeancePlannifier.objects.filter(planning=planns)    
     for planning in plannings:
         jour_n = (planns.semaine - 1) * 5 + planning.date_heure_debut.weekday() + 1
         jour_n = str(jour_n)
@@ -518,10 +506,11 @@ def imprimer(request, planningId):
             days.append(day)
         if timeshot not in timeslots:
             timeslots.append(timeshot)
+        
 
     #heures de la jours
     ues_prof_matieres = {time: {} for time in timeslots}
-    print(ues_prof_matieres)
+    # print(ues_prof_matieres)
 
     for plan in plannings:
         time_slot = plan.timeshot  
@@ -541,53 +530,56 @@ def imprimer(request, planningId):
         ues_prof_matieres[time_slot][day][activity].append({
             "professeur": professor
         })
-
-    # for timeslot in ues_prof_matieres:
-    #     # print("\nTime Slot:", timeslot)
-    #     for day in ues_prof_matieres[timeslot]:
-    #         # print("Day:", day)
-    #         for activity in ues_prof_matieres[timeslot][day]:
-    #             # print(activity, ":")
-    #             for professor in ues_prof_matieres[timeslot][day][activity]:
-    #                 # print("\tProfessor:", professor["professeur"])
-    #                 pass
-
     
+    heure_statique = {
+        'c1' : '7h:00',
+	    "c2" : "8h:30",
+        "c3" : "8h:45",
+        "c4" : "10h:15",
+        "c5" : "10h:30",
+        "c6" : "12h:00",
+        "c7" : "14h:00",
+        "c8" : "15h:30",
+        "c9" : "15h:45",
+        "c10" : "17h:15",
+    }
 
-    # for cle, valeur in ues_prof_matieres.items():
-    #     heurs  = cle
-    #     pr = valeur
+    tableau_final = []
+    values_plannings = ues_prof_matieres.values()
+    for elt in values_plannings:
+        # On crée une liste temporaire pour stocker les valeurs de chaque élément
+        temp_list = []
+        for day, schedule in elt.items():
+            if schedule:  # Vérifie si le jour est programmé
+                temp_list.append(schedule)
+            else:
+                etude = "etudes"
+                temp_list.append(etude)
+        tableau_final.append(temp_list)
 
-    #     print (heurs)
-    #     print(pr)sdopipojdokop
-
-#debut edouard test
-    tableau = []
-    # Parcourir le dictionnaire principal
-    for key1, value1 in ues_prof_matieres.items():
-        if isinstance(value1, dict):
-            # Parcourir le sous-dictionnaire
-            for key2, value2 in value1.items():
-                if isinstance(value2, dict):
-                    # Parcourir le sous-sous-dictionnaire
-                    for key3, value3 in value2.items():
-                        if isinstance(value3, list):
-                            # Parcourir la liste de dictionnaires
-                            for item in value3:
-                                for key4, value4 in item.items():
-                                    print(f"{key1} -> {key2} -> {key3} -> {key4}: {value4}")
-                        else:
-                            print(f"{key1} -> {key2} -> {key3}: {value3}")
-                else:
-                    print(f"{key1} -> {key2}: {value2}")
-        else:
-            print(f"{key1}: {value1}")
-        
-#fin edouard test
+    ligne1 = [(list(e.keys()), list(e.values())) for e in tableau_final[1]]
+    ligne2 = [(list(e.keys()), list(e.values())) for e in tableau_final[2]]
+    ligne3 = [(list(e.keys()), list(e.values())) for e in tableau_final[3]]
+    ligne4 = [(list(e.keys()), list(e.values())) for e in tableau_final[4]]
+    ligne5 = [(list(e.keys()), list(e.values())) for e in tableau_final[5]]
 
 
-    print(ues_prof_matieres)
-    context = {'planning': ues_prof_matieres, 'niveau': niveau, 'days': days, 'taille': 22.5 / len(days), 'tenues': tenues} 
+
+    print(ligne1)
+
+    context = {
+        'planning': ues_prof_matieres, 
+        'niveau': niveau, 
+        'days': days, 
+        'taille': 22.5 / len(days), 
+        'tenues': tenues,
+        'heure_statique' : heure_statique,
+        'ligne1' : ligne1,
+        'ligne2' : ligne2,
+        'ligne3' : ligne3,
+        'ligne4' : ligne4,
+        'ligne5' : ligne5,
+    } 
          
 
     latex_input = 'planning_week'
