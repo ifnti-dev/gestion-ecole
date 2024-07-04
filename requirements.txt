@@ -25,3 +25,4 @@ celery
 redis
 openpyxl
 djangorestframework
+requests

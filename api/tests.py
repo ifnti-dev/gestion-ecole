@@ -19,8 +19,76 @@ class UeApiViewsTest(TestCase):
         response = requests.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-   
+    def test_create_ue(self):
+        url = f"{BASE_URL}/ue/create"
+        response = requests.get(url)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
+    def test_update_ue(self):
+        url = f"{BASE_URL}/ue/update/1"
+        response = requests.put(url)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+    def test_delete_ue(self):
+        url = f"{BASE_URL}/ue/delete/1"
+        response = requests.delete(url)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+    def test_detail_ue(self):
+        url = f"{BASE_URL}/ue/detail/1"
+        response = requests.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+
+
+class MatiereApiViewsTest(TestCase):
+    """
+    MatiereApiViewsTest contient les methodes de test du crud de matiere_api_views
+    """
+
+    def setUp(self):
+        pass    
+
+    def test_list_matiere(self):
+        url = f"{BASE_URL}/matieres"
+        response = requests.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_create_matiere(self):
+        url = f"{BASE_URL}/matiere/create"
+        response = requests.get(url)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        
+    def test_update_matiere(self):
+        url = f"{BASE_URL}/matiere/update/1"
+        response = requests.put(url)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        
+    def test_delete_matiere(self):
+        url = f"{BASE_URL}/matiere/delete/1"
+        response = requests.delete(url)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+    
+    def test_detail_matiere(self):
+        url = f"{BASE_URL}/matiere/detail/1"
+        response = requests.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+
+class ProgrammeApiViewsTest(TestCase):
+    """
+    ProgrammeApiViewsTest contient les methodes de test du crud de programme_api_views
+    """
+
+    def setUp(self):
+        pass    
+
+
+    def test_get_programme(self):
+        url = f"{BASE_URL}/programmes"
+        response = requests.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        
 class PersonnelApiTest(TestCase):
     """
     Test routes personnels
@@ -88,6 +156,7 @@ class PersonnelApiTest(TestCase):
         response=requests.get(url)
         self.assertEqual(response.status_code,status.HTTP_200_OK)
     
+
 class EnseignantApiTest(TestCase):
     def setUp(self):
         pass
@@ -117,10 +186,41 @@ class EnseignantApiTest(TestCase):
         response=requests.get(url)
         self.assertEqual(response.status_code,status.HTTP_200_OK)
 
+
+
+
+
+
+
+# Test des API du Model Etudiant 
+
+class EtudiantApiTest(TestCase):
+    def setUp(self):
+        pass
+    def test_create_etudiant(self):
+        url=f"{BASE_URL}/etudiant/create"
+        response=requests.get(url)
+        self.assertEqual(response.status_code,status.HTTP_200_OK)
     
-    def test_detail_enseignant(self):
-        url=f"{BASE_URL}/enseignant/detail/2"
+    def test_update_etudiant(self):
+        url=f"{BASE_URL}/etudiant/update/2"
+        response=requests.get(url)
+        self.assertEqual(response.status_code,status.HTTP_200_OK)
+    
+
+    def test_delete_etudiant(self):
+        url=f"{BASE_URL}/etudiant/delete/2"
+        response=requests.get(url)
+        self.assertEqual(response.status_code,status.HTTP_200_OK)
+    
+    def test_list_etudiant(self):
+        url=f"{BASE_URL}/etudiants"
+        response=requests.get(url)
+        self.assertEqual(response.status_code,status.HTTP_200_OK)
+    
+    def test_detail_etudiant(self):
+        url=f"{BASE_URL}/etudiant/detail/2"
         response=requests.get(url)
         self.assertEqual(response.status_code,status.HTTP_200_OK)
 
-    
+
