@@ -96,7 +96,7 @@ class PersonnelApiTest(TestCase):
 
     def setUp(self):
         pass
-        #Personnel.objects.all().delete()
+        Personnel.objects.all().delete()
         
     def test_list_personnel(self):
         url=f"{BASE_URL}/personnels"
@@ -111,14 +111,21 @@ class PersonnelApiTest(TestCase):
             "email":"toub@gmail.com","adresse":"sokode",
             "prefecture":"tchaoudjo","carte_identity":45896,
             "nationalite":"togolaise","salaireBrut":10000,
-            "nbreJrsCongesRestant":30,"nbreJrsConsomme":8,
-            "qualification_professionnel":"Enseignant",
-            "nombre_de_personnes_en_charge":2,"nif":"148950",
-            "numero_cnss":"982200478",
-        }
-        
-        url=f"{BASE_URL}/personnel/create"
-        response=requests.post(url,data)
+            "nbreJrsCongesRestant":30,"nbreJrsConsomme":8, def test_formulaire_demande_conges(self):
+        url=f"{BASE_URL}/personnel/form__demander_conge/1"
+        response=requests.get(url)
+        self.assertEqual(response.status_code,status.HTTP_200_OK)
+
+    def test_imprimer_demande_conge(self):
+        url=f"{BASE_URL}/personnel/imprimer_demande_conge"
+        response=requests.get(url)
+        self.assertEqual(response.status_code,status.HTTP_200_OK)
+    
+
+    def test_accorder_conge(self):
+        url=f"{BASE_URL}/personnel/accorder_conge"
+        response=requests.get(url)
+        self.assertEqual(response.status_code,status.HTTP_200_OK)
         self.assertEqual(response.status_code,status.HTTP_201_CREATED)
         self.assertEqual(Personnel.objects.count(), 1)
         
@@ -140,21 +147,7 @@ class PersonnelApiTest(TestCase):
         response=requests.get(url)
         self.assertEqual(response.status_code,status.HTTP_200_OK)
 
-    def test_formulaire_demande_conges(self):
-        url=f"{BASE_URL}/personnel/form__demander_conge"
-        response=requests.get(url)
-        self.assertEqual(response.status_code,status.HTTP_200_OK)
-
-    def test_imprimer_demande_conge(self):
-        url=f"{BASE_URL}/personnel/imprimer_demande_conge"
-        response=requests.get(url)
-        self.assertEqual(response.status_code,status.HTTP_200_OK)
     
-
-    def test_accorder_conge(self):
-        url=f"{BASE_URL}/personnel/accorder_conge"
-        response=requests.get(url)
-        self.assertEqual(response.status_code,status.HTTP_200_OK)
     
 
 class EnseignantApiTest(TestCase):
@@ -212,7 +205,6 @@ class EtudiantApiTest(TestCase):
         url=f"{BASE_URL}/etudiant/delete/2"
         response=requests.get(url)
         self.assertEqual(response.status_code,status.HTTP_200_OK)
-    
     def test_list_etudiant(self):
         url=f"{BASE_URL}/etudiants"
         response=requests.get(url)
@@ -223,4 +215,28 @@ class EtudiantApiTest(TestCase):
         response=requests.get(url)
         self.assertEqual(response.status_code,status.HTTP_200_OK)
 
+
+    
+
+class CongeTestApiViews(TestCase):
+    def setUp(self):
+        pass
+    
+    def test_formulaire_demande_conges(self):
+        url=f"{BASE_URL}/personnel/form__demander_conge/1"
+        response=requests.get(url)
+        self.assertEqual(response.status_code,status.HTTP_200_OK)
+
+    def test_imprimer_demande_conge(self):
+        url=f"{BASE_URL}/personnel/imprimer_demande_conge"
+        response=requests.get(url)
+        self.assertEqual(response.status_code,status.HTTP_200_OK)
+    
+
+    def test_accorder_conge(self):
+        url=f"{BASE_URL}/personnel/accorder_conge"
+        response=requests.get(url)
+        self.assertEqual(response.status_code,status.HTTP_200_OK)
+
+  
 

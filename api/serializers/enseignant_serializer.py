@@ -1,7 +1,10 @@
 from rest_framework import serializers
 from main.models import Enseignant
 
-class Enseignant(serializers.ModelSerializer):
+class EnseignantSerializer(serializers.ModelSerializer):
     class Meta:
         model=Enseignant
-        fields='__all__'
+        fields=(
+            "type","specialite",
+            "personnel",
+        )

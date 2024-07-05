@@ -1105,7 +1105,7 @@ class Personnel(Utilisateur):
 
 class Enseignant(models.Model):
     """
-    Cette classe hérite de la classe Personnel, elle représente les enseignants.
+     elle représente les enseignants.
     """    
     """
         Définit le numéro d'ordre
