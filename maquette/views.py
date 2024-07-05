@@ -152,10 +152,12 @@ def generate_maquette(request):
         else:
             data['form'] = form
     else:
+        annee_courante = AnneeUniversitaire.static_get_current_annee_universitaire()
+        semestres = annee_courante.get_semestres()
         data['maquette_semestres'] = generateDictFromProgrammeData(None, parcours, annee_accademique)
         generate_maquette_pdf(data['maquette_semestres'], template_path)
         data['pdf_file'] = "/media/pdf/maquette.pdf"
-        data['form'] = GenerateMaquetteForm(initial={"parcours": Parcours.objects.first()})
+        data['form'] = GenerateMaquetteForm(initial={"parcours": Parcours.objects.first(), "semestres": semestres})
         
     return render(request, "maquette/generate_maquette.html", data)
 

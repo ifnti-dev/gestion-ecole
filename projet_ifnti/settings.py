@@ -30,6 +30,9 @@ X_FRAME_OPTIONS = 'SAMEORIGIN'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+
+    
+
 ALLOWED_HOSTS = ["*"]
 
 
@@ -59,6 +62,8 @@ INSTALLED_APPS = [
     'solo',
     'planning',
     'cahier_de_texte',
+    'rest_framework',
+    'api',
 ]
 
 
@@ -100,19 +105,30 @@ WSGI_APPLICATION = 'projet_ifnti.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('DATABASE'),
-        'USER': os.getenv('DB_USER'),
-        'PASSWORD': os.getenv('DB_PASSWORD'),
-        'HOST': os.getenv('DB_FIRST_HOST'),
-        'HOST': os.getenv('DB_SECOND_HOST'),
-        'PORT': os.getenv('DB_PORT'),
-       
+#Configuration des conditions de production ou de developpement
+IS_PRODUCTION = False
 
+if IS_PRODUCTION:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.getenv('DATABASE'),
+            'USER': os.getenv('DB_USER'),
+            'PASSWORD': os.getenv('DB_PASSWORD'),
+            'HOST': os.getenv('DB_FIRST_HOST'),
+            'HOST': os.getenv('DB_SECOND_HOST'),
+            'PORT': os.getenv('DB_PORT'),
+        }
     }
-}
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": "db.sqlite3",
+        }
+    }
+
+
 
 # DATABASES = {
 #     "default": {

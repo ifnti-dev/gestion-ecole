@@ -4,11 +4,10 @@ from django import forms
 from main.models import CorrespondanceMaquette, Domaine, Matiere, Parcours, Programme, Semestre, Ue, AnneeUniversitaire
 
 class GenerateMaquetteForm(forms.Form):
-    annee_courante = AnneeUniversitaire.static_get_current_annee_universitaire()
-    print(annee_courante)
+    
    # The code is defining two fields, `semestre` and `parcours`, for a form.
     semestres = forms.ModelMultipleChoiceField(
-        queryset=annee_courante.get_semestres(),
+        queryset=Semestre.objects.all(),
         widget=forms.SelectMultiple(attrs={'class' : 'form-control js-select2', 'onchange': 'this.form.submit()'}),
         required=False
     )
