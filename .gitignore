@@ -11,6 +11,10 @@ db.sqlite3
 
 db*
 
+backup
+whole.json
+whole.*
+
 **/.zip
 **/migrations/**
 docs/build/*
