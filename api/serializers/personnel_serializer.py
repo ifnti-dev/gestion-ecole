@@ -1,5 +1,4 @@
 from rest_framework import serializers
-from django.contrib.auth.models import Group
 from main.models import Personnel
 
 class PersonnelSerializer(serializers.ModelSerializer):

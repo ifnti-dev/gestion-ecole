@@ -1,5 +1,7 @@
-from main.forms import PersonnelForm
-from main.models import Personnel
+import datetime
+
+from django.shortcuts import get_object_or_404
+from main.models import Conge, Personnel
 from api.serializers.personnel_serializer import PersonnelSerializer
 from django.http import JsonResponse
 from rest_framework import status 
@@ -8,6 +10,8 @@ from rest_framework.decorators import api_view
 ######today
 from django.contrib.auth.models import Group
 from rest_framework.response import Response
+
+from main.pdfMaker import generate_pdf
 @api_view(['GET'])
 def list_personnel(request):
     """
@@ -75,14 +79,4 @@ def detail_personnel(request,pk):
         return Response(status=status.HTTP_404_NOT_FOUND)
 
 
-@api_view(['POST'])
-def formulaire_demande_conges(request):
-    return JsonResponse(data={},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-@api_view(['GET'])
-def imprimer_demande_conge(request):
-    return JsonResponse(data={},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-@api_view(['GET'])
-def accorder_conge(request):
-    return JsonResponse(data={},status=status.HTTP_500_INTERNAL_SERVER_ERROR)

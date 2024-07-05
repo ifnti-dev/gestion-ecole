@@ -3,7 +3,7 @@ from api.views.etudiant_api_views import etudiant_list
 from api.views import ue_api_views
 from api.views import personnel_api_views
 from api.views import enseignant_api_views
-
+from api.views import conge_api_views
 urlpatterns = [
     path("etudiant/", etudiant_list),
 
@@ -14,9 +14,7 @@ urlpatterns = [
     path("personnel/delete/<int:pk>",personnel_api_views.delete_personnel),
     path("personnel/update/<int:pk>",personnel_api_views.update_personnel),
     path("personnel/detail/<int:pk>",personnel_api_views.detail_personnel),
-    path("personnel/formulaire_demande_conges",personnel_api_views.formulaire_demande_conges),
-    path("personnel/imprimer_demande_conge",personnel_api_views.imprimer_demande_conge),
-    path("personnel/accorder_conge",personnel_api_views.accorder_conge),
+    
 
     ########################## Enseignant api  urls######################################
 
@@ -29,11 +27,15 @@ urlpatterns = [
 
     path("enseignant/list_informations_enseignants",enseignant_api_views.list_informations_enseignants),
     path("enseignant/enregistrer_informations",enseignant_api_views.enregistrer_informations),
+    
     # path("enseignant/get_semestres",enseignant_api_views.get_semestres),
     # path("enseignant/reactiver_semestre/<int:pk>",enseignant_api_views.reactiver_semestre),
    
 
-
+    ######c=Conges ulrs api #################
+    path("conge/formulaire_demande_conges/<int:pk>",conge_api_views.formulaire_demande_conges),
+    path("conge/imprimer_demande_conge",conge_api_views.imprimer_demande_conge),
+    path("conge/accorder_conge",conge_api_views.accorder_conge),
 
 
 
