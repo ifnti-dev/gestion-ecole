@@ -129,14 +129,6 @@ else:
     }
 
 
-
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.sqlite3",
-#         "NAME": "db.sqlite3",
-#     }
-# }
-
 DATA_UPLOAD_MAX_NUMBER_FIELDS =100000
 # Email configuration
 
