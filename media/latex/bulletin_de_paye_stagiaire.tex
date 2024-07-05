@@ -61,7 +61,9 @@
 \hline 
 Risques professionnels & 2 & \VAR{frais_risques_professionnel} & 0 & 0 \\  
 \hline  
-\textbf{Totaux CNSS} &\multicolumn{2}{|c|}{\VAR{retenues_cnss_employeur}} &\multicolumn{2}{|c|}{0}\\ 
+Assurance maladie universelle & 5 & \VAR{assurance_maladie_universelle} & 5 & \VAR{assurance_maladie_universelle} \\ 
+\hline  
+\textbf{Totaux CNSS} &\multicolumn{2}{|c|}{\VAR{retenues_cnss_employeur}} &\multicolumn{2}{|c|}{\VAR{assurance_maladie_universelle}}\\ 
 \hline 
 \textbf{SALAIRE NET} & \multicolumn{4}{|c|}{\textbf{\VAR{salaire_net} FCFA}}\\ 
 \hline 
@@ -74,7 +76,7 @@ Primes forfaitaires: & \VAR{prime_forfaitaire} FCFA  \\\\
 \end{tabular}
 
 \begin{tabular}{@{}r@{\hspace{2cm}}r}
-   {\Large \textbf{Net à payer:}} & \textbf{\VAR{bulletin.salaire_net_a_payer} FCFA} \end{tabular}
+   {\Large \textbf{Net à payer:}} & \textbf{\VAR{salaire_net} FCFA} \end{tabular}
 \end{flushleft}
 
 \null\hfill Fait à Sokodé, le \today
@@ -83,7 +85,7 @@ Primes forfaitaires: & \VAR{prime_forfaitaire} FCFA  \\\\
 
 \begin{minipage}[t]{0.5\textwidth} % Début de la première zone de texte
     \raggedright % Alignement à gauche
-    \VAR{fiche_paie.enseignant.nom} \VAR{fiche_paie.enseignant.prenom}
+    \VAR{fiche_paie.personnel.nom} \VAR{fiche_paie.personnel.prenom}
     \end{minipage} % Fin de la première zone de texte
     \hfill % Espace flexible pour remplir l'espace entre les deux zones de texte
     \begin{minipage}[t]{0.4\textwidth} % Début de la deuxième zone de texte

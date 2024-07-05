@@ -16,7 +16,7 @@ from datetime import datetime
 import locale
 from django.contrib import messages
 # Définir la locale en français
-locale.setlocale(locale.LC_TIME, 'fr_FR.UTF-8')
+# locale.setlocale(locale.LC_TIME, 'fr_FR.UTF-8')
 
 
 ###############
@@ -1543,6 +1543,7 @@ def enregistrer_bulletin_stagiaire(request, id=0):
 @login_required(login_url=settings.LOGIN_URL)
 def bulletin_de_paye_stagiaire(request, id):
     bulletin = get_object_or_404(VersmentSalaire, id=id)
+    fiche_paie = get_object_or_404(VersmentSalaire, id=id)
     salaireDeBase = int(bulletin.personnel.salaireBrut)
     prime_efficacite = int(bulletin.prime_efficacite)
     prime_qualite = int(bulletin.prime_qualite)
@@ -1569,11 +1570,11 @@ def bulletin_de_paye_stagiaire(request, id):
     salaire_net_str = "{:,.0f}".format(bulletin.salaire_net_a_payer)
     # Assigner la chaîne de caractères formatée à salaire_net_a_payer
     bulletin.salaire_net_a_payer = salaire_net_str
-
+    assurance_maladie_universelle = int(bulletin.assurance_maladie_universelle * bulletin.personnel.salaireBrut)
 
     ## pour l'employeur
     frais_risques_professionnel = int(bulletin.frais_risques_professionnel * bulletin.personnel.salaireBrut)
-    retenues_cnss_employeur = int( frais_risques_professionnel)
+    retenues_cnss_employeur = frais_risques_professionnel+assurance_maladie_universelle
 
     # Convertir les montants en chaînes de caractères formatées avec des séparateurs de milliers
     prime_efficacite_str = "{:,.0f}".format(prime_efficacite)
@@ -1587,13 +1588,15 @@ def bulletin_de_paye_stagiaire(request, id):
     total_primes_str = "{:,.0f}".format(total_primes)
     retenues_cnss_employeur_str = "{:,.0f}".format(retenues_cnss_employeur)
     frais_risques_professionnel_str = "{:,.0f}".format(frais_risques_professionnel)
-    salaire_net_str = "{:,.0f}".format(salaire_net)
+    salaire_net_str = "{:,.0f}".format(salaire_net-assurance_maladie_universelle)
+    assurance_maladie_universelle_str = "{:,.0f}".format(assurance_maladie_universelle)
 
     # Assigner les chaînes de caractères formatées aux variables correspondantes
     context = {
         'bulletin': bulletin,
         'prime_efficacite': prime_efficacite_str,
         'prime_qualite': prime_qualite_str,
+        'assurance_maladie_universelle' : assurance_maladie_universelle_str,
         'frais_travaux_complementaires': frais_travaux_complementaires_str,
         'prime_anciennete': prime_anciennete_str,
         'salaireDeBase': salaireDeBase_str,
@@ -1606,6 +1609,7 @@ def bulletin_de_paye_stagiaire(request, id):
         'frais_risques_professionnel': frais_risques_professionnel_str,
         "date_debut_formatted": date_debut_formatted,
         "date_fin_formatted": date_fin_formatted,
+        "fiche_paie": fiche_paie,
     }
 
     latex_input = 'bulletin_de_paye_stagiaire'
