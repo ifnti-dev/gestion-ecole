@@ -20,8 +20,6 @@ def create_matiere(request):
 def update_matiere(request, pk):
     return JsonResponse(data={}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
  
-
-
 @api_view(['DELETE'])
 def delete_matiere(request, pk):
     return JsonResponse(data={}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
