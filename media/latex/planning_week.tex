@@ -22,11 +22,11 @@
 \vfill
 \begin{tabular}{r|C{4.5cm}|C{4.5cm}|C{4.5cm}|C{4.5cm}|C{4.5cm}|}
 \multicolumn{1}{c}{} 
-& \multicolumn{1}{c}{\large \VAR{days[0]}}
-& \multicolumn{1}{c}{\large \VAR{days[1]}}
-& \multicolumn{1}{c}{\large \VAR{days[2]}}
-& \multicolumn{1}{c}{\large \VAR{days[3]}}
-& \multicolumn{1}{c}{\large \VAR{days[4]}}\\
+& \multicolumn{1}{c}{\VAR{days[0]}}
+& \multicolumn{1}{c}{\VAR{days[1]}}
+& \multicolumn{1}{c}{\VAR{days[2]}}
+& \multicolumn{1}{c}{\VAR{days[3]}}
+& \multicolumn{1}{c}{\VAR{days[4]}}\\
 \multicolumn{1}{c}{}&\multicolumn{1}{c}{}&\multicolumn{1}{c}{}&\multicolumn{1}{c}{}&\multicolumn{1}{c}{}&\multicolumn{1}{c}{}
 \\
 \hhline{~-----}
@@ -38,7 +38,8 @@ Tenues & \VAR{tenues[0]} & \VAR{tenues[1]} & \VAR{tenues[2]} & \VAR{tenues[3]} &
 \VAR{heure_statique["c1"]}
 
 \BLOCK{for elt in ligne1}
-& \multirow{3}{*}{\pbox{7cm}{\VAR{elt[0][0]}\\\VAR{elt[1][0][0]['professeur']}}}
+% & \multirow{3}{*}{\pbox{7cm}{\VAR{elt}\\\VAR{elt['Enseignant']}}}
+& \multirow{3}{*}{\pbox{7cm}{\VAR{elt}}}
 \BLOCK{endfor}\\
 
 
@@ -53,8 +54,17 @@ Tenues & \VAR{tenues[0]} & \VAR{tenues[1]} & \VAR{tenues[2]} & \VAR{tenues[3]} &
 
 
 \BLOCK{for elt in ligne2}
-& \multirow{3}{*}{\pbox{7cm}{\VAR{elt[0][0]}\\\VAR{elt[1][0][0]['professeur']}}}
+% & \multirow{3}{*}{\pbox{7cm}{\VAR{elt}\\\VAR{elt['Enseignant']}}}
+& \multirow{3}{*}{\pbox{7cm}{\VAR{elt}}}
 \BLOCK{endfor}\\
+
+% \BLOCK{for elt in tab_mat_ligne2}
+% % & \multirow{3}{*}{\pbox{7cm}{\VAR{elt}\\\VAR{elt['Enseignant']}}}
+% & \multirow{3}{*}{\pbox{7cm}{\VAR{elt}}}
+% \BLOCK{endfor}\\
+
+
+
 
 & & & & & \\
 \VAR{heure_statique["c4"]}
@@ -64,9 +74,15 @@ Tenues & \VAR{tenues[0]} & \VAR{tenues[1]} & \VAR{tenues[2]} & \VAR{tenues[3]} &
 \hhline{~-----}
 \VAR{heure_statique["c5"]}
 
+% \BLOCK{for elt in ligne3}
+% & \multirow{3}{*}{\pbox{7cm}{\VAR{elt[0][0]}\\\VAR{elt[1][0][0]['professeur']}}}
+% \BLOCK{endfor}\\
 \BLOCK{for elt in ligne3}
-& \multirow{3}{*}{\pbox{7cm}{\VAR{elt[0][0]}\\\VAR{elt[1][0][0]['professeur']}}}
+% & \multirow{3}{*}{\pbox{7cm}{\VAR{elt}\\\VAR{elt['Enseignant']}}}
+& \multirow{3}{*}{\pbox{7cm}{\VAR{elt}}}
 \BLOCK{endfor}\\
+
+
 
 & & & & & \\
 \VAR{heure_statique["c6"]}
@@ -75,11 +91,24 @@ Tenues & \VAR{tenues[0]} & \VAR{tenues[1]} & \VAR{tenues[2]} & \VAR{tenues[3]} &
 \multicolumn{1}{c}{}&\multicolumn{1}{|c}{}&\multicolumn{1}{c}{}&\multicolumn{1}{c}{}&\multicolumn{1}{c}{}&\multicolumn{1}{c|}{}\\
 \hhline{~-----}
 
-\VAR{heure_statique["c7"]}
+% \VAR{heure_statique["c7"]}
 
-\BLOCK{for elt in ligne4}
-& \multirow{3}{*}{\pbox{7cm}{\VAR{elt[0][0]}\\\VAR{elt[1][0][0]['professeur']}}}
+% \BLOCK{for elt in ligne4}
+% & \multirow{3}{*}{\pbox{7cm}{\VAR{elt[0][0]}\\\VAR{elt[1][0][0]['professeur']}}}
+% \BLOCK{endfor}\\
+
+
+% \BLOCK{for elt in ligne4}
+% % & \multirow{3}{*}{\pbox{7cm}{\VAR{elt}\\\VAR{elt['Enseignant']}}}
+% & \multirow{3}{*}{\pbox{7cm}{\VAR{elt}}}
+% \BLOCK{endfor}\\
+
+\BLOCK{for elt in ligne5}
+& \multirow{3}{*}{\pbox{7cm}{\VAR{elt if elt else 'études'}}}
 \BLOCK{endfor}\\
+
+
+
 
 & & & & & \\
 \VAR{heure_statique["c8"]}
@@ -90,9 +119,15 @@ Tenues & \VAR{tenues[0]} & \VAR{tenues[1]} & \VAR{tenues[2]} & \VAR{tenues[3]} &
 
 \VAR{heure_statique["c9"]}
 
+% \BLOCK{for elt in ligne5}
+% & \multirow{3}{*}{\pbox{7cm}{\VAR{elt[0][0]}\\\VAR{elt[1][0][0]['professeur']}}}
+% \BLOCK{endfor}\\
+
 \BLOCK{for elt in ligne5}
-& \multirow{3}{*}{\pbox{7cm}{\VAR{elt[0][0]}\\\VAR{elt[1][0][0]['professeur']}}}
+& \multirow{3}{*}{\pbox{7cm}{\VAR{elt}}}
 \BLOCK{endfor}\\
+
+
 
 & & & & & \\
 \VAR{heure_statique["c10"]}

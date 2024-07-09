@@ -21,6 +21,9 @@ from collections import defaultdict
 from django.conf import settings
 from datetime import datetime
 
+from datetime import datetime, time
+from django.utils.dateparse import parse_date
+
 
 
 
@@ -468,11 +471,11 @@ def imprimer(request, planningId):
     if request.user.groups.all().first().name not in ['directeur_des_etudes', 'secretaire']:
         return render(request, 'errors_pages/403.html')
     
+
     planns = Planning.objects.filter(id=planningId).first()
     days = []
-    timeslots = ['']
-    tenues = ['Veste', 'Tricot', 'Veste', 'Tricot', 'Bigarré', 'Bigarré']
-    
+    timeslots = []
+
     semestre_libelle = planns.semestre.libelle
     annee_universitaire = planns.semestre.annee_universitaire
 
@@ -484,7 +487,6 @@ def imprimer(request, planningId):
         niveau = f'L3 {semestre_libelle} {annee_universitaire}'
     else:
         niveau = f'Unknown {semestre_libelle} {annee_universitaire}'
-
 
     plannings = SeancePlannifier.objects.filter(planning=planns)    
     for planning in plannings:
@@ -506,11 +508,9 @@ def imprimer(request, planningId):
             days.append(day)
         if timeshot not in timeslots:
             timeslots.append(timeshot)
-        
-
+     
     #heures de la jours
     ues_prof_matieres = {time: {} for time in timeslots}
-    # print(ues_prof_matieres)
 
     for plan in plannings:
         time_slot = plan.timeshot  
@@ -531,60 +531,66 @@ def imprimer(request, planningId):
             "professeur": professor
         })
     
+
+
+    
+    tenues = ['Veste', 'Tricot', 'Veste', 'Tricot', 'Bigarré', 'Bigarré']
     heure_statique = {
-        'c1' : '7h:00',
-	    "c2" : "8h:30",
-        "c3" : "8h:45",
-        "c4" : "10h:15",
-        "c5" : "10h:30",
-        "c6" : "12h:00",
-        "c7" : "14h:00",
-        "c8" : "15h:30",
-        "c9" : "15h:45",
-        "c10" : "17h:15",
+        'c1': '7h:00',
+        'c2': '8h:30',
+        'c3': '8h:45',
+        'c4': '10h:15',
+        'c5': '10h:30',
+        'c6': '12h:00',
+        'c7': '14h:00',
+        'c8': '15h:30',
+        'c9': '15h:45',
+        'c10': '17h:15',
     }
 
-    tableau_final = []
-    values_plannings = ues_prof_matieres.values()
-    for elt in values_plannings:
-        # On crée une liste temporaire pour stocker les valeurs de chaque élément
-        temp_list = []
-        for day, schedule in elt.items():
-            if schedule:  # Vérifie si le jour est programmé
-                temp_list.append(schedule)
-            else:
-                etude = "etudes"
-                temp_list.append(etude)
-        tableau_final.append(temp_list)
+    debutd = parse_date('2024-07-08')
+    fin = parse_date('2024-07-13')
 
-    ligne1 = [(list(e.keys()), list(e.values())) for e in tableau_final[1]]
-    ligne2 = [(list(e.keys()), list(e.values())) for e in tableau_final[2]]
-    ligne3 = [(list(e.keys()), list(e.values())) for e in tableau_final[3]]
-    ligne4 = [(list(e.keys()), list(e.values())) for e in tableau_final[4]]
-    ligne5 = [(list(e.keys()), list(e.values())) for e in tableau_final[5]]
+    recup_seanceplannifier = SeancePlannifier.objects.filter(date_heure_debut__date__gte=debutd, date_heure_fin__date__lte=fin)
+
+    time_ranges = [
+        (time(7, 0), time(8, 30)),
+        (time(8, 45), time(10, 15)),
+        (time(10, 30), time(12, 0)),
+        (time(14, 0), time(15, 30)),
+        (time(15, 45), time(17, 15))
+    ]
+
+    tab_matieres = [[] for _ in range(len(time_ranges))]
+
+    for i, (start_time, end_time) in enumerate(time_ranges):
+        ligne = recup_seanceplannifier.filter(date_heure_debut__time__gte=start_time, date_heure_debut__time__lte=end_time)
+        for mat in ligne:
+            tab_matieres[i].append(mat.matiere.libelle)
+
+    ligne1 = tab_matieres[0]
+    ligne2 = tab_matieres[1]
+    ligne3 = tab_matieres[2]
+    ligne4 = tab_matieres[3]
+    ligne5 = tab_matieres[4]
 
 
-
-    print(ligne1)
 
     context = {
-        'planning': ues_prof_matieres, 
-        'niveau': niveau, 
-        'days': days, 
-        'taille': 22.5 / len(days), 
-        'tenues': tenues,
-        'heure_statique' : heure_statique,
         'ligne1' : ligne1,
         'ligne2' : ligne2,
         'ligne3' : ligne3,
         'ligne4' : ligne4,
         'ligne5' : ligne5,
+        'niveau': niveau, 
+        'days': days, 
+        'tenues': tenues,
+        'heure_statique' : heure_statique,
     } 
-         
 
     latex_input = 'planning_week'
-    latex_output = f'planning_week_{planns.semaine}_{semestre_libelle}_{annee_universitaire}'
-    pdf_file = f'planning_week_{planns.semaine}_{semestre_libelle}_{annee_universitaire}'
+    latex_output = f'planning_week'
+    pdf_file = f'planning_week'
 
     # génération du pdf
     generate_pdf(context, latex_input, latex_output, pdf_file)
@@ -594,6 +600,9 @@ def imprimer(request, planningId):
         response = HttpResponse(pdf_preview, content_type='application/pdf')
         response['Content-Disposition'] = f'inline;filename={pdf_file}.pdf'
         return response
+ 
+         
+
 
 # -----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
