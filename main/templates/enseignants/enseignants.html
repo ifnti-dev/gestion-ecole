@@ -47,9 +47,9 @@
                 <tbody>
                     {% for enseignant in enseignants %}
                     <tr>
-                        <td class="text-center">{{ enseignant.nom }} {{ enseignant.prenom }}</td>
-                        <td class="text-center">{{ enseignant.contact }}</td>
-                        <td class="text-center">{{ enseignant.email }}</td>
+                        <td class="text-center">{{ enseignant.personnel.nom }} {{ enseignant.personnel.prenom }}</td>
+                        <td class="text-center">{{ enseignant.personnel.contact }}</td>
+                        <td class="text-center">{{ enseignant.personnel.email }}</td>
                         <td class="text-center">{{ enseignant.specialite }}</td>
                         {% if is_directeur_des_etudes or is_admin  %}
                         <td class="text-center">
