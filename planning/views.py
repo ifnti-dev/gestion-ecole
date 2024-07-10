@@ -21,6 +21,9 @@ from collections import defaultdict
 from django.conf import settings
 from datetime import datetime
 
+from datetime import datetime, time
+from django.utils.dateparse import parse_date
+
 
 
 
@@ -450,18 +453,6 @@ def seance(request,seanceId):
 
 
 # ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-# def french_day(day):
-#     # print(day)
-#     french_correspondance_days = {
-#         'Monday':'Lundi',
-#         'Tuesday' :'Mardi',
-#         'Wednesday' :'Mercredi',
-#         'Thursday' :'Jeudi',
-#         'Friday' :'Vendredi',
-#         'Saturday' :'Samedi'
-#     }
-#     return french_correspondance_days[day]
-# ---------------------------------------------------------------------------
 def french_day(day):
     days = {
         'Monday': 'Lundi',
@@ -480,11 +471,11 @@ def imprimer(request, planningId):
     if request.user.groups.all().first().name not in ['directeur_des_etudes', 'secretaire']:
         return render(request, 'errors_pages/403.html')
     
+
     planns = Planning.objects.filter(id=planningId).first()
     days = []
-    timeslots = ['']
-    tenues = ['Veste', 'Tricot', 'Veste', 'Tricot', 'Bigarré', 'Bigarré']
-    
+    timeslots = []
+
     semestre_libelle = planns.semestre.libelle
     annee_universitaire = planns.semestre.annee_universitaire
 
@@ -497,8 +488,7 @@ def imprimer(request, planningId):
     else:
         niveau = f'Unknown {semestre_libelle} {annee_universitaire}'
 
-
-    plannings = SeancePlannifier.objects.filter(planning=planns)
+    plannings = SeancePlannifier.objects.filter(planning=planns)    
     for planning in plannings:
         jour_n = (planns.semaine - 1) * 5 + planning.date_heure_debut.weekday() + 1
         jour_n = str(jour_n)
@@ -518,10 +508,9 @@ def imprimer(request, planningId):
             days.append(day)
         if timeshot not in timeslots:
             timeslots.append(timeshot)
-
+     
     #heures de la jours
     ues_prof_matieres = {time: {} for time in timeslots}
-    print(ues_prof_matieres)
 
     for plan in plannings:
         time_slot = plan.timeshot  
@@ -541,58 +530,58 @@ def imprimer(request, planningId):
         ues_prof_matieres[time_slot][day][activity].append({
             "professeur": professor
         })
-
-    # for timeslot in ues_prof_matieres:
-    #     # print("\nTime Slot:", timeslot)
-    #     for day in ues_prof_matieres[timeslot]:
-    #         # print("Day:", day)
-    #         for activity in ues_prof_matieres[timeslot][day]:
-    #             # print(activity, ":")
-    #             for professor in ues_prof_matieres[timeslot][day][activity]:
-    #                 # print("\tProfessor:", professor["professeur"])
-    #                 pass
-
     
 
-    # for cle, valeur in ues_prof_matieres.items():
-    #     heurs  = cle
-    #     pr = valeur
 
-    #     print (heurs)
-    #     print(pr)sdopipojdokop
+    
+    tenues = ['Veste', 'Tricot', 'Veste', 'Tricot', 'Bigarré', 'Bigarré', 'Bigarré']
 
-#debut edouard test
-    tableau = []
-    # Parcourir le dictionnaire principal
-    for key1, value1 in ues_prof_matieres.items():
-        if isinstance(value1, dict):
-            # Parcourir le sous-dictionnaire
-            for key2, value2 in value1.items():
-                if isinstance(value2, dict):
-                    # Parcourir le sous-sous-dictionnaire
-                    for key3, value3 in value2.items():
-                        if isinstance(value3, list):
-                            # Parcourir la liste de dictionnaires
-                            for item in value3:
-                                for key4, value4 in item.items():
-                                    print(f"{key1} -> {key2} -> {key3} -> {key4}: {value4}")
-                        else:
-                            print(f"{key1} -> {key2} -> {key3}: {value3}")
-                else:
-                    print(f"{key1} -> {key2}: {value2}")
-        else:
-            print(f"{key1}: {value1}")
+    debutd = parse_date('2024-07-08')
+    fin = parse_date('2024-07-13')
+
+    recup_seanceplannifier = SeancePlannifier.objects.filter(date_heure_debut__date__gte=debutd, date_heure_fin__date__lte=fin)
+
+    time_ranges = [
+        (time(7, 0), time(8, 30)),
+        (time(8, 45), time(10, 15)),
+        (time(10, 30), time(12, 0)),
+        (time(14, 0), time(15, 30)),
+        (time(15, 45), time(17, 15))
+    ]
+
+    tab_seance_plannifier = [[] for _ in range(len(time_ranges))]
+
+
+
+    for i, (start_time, end_time) in enumerate(time_ranges):
+        tab_seance_plannifier[i].append(start_time)
+        tab_seance_plannifier[i].append(end_time)
+
+        ligne = recup_seanceplannifier.filter(date_heure_debut__time__gte=start_time, date_heure_debut__time__lte=end_time)
+        for mat in ligne:
+            tab_seance_plannifier[i].append(mat.matiere.libelle)
+
+        taille_max = 8 
+        taille_tableau = len(tab_seance_plannifier[i])
         
-#fin edouard test
+
+        for _ in range(taille_tableau, taille_max):
+            tab_seance_plannifier[i].append("études")
+            
+    print(days)
 
 
-    print(ues_prof_matieres)
-    context = {'planning': ues_prof_matieres, 'niveau': niveau, 'days': days, 'taille': 22.5 / len(days), 'tenues': tenues} 
-         
+
+    context = {
+        'lignes' : tab_seance_plannifier,
+        'niveau': niveau, 
+        'days': days, 
+        'tenues': tenues,
+    } 
 
     latex_input = 'planning_week'
-    latex_output = f'planning_week_{planns.semaine}_{semestre_libelle}_{annee_universitaire}'
-    pdf_file = f'planning_week_{planns.semaine}_{semestre_libelle}_{annee_universitaire}'
+    latex_output = f'planning_week'
+    pdf_file = f'planning_week'
 
     # génération du pdf
     generate_pdf(context, latex_input, latex_output, pdf_file)
@@ -602,6 +591,9 @@ def imprimer(request, planningId):
         response = HttpResponse(pdf_preview, content_type='application/pdf')
         response['Content-Disposition'] = f'inline;filename={pdf_file}.pdf'
         return response
+ 
+         
+
 
 # -----------------------------------------------------------------------------------------------------------------------------------------------------------------
 

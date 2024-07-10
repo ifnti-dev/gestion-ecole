@@ -6,128 +6,63 @@
 \usepackage{hhline}
 \usepackage{colortbl}
 \usepackage{array}
+\usepackage{pbox}
 
 \newcolumntype{C}[1]{>{\centering\arraybackslash}m{#1}}
 \newcolumntype{R}[1]{>{\raggedleft\arraybackslash}m{#1}} 
 \newcolumntype{L}[1]{>{\raggedright\arraybackslash}m{#1}} 
 
 \begin{document}
-
-%mes tests
-
-\textbf{premiere clé }\hspace{0.8cm}\textbf{\var{key1}}
-
-
-%fin de mes test
-
-
 \thispagestyle{empty}
 \vfill
 \begin{center}
 {\Huge \VAR{niveau}}
 \end{center}
 \vfill
-\begin{tabular}{r|C{4.5cm}|C{4.5cm}|C{4.5cm}|C{4.5cm}|C{4.5cm}|}
+\begin{tabular}{r|C{3.6cm}|C{3.6cm}|C{3.6cm}|C{3.6cm}|C{3.6cm}|C{3.6cm}|}
+
+
+
 \multicolumn{1}{c}{} 
 & \multicolumn{1}{c}{\large \VAR{days[0]}}
 & \multicolumn{1}{c}{\large \VAR{days[1]}}
 & \multicolumn{1}{c}{\large \VAR{days[2]}}
 & \multicolumn{1}{c}{\large \VAR{days[3]}}
-& \multicolumn{1}{c}{\large \VAR{days[4]}}\\
-\multicolumn{1}{c}{}&\multicolumn{1}{c}{}&\multicolumn{1}{c}{}&\multicolumn{1}{c}{}&\multicolumn{1}{c}{}&\multicolumn{1}{c}{}\\
-\hhline{~-----}
-Tenues & \VAR{tenues[0]} & \VAR{tenues[1]} & \VAR{tenues[2]} & \VAR{tenues[3]} & \VAR{tenues[4]} \\ 
-\hhline{~-----}
-\multicolumn{1}{c}{}&\multicolumn{1}{c}{}&\multicolumn{1}{c}{}&\multicolumn{1}{c}{}&\multicolumn{1}{c}{}&\multicolumn{1}{c}{}\\
-\hhline{~-----}
+& \multicolumn{1}{c}{\large \VAR{days[4]}}
+& \multicolumn{1}{c}{\large \VAR{days[5]}}\\
+\multicolumn{1}{c}{}&\multicolumn{1}{c}{}&\multicolumn{1}{c}{}&\multicolumn{1}{c}{}&\multicolumn{1}{c}{}&\multicolumn{1}{c}{}&\multicolumn{1}{c}{}
+
+\\
+\hhline{~------}
+\VAR{tenues[0]} & \VAR{tenues[1]} & \VAR{tenues[2]} & \VAR{tenues[3]} & \VAR{tenues[4]}  & \VAR{tenues[5]} & \VAR{tenues[6]}\\ 
+\hhline{~------}
+\multicolumn{1}{c}{}&\multicolumn{1}{c}{}&\multicolumn{1}{c}{}&\multicolumn{1}{c}{}&\multicolumn{1}{c}{}&\multicolumn{1}{c}{}&\multicolumn{1}{c}{}\\
+\hhline{~------}
 
 
 
 
-7h
-& \multirow{2}{*}{Conception, Dev app(Laravel)}
-& \multirow{2}{*}{Conception, Dev app(Laravel)}
-& \multirow{2}{*}{Conception, Dev app(Laravel)}
-& \multirow{2}{*}{Conception, Dev app(Laravel)}
-& \multirow{2}{*}{Conception, Dev app(Laravel)}\\
-& \multirow{2}{*}{(M.Sabirou,M.Malik)}
-& \multirow{2}{*}{(M.Sabirou,M.Malik)}
-& \multirow{2}{*}{(M.Sabirou,M.Malik)}
-& \multirow{2}{*}{(M.Sabirou,M.Malik)}
-& \multirow{2}{*}{(M.Sabirou,M.Malik)}\\
-\multirow{2}{*}{8h30} & & & & & \\ 
-\hhline{~-----}
-\multirow{2}{*}{8h45} & & & & & \\
-\hhline{~-----}
-& \multirow{2}{*}{Conception, Dev app(Laravel)}
-& \multirow{2}{*}{Conception, Dev app(Laravel)}
-& \multirow{2}{*}{Conception, Dev app(Laravel)}
-& \multirow{2}{*}{IHM Java}
-& \multirow{2}{*}{Conception, Dev app(Laravel)}\\
-& \multirow{2}{*}{(M.Sabirou,M.Malik)}
-& \multirow{2}{*}{(M.Sabirou,M.Malik)}
-& \multirow{2}{*}{(M.Sabirou,M.Malik)}
-& \multirow{2}{*}{(M.Adame)}
-& \multirow{2}{*}{(M.Sabirou,M.Malik)}\\
-\multirow{2}{*}{10h15} &  &  &  &  & \\ 
-\hhline{~-----}
-\multirow{2}{*}{10h30}&&&&&\\
-\hhline{~-----}
-& \multirow{2}{*}{Admin serveur, SE (Ubuntu)}
-& \multirow{2}{*}{Conception, Dev app(Laravel)}
-& \multirow{2}{*}{Conception, Dev app(Laravel)}
-& \multirow{2}{*}{IHM Java}
-& \multirow{2}{*}{Conception, Dev app(Laravel)}\\
-& \multirow{2}{*}{(M.Raphael)}
-& \multirow{2}{*}{(M.Sabirou,M.Malik)}
-& \multirow{2}{*}{(M.Sabirou,M.Malik)}
-& \multirow{2}{*}{(M.Adame)}
-& \multirow{2}{*}{(M.Sabirou,M.Malik)}\\
-\multirow{2}{*}{12h} &  &  &  & &  \\ 
-\hhline{~-----}
-\hhline{~-----}
- & \multicolumn{5}{|c|}{\cellcolor[gray]{0.9}}\\ 
- & \multicolumn{5}{|c|}{\cellcolor[gray]{0.9}}\\
- & \multicolumn{5}{|c|}{\cellcolor[gray]{0.9}}\\
- & \multicolumn{5}{|c|}{\cellcolor[gray]{0.9}}\\
-\multirow{2}{*}{14h} & \multicolumn{5}{|c|}{\cellcolor[gray]{0.9}\multirow{-5}{*}{{\Large Semaine 14 du 10/06 au 14/06 (J66 à J70)}}}\\
-\hhline{~-----}
-& \multirow{2}{*}{Base de données}
-& \multirow{2}{*}{Étude(Conception, Dev app)}
-& \multirow{2}{*}{Étude}
-& \multirow{2}{*}{Étude(IHM Java)}
-& \multirow{2}{*}{Étude}\\
-& \multirow{2}{*}{(M.Sabirou,M.Samrou)}
-& \multirow{2}{*}{}
-& \multirow{2}{*}{}
-& \multirow{2}{*}{}
-& \multirow{2}{*}{}\\
-\multirow{2}{*}{15h30} &  & & & & \\ 
-\hhline{~-----}
-\multirow{2}{*}{15h45} &  &  &  &  & \\ 
-\hhline{~-----}
-& \multirow{2}{*}{Base de données}
-& \multirow{2}{*}{Étude(Conception, Dev app)}
-& \multirow{2}{*}{Étude}
-& \multirow{2}{*}{Étude(IHM Java)}
-& \multirow{2}{*}{Étude}\\
-& \multirow{2}{*}{(M.Sabirou,M.Samrou)}
-& \multirow{2}{*}{}
-& \multirow{2}{*}{}
-& \multirow{2}{*}{}
-& \multirow{2}{*}{}\\
-\multirow{2}{*}{17h15} &  & & & & \\
-\hhline{~-----}
-\multirow{2}{*}{17h15} &  & & & & \\
-\hhline{~-----}
-\multirow{2}{*}{}&
- \multirow{2}{*}{} &
- \multirow{2}{*}{} &
- \multirow{2}{*}{} &
- \multirow{2}{*}{} &
- \multirow{2}{*}{Ménage}\\
-\multirow{2}{*}{18h00} & & & & & \\ 
-\hhline{~-----}
-\end{tabular} \\
+
+
+\BLOCK{for l in lignes}
+\VAR{l[0]}
+& \multirow{3}{*}{\VAR{l[2]}}
+& \multirow{3}{*}{\pbox{3.5cm}{\VAR{l[3]}}}
+& \multirow{3}{*}{\VAR{l[4]}}
+& \multirow{3}{*}{\VAR{l[5]}}
+& \multirow{3}{*}{\VAR{l[6]}}
+& \multirow{3}{*}{\VAR{l[7]}}\\
+& & & & & & \\
+\VAR{l[1]}
+
+
+& & & & & & \\
+\hhline{~------}
+
+\multicolumn{1}{c}{}&\multicolumn{1}{|c}{}&\multicolumn{1}{c}{}&\multicolumn{1}{c}{}&\multicolumn{1}{c}{}&\multicolumn{1}{c}{}&\multicolumn{1}{c|}{}\\
+\hhline{~------}
+\BLOCK{endfor} 
+\end{tabular}
+
 \vfill
 \end{document}
