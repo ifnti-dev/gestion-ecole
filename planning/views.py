@@ -534,19 +534,7 @@ def imprimer(request, planningId):
 
 
     
-    tenues = ['Veste', 'Tricot', 'Veste', 'Tricot', 'Bigarré', 'Bigarré']
-    heure_statique = {
-        'c1': '7h:00',
-        'c2': '8h:30',
-        'c3': '8h:45',
-        'c4': '10h:15',
-        'c5': '10h:30',
-        'c6': '12h:00',
-        'c7': '14h:00',
-        'c8': '15h:30',
-        'c9': '15h:45',
-        'c10': '17h:15',
-    }
+    tenues = ['Veste', 'Tricot', 'Veste', 'Tricot', 'Bigarré', 'Bigarré', 'Bigarré']
 
     debutd = parse_date('2024-07-08')
     fin = parse_date('2024-07-13')
@@ -561,31 +549,34 @@ def imprimer(request, planningId):
         (time(15, 45), time(17, 15))
     ]
 
-    tab_matieres = [[] for _ in range(len(time_ranges))]
+    tab_seance_plannifier = [[] for _ in range(len(time_ranges))]
+
+
 
     for i, (start_time, end_time) in enumerate(time_ranges):
+        tab_seance_plannifier[i].append(start_time)
+        tab_seance_plannifier[i].append(end_time)
+
         ligne = recup_seanceplannifier.filter(date_heure_debut__time__gte=start_time, date_heure_debut__time__lte=end_time)
         for mat in ligne:
-            tab_matieres[i].append(mat.matiere.libelle)
+            tab_seance_plannifier[i].append(mat.matiere.libelle)
 
-    ligne1 = tab_matieres[0]
-    ligne2 = tab_matieres[1]
-    ligne3 = tab_matieres[2]
-    ligne4 = tab_matieres[3]
-    ligne5 = tab_matieres[4]
+        taille_max = 8 
+        taille_tableau = len(tab_seance_plannifier[i])
+        
+
+        for _ in range(taille_tableau, taille_max):
+            tab_seance_plannifier[i].append("études")
+            
+    print(days)
 
 
 
     context = {
-        'ligne1' : ligne1,
-        'ligne2' : ligne2,
-        'ligne3' : ligne3,
-        'ligne4' : ligne4,
-        'ligne5' : ligne5,
+        'lignes' : tab_seance_plannifier,
         'niveau': niveau, 
         'days': days, 
         'tenues': tenues,
-        'heure_statique' : heure_statique,
     } 
 
     latex_input = 'planning_week'
