@@ -75,7 +75,7 @@ class Utilisateur(models.Model):
     """
 
     lieunaissance = models.CharField(
-        blank=True, max_length=20, verbose_name="lieu de naissance", null=True)
+        blank=True, max_length=50, verbose_name="lieu de naissance", null=True)
 
     """
         Lieu de naissance de l'utilisateur
@@ -146,7 +146,7 @@ class Utilisateur(models.Model):
     """
 
     nationalite = models.CharField(
-        max_length=30, default='Togolaise', verbose_name='Nationalté', blank=True)
+        max_length=50, default='Togolaise', verbose_name='Nationalté', blank=True)
 
     """
         Attestation de nationalité de l'utilisateur
@@ -217,8 +217,7 @@ class Etudiant(Utilisateur):
     """
         Classe Etudiant
     """
-    id = models.CharField(primary_key=True, blank=True,
-                          max_length=12, editable=False)
+    id = models.CharField(primary_key=True, blank=True,max_length=12, editable=False)
     CHOIX_SERIE = [('A', 'A'), ('C', 'C'), ('D', 'D'), ('E', 'E'), ('F1', 'F1'), ('F2', 'F2'), ('F3', 'F3'),
                    ('F4', 'F4'), ('G2', 'G2')]
 
@@ -462,8 +461,7 @@ class Etudiant(Utilisateur):
         **Nullable:** true
     """
 
-    tuteurs = models.ManyToManyField(
-        'Tuteur', related_name="Tuteurs", blank=True, null=True)
+    tuteurs = models.ManyToManyField('Tuteur', related_name="Tuteurs", blank=True, null=True)
 
     """
         Tuteurs de l'étudiant
@@ -903,10 +901,10 @@ class Etudiant(Utilisateur):
             etudiant=self, annee_universitaire=annee_universitaire_courante, solde=0)
 
 
-@receiver(post_save, sender=Etudiant)
-def create_compte_etudiant(sender, instance, created, **kwargs):
-    if created:
-        instance.create_compte_etudiant()
+# @receiver(post_save, sender=Etudiant)
+# def create_compte_etudiant(sender, instance, created, **kwargs):
+#     if created:
+#         instance.create_compte_etudiant()
 
 
 class Personnel(Utilisateur):   
@@ -1105,7 +1103,7 @@ class Personnel(Utilisateur):
 
 class Enseignant(models.Model):
     """
-    Cette classe hérite de la classe Personnel, elle représente les enseignants.
+     elle représente les enseignants.
     """    
     """
         Définit le numéro d'ordre
@@ -1758,7 +1756,7 @@ class AnneeUniversitaire(models.Model):
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-        self.generateSemeste()
+        #self.generateSemeste()
 
     def disable(self):
         """
@@ -1806,6 +1804,7 @@ class AnneeUniversitaire(models.Model):
             :return: Un objet AnneUniversitaire correspondant à l'année universitaire en cours
             :retype: AnneeUniversitaire
         """
+        
         current_date = timezone.now()
         virtual_current_university_date, created = AnneeUniversitaire.objects.get_or_create(annee_courante=True, defaults={'annee': current_date.year-1})
         if virtual_current_university_date.annee == current_date.year-1 and current_date.month >= 8:
@@ -2313,8 +2312,7 @@ class CompteBancaire(models.Model):
 
 
     """
-    solde_bancaire = models.DecimalField(
-        max_digits=10, decimal_places=2, default=0)
+    solde_bancaire = models.FloatField(default=0)
     """
         Solde dans le compte
 
@@ -2938,7 +2936,7 @@ class FicheDePaie(models.Model):
         **Type:** string
 
     """
-    nombreHeureL1 = models.IntegerField(
+    nombreHeureL1 = models.FloatField(
         verbose_name="Nombre d'heure L1", default=0)
     """
         Nombre d'heure réalisées en L1
@@ -2948,7 +2946,7 @@ class FicheDePaie(models.Model):
         **Valeur par défaut:** 0
 
     """
-    nombreHeureL2 = models.IntegerField(
+    nombreHeureL2 = models.FloatField(
         verbose_name="Nombre d'heure L2", default=0)
     """
         Nombre d'heures réalisées en L2
@@ -2958,7 +2956,7 @@ class FicheDePaie(models.Model):
         **Valeur par défaut:** 0
 
     """
-    nombreHeureL3 = models.IntegerField(
+    nombreHeureL3 = models.FloatField(
         verbose_name="Nombre d'heure L3", default=0)
     """
         Nombre d'heures réalisées en L3
@@ -2968,7 +2966,7 @@ class FicheDePaie(models.Model):
         **Valeur par défaut:** 0
 
     """
-    nombreHeure = models.IntegerField(verbose_name="Nombre d'heure", default=0)
+    nombreHeure = models.FloatField(verbose_name="Nombre d'heure", default=0)
     """
         Nombre d'heures au total
 
@@ -2986,7 +2984,7 @@ class FicheDePaie(models.Model):
         **Valeur par défaut:** 0
 
     """
-    montantL1 = models.IntegerField(verbose_name="montant L1", default=0)
+    montantL1 = models.FloatField(verbose_name="montant L1", default=0)
     """
         Montant total en L1
 
@@ -2995,7 +2993,7 @@ class FicheDePaie(models.Model):
         **Valeur par défaut:** 0
 
     """
-    montantL2 = models.IntegerField(verbose_name="montant L2", default=0)
+    montantL2 = models.FloatField(verbose_name="montant L2", default=0)
     """
         Montant total en L2
 
@@ -3003,7 +3001,7 @@ class FicheDePaie(models.Model):
 
         **Valeur par défaut:** 0
     """
-    montantL3 = models.IntegerField(verbose_name="montant L3", default=0)
+    montantL3 = models.FloatField(verbose_name="montant L3", default=0)
     """
         Montant total en L3
 
@@ -3012,7 +3010,7 @@ class FicheDePaie(models.Model):
         **Valeur par défaut:** 0
 
     """
-    montant = models.IntegerField(verbose_name="montant", default=0)
+    montant = models.FloatField(verbose_name="montant", default=0)
     """
         Montant total
 
@@ -3021,7 +3019,7 @@ class FicheDePaie(models.Model):
         **Valeur par défaut:** 0
 
     """
-    difference = models.IntegerField(verbose_name="Différence", default=0)
+    difference = models.FloatField(verbose_name="Différence", default=0)
     """
         Différence
 
@@ -3030,7 +3028,7 @@ class FicheDePaie(models.Model):
         **Valeur par défaut:** 0
 
     """
-    acomptes = models.IntegerField(verbose_name="Acomptes", default=0)
+    acomptes = models.FloatField(verbose_name="Acomptes", default=0)
     """
         Acompte
 

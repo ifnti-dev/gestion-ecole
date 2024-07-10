@@ -318,16 +318,32 @@ def liste_seance(request):
         return render(request, "cahier_de_text/liste_seance.html", {"seances_en_attente": seances_en_attente, "seances_validees": seances_validees})
 
 @login_required(login_url="/main/connexion")
-def liste_seance_etudiant(request):
+def liste_seance_etudiant(request,matiere=None,signer=None):
+    matiere = request.GET.get('matiere')
+    signer = request.GET.get("signer")
     if request.user.is_authenticated:
         if request.user.groups.all().first().name not in ['etudiant']:
             return render(request, 'errors_pages/403.html')
+        
         user_connecte=get_object_or_404(get_user_model(),id=request.user.id)
         etudiant_connecte = get_object_or_404(Etudiant, user=user_connecte)
         semestres=Semestre.objects.filter(annee_universitaire_id=request.session.get("id_annee_selectionnee"))
-        seances_en_attente = Seance.objects.filter(auteur=etudiant_connecte, valider=False ,semestre__in=semestres)
-        seances_validees = Seance.objects.filter(auteur=etudiant_connecte,valider=True,semestre__in=semestres)
-        return render(request, "cahier_de_text/liste_seance_etudiant.html", {"seances_en_attente": seances_en_attente, "seances_validees": seances_validees})
+        matieres = Matiere.objects.all()
+        if matiere=="" or signer=="":
+            seances = Seance.objects.filter(auteur=etudiant_connecte,semestre__in=semestres)
+            return render(request, "cahier_de_text/liste_seance_etudiant.html", {"matieres": matieres, "seances_validees": seances})
+        if matiere is not None:
+            matiere = get_object_or_404(Matiere,id=matiere)
+            seances = Seance.objects.filter(auteur=etudiant_connecte,matiere=matiere, semestre__in=semestres)
+            return render(request, "cahier_de_text/liste_seance_etudiant.html", {"matieres": matieres, "seances_validees": seances})
+        
+        if signer is not None:
+            seances = Seance.objects.filter(auteur=etudiant_connecte,valider=signer, semestre__in=semestres)
+            return render(request, "cahier_de_text/liste_seance_etudiant.html", {"matieres": matieres, "seances_validees": seances})
+
+        
+        seances = Seance.objects.filter(auteur=etudiant_connecte,semestre__in=semestres)
+        return render(request, "cahier_de_text/liste_seance_etudiant.html", {"matieres": matieres, "seances_validees": seances})
 
 
 
@@ -359,12 +375,17 @@ def imprimer(request):
     #si on veut un affichage par matiere , ca met automatiquement la liste des matieres a true 
     for semestre_id in semestres:
         semestre = Semestre.objects.get(id=semestre_id)
+        if list(Seance.objects.filter(semestre=semestre))==[]:
+            notification = {
+                "message": "Aucune seance n'a été rapporter dans le chier de text", "type": "info"}
+            context = {"notification": notification }
+            return redirect("/cahier_de_texte/" ,context)
         if nuance(valider) :
             seances_total = Seance.objects.filter(semestre=semestre,valider=nuance(valider)).order_by('date_et_heure_debut')
-            print(valider,nuance(valider),seances_total.count())
+            #print(valider,nuance(valider),seances_total.count())
         else :
             seances_total = Seance.objects.filter(semestre=semestre).order_by('date_et_heure_debut')    
-            print(valider,nuance(valider),seances_total.count())
+            #print(valider,nuance(valider),seances_total.count())
         
         ues = semestre.get_all_ues()
         matieres_dict = {}
@@ -384,9 +405,9 @@ def imprimer(request):
                      'listeMatiere':listeMatiere,
                      'seances':seances_total,
                      'matieres':matieres,
-                     'sousCategorisation':sousCategorisation
+                     'sousCategorisation':sousCategorisation,
+                     'HeureConsomme':HeureConsomme
                      }
-                                       
             latex_input = 'cahier_de_texte'
             latex_ouput = 'CDT_'+str(semestre_id)+'_'+str(datetime.datetime.now())
             pdf_file = 'CDT_'+str(semestre_id)+'_'+str(datetime.datetime.now())
@@ -395,47 +416,49 @@ def imprimer(request):
             generate_pdf(context, latex_input, latex_ouput, pdf_file)
             pdf_paths.append('media/pdf/' + pdf_file)
             
-        else :                       
-            if nuance(HeureConsomme) :
-                for matiere in matieres :
-                    seances_prime = seances_total.filter(matiere=matiere).order_by('date_et_heure_debut')
-                    if seances_prime.count() >0:
-                        temps=0
-                        for seance in seances_prime:
-                            temps+=(seance.date_et_heure_fin - seance.date_et_heure_debut).total_seconds()
-                        hours, remainder = divmod(temps, 3600)
-                        minutes, _ = divmod(remainder, 60)
+        else :
+            #if nuance(HeureConsomme) :
+            for matiere in matieres :
+                print(matiere.heures)
+                seances_prime = seances_total.filter(matiere=matiere).order_by('date_et_heure_debut')
+                if seances_prime.count() >0:
+                    temps=0
+                    for seance in seances_prime:
+                        temps+=(seance.date_et_heure_fin - seance.date_et_heure_debut).total_seconds()
+                    hours, remainder = divmod(temps, 3600)
+                    minutes, _ = divmod(remainder, 60)
 
-                        matiere_key = matiere.libelle
-                        if matiere_key not in matieres_dict:
-                            matieres_dict[matiere_key] = {"HeureConsomme": 0, "seances": []}
+                    matiere_key = matiere.libelle
+                    if matiere_key not in matieres_dict:
+                        matieres_dict[matiere_key] = {"HeureConsomme": 0, "seances": []}
 
-                        matieres_dict[matiere_key]["HeureConsomme"] = str(int(hours))+'h '+str(int(minutes))+'min'
-                        matieres_dict[matiere_key]["HeurePrevues"] = str(int(matiere.heures))+'h00min'
-                        matieres_dict[matiere_key]["UE"] = matiere.ue
-                        matieres_dict[matiere_key]["Prof"] = matiere.enseignant
-                        matieres_dict[matiere_key]["seances"]=seances_prime
-                    
-                context={'etudiants':etudiants,
-                         'semestre':semestre_id,
-                         'ues':ues,
-                         'matieres' : matieres,
-                         'listeEtudiant':listeEtudiant,
-                         'listeMatiere':listeMatiere,
-                         'listeAbsence':listeAbsence,
-                         'commentaires':commentaires,
-                         'listeUe':listeUe,
-                         'listeEtudiant':listeEtudiant,
-                         'seances':matieres_dict,
-                         'sousCategorisation':sousCategorisation
-                        }        
-                latex_input = 'cahier_de_texte'
-                latex_ouput = 'CDT_'+str(semestre_id)+'_'+str(datetime.datetime.now())
-                pdf_file = 'CDT_'+str(semestre_id)+'_'+str(datetime.datetime.now())
+                    matieres_dict[matiere_key]["HeureConsomme"] = str(int(hours))+'h '+str(int(minutes))+'min'
+                    matieres_dict[matiere_key]["HeurePrevues"] = str(int(matiere.heures))+'h00min' if matiere.heures!=None else "Non definit"
+                    matieres_dict[matiere_key]["UE"] = matiere.ue
+                    matieres_dict[matiere_key]["Prof"] = matiere.enseignant
+                    matieres_dict[matiere_key]["seances"]=seances_prime
+                
+            context={'etudiants':etudiants,
+                        'semestre':semestre_id,
+                        'ues':ues,
+                        'matieres' : matieres,
+                        'listeEtudiant':listeEtudiant,
+                        'listeMatiere':listeMatiere,
+                        'listeAbsence':listeAbsence,
+                        'commentaires':commentaires,
+                        'listeUe':listeUe,
+                        'listeEtudiant':listeEtudiant,
+                        'seances':matieres_dict,
+                        'sousCategorisation':sousCategorisation,
+                        'HeureConsomme':HeureConsomme
+                    }        
+            latex_input = 'cahier_de_texte'
+            latex_ouput = 'CDT_'+str(semestre_id)+'_'+str(datetime.datetime.now())
+            pdf_file = 'CDT_'+str(semestre_id)+'_'+str(datetime.datetime.now())
 
-                # génération du pdf
-                generate_pdf(context, latex_input, latex_ouput, pdf_file)
-                pdf_paths.append('media/pdf/' + pdf_file)
+            # génération du pdf
+            generate_pdf(context, latex_input, latex_ouput, pdf_file)
+            pdf_paths.append('media/pdf/' + pdf_file)
 
     if len(pdf_paths) > 1:
             notification = {
@@ -449,8 +472,6 @@ def imprimer(request):
     response = HttpResponse(merged_pdf_content, content_type='application/pdf')
     response['Content-Disposition'] = 'inline;filename=merged_pdfs.pdf'
     return response
-        
-                
 
 
 

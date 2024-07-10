@@ -11,6 +11,10 @@ db.sqlite3
 
 db*
 
+backup
+whole.json
+whole.*
+
 **/.zip
 **/migrations/**
 docs/build/*
@@ -171,3 +175,5 @@ projet_ifnti/settings.py
 media/excel_templates/export/*
 #ignore my service file
 gestion_ifnti.service
+*.sqlite3
+
