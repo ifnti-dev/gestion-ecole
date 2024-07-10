@@ -1515,8 +1515,11 @@ def enregistrer_bulletin_stagiaire(request, id=0):
                 bulletin.compte_bancaire = compte_universite
                 bulletin.save()
                 deductions = Decimal(bulletin.frais_risques_professionnel) * Decimal(bulletin.personnel.salaireBrut)  
-                montant_a_prelever = bulletin.salaire_net_a_payer + deductions 
-                compte_universite.solde_bancaire -= montant_a_prelever
+                print("deduction f :",float(deductions))
+                print('salaire + ded : ',bulletin.salaire_net_a_payer + deductions)
+                #montant_a_prelever = bulletin.salaire_net_a_payer + deductions 
+                #compte_universite.solde_bancaire -= montant_a_prelever
+                compte_universite.solde_bancaire= compte_universite.solde_bancaire - float(bulletin.salaire_net_a_payer + deductions)
                 compte_universite.save()
                 
                 id_annee_selectionnee = AnneeUniversitaire.static_get_current_annee_universitaire().id

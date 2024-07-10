@@ -85,19 +85,37 @@ Primes forfaitaires: & \VAR{prime_forfaitaire} FCFA  \\\\
    {\Large \textbf{Net à payer:}} & \textbf{\VAR{bulletin.salaire_net_a_payer} FCFA} \end{tabular}
 \end{flushleft}
 
-
 \begin{flushright}
-Fait à Sokodé le \today
-\end{flushright}\vspace{1mm}
-Signature de l'Employé \hspace{3.3cm}  Le Responsable d'établissement
-\begin{flushleft}
-\vspace{0.75cm}
-Mr \VAR{bulletin.personnel}
-\end{flushleft}
+Sokodé le \today
+\end{flushright}\vspace{2mm}
+
+Signature de l'Employé \hspace{5.3cm}  Le Responsable d'établissement
+\vspace{1cm}
 
 
-\begin{flushright}
-\vspace{0.75cm}
+\begin{minipage}[t]{0.5\textwidth} % Début de la première zone de texte
+\raggedright % Alignement à gauche
+Mr  \VAR{bulletin.personnel.nom}  \VAR{bulletin.personnel.prenom} 
+\end{minipage} % Fin de la première zone de texte
+\hfill % Espace flexible pour remplir l'espace entre les deux zones de texte
+\begin{minipage}[t]{0.4\textwidth} % Début de la deuxième zone de texte
+\raggedleft % Alignement à droite
 Mr Sabirou Mohamed TEOURI
-\end{flushright}
+
+\end{minipage} % Fin de la deuxième zone de texte
+
+% \begin{flushright}
+% Fait à Sokodé le \today \VAR{bulletin.personnel.nom}  \VAR{bulletin.personnel.prenom}
+% \end{flushright}\vspace{1mm}
+% Signature de l'Employé \hspace{3.3cm}  Le Responsable d'établissement
+% \begin{flushleft}
+% \vspace{0.75cm}
+% Mr \VAR{bulletin.personnel}
+% \end{flushleft}
+
+
+% \begin{flushright}
+% \vspace{0.75cm}
+% Mr Sabirou Mohamed TEOURI
+% \end{flushright}
 \end{document}
