@@ -1003,15 +1003,20 @@ def carte_etudiant(request, id, niveau):
     latex_ouput = 'generated_carte_etudiant'
     pdf_file = 'carte_etudiant_' + str(etudiant.id)
 
-    # génération du pdf
-    generate_pdf(context, latex_input, latex_ouput, pdf_file)
-
     # visualisation du pdf dans le navigateur
-    with open('media/pdf/' + str(pdf_file) + '.pdf', 'rb') as f:
-        pdf_preview = f.read()
-        response = HttpResponse(pdf_preview, content_type='application/pdf')
-        response['Content-Disposition'] = 'inline;filename=pdf_file.pdf'
-        return response
+    try:
+        # génération du pdf
+        generate_pdf(context, latex_input, latex_ouput, pdf_file)
+
+        # visualisation du pdf dans le navigateur
+        with open('media/pdf/' + str(pdf_file) + '.pdf', 'rb') as f:
+            pdf_preview = f.read()
+            response = HttpResponse(pdf_preview, content_type='application/pdf')
+            response['Content-Disposition'] = 'inline;filename=pdf_file.pdf'
+            return response
+    except:
+        messages.add_message(request, messages.ERROR, "Ce etudient n'a toutes les informations pour generer une carte")
+        return redirect("/main/etudiants/")
 
 
 @login_required(login_url=settings.LOGIN_URL)
