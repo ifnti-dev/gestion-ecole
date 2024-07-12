@@ -4,14 +4,14 @@
 
 <div class="block block-rounded m-5">
     <div class="block-header p-4">
-        <a href="{% url 'conges:demandes_validees' id_annee_selectionnee %}" class="btn btn-outline-warning">
+        <a href="{% url 'conges:demandes_validees' id_annee_selectionnee %}" class="btn btn-outline-warning shadow-sm">
             Demandes validées
         </a>
-        <a href="{% url 'conges:demandes_rejettees' id_annee_selectionnee %}" class="btn btn-outline-warning">
+        <a href="{% url 'conges:demandes_rejettees' id_annee_selectionnee %}" class="btn btn-outline-warning shadow-sm">
             Demandes rejettées
         </a>
     </div>
-    <div class="block-content block-content-full">
+    <div class="block-content block-content-full shadow-lg">
         <h3 class="block-title" style="text-align: center;">Demandes de congés en attente</h3>
         <table class="table table-bordered table-striped table-vcenter js-dataTable-full-pagination">
             <thead>
