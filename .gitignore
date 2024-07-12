@@ -173,4 +173,7 @@ main/migrations/0001_initial.py
 projet_ifnti/settings.py
 #Ignore folder export evaluation
 media/excel_templates/export/*
+#ignore my service file
+gestion_ifnti.service
 *.sqlite3
+

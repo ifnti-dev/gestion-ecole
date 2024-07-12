@@ -7,7 +7,7 @@ from django.conf import settings
 from main.forms import EnseignantForm, EtudiantForm, EvaluationForm, InformationForm, PersonnelForm, ProgrammeForm, NoteForm, TuteurForm, UeForm, MatiereForm
 from scripts.mail_utils import send_email_task
 from scripts.utils import export_evaluation_data, load_notes_from_evaluation, pre_load_evaluation_template_data
-from .models import Domaine, Enseignant, Evaluation, Personnel, Information, Matiere, Etudiant, Competence, Note, Parcours, Programme, Semestre, Ue, AnneeUniversitaire, Tuteur, Utilisateur
+from .models import Domaine, Enseignant, Evaluation, Parametre, Personnel, Information, Matiere, Etudiant, Competence, Note, Parcours, Programme, Semestre, Ue, AnneeUniversitaire, Tuteur, Utilisateur
 from cahier_de_texte.models import Seance
 from planning.models import Planning, SeancePlannifier
 
@@ -2492,7 +2492,10 @@ def enseignant_detail(request, id):
 @login_required(login_url=settings.LOGIN_URL)
 def certificat_travail(request, id):
     information = get_object_or_404(Information, id=id)
-    context = {'information': information}
+    parametre=Parametre.objects.first()
+    context = {'information': information,
+                'parametre':parametre,
+            }
 
     # nom des fichiers d'entrée et de sortie
     latex_input = 'certificat_travail'
@@ -2534,8 +2537,8 @@ def enregistrer_informations(request, id=0):
             form = InformationForm(request.POST, instance=information)
         if form.is_valid():
             information = form.save(commit=False)
-            directeur = DirecteurDesEtudes.objects.get(user=request.user)
-            information.directeur = directeur
+            directeur = Personnel.objects.get(user=request.user,)
+            #information.directeur = directeur
 
             dateDebut = information.dateDebut
             dateFin = information.dateFin

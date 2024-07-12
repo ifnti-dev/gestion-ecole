@@ -2048,6 +2048,10 @@ class Parametre(models.Model):
     nom_institut = models.CharField(max_length=255, null=True, blank=True)
     logo_institut = models.ImageField(upload_to='logo_institut', null=True, blank=True)
     directeur_des_etudes = models.CharField(max_length=255, null=True, blank=True)
+    
+    def __str__(self):
+        return self.numero_compte +" "+ self.nom_institut +" " +self.directeur_des_etudes
+    
 
 class CorrespondanceMaquette(models.Model):
     """
@@ -2897,7 +2901,7 @@ class Information(models.Model):
         super(Information, self).save(*args, **kwargs)
 
     def __str__(self):
-        return str(self.enseignant.nom) + " " + str(self.numeroSecurite) + " " + str(self.discipline.libelle)
+        return str(self.enseignant.personnel.nom) + " " + str(self.numeroSecurite) + " " + str(self.discipline.libelle)
 
 class FicheDePaie(models.Model):
     """

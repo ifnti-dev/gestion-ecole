@@ -43,13 +43,13 @@
             </thead>
             <tbody>
                 <tr>
-                    <td class="text-center font-size-sm">{{enseignant.sexe}}</td>
-                    <td class="text-center font-size-sm">{{enseignant.email}}</td>
-                    <td class="text-center font-size-sm">{{enseignant.contact}}</td>
-                    <td class="text-center font-size-sm">{{enseignant.adresse}}</td>
-                    <td class="text-center font-size-sm">{{enseignant.datenaissance}}</td>
-                    <td class="text-center font-size-sm">{{enseignant.lieunaissance}}</td>              
-                    <td class="text-center font-size-sm">{{enseignant.is_active}}</td>
+                    <td class="text-center font-size-sm">{{enseignant.personnel.sexe}}</td>
+                    <td class="text-center font-size-sm">{{enseignant.personnel.email}}</td>
+                    <td class="text-center font-size-sm">{{enseignant.personnel.contact}}</td>
+                    <td class="text-center font-size-sm">{{enseignant.personnel.adresse}}</td>
+                    <td class="text-center font-size-sm">{{enseignant.personnel.datenaissance}}</td>
+                    <td class="text-center font-size-sm">{{enseignant.personnel.lieunaissance}}</td>              
+                    <td class="text-center font-size-sm">{{enseignant.personnel.is_active}}</td>
                     <td class="text-center font-size-sm">{{enseignant.type}}</td>
                 </tr>
             </tbody>
@@ -74,12 +74,12 @@
             <tbody>
                 <tr>
                     <td class="text-center font-size-sm">{{enseignant.specialite}}</td>
-                    <td class="text-center font-size-sm">{{enseignant.numero_cnss}}</td>
-                    <td class="text-center font-size-sm">{{enseignant.nif}}</td>
-                    <td class="text-center font-size-sm">{{enseignant.salaireBrut}} FCFA</td>
-                    <td class="text-center font-size-sm">{{enseignant.nombre_de_personnes_en_charge}}</td>
-                    <td class="text-center font-size-sm">{{enseignant.nbreJrsCongesRestant}}</td>
-                    <td class="text-center font-size-sm">{{enseignant.nbreJrsConsomme}}</td>
+                    <td class="text-center font-size-sm">{{enseignant.personnel.numero_cnss}}</td>
+                    <td class="text-center font-size-sm">{{enseignant.personnel.nif}}</td>
+                    <td class="text-center font-size-sm">{{enseignant.personnel.salaireBrut}} FCFA</td>
+                    <td class="text-center font-size-sm">{{enseignant.personnel.nombre_de_personnes_en_charge}}</td>
+                    <td class="text-center font-size-sm">{{enseignant.personnel.nbreJrsCongesRestant}}</td>
+                    <td class="text-center font-size-sm">{{enseignant.personnel.nbreJrsConsomme}}</td>
                 </tr>
             </tbody>
         </table>
@@ -98,9 +98,9 @@
             
             <tbody>
                 <tr>
-                    <td class="text-center font-size-sm">{{enseignant.calculer_salaire_brut_annuel}} FCFA</td>
-                    <td class="text-center font-size-sm">{{enseignant.calculer_irpp_tcs_annuel}} FCFA</td>
-                    <td class="text-center font-size-sm">{{enseignant.calcule_deductions_cnss_annuel}} FCFA</td>
+                    <td class="text-center font-size-sm">{{enseignant.personnel.calculer_salaire_brut_annuel}} FCFA</td>
+                    <td class="text-center font-size-sm">{{enseignant.personnel.calculer_irpp_tcs_annuel}} FCFA</td>
+                    <td class="text-center font-size-sm">{{enseignant.personnel.calcule_deductions_cnss_annuel}} FCFA</td>
                 </tr>
             </tbody>
         </table>

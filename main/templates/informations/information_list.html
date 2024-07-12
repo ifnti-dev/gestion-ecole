@@ -25,7 +25,7 @@
                 <tbody>
                     {% for information in informations_enseignants %}
                     <tr>
-                        <td class="text-center">{{information.enseignant.nom}} {{information.enseignant.prenom}}</td>
+                        <td class="text-center">{{information.enseignant.personnel.nom}} {{information.enseignant.prenom}}</td>
                         <td class="text-center">{{information.numeroSecurite}}</td>
                         <td class="text-center">{{information.discipline.libelle}}</td>
                         <td class="text-center">{{information.dateDebut}}</td>

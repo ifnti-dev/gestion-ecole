@@ -1,10 +1,14 @@
 from django.contrib import admin
-from .models import User, Enseignant, Evaluation, CompteBancaire, Fournisseur, Domaine,Information, Parcours,Programme, Matiere, Etudiant, Competence, Note, Semestre, Ue, AnneeUniversitaire, Personnel, Tuteur, Paiement, FicheDePaie, Frais, CompteEtudiant, VersmentSalaire, Conge
+from .models import User, Enseignant, Parametre,Evaluation, CompteBancaire, Fournisseur, Domaine,Information, Parcours,Programme, Matiere, Etudiant, Competence, Note, Semestre, Ue, AnneeUniversitaire, Personnel, Tuteur, Paiement, FicheDePaie, Frais, CompteEtudiant, VersmentSalaire, Conge
 from cahier_de_texte.models import Seance
 from planning.models import Planning,SeancePlannifier
 from main.forms import EnseignantForm
 from import_export.admin import ImportExportModelAdmin
 
+
+@admin.register(Parametre)
+class ParametreImportExport(ImportExportModelAdmin):
+    pass
 
 @admin.register(Etudiant)
 class EtudiantImportExport(ImportExportModelAdmin):

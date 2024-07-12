@@ -114,22 +114,22 @@
 \newpage
 \clearpage % or \cleardoublepage
 
+%%%%%%%%%%%%%%%%%%%%%%% parMatieres %%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \BLOCK{if sousCategorisation == 'parMatieres'}
 	\BLOCK{for mat  in seances}
 		.
+		\BLOCK{if HeureConsomme }
+			{\vspace{2cm}\hspace{2.5cm}\LARGE Heures Prévues : \textbf{\VAR{seances[mat].HeurePrevues}}}\\
+			{\vspace{2cm}\hspace{2.5cm}\LARGE Heures Consommées : \textbf{\VAR{seances[mat].HeureConsomme}}}\\
+			{\vspace{2cm}\hspace{2.5cm}\LARGE UE : \textbf{\VAR{seances[mat].UE.libelle}}}\\
+		\BLOCK{endif}
 
 		{\vspace{6cm}\hspace{2.5cm}\LARGE Matiere : \textbf{\VAR{mat}}} \\
-	
-		{\vspace{2cm}\hspace{2.5cm}\LARGE Heures Prévues : \textbf{\VAR{seances[mat].HeurePrevues}}}\\
- 
-		{\vspace{2cm}\hspace{2.5cm}\LARGE Heures Consommées : \textbf{\VAR{seances[mat].HeureConsomme}}}\\
 
 		{\vspace{2cm}\hspace{2.5cm}\LARGE Nombres de Séances : \textbf{\VAR{seances[mat].seances|length}}}\\
 
-		{\vspace{2cm}\hspace{2.5cm}\LARGE UE : \textbf{\VAR{seances[mat].UE.libelle}}}\\
-
 		{\vspace{2cm}\hspace{2.5cm}\LARGE Professeur Responsable : \textbf{\VAR{seances[mat].Prof}}}\\
-
 
 		\newpage
 		\begin{longtable}{|P{4cm}|P{9cm}|P{4cm}|}
@@ -163,10 +163,7 @@
 				\underline{Details Séance}:
 				\linebreak
 				\VAR{cour.description}
-				\linebreak
-				\linebreak
-				\linebreak
-				\linebreak
+
 				\underline{Validé par l'enseignant ?}: \BLOCK{if cour.valider} Oui \BLOCK{else} Non \BLOCK{endif}
 				&\underline{Matiere}:
 				\linebreak
@@ -174,7 +171,7 @@
 				\linebreak    
 				\underline{Enseignant}:
 				\linebreak
-				\VAR{cour.enseignant.prenom} \VAR{cour.enseignant.nom}
+				\VAR{cour.enseignant}
 				\linebreak
 				\BLOCK{if commentaires =="on"}
 				\underline{Commentaires Prof}:
@@ -189,6 +186,8 @@
 		\newpage
 	\BLOCK{endfor}
 \BLOCK{endif}
+
+%%%%%%%%%%%%%%%%%%%%%%% chronologieHoraire %%%%%%%%%%%%%%%%%%%%%%%%%%%
 \BLOCK{if sousCategorisation == 'chronologieHoraire'}
 	\begin{longtable}{|P{4cm}|P{9cm}|P{4cm}|}
 		\hline
@@ -220,18 +219,13 @@
 			\underline{Details Séance}:
 			\linebreak
 			\VAR{cour.description}
-			\linebreak
-			\linebreak
-			\linebreak
-			\linebreak
 			\underline{Validé par l'enseignant ?}: \BLOCK{if cour.valider} Oui \BLOCK{else} Non \BLOCK{endif}
 			&\underline{Matiere}:
 			\linebreak
 			\VAR{cour.matiere.codematiere}::\VAR{cour.matiere.libelle}
 			\linebreak    
 			\underline{Enseignant}:
-			\linebreak
-			\VAR{cour.enseignant.prenom} \VAR{cour.enseignant.nom}
+			\VAR{cour.enseignant}
 			\linebreak
 			\BLOCK{if commentaires =="on"}
 			\underline{Commentaires Prof}:
