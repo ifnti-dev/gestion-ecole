@@ -557,20 +557,30 @@ def imprimer(request, planningId):
         tab_seance_plannifier[i].append(start_time)
         tab_seance_plannifier[i].append(end_time)
 
-        ligne = recup_seanceplannifier.filter(date_heure_debut__time__gte=start_time, date_heure_debut__time__lte=end_time)
-        for mat in ligne:
-            tab_seance_plannifier[i].append(mat.matiere.libelle)
+        # ligne = recup_seanceplannifier.filter(date_heure_debut__time__gte=start_time, date_heure_debut__time__lte=end_time)
+        # for mat in ligne:
+        #     tab_seance_plannifier[i].append(mat.matiere.libelle)
 
-        taille_max = 8 
-        taille_tableau = len(tab_seance_plannifier[i])
+        # taille_max = 8 
+        # taille_tableau = len(tab_seance_plannifier[i])
         
 
-        for _ in range(taille_tableau, taille_max):
-            tab_seance_plannifier[i].append("études")
+        # for _ in range(taille_tableau, taille_max):
+        #     tab_seance_plannifier[i].append("études")
+
+    
+
+    for elt in tab_seance_plannifier:
+        ligne = {
+            "c1" : elt[0],
+            "c2" : elt[1]
+        }
+
+        print(ligne)
             
-    print(days)
 
 
+    # print(tab_seance_plannifier)
 
     context = {
         'lignes' : tab_seance_plannifier,
