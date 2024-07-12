@@ -111,7 +111,9 @@ class PersonnelApiTest(TestCase):
             "email":"toub@gmail.com","adresse":"sokode",
             "prefecture":"tchaoudjo","carte_identity":45896,
             "nationalite":"togolaise","salaireBrut":10000,
-            "nbreJrsCongesRestant":30,"nbreJrsConsomme":8, def test_formulaire_demande_conges(self):
+            "nbreJrsCongesRestant":30,"nbreJrsConsomme":8, 
+        }
+    def test_formulaire_demande_conges(self):
         url=f"{BASE_URL}/personnel/form__demander_conge/1"
         response=requests.get(url)
         self.assertEqual(response.status_code,status.HTTP_200_OK)
