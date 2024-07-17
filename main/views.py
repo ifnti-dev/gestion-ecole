@@ -1475,7 +1475,7 @@ def releve_notes_semestre(request, id_semestre):
 
 @login_required(login_url=settings.LOGIN_URL)
 # methode générant le relevé détaillé d'un étudiant
-def releve_notes_detail(request, id, id_semestre):
+def releve_notes_detail(request, id_etudiant, id_semestre):
     """
     Génére le relevé de notes détaillé par matière d'un étudiant au cours d'un semestre.
     :param request: L'objet de requête Django.
@@ -1488,7 +1488,7 @@ def releve_notes_detail(request, id, id_semestre):
         return render(request, 'errors_pages/403.html')
 
     semestre = get_object_or_404(Semestre, id=id_semestre)
-    etudiant = get_object_or_404(Etudiant, id=id)
+    etudiant = get_object_or_404(Etudiant, id=id_etudiant)
 
     if request.user.groups.all().first().name == 'etudiant':
         if request.user.etudiant and request.user.etudiant != etudiant:
@@ -1557,8 +1557,10 @@ def releve_notes_detail(request, id, id_semestre):
 
 
 @login_required(login_url=settings.LOGIN_URL)
-def releve_notes_details_all(request, id_semestre):
+def releve_notes_details_all(request, id_semestre, avec_rattrapage=None):
 
+    avec_rattrapage = True if avec_rattrapage else False
+    
     if request.user.groups.all().first().name not in ['directeur_des_etudes', 'secretaire']:
         return render(request, 'errors_pages/403.html')
 
@@ -1602,9 +1604,9 @@ def releve_notes_details_all(request, id_semestre):
             nbre_matieres = len(ue.matiere_set.all())
             for matiere in ue.matiere_set.all():
                 # récupération des matières de l'ue et la moyenne de l'étudiant dans celles-ci
-                moyenne, _, _ = etudiant.moyenne_etudiant_matiere(matiere, semestre)
+                moyenne, _, _ = etudiant.moyenne_etudiant_matiere(matiere, semestre, avec_rattrapage)
                 matieres.append({'matiere': matiere, 'moyenne_matiere': format(moyenne, '.2f')})
-            moyenne, a_valider, _ = etudiant.moyenne_etudiant_ue(ue, semestre)
+            moyenne, a_valider, _ = etudiant.moyenne_etudiant_ue(ue, semestre, avec_rattrapage)
             credit = ue.nbreCredits if a_valider else 0
             total_credit += credit
             # credit = str(credit) + ":" + str(ue.minValue)

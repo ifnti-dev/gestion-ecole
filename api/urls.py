@@ -55,7 +55,7 @@ urlpatterns = [
     path("ue/deltail/<int:pk>", ue_api_views.detail_ue),
     path("ue/delete/<int:pk>", ue_api_views.delete_ue),
     #-----api des matieres------------
-    path("etudiant/", etudiant_list),
+    #path("etudiant/", etudiant_list),
     path("matieres/", list_matiere),
     path("matiere/create/<int:id>/", create_matiere),
     path("matiere/update/<int:id>/", update_matiere),
@@ -63,5 +63,4 @@ urlpatterns = [
     path("matiere/detail/<int:id>/", detail_matiere),
     #-----api des programme------------
     path("programmes/", get_programme)
-    path("matiere/detail/<int:id>/", detail_matiere)
 ]
