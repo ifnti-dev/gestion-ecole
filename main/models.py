@@ -597,7 +597,7 @@ class Etudiant(Utilisateur):
                 result.append(_result)
         return result
 
-    def moyenne_etudiant_matiere(self, matiere, semestre):
+    def moyenne_etudiant_matiere(self, matiere, semestre, avec_rattrapage=False):
         """
 
             Cette fonction permet de calculer la moyenne de l'étudiant dans une matière et de donner l'année de validation, si l'étudiant à passé des rattrapages il retourne alors la note de rattrapage et l'année de passage de rattrapage. Ces deux valeurs seront associées d'un booléen définissant si la personne à validé la matière ou non.
@@ -624,7 +624,7 @@ class Etudiant(Utilisateur):
         # s'il il y'a eu des rattrapages alors on recherche les notes de l'étudiant au cours de ces rattrapages
         moyenne_rattrapage, a_valide_rattrapage, anneeValidation_rattrapage = 0,0,0
         
-        if rattrapages:
+        if avec_rattrapage and rattrapages:
             for rattrapage in rattrapages:
                 note = rattrapage.note_set.filter(etudiant=self)
                 # si l'étudiant a eu à passer alors un ou plusieurs rattrapage on prend uniquement la note la plus élevée
@@ -650,14 +650,13 @@ class Etudiant(Utilisateur):
                 
         moyenne = round(somme/100, 2)
         a_valide = moyenne >= matiere.minValue
-        print(moyenne," - ", moyenne_rattrapage)
+        # print(moyenne," - ", moyenne_rattrapage)
         if moyenne_rattrapage > moyenne:
             return moyenne_rattrapage, a_valide_rattrapage, anneeValidation_rattrapage
         return moyenne, a_valide, semestre.annee_universitaire.annee
 
-    def moyenne_etudiant_ue(self, ue, semestre):
+    def moyenne_etudiant_ue(self, ue, semestre, avec_rattrapage=False):
         """
-
             Cette fonction permet de calculer la moyenne de l'étudiant dans une UE et de donner l'année de validation. L'année de validation est déterminée dans les cas de rattrapage passé par l'étudinat dans une matière de l'ue par l'année du dernier rattrapage en date passé par l'étudiant et qui de surcroît a été validé.
 
             :param ue: L'UE dans laquelle la moyenne est calculée. 
@@ -666,8 +665,6 @@ class Etudiant(Utilisateur):
             :type semestre: Semestre
             :return: Retourne un tuple contenant la moyenne obtenue, un booléen déterminant si l'étudiant à validé ou pas, et l'année de validation.
             :retype: tuple(moyenne, validation, année de validation)
-
-
         """
         moyenne = 0
         somme_note = 0
@@ -677,26 +674,27 @@ class Etudiant(Utilisateur):
         # si l'étudiant à tout validé correctement alors l'année est maintenue
         # dans le cas contraire il s'agit de l'année de validation du dernier rattrapage qu'il à réussi
         anneeValidation = semestre.annee_universitaire.annee
-
+        validation_matieres = True
+        
         if not matieres:
             return 0.0, False, anneeValidation
 
         for matiere in matieres:
-            note, validation_matiere, annee = self.moyenne_etudiant_matiere(matiere, semestre)
+            note, validation_matiere, annee = self.moyenne_etudiant_matiere(matiere, semestre, avec_rattrapage)
             somme_note += float(note) * float(matiere.coefficient)
             somme_coef += matiere.coefficient
+            validation_matieres = validation_matieres and validation_matiere
             # ici on effectue une comparaison pour récupérer l'année scolaire la plus élevée
             # il s'agit en réalité de l'année de la validation du dernier rattrapage
             if anneeValidation < annee:
                 anneeValidation = annee
 
         moyenne = round(somme_note/somme_coef, 2)
-        a_valide = moyenne >= ue.minValue
+        if validation_matieres:
+            a_valide = moyenne >= ue.minValue
+        else:
+            a_valide = validation_matieres
         return moyenne, a_valide, anneeValidation
-
-
-# Calcule le nombre de crédits obtenus par l'étudiant dans un semestre donné.
-
 
     def credits_obtenus_semestre(self, semestre):
         """
