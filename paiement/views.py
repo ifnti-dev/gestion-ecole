@@ -907,7 +907,7 @@ def enregistrer_bulletin(request, id=0):
                 taxes_cnss = Decimal(bulletin.frais_prestations_familiale_salsalaire) * Decimal(bulletin.personnel.salaireBrut) + Decimal(bulletin.frais_prestations_familiales) * Decimal(bulletin.personnel.salaireBrut) + Decimal(bulletin.frais_risques_professionnel) * Decimal(bulletin.personnel.salaireBrut) + Decimal(bulletin.frais_pension_vieillesse_emsalaire) * Decimal(bulletin.personnel.salaireBrut) 
                 deductions = taxes_cnss + bulletin.tcs
                 montant_a_prelever = bulletin.salaire_net_a_payer + deductions 
-                compte_universite.solde_bancaire -= montant_a_prelever
+                compte_universite.solde_bancaire -= float(montant_a_prelever)
                 compte_universite.save()
                 
                 id_annee_selectionnee = AnneeUniversitaire.static_get_current_annee_universitaire().id
