@@ -38,7 +38,8 @@ def liste_mes_conges(request, id_annee_selectionnee):
     """
     annee_universitaire = get_object_or_404(AnneeUniversitaire, pk=id_annee_selectionnee)    
     conges = Conge.objects.filter(annee_universitaire=annee_universitaire, personnel__user=request.user)   
-    personnel = Personnel.objects.get(user=request.user)  # Récupérer l'objet Personnel associé à l'utilisateur actuel
+    
+    personnel = get_object_or_404(Personnel, user=request.user)  # Récupérer l'objet Personnel associé à l'utilisateur actuel
     
     date_debut_formatted_list = []
     date_fin_formatted_list = []
