@@ -1488,6 +1488,7 @@ def enregistrer_bulletin_stagiaire(request, id=0):
             form = StagiairesForm()
         else:
             bulletin = VersmentSalaire.objects.get(pk=id)
+            print(bulletin.date_debut)
             form = StagiairesForm(instance=bulletin)   
         return render(request, 'salaires/enregistrer_bulletin_stagiaire.html', {'form': form})
     else:
@@ -1516,7 +1517,7 @@ def enregistrer_bulletin_stagiaire(request, id=0):
                 bulletin.save()
                 deductions = Decimal(bulletin.frais_risques_professionnel) * Decimal(bulletin.personnel.salaireBrut)  
                 montant_a_prelever = bulletin.salaire_net_a_payer + deductions 
-                compte_universite.solde_bancaire -= montant_a_prelever
+                compte_universite.solde_bancaire -= float(montant_a_prelever)
                 compte_universite.save()
                 
                 id_annee_selectionnee = AnneeUniversitaire.static_get_current_annee_universitaire().id
