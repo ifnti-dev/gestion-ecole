@@ -79,20 +79,25 @@ Primes forfaitaires: & \VAR{prime_forfaitaire} FCFA  \\\\
    {\Large \textbf{Net à payer:}} & \textbf{\VAR{salaire_net} FCFA} \end{tabular}
 \end{flushleft}
 
-\begin{flushright}
-    Fait à Sokodé, le \today \end{flushright}\vspace{1mm}
-Signature de l'Employé \hspace{3.3cm}  Le Responsable d'établissement
+\begin{minipage}[t]{0.5\textwidth} % Début de la première zone de texte
+   \raggedright Signature de l'Employé
+\end{minipage} % Fin de la première zone de texte
+ %\hfill % Espace flexible pour remplir l'espace entre les deux zones de texte
+\begin{minipage}[t]{0.5\textwidth} % Début de la deuxième zone de texte
+    \raggedleft % Alignement à droite
+     Le Responsable d'établissement
+\end{minipage}
 
-\vspace{1cm}
+\vspace{30mm}
 
 \begin{minipage}[t]{0.5\textwidth} % Début de la première zone de texte
-    \raggedright % Alignement à gauche
-    \VAR{fiche_paie.personnel.nom} \VAR{fiche_paie.personnel.prenom}
-    \end{minipage} % Fin de la première zone de texte
-    \hfill % Espace flexible pour remplir l'espace entre les deux zones de texte
-    \begin{minipage}[t]{0.4\textwidth} % Début de la deuxième zone de texte
+   \raggedright \VAR{fiche_paie.personnel.nom} \VAR{fiche_paie.personnel.prenom}
+\end{minipage} % Fin de la première zone de texte
+ %\hfill % Espace flexible pour remplir l'espace entre les deux zones de texte
+\begin{minipage}[t]{0.5\textwidth} % Début de la deuxième zone de texte
     \raggedleft % Alignement à droite
     Mr Sabirou Mohamed TEOURI
-    \end{flushright}
+\end{minipage}
+
 
 \end{document}
