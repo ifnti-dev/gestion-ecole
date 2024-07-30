@@ -567,7 +567,7 @@ def compte_bancaire(request, id_annee_selectionnee):
     fiche_de_charge = Charge.objects.filter(annee_universitaire=id_annee_selectionnee)
     total_charges = sum(fiche.montant for fiche in fiche_de_charge)
 
-    total_salaires = (total_charges + total_fiche_de_paies) + montant_total_salaires
+    total_salaires = (total_charges + total_fiche_de_paies) + float(montant_total_salaires)
 
     compte_bancaire_obj = CompteBancaire.objects.first()
     compte_existe = compte_bancaire_obj is not None

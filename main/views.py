@@ -61,27 +61,24 @@ def dashboard(request):
         :param request: L'objet de requête Django.
         :return: Une réponse HTTP avec le tableau de bord et les informations associées.
     """
+    #return render(request, 'index.html')
+
     id_annee_selectionnee = request.session.get('id_annee_selectionnee')
     annee_selectionnee = get_object_or_404(
         AnneeUniversitaire, pk=id_annee_selectionnee)
     semestres = annee_selectionnee.get_semestres()
     if request.user.groups.all().first().name in ['directeur_des_etudes', 'comptable', 'secretaire']:
         tous_les_etudiants = Etudiant.objects.all()
-        etudiants = tous_les_etudiants.filter(
-            semestres__in=semestres).distinct()
-        # etudiants_sans_context =
+        etudiants = tous_les_etudiants.filter(semestres__in=semestres).distinct()
 
         tous_les_enseignants = Enseignant.objects.all()
-        enseignants = tous_les_enseignants.filter(
-            matiere__ue__programme__semestre__in=semestres).distinct()
+        enseignants = tous_les_enseignants.filter(matiere__ue__programme__semestre__in=semestres).distinct()
 
         toutes_les_matieres = Matiere.objects.all()
-        matieres = toutes_les_matieres.filter(
-            ue__programme__semestre__in=semestres).distinct()
+        matieres = toutes_les_matieres.filter(ue__programme__semestre__in=semestres).distinct()
 
         toutes_les_ues = Ue.objects.all()
-        ues = toutes_les_ues.filter(
-            programme__semestre__in=semestres).distinct()
+        ues = toutes_les_ues.filter(programme__semestre__in=semestres).distinct()
         ues_non_utilise = toutes_les_ues.filter(programme=None)
 
         data = {
@@ -115,14 +112,14 @@ def dashboard(request):
 
     elif request.user.groups.all().first().name == 'enseignant':
 
-        enseignant = get_object_or_404(Enseignant, user=request.user)
-
+        enseignant = Enseignant.objects.filter(personnel__user=request.user).get()
         seances = SeancePlannifier.objects.filter(professeur=enseignant)
         event_data = [{'title': seance.intitule, 'start': seance.date_heure_debut,
                        'end': seance.date_heure_fin, 'url': '/planning/seance/' + str(seance.id) + ''} for seance in seances]
         event_data = json.dumps(event_data, default=datetime_serializer)
         context = {'event_data': event_data}
-        return render(request, 'dashboard.html', context)
+        #return HttpResponse("Hello")
+        return render(request, 'dashboard.html', context=context)
 
 
 def change_annee_universitaire(request):
@@ -2254,6 +2251,7 @@ def login_view(request):
             request.session['is_enseignant'] = False if is_directeur_des_etudes else is_enseignant
             request.session['is_secretaire'] = False if is_directeur_des_etudes else is_secretaire
             request.session['is_comptable'] = False if is_directeur_des_etudes else is_comptable
+            
 
             has_model = False
             if is_etudiant:
@@ -2269,10 +2267,13 @@ def login_view(request):
                 try:
                     personnel = user.personnel
                     id_auth_model = personnel.id
+                    print("Hello")
+                    print(personnel)
 
-                    if is_enseignant:
-                        id_auth_model = Enseignant.objects.get(user=user).id
-                        request.session['profile_path'] = f'main/detail_etudiant/{id_auth_model}/'
+                    # if is_enseignant:
+                    #     id_auth_model = Enseignant.objects.get(user=user).id
+                    #     request.session['profile_path'] = f'main/detail_etudiant/{id_auth_model}/'
+                    print(id_auth_model)
                     request.session['id_auth_model'] = id_auth_model
                     has_model = True
                 except Exception as e:
@@ -2293,12 +2294,12 @@ def recuperation_mdp(request):
         notification = {
             "message": "Cet utilisateur n'existe pas", "type": "erreur"}
 
-        users = get_user_model().objects.filter(
-            username=username_or_email) | get_user_model().objects.filter(email=username_or_email)
+        users = get_user_model().objects.filter(username=username_or_email) | get_user_model().objects.filter(email=username_or_email)
 
         if not users:
             messages.error(request, "Votre identifiant est invalide !")
             return redirect('main:reminder')
+        
         user = users.first()
 
         password = get_user_model().objects.make_random_password()
