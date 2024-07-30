@@ -2245,12 +2245,6 @@ def login_view(request):
             is_enseignant = bool(user_groups.filter(name="enseignant"))
             is_secretaire = bool(user_groups.filter(name="secretaire"))
             is_comptable = bool(user_groups.filter(name="comptable"))
-
-            request.session['is_directeur_des_etudes'] = is_directeur_des_etudes
-            request.session['is_etudiant'] = is_etudiant
-            request.session['is_enseignant'] = False if is_directeur_des_etudes else is_enseignant
-            request.session['is_secretaire'] = False if is_directeur_des_etudes else is_secretaire
-            request.session['is_comptable'] = False if is_directeur_des_etudes else is_comptable
             
 
             has_model = False
@@ -2280,6 +2274,11 @@ def login_view(request):
                     pass
             if has_model or (user.is_superuser and is_directeur_des_etudes):
                 login(request, user)
+                request.session['is_directeur_des_etudes'] = is_directeur_des_etudes
+                request.session['is_etudiant'] = is_etudiant
+                request.session['is_enseignant'] = False if is_directeur_des_etudes else is_enseignant
+                request.session['is_secretaire'] = False if is_directeur_des_etudes else is_secretaire
+                request.session['is_comptable'] = False if is_directeur_des_etudes else is_comptable
                 return redirect('/')
             return render(request, "connexion/login.html", {'error': 'Identifiants invalides'})
 
