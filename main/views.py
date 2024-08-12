@@ -1407,7 +1407,7 @@ def releve_notes_semestre(request, id_semestre):
         return render(request, 'errors_pages/403.html')
 
     semestre = get_object_or_404(Semestre, id=id_semestre)
-    etudiants = semestre.etudiant_set.all().order_by('nom', 'prenom')
+    etudiants = semestre.etudiant_set.filter(is_active=True).order_by('nom', 'prenom')
 
     # récupération des ues du semestre
     semestre_ues = semestre.get_all_ues()
@@ -1562,7 +1562,7 @@ def releve_notes_details_all(request, id_semestre, avec_rattrapage=None):
         return render(request, 'errors_pages/403.html')
 
     semestre = get_object_or_404(Semestre, id=id_semestre)
-    etudiants = semestre.etudiant_set.all().order_by('nom', 'prenom')
+    etudiants = semestre.etudiant_set.filter(is_active=True).order_by('nom', 'prenom')
 
     nbre_colonnes = 2
 
@@ -1619,7 +1619,8 @@ def releve_notes_details_all(request, id_semestre, avec_rattrapage=None):
         'nbre_colonnes': nbre_colonnes,
         'colonnes': colonnes,
         'lignes': lignes_releve,
-        'nbre_lignes': len(lignes_releve)
+        'nbre_lignes': len(lignes_releve),
+        'is_rattrapage': avec_rattrapage
     }
 
     # nom des fichiers d'entrée et de sortie
