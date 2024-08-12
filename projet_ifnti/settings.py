@@ -106,7 +106,7 @@ WSGI_APPLICATION = 'projet_ifnti.wsgi.application'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
 #Configuration des conditions de production ou de developpement
-IS_PRODUCTION = True
+IS_PRODUCTION = False
 
 if IS_PRODUCTION:
     DATABASES = {

@@ -28,11 +28,16 @@
 %\title{Récapitulatif du semestre \VAR{semestre}}
 \begin{center}
 \begin{LARGE}
+\BLOCK{if is_rattrapage}
 Récapitulatif du semestre \VAR{semestre}
 après le rattrapage
+\BLOCK{else}
+Récapitulatif du semestre \VAR{semestre}
+\BLOCK{endif}
+
 \end{LARGE}
 \end{center}
-\begin{adjustbox}{width=1.2\textwidth,center}
+\begin{adjustbox}{width=1\textwidth,center}
 
 \begin{tabular}{\VAR{colonnes}}
 %ensuite pour le cline on par de 3 jusqua cette valeur recuperer
