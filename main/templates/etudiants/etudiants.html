@@ -48,6 +48,15 @@
             {% comment %} Génération des notes {% endcomment %}
             {% if  is_directeur_des_etudes %}
             <li class="nav-main-item">
+                <a class="nav-main-link nav-main-link-name" data-toggle="" aria-haspopup="true" aria-expanded="false"
+                    href="{% url 'main:bilan_annuelle' selected_semestre.id %}">
+                    <i class="fa fa-id-card mr-1" aria-hidden="true"></i>
+                    <span class="nav-main-link-name documents-link" style="color: #1c72d6;">
+                        Bilan annuelle 
+                    </span>
+                </a>
+            </li>
+            <li class="nav-main-item">
                 <a class="nav-main-link nav-main-link-submenu" data-toggle="submenu" aria-haspopup="true"
                     aria-expanded="false" href="#">
                     <i class="fa fa-file mr-1" aria-hidden="true"></i>

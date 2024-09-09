@@ -1639,6 +1639,52 @@ def releve_notes_details_all(request, id_semestre, avec_rattrapage=None):
         response['Content-Disposition'] = 'inline;filename=pdf_file.pdf'
         return response
 
+@login_required(login_url=settings.LOGIN_URL)
+def bilan_annuelle(request, id_semestre, avec_rattrapage=None):
+
+    avec_rattrapage = True if avec_rattrapage else False
+    
+    if request.user.groups.all().first().name not in ['directeur_des_etudes', 'secretaire']:
+        return render(request, 'errors_pages/403.html')
+
+    
+    etudiants = Etudiant.objects.filter(is_active=True, semestres__id=id_semestre).order_by('nom', 'prenom')
+
+    semestres = Semestre.objects.filter(id__in=etudiants[0].semestres.all())
+    
+
+    # boucle sur chaque étudiant piour constituer la ligne associée à l'étudiant
+    for etudiant in etudiants:
+        total_credit = 0
+        for semestre in semestres:
+            semestre_ues = semestre.get_all_ues()
+            for ue in semestre_ues:
+                _, a_valider, _ = etudiant.moyenne_etudiant_ue(ue, semestre, avec_rattrapage)
+                credit = ue.nbreCredits if a_valider else 0
+                total_credit += credit
+        etudiant.total_credit = total_credit
+        
+    context = {
+        'niveau' : f"{AnneeUniversitaire.getNiveau(semestre.libelle)} {AnneeUniversitaire.static_get_current_annee_universitaire()}",
+        'etudiants': etudiants,
+        'is_rattrapage': avec_rattrapage
+    }
+
+    # nom des fichiers d'entrée et de sortie
+    latex_input = 'synthese_annuelle'
+    latex_ouput = 'generated_synthese_annuelle'
+    pdf_file = 'pdf_synthese_annuelle'
+
+    # génération du pdf
+    generate_pdf(context, latex_input, latex_ouput, pdf_file)
+
+    # visualisation du pdf dans le navigateur
+    with open('media/pdf/' + str(pdf_file) + '.pdf', 'rb') as f:
+        pdf_preview = f.read()
+        response = HttpResponse(pdf_preview, content_type='application/pdf')
+        response['Content-Disposition'] = 'inline;filename=pdf_file.pdf'
+        return response
+
 
 
 @login_required(login_url=settings.LOGIN_URL)

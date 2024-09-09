@@ -1,0 +1,54 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{lscape}
+\usepackage{multirow}
+\usepackage{array}
+\usepackage[OT1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[none]{hyphenat}
+\usepackage{fancyhdr}
+\usepackage{eso-pic, graphicx}
+\usepackage{geometry}[left=0cm, bottom=0cm, right=0cm, top=0cm]
+\usepackage[french]{babel}
+\usepackage{adjustbox}
+
+\graphicspath{ {\VAR{image_path}} }
+
+\newcommand\BackgroundPic{
+\put(0,0){
+\parbox[b][\paperheight]{\paperwidth}{
+\includegraphics[width=\paperwidth,height=\paperheight]{CharteGraphiqueDocumentPageDeGardeLogo}
+}}}
+
+\begin{document}  
+
+\AddToShipoutPicture*{\BackgroundPic}
+
+\renewcommand{\arraystretch}{2}
+
+\begin{center}
+\begin{LARGE}
+Récapitulatif \VAR{niveau}
+\end{LARGE}
+\end{center}
+\vspace{3cm}
+\begin{adjustbox}{width=1.1\textwidth,center}
+\begin{tabular}{|p{6cm}|p{6cm}|p{6cm}|}
+\hline
+Nom & Prénom & CréditTotal \\ 
+\hline 
+\BLOCK{for etudiant in etudiants} 
+\VAR{etudiant.nom} & \VAR{etudiant.prenom} & \VAR{etudiant.total_credit} \\ 
+\hline 
+\BLOCK{endfor}
+\end{tabular} 
+
+\end{adjustbox}
+
+
+\end{document}

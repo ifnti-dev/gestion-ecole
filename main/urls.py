@@ -31,31 +31,32 @@ urlpatterns = [
     path('deconnexion', views.logout_view, name='deconnexion'),
 
 
-    # touré-ydaou urls templates latex 30-04-2023
-#     path('etudiants_l/<int:niveau>/',
-#          views.etudiants_par_niveau, name='etudiants_ln'),
-    path('carte-etudiant/<str:id>/<str:niveau>',
-         views.carte_etudiant, name='carte_etudiant'),
-    path('diplome/<str:id>', views.diplome_etudiant, name='diplome_etudiant'),
-    path('certificat_scolaire/<str:id>/<str:niveau>',
-         views.certificat_scolaire, name='certificat_scolaire'),
-    path('releve_notes/<str:id_etudiant>/<str:id_semestre>',
-         views.releve_notes, name='releve_notes'),
-    path('releve_note_detail/<str:id>/<str:id_semestre>',
-         views.releve_notes_detail, name="releve_notes_detail"),
-    path('releve_note_detail/<str:id_semestre>',
-         views.releve_notes_details_all, name="releve_notes_detail"),
-    path('releve_note_detail_avec_rattrapage/<str:id_semestre>/<int:avec_rattrapage>',
-         views.releve_notes_details_all, name="releve_notes_detail_avec_rattrapage"),
+     # touré-ydaou urls templates latex 30-04-2023
+     #     path('etudiants_l/<int:niveau>/',
+     #          views.etudiants_par_niveau, name='etudiants_ln'),
+     path('carte-etudiant/<str:id>/<str:niveau>',
+          views.carte_etudiant, name='carte_etudiant'),
+     path('diplome/<str:id>', views.diplome_etudiant, name='diplome_etudiant'),
+     path('certificat_scolaire/<str:id>/<str:niveau>',
+          views.certificat_scolaire, name='certificat_scolaire'),
+     path('releve_notes/<str:id_etudiant>/<str:id_semestre>',
+          views.releve_notes, name='releve_notes'),
+     path('releve_note_detail/<str:id>/<str:id_semestre>',
+          views.releve_notes_detail, name="releve_notes_detail"),
+     path('releve_note_detail/<str:id_semestre>',
+          views.releve_notes_details_all, name="releve_notes_detail"),
+     path('releve_note_detail_avec_rattrapage/<str:id_semestre>/<int:avec_rattrapage>',
+          views.releve_notes_details_all, name="releve_notes_detail_avec_rattrapage"),
+     path('bilan_annuelle/<str:id_semestre>',views.bilan_annuelle, name="bilan_annuelle"),
 
-    # urls permettant de générer les documents de manière groupée (pour un ensemble d'étudiants)
-    path('releve_notes/<str:id_semestre>',
-         views.releve_notes_semestre, name='releve_notes'),
-    path('carte-etudiant/<str:niveau>',
-         views.carte_etudiant_all, name='carte_etudiant'),
-    path('diplomes', views.diplome_etudiant_all, name='diplome_etudiant'),
-    path('recapitulatif-notes-matières/<str:id_matiere>/<str:id_semestre>',
-         views.recapitulatif_notes, name='recap_notes'),
+     # urls permettant de générer les documents de manière groupée (pour un ensemble d'étudiants)
+     path('releve_notes/<str:id_semestre>',
+          views.releve_notes_semestre, name='releve_notes'),
+     path('carte-etudiant/<str:niveau>',
+          views.carte_etudiant_all, name='carte_etudiant'),
+     path('diplomes', views.diplome_etudiant_all, name='diplome_etudiant'),
+     path('recapitulatif-notes-matières/<str:id_matiere>/<str:id_semestre>',
+          views.recapitulatif_notes, name='recap_notes'),
 
 
      ###export_excel_evaluation
