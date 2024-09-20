@@ -38,12 +38,12 @@ Récapitulatif \VAR{niveau}
 \end{center}
 \vspace{3cm}
 \begin{adjustbox}{width=1.1\textwidth,center}
-\begin{tabular}{|p{6cm}|p{6cm}|p{6cm}|p{6cm}|p{6cm}|}
+\begin{tabular}{|p{4cm}|p{4cm}|p{2cm}|p{2cm}|p{2cm}|p{0cm}|}
 \hline
-Nom & Prénom & Crédit \VAR{semestres_libelle[0]} & Crédit  \VAR{semestres_libelle[1]} & CréditTotal \\ 
+Nom & Prénom & Crédit \VAR{semestres_libelle[0]} & Crédit  \VAR{semestres_libelle[1]} & CréditTotal & \\ 
 \hline 
 \BLOCK{for etudiant in etudiants} 
-\VAR{etudiant.nom} & \VAR{etudiant.prenom} & \VAR{etudiant.credit1}  & \VAR{etudiant.credit2} & \VAR{etudiant.total_credit} \\ 
+\VAR{etudiant.nom} & \VAR{etudiant.prenom} & \centering \VAR{etudiant.credit1}  & \centering \VAR{etudiant.credit2} & \centering \VAR{etudiant.total_credit} & \\ 
 \hline 
 \BLOCK{endfor}
 \end{tabular} 
