@@ -1650,8 +1650,14 @@ def bilan_annuelle(request, id_semestre, avec_rattrapage=None):
     
     etudiants = Etudiant.objects.filter(is_active=True, semestres__id=id_semestre).order_by('nom', 'prenom')
 
-    semestres = Semestre.objects.filter(id__in=etudiants[0].semestres.all())
-    
+    _semestre = Semestre.objects.get(pk=id_semestre)
+    if _semestre.libelle in ["S1", "S2"]:
+        semestres = Semestre.objects.filter(libelle__in=["S1", "S2"], annee_universitaire=_semestre.annee_universitaire)
+    elif _semestre.libelle in ["S3", "S4"]:
+        semestres = Semestre.objects.filter(libelle__in=["S3", "S4"], annee_universitaire=_semestre.annee_universitaire)
+    elif _semestre.libelle in ["S3", "S4"]:
+        semestres = Semestre.objects.filter(libelle__in=["S3", "S4"], annee_universitaire=_semestre.annee_universitaire)
+        
 
     # boucle sur chaque étudiant piour constituer la ligne associée à l'étudiant
     for etudiant in etudiants:
