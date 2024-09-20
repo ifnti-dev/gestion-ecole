@@ -1654,10 +1654,13 @@ def bilan_annuelle(request, id_semestre, avec_rattrapage=None):
     _semestre = Semestre.objects.get(pk=id_semestre)
     if _semestre.libelle in ["S1", "S2"]:
         semestres = Semestre.objects.filter(libelle__in=["S1", "S2"], annee_universitaire=_semestre.annee_universitaire)
+        semestre_libelle = ["S1", "S2"]
     elif _semestre.libelle in ["S3", "S4"]:
         semestres = Semestre.objects.filter(libelle__in=["S3", "S4"], annee_universitaire=_semestre.annee_universitaire)
+        semestre_libelle =  ["S3", "S4"]
     elif _semestre.libelle in ["S3", "S4"]:
         semestres = Semestre.objects.filter(libelle__in=["S3", "S4"], annee_universitaire=_semestre.annee_universitaire)
+        semestre_libelle = ["S3", "S4"]
         
 
     # boucle sur chaque étudiant piour constituer la ligne associée à l'étudiant
@@ -1665,15 +1668,23 @@ def bilan_annuelle(request, id_semestre, avec_rattrapage=None):
         total_credit = 0
         for semestre in semestres:
             semestre_ues = semestre.get_all_ues()
+            total_credit_semestre = 0
             for ue in semestre_ues:
                 _, a_valider, _ = etudiant.moyenne_etudiant_ue(ue, semestre, avec_rattrapage)
                 credit = ue.nbreCredits if a_valider else 0
                 total_credit += credit
+                total_credit_semestre += credit
+            if semestre.libelle == semestre_libelle[0]:
+                etudiant.credit1 = total_credit_semestre
+            elif semestre.libelle == semestre_libelle[1]:
+                etudiant.credit2 = total_credit_semestre
+                
         etudiant.total_credit = total_credit
         
     context = {
         'niveau' : f"{AnneeUniversitaire.getNiveau(semestre.libelle)} {AnneeUniversitaire.static_get_current_annee_universitaire()}",
         'etudiants': etudiants,
+        'semestres_libelle' : semestre_libelle,
         'is_rattrapage': avec_rattrapage
     }
 
