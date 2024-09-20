@@ -1643,6 +1643,7 @@ def releve_notes_details_all(request, id_semestre, avec_rattrapage=None):
 def bilan_annuelle(request, id_semestre, avec_rattrapage=None):
 
     avec_rattrapage = True if avec_rattrapage else False
+    avec_rattrapage = True
     
     if request.user.groups.all().first().name not in ['directeur_des_etudes', 'secretaire']:
         return render(request, 'errors_pages/403.html')
