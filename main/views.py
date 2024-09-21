@@ -1682,10 +1682,10 @@ def bilan_annuelle(request, id_semestre, avec_rattrapage=None):
         etudiant.total_credit = total_credit
         
     context = {
-        'niveau' : f"{AnneeUniversitaire.getNiveau(semestre.libelle)} {AnneeUniversitaire.static_get_current_annee_universitaire()}",
+        'niveau' : f"{AnneeUniversitaire.getNiveau(semestre.libelle)} {semestre.annee_universitaire}",
         'etudiants': etudiants,
         'semestres_libelle' : semestre_libelle,
-        'is_rattrapage': avec_rattrapage
+        'is_rattrapage': avec_rattrapage,
     }
 
     # nom des fichiers d'entrée et de sortie
