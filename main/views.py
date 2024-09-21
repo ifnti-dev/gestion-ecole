@@ -1658,9 +1658,9 @@ def bilan_annuelle(request, id_semestre, avec_rattrapage=None):
     elif _semestre.libelle in ["S3", "S4"]:
         semestres = Semestre.objects.filter(libelle__in=["S3", "S4"], annee_universitaire=_semestre.annee_universitaire)
         semestre_libelle =  ["S3", "S4"]
-    elif _semestre.libelle in ["S3", "S4"]:
-        semestres = Semestre.objects.filter(libelle__in=["S3", "S4"], annee_universitaire=_semestre.annee_universitaire)
-        semestre_libelle = ["S3", "S4"]
+    elif _semestre.libelle in ["S5", "S6"]:
+        semestres = Semestre.objects.filter(libelle__in=["S5", "S6"], annee_universitaire=_semestre.annee_universitaire)
+        semestre_libelle = ["S5", "S6"]
         
 
     # boucle sur chaque étudiant piour constituer la ligne associée à l'étudiant
