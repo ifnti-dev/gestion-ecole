@@ -1415,7 +1415,7 @@ def releve_notes_semestre(request, id_semestre):
 
     # tableau contenant l'ensemble des relevés de notes
     releves_notes_tab = []
-
+    avec_rattrapage = True
     for etudiant in etudiants:
         # tableau contenant les données correspondant au relevé de notes d'un étudiant
         releve_note = {}
@@ -1423,10 +1423,11 @@ def releve_notes_semestre(request, id_semestre):
         credits_obtenus = 0
         for ue in semestre_ues:
             moyenne, validation, anneeValidation = etudiant.moyenne_etudiant_ue(
-                ue, semestre)
+                ue, semestre, avec_rattrapage)
             matieres_libelles = ''
             for matiere in ue.matiere_set.all():
                 matieres_libelles += matiere.libelle + ', '
+                
             releve_note['lignes'].append(
                 {'ue': ue, 'moyenne': round(
                     moyenne, 2), 'validation': validation, 'anneeValidation': anneeValidation, 'matieres_libelles': matieres_libelles}
