@@ -1321,7 +1321,7 @@ def attestation_diplome(request, id, niveau):
 
 @login_required(login_url=settings.LOGIN_URL)
 # methode générant le relevé de notes de l'étudiant
-def releve_notes(request, id, id_semestre):
+def releve_notes(request, id_etudiant, id_semestre):
     """
     Génére le relevé de notes semestriel d'un étudiant
     :param request: L'objet de requête Django.
@@ -1333,7 +1333,7 @@ def releve_notes(request, id, id_semestre):
     if request.user.groups.all().first().name not in ['directeur_des_etudes', 'secretaire', 'etudiant']:
         return render(request, 'errors_pages/403.html')
 
-    etudiant = get_object_or_404(Etudiant, id=id)
+    etudiant = get_object_or_404(Etudiant, id=id_etudiant)
     semestre = get_object_or_404(Semestre, id=id_semestre)
     context = {}
 
@@ -1344,9 +1344,10 @@ def releve_notes(request, id, id_semestre):
     # récupération des ues du semestre
     semestre_ues = semestre.get_all_ues()
     ues = []
+    avec_rattrapage = True
     for ue in semestre_ues:
         moyenne, validation, anneeValidation = etudiant.moyenne_etudiant_ue(
-            ue, semestre)
+            ue, semestre, avec_rattrapage)
         matieres_libelles = ''
         for matiere in ue.matiere_set.all():
             matieres_libelles += matiere.libelle + ', '
