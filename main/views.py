@@ -1424,9 +1424,8 @@ def releve_notes_semestre(request, id_semestre):
         for ue in semestre_ues:
             moyenne, validation, anneeValidation = etudiant.moyenne_etudiant_ue(
                 ue, semestre, avec_rattrapage)
-            matieres_libelles = ''
-            for matiere in ue.matiere_set.all():
-                matieres_libelles += matiere.libelle + ', '
+                        
+            matieres_libelles = ', '.join(ue.matiere_set.all().values_list('libelle', flat=True))
                 
             releve_note['lignes'].append(
                 {'ue': ue, 'moyenne': round(
