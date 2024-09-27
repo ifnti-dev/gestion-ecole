@@ -90,14 +90,14 @@ def genarate_diplome():
         #     "annee_diplome": "2023-2024",
         #     "date_soutenance": "20-04-2024",
         # },
-        {
-            "matricule": "Monsieur",
-            "full_name": "NGANDEU NDJEUKAM Alhasan",
-            "date_naiss": "11 Novembre 2002",
-            "lieu_naiss": "Sokodé",
-            "annee_diplome": "2023-2024",
-            "date_soutenance": "20-04-2024",
-        },
+        # {
+        #     "matricule": "Monsieur",
+        #     "full_name": "NGANDEU NDJEUKAM Alhasan",
+        #     "date_naiss": "11 Novembre 2002",
+        #     "lieu_naiss": "Sokodé",
+        #     "annee_diplome": "2023-2024",
+        #     "date_soutenance": "20-04-2024",
+        # },
     ]
     i = 0
     for etudiant in etudiants:
