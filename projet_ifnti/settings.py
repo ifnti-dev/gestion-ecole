@@ -29,8 +29,6 @@ X_FRAME_OPTIONS = 'SAMEORIGIN'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-
-
     
 
 ALLOWED_HOSTS = ["*"]
@@ -38,7 +36,7 @@ ALLOWED_HOSTS = ["*"]
 
 LOGIN_URL = "/main/connexion"
 
-#DATE_INPUT_FORMATS = ['%d-%m-%Y']
+DATE_INPUT_FORMATS = ['%d-%m-%Y']
 USE_L10N = False
 # Application definition
 

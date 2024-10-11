@@ -63,8 +63,7 @@ class Utilisateur(models.Model):
         **Type**:    string
     """
 
-    datenaissance = models.DateField(blank=True, verbose_name="date de naissance", null=True, validators=[
-                                     MaxValueValidator(limit_value=date(2006, 1, 1), message="L'année de naissance doit être inférieure à 2006")])
+    datenaissance = models.DateField(blank=True, verbose_name="date de naissance", null=True)
 
     """
         Date de naissance de l'utilisateur
@@ -486,7 +485,9 @@ class Etudiant(Utilisateur):
         """
         Méthode pour sauvegarder un étudiant
         """
+        
         self.email = self.generate_email()
+        
         if not self.id:
             list_etudiants = Etudiant.objects.filter(anneeentree=self.anneeentree)
             if list_etudiants:
@@ -500,6 +501,7 @@ class Etudiant(Utilisateur):
             self.user = create_auth_user(self.nom, self.prenom, self.email)  
             group_etudiant = Group.objects.get(name="etudiant")
             self.user.groups.add(group_etudiant)
+            
         super().save()
 
     def get_semestre_courant(self):
