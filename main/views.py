@@ -31,8 +31,6 @@ def datetime_serializer(obj):
         return obj.strftime('%Y-%m-%dT%H:%M:%S')
     raise TypeError("Type not serializable")
 
-
-
 @login_required(login_url=settings.LOGIN_URL)
 def export_excel_evaluation(request, id_matiere, id_semestre):
    
@@ -298,6 +296,7 @@ def create_etudiant(request, id=0):
             # Modification d'un étudiant existant, préremplir le formulaire avec les données existantes
             etudiant = Etudiant.objects.get(pk=id)
             form = EtudiantForm(instance=etudiant)
+            print(form.initial['datenaissance']) 
         return render(request, 'etudiants/create_etudiant.html', {'form': form})
     else:
         # Gestion de la requête POST
@@ -1348,9 +1347,9 @@ def releve_notes(request, id_etudiant, id_semestre):
     for ue in semestre_ues:
         moyenne, validation, anneeValidation = etudiant.moyenne_etudiant_ue(
             ue, semestre, avec_rattrapage)
-        matieres_libelles = ''
-        for matiere in ue.matiere_set.all():
-            matieres_libelles += matiere.libelle + ', '
+      
+        matieres_libelles = ', '.join(ue.matiere_set.all().values_list('libelle', flat=True))
+            
         ues.append({'ue': ue, 'moyenne': round(
             moyenne, 2), 'validation': validation, 'anneeValidation': anneeValidation, 'matieres_libelles': matieres_libelles})
 

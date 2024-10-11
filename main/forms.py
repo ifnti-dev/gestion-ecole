@@ -81,7 +81,7 @@ class NoteForm(forms.ModelForm):
 
 
 class EtudiantForm(forms.ModelForm):
-    datenaissance = DateField(widget=forms.DateInput( attrs={'class': 'form-control',"type":"date"}), label="Date de naissance")
+    datenaissance = DateField(widget=forms.DateInput(attrs={'class': 'form-control',"type":"date"}, format='%Y-%m-%d'), label="Date de naissance")
     class Meta:
         model = Etudiant
         fields = ['nom', 'prenom', 'contact', 'sexe', 'adresse', 'datenaissance', 'lieunaissance', 'profil', 'prefecture', 'is_active', 'seriebac1', 'seriebac2', 'anneebac1', 'anneebac2', 'etablissementSeconde', 'etablissementPremiere', 'etablissementTerminale', 'francaisSeconde', 'francaisPremiere','francaisTerminale', 'anglaisSeconde', 'anglaisPremiere', 'anglaisTerminale', 'mathematiqueSeconde', 'mathematiquePremiere', 'mathematiqueTerminale', 'semestres', 'photo_passport']
@@ -91,7 +91,6 @@ class EtudiantForm(forms.ModelForm):
             'contact': forms.TextInput(attrs={'class': 'form-control'}),
             'sexe': forms.Select(choices=Etudiant.SEXE_CHOISE, attrs={'class': 'form-control'}),
             'adresse': forms.TextInput(attrs={'class': 'form-control'}),
-            'datenaissance': DateField(widget=forms.SelectDateWidget(years=range(1900, 2006)), label="Date de naissance"),
             'lieunaissance': forms.TextInput(attrs={'class': 'form-control'}),
             'prefecture': forms.TextInput(attrs={'class': 'form-control'}),
             'is_active': forms.CheckboxInput(attrs={'class': 'form-control'}),
