@@ -143,6 +143,7 @@
                 <table class="table table-bordered table-vcenter js-dataTable-full-pagination">
                     <thead>
                         <tr>
+                            <th class="text-center">Matricule</th>
                             <th class="text-center" style="width: 30%;">Nom &amp; Prénoms</th>
                             <th class="text-center">Niveau</th>
                             <th class="text-center" style="width: 80px;">Email</th>
@@ -158,6 +159,7 @@
                     <tbody>
                         {% for etudiant in etudiants %}
                         <tr class="{% if etudiant in etudiants_insuffisants %}bg-danger text-white{% endif %} {% if not etudiant.etudiant.is_active %}text-danger{% endif %}">
+                            <td class="text-center font-size-sm">{{ etudiant.etudiant.id }}</td>
                             <td class="text-center font-size-sm">{{ etudiant.etudiant.nom }} {{ etudiant.etudiant.prenom }}</td>
                             <td class="text-center d-sm-table-cell">
                                 {% if etudiant.niveau == 'L1' %}
