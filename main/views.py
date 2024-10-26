@@ -220,7 +220,7 @@ def etudiants(request):
     }
 
     # Rendre la page avec le contexte
-    return render(request, 'etudiants/list.html', context=data)
+    return render(request, 'etudiants/etudiants.html', context=data)
 
 
 @login_required(login_url=settings.LOGIN_URL)
