@@ -888,7 +888,8 @@ def enregistrer_bulletin(request, id=0):
         else:
             bulletin = VersmentSalaire.objects.get(pk=id)
             compte_universite = bulletin.compte_bancaire
-            compte_universite.solde_bancaire += bulletin.salaire_net_a_payer + bulletin.tcs + (Decimal(bulletin.frais_prestations_familiale_salsalaire) * Decimal(bulletin.personnel.salaireBrut) + Decimal(bulletin.frais_prestations_familiales) * Decimal(bulletin.personnel.salaireBrut) + Decimal(bulletin.frais_risques_professionnel) * Decimal(bulletin.personnel.salaireBrut) + Decimal(bulletin.frais_pension_vieillesse_emsalaire) * Decimal(bulletin.personnel.salaireBrut))
+            _somme = bulletin.salaire_net_a_payer + bulletin.tcs + (Decimal(bulletin.frais_prestations_familiale_salsalaire) * Decimal(bulletin.personnel.salaireBrut) + Decimal(bulletin.frais_prestations_familiales) * Decimal(bulletin.personnel.salaireBrut) + Decimal(bulletin.frais_risques_professionnel) * Decimal(bulletin.personnel.salaireBrut) + Decimal(bulletin.frais_pension_vieillesse_emsalaire) * Decimal(bulletin.personnel.salaireBrut))
+            compte_universite.solde_bancaire += int(_somme)
             print(bulletin.salaire_net_a_payer + bulletin.tcs + (Decimal(bulletin.frais_prestations_familiale_salsalaire) * Decimal(bulletin.personnel.salaireBrut) + Decimal(bulletin.frais_prestations_familiales) * Decimal(bulletin.personnel.salaireBrut) + Decimal(bulletin.frais_risques_professionnel) * Decimal(bulletin.personnel.salaireBrut) + Decimal(bulletin.frais_pension_vieillesse_emsalaire) * Decimal(bulletin.personnel.salaireBrut)))
             compte_universite.save()
             form = VersmentSalaireForm(request.POST, instance=bulletin)

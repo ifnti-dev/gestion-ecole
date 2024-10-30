@@ -36,7 +36,10 @@ ALLOWED_HOSTS = ["*"]
 
 LOGIN_URL = "/main/connexion"
 
-DATE_INPUT_FORMATS = ['%d-%m-%Y']
+DATE_FORMAT = 'd/m/Y'
+
+DATE_INPUT_FORMATS = ['%d/%m/%Y', '%Y-%m-%d']
+
 USE_L10N = False
 # Application definition
 
