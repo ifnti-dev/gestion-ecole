@@ -17,10 +17,11 @@ def bootstrap(request):
         niveau = ''
             
     try:
+        #print(current_annee_accademique.id)
         id_annee_selectionnee = int(request.session.get("id_annee_selectionnee"))
     except:
         id_annee_selectionnee = 0
-
+        
     return {
         'annee_universitaire': current_annee_accademique if current_annee_accademique else "-",
         'annees_universitaire': AnneeUniversitaire.objects.all().order_by('-annee'),

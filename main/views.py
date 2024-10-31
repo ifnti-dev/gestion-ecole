@@ -129,8 +129,8 @@ def change_annee_universitaire(request):
     """
 
     if request.POST:
-        request.session["id_annee_selectionnee"] = request.POST.get(
-            'annee_universitaire')
+        request.session["id_annee_selectionnee"] = request.POST.get('annee_universitaire')
+        #print(request.session["id_annee_selectionnee"])
         return redirect(request.POST.get('origin_path'))
 
 
