@@ -16,8 +16,8 @@ from django.db.models import Max
 from django.contrib.auth.models import Group
 from django.db.models import Sum
 from num2words import num2words
-from decimal import Decimal, ROUND_DOWN
-import math
+from decimal import Decimal
+import os
 
 def create_auth_user(nom, prenom, email):
     username = (nom+prenom).lower()
@@ -210,9 +210,13 @@ class Utilisateur(models.Model):
         self.is_active = True
         self.save()
 
+def renommer_image_photo_passport(instance, filename):
+    extension = filename.split('.')[-1]
+    nom_fichier = f"{instance.id}.{extension}"
+    print(nom_fichier)
+    return os.path.join("images/photo_passports", nom_fichier)
 
 class Etudiant(Utilisateur):
-
     """
         Classe Etudiant
     """
@@ -440,7 +444,7 @@ class Etudiant(Utilisateur):
         **Valeur par défaut:** Décision du conseil
     """
 
-    photo_passport = models.ImageField(upload_to="etudiant/photo_passports", null=True, blank=True, verbose_name="Photo passport")
+    photo_passport = models.ImageField(upload_to=renommer_image_photo_passport, null=True, blank=True, verbose_name="Photo passport")
 
     """
         Photo de profil

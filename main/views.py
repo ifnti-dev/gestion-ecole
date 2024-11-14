@@ -296,7 +296,7 @@ def create_etudiant(request, id=0):
             # Modification d'un étudiant existant, préremplir le formulaire avec les données existantes
             etudiant = Etudiant.objects.get(pk=id)
             form = EtudiantForm(instance=etudiant)
-            print(form.initial['datenaissance']) 
+            print(form.initial['datenaissance'])
         return render(request, 'etudiants/create_etudiant.html', {'form': form})
     else:
         # Gestion de la requête POST
@@ -312,6 +312,7 @@ def create_etudiant(request, id=0):
             # Sauvegarde de l'étudiant pour générer un ID
             etudiant = form.save(commit=False)
             etudiant.save()
+            #print(etudiant.datenaissance)
 
             # Trouver l'année universitaire en cours
             annee_universitaire_courante = AnneeUniversitaire.objects.get(
@@ -334,13 +335,12 @@ def create_etudiant(request, id=0):
             # Attacher l'étudiant au Semestre 1 (S1) de l'année universitaire en cours
             etudiant.semestres.add(semestre_s1)
             etudiant.save()
-
+            #return HttpResponse("Hello")
             # Rediriger vers la liste des étudiants après création ou modification réussie
             return redirect('main:etudiants')
         else:
             # Le formulaire n'est pas valide, réafficher le formulaire avec les erreurs
             return render(request, 'etudiants/create_etudiant.html', {'form': form})
-
 
 @login_required(login_url=settings.LOGIN_URL)
 @permission_required("main.view_etudiant")
@@ -964,6 +964,8 @@ def create_ue(request, id=0):
 @login_required(login_url=settings.LOGIN_URL)
 # methode générant la carte de l'étudiant
 def carte_etudiant(request, id, niveau):
+    from projet_ifnti.settings import BASE_DIR
+
     """
     Permet de générer sous format pdf la carte étudiante d'un étudiant
 
@@ -986,18 +988,18 @@ def carte_etudiant(request, id, niveau):
     in_format = "%Y-%m-%d"
     out_format = "%d-%m-%Y"
 
-    if etudiant.datenaissance:
-        date_formatee = datetime.strptime(
-            str(etudiant.datenaissance), in_format).strftime(out_format)
-    else:
-        date_formatee = 'None'
+    etudiant.datenaissance = etudiant.datenaissance if etudiant.datenaissance else ""
+    etudiant.photo = "/".join(etudiant.photo_passport.__str__().split('/')[1:]) if etudiant.photo_passport and etudiant.photo_passport != "" else "photo_passports/default.png"
+    etudiant.photo = os.path.join(BASE_DIR, 'media') + '/images/' + etudiant.photo
 
     context = {'etudiant': etudiant, 'niveau': niveau, 'annee': str(
-        annee_universitaire.annee) + '-' + str(annee_universitaire.annee + 1), 'date_naissance': date_formatee}
+        annee_universitaire.annee) + '-' + str(annee_universitaire.annee + 1)}
 
     latex_input = 'carte_etudiant'
     latex_ouput = 'generated_carte_etudiant'
     pdf_file = 'carte_etudiant_' + str(etudiant.id)
+    
+
 
     # génération du pdf
     generate_pdf(context, latex_input, latex_ouput, pdf_file)
@@ -1013,6 +1015,7 @@ def carte_etudiant(request, id, niveau):
 @login_required(login_url=settings.LOGIN_URL)
 # methode générant la carte des étudiants d'un niveau
 def carte_etudiant_all(request, niveau):
+    from projet_ifnti.settings import BASE_DIR
     """
     Génére les cartes étudiantes de tout les étudiants d'un niveau donné
     :param request: L'objet de requête Django.
@@ -1041,13 +1044,18 @@ def carte_etudiant_all(request, niveau):
         in_format = "%Y-%m-%d"
         out_format = "%d-%m-%Y"
 
-        if etudiant.datenaissance:
-            date_formatee = datetime.strptime(
-                str(etudiant.datenaissance), in_format).strftime(out_format)
-        else:
-            date_formatee = 'None'
+        # if etudiant.datenaissance:
+        #     date_formatee = datetime.strptime(
+        #         str(etudiant.datenaissance), in_format).strftime(out_format)
+        # else:
+        #     date_formatee = 'None'
 
-        etudiant.datenaissance = date_formatee
+        etudiant.datenaissance = etudiant.datenaissance if etudiant.datenaissance else ""
+        etudiant.photo = "/".join(etudiant.photo_passport.__str__().split('/')[1:]) if etudiant.photo_passport and etudiant.photo_passport != "" else "photo_passports/default.png"
+        etudiant.photo = os.path.join(BASE_DIR, 'media') + '/images/' + etudiant.photo
+        #print(etudiant.photo)
+        #default.png
+    #return HttpResponse("Hello")
 
     nbre_pages = len(etudiants) // 9
 
