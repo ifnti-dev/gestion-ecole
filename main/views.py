@@ -311,30 +311,10 @@ def create_etudiant(request, id=0):
         if form.is_valid():
             # Sauvegarde de l'étudiant pour générer un ID
             etudiant = form.save(commit=False)
+            etudiant.semestres.set(form.cleaned_data.get("semestres"))
             etudiant.save()
-            #print(etudiant.datenaissance)
+            #print(etudiant.semestres.all())
 
-            # Trouver l'année universitaire en cours
-            annee_universitaire_courante = AnneeUniversitaire.objects.get(
-                annee_courante=True)
-
-            # Vérifier si le Semestre 1 (S1) de l'année universitaire courante existe
-            try:
-                semestre_s1 = annee_universitaire_courante.semestre_set.get(
-                    libelle='S1')
-            except Semestre.DoesNotExist:
-                # Le semestre n'existe pas, nous devons le créer
-                semestre_s1 = Semestre(
-                    libelle='S1',
-                    credits=30,
-                    courant=True,  # Vous pouvez définir la valeur correcte ici
-                    annee_universitaire=annee_universitaire_courante
-                )
-                semestre_s1.save()
-
-            # Attacher l'étudiant au Semestre 1 (S1) de l'année universitaire en cours
-            etudiant.semestres.add(semestre_s1)
-            etudiant.save()
             #return HttpResponse("Hello")
             # Rediriger vers la liste des étudiants après création ou modification réussie
             return redirect('main:etudiants')
