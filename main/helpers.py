@@ -5,6 +5,7 @@ from openpyxl import load_workbook
 import os
 from datetime import datetime, timedelta
 import shutil 
+from django.utils.text import slugify
 
 
 
@@ -64,14 +65,7 @@ def convertir_format_date(date):
         # Gérer les erreurs si la conversion échoue
         raise ValueError("Format de date invalide")
 
-def genarate_username(nom, prenom):
-    return ""
 
-def get_user_by_username(username):
-    pass
-
-def get_etudiant_by_user(user):
-    pass
 
 
 
