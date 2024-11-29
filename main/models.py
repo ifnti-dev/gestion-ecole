@@ -1014,13 +1014,17 @@ class Personnel(Utilisateur):
             return None
         
     def bind_enseignant(self, type_enseignant, speliatite_enseignant):
+        print(type_enseignant)
         if type_enseignant and speliatite_enseignant:
             try:
                 enseignant = self.enseignant
+                print(enseignant)
                 enseignant.type = type_enseignant
                 enseignant.specialite = speliatite_enseignant
                 enseignant.save()
             except Exception as e:
+                print("Error:::: ")
+                print(enseignant)
                 Enseignant.objects.get_or_create(type=type_enseignant, specialite=speliatite_enseignant, personnel=self)
     
     def assign_groups(self, groups):

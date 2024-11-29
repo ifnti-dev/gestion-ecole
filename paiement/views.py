@@ -1236,14 +1236,19 @@ def enregistrer_fiche_de_paie(request, id=0):
 
     Raises:
         None
-
     """
+    # id_annee_selectionnee = AnneeUniversitaire.static_get_current_annee_universitaire().id
+    id_annee_selectionnee = request.session.get('id_annee_selectionnee')
+
     if request.method == "GET":
+        print(id_annee_selectionnee)
         if id == 0:
             form = FicheDePaieForm()
+            form.initialiseMatiere(annee_pk=id_annee_selectionnee)
         else:
             fiche_de_paie = FicheDePaie.objects.get(pk=id)
-            form = FicheDePaieForm(instance=fiche_de_paie)   
+            form = FicheDePaieForm(instance=fiche_de_paie)
+            form.initialiseMatiere(annee_pk=id_annee_selectionnee)
         return render(request, 'fichePaies/create_fiche_de_paie.html', {'form': form})
     else:
         if id == 0:
@@ -1278,7 +1283,6 @@ def enregistrer_fiche_de_paie(request, id=0):
                 compte_universite.solde_bancaire -= fiche_de_paie.montant 
                 compte_universite.save()
 
-                id_annee_selectionnee = AnneeUniversitaire.static_get_current_annee_universitaire().id
                 return redirect('paiement:liste_fiches_de_paie', id_annee_selectionnee=id_annee_selectionnee)           
             else:
                 return render(request, 'etudiants/message_erreur.html', {"message": "Le compte bancaire n'existe pas"})                               

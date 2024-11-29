@@ -14,7 +14,7 @@ def bootstrap(request):
         except Exception as e:
             niveau = ""
     else:
-        niveau = ''
+        niveau = ""
             
     try:
         #print(current_annee_accademique.id)

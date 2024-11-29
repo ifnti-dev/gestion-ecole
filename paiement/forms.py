@@ -197,13 +197,15 @@ class FicheDePaieForm(forms.ModelForm):
             'prixUnitaire': forms.NumberInput(attrs={'class': 'form-control'}),
             'acomptes': forms.NumberInput(attrs={'class': 'form-control'}),
         }
+    def initialiseMatiere(self, annee_pk):
+        self.annee_pk = annee_pk
+        self.fields['matieres_L1'].queryset = Matiere.objects.filter(ue__programme__semestre__libelle__in=['S1', 'S2'], ue__programme__semestre__annee_universitaire__pk=self.annee_pk)
+        self.fields['matieres_L2'].queryset = Matiere.objects.filter(ue__programme__semestre__libelle__in=['S3', 'S4'], ue__programme__semestre__annee_universitaire__pk=self.annee_pk)
+        self.fields['matieres_L3'].queryset = Matiere.objects.filter(ue__programme__semestre__libelle__in=['S5', 'S6'], ue__programme__semestre__annee_universitaire__pk=self.annee_pk)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['matieres_L1'].queryset = Matiere.objects.filter(ue__programme__semestre__libelle__in=['S1', 'S2'])
-        self.fields['matieres_L2'].queryset = Matiere.objects.filter(ue__programme__semestre__libelle__in=['S3', 'S4'])
-        self.fields['matieres_L3'].queryset = Matiere.objects.filter(ue__programme__semestre__libelle__in=['S5', 'S6'])
-
+        
     def clean(self):
         cleaned_data = super().clean()
         nombreHeureL1 = cleaned_data.get('nombreHeureL1')
