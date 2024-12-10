@@ -129,9 +129,10 @@ def change_annee_universitaire(request):
     """
 
     if request.POST:
-        request.session["id_annee_selectionnee"] = request.POST.get('annee_universitaire')
-        #print(request.session["id_annee_selectionnee"])
-        return redirect(request.POST.get('origin_path'))
+        id_annee_universitaire = request.POST.get('annee_universitaire')
+        request.session["id_annee_selectionnee"] = id_annee_universitaire
+        new_origin_path = request.POST.get('origin_path')
+        return redirect(new_origin_path)
 
 
 @login_required(login_url=settings.LOGIN_URL)
@@ -310,11 +311,10 @@ def create_etudiant(request, id=0):
 
         if form.is_valid():
             # Sauvegarde de l'étudiant pour générer un ID
-            etudiant = form.save(commit=False)
-            etudiant.semestres.set(form.cleaned_data.get("semestres"))
-            etudiant.save()
-            #print(etudiant.semestres.all())
-
+            etudiant = form.save()
+            semestres = form.cleaned_data.get("semestres")
+            etudiant.semestres.set(semestres)
+            
             #return HttpResponse("Hello")
             # Rediriger vers la liste des étudiants après création ou modification réussie
             return redirect('main:etudiants')
@@ -403,96 +403,6 @@ def liste_etudiants_par_semestre(request, id_annee_selectionnee):
 
     # Rendre la page avec le contexte
     return render(request, 'etudiants/liste_etudiants_par_semestre.html', context=data)
-
-
-# def liste_etudiants_par_semestre(request, id_annee_selectionnee):
-#     """
-#     Affiche la liste des étudiants pour un semestre sélectionné dans une année universitaire donnée.
-
-#     :param request: L'objet de requête Django.
-#     :param id_annee_selectionnee: L'identifiant de l'année universitaire sélectionnée.
-#     :return: Une réponse HTTP avec la liste des étudiants et des informations associées.
-#     """
-
-#     # Récupérer le rôle de l'utilisateur
-#     role = get_user_role(request)
-
-#     # Récupérer l'objet AnneeUniversitaire en fonction de l'identifiant fourni
-#     annee_universitaire = get_object_or_404(
-#         AnneeUniversitaire, pk=id_annee_selectionnee)
-
-#     # Récupérer l'année universitaire actuelle
-#     current_annee = AnneeUniversitaire.static_get_current_annee_universitaire()
-#     print("annee c",current_annee)
-
-#     # Initialiser des variables
-#     niveau = ""
-#     data = {}
-#     semestre_id = None
-#     semestres_selected = None
-
-#     # Logique pour les directeurs des études
-#     if role.name == "directeur_des_etudes":
-#         niveau = "IFNTI"
-#         semestres = annee_universitaire.semestre_set.all()
-#         semestres_selected = semestres
-
-#     # Vérifier si un semestre est spécifié dans la requête
-#     if 'semestre' in request.GET:
-#         semestre_id = request.GET.get('semestre')
-#         print(semestre_id)
-#         semestres_selected = semestres.filter(pk=semestre_id)
-    
-#     try:
-#         programme = Programme.objects.get(semestre=semestres_selected[0])
-#         print("program",programme)
-
-#         # Filtrer les étudiants en fonction des semestres sélectionnés et qui sont actifs
-#         etudiants = Etudiant.objects.filter(
-#             semestres__in=semestres_selected, is_active=True).distinct()
-
-#         # Initialiser une liste pour les étudiants insuffisants
-#         etudiants_insuffisants = []
-#         print("---------------------------------------------------")
-#         #print(etudiants)
-#         print("---------------------------------------------------")
-#         # Calculer les crédits obtenus par chaque étudiant pour le semestre sélectionné
-#         for etudiant in etudiants:
-#             credits_obtenus = etudiant.credits_obtenus_semestre(
-#                 programme=programme)  # Utiliser le premier semestre sélectionné
-#             print("credits_obtenus",credits_obtenus)
-#             # Créer un attribut pour stocker les crédits obtenus
-#             etudiant.credits_obtenus = credits_obtenus
-
-#         # Récupérer le semestre actuel de chaque étudiant dans l'année universitaire
-#         for etudiant in etudiants:
-#             semestres_etudiant = etudiant.semestres.filter(
-#                 annee_universitaire=annee_universitaire)
-#             if semestres_etudiant.exists():
-#                 semestre_actuel = semestres_etudiant.latest('libelle')
-#                 print("semestre actuel",semestre_actuel)
-#                 etudiant.semestre_actuel = semestre_actuel
-#             else:
-#                 etudiant.semestre_actuel = None
-#     except Exception as e:
-#         etudiants=[]
-#         etudiants_insuffisants=[]
-#     # Construire le contexte pour le rendu de la page
-#     data = {
-#         'etudiants': etudiants,
-#         'semestres': semestres,
-#         'etudiants_insuffisants': etudiants_insuffisants,
-#         'niveau': niveau,
-#         'selected_semestre': semestres_selected
-#     }
-
-#     # Rendre la page avec le contexte
-#     return render(request, 'etudiants/liste_etudiants_par_semestre.html', context=data)
-
-
-
-
-
 
 @login_required(login_url=settings.LOGIN_URL)
 @permission_required("main.change_etudiant")
@@ -779,6 +689,7 @@ def create_matiere(request, id=0):
             matiere = Matiere.objects.get(pk=id)
             form = MatiereForm(instance=matiere)
             form.set_ue(ues)
+        print(Enseignant.objects.all())
         return render(request, 'matieres/create_matiere.html', {'form': form})
     else:
         if id == 0:
@@ -790,7 +701,6 @@ def create_matiere(request, id=0):
             form = MatiereForm(request.POST, instance=matiere)
             form.set_ue(ues)
             message = "a été mis a jour"
-
         if form.is_valid():
             matiere = form.save()
             messages.success(
@@ -798,7 +708,7 @@ def create_matiere(request, id=0):
             return redirect('main:matieres_etudiant')
         return render(request, 'matieres/create_matiere.html', {'form': form})
 
-
+@permission_required("main.delete_matiere")
 def delete_matiere(request, id_matiere):
     matiere = get_object_or_404(Matiere, pk=id_matiere)
     messages.success(
@@ -807,7 +717,7 @@ def delete_matiere(request, id_matiere):
     return redirect('main:matieres_etudiant')
 
 
-def ues_etudiants(request):
+def ues(request):
     """
     Retourne une page html affichant l'ensemble des UEs d'un utilisateur en fonction de son rôle et du semestre selectioné s'il existe. 
 
@@ -818,8 +728,7 @@ def ues_etudiants(request):
     """
     role = get_user_role(request)
     id_annee_selectionnee = request.session.get("id_annee_selectionnee")
-    annee_universitaire = get_object_or_404(
-        AnneeUniversitaire, pk=id_annee_selectionnee)
+    annee_universitaire = get_object_or_404(AnneeUniversitaire, pk=id_annee_selectionnee)
     semestres = annee_universitaire.semestre_set.all()
     semestres_selected = semestres
 
@@ -828,42 +737,25 @@ def ues_etudiants(request):
     elif role.name == "enseignant" or role.name == "directeur_des_etudes" or role.name == "secretaire":
         titre_section = "Nos Ues"
 
-    if 'semestre' in request.GET:
+    if 'semestre' in request.GET and request.GET.get('semestre') != "":
         semestre_id = request.GET.get('semestre')
         semestres_selected = semestres.filter(pk=semestre_id)
+        ues = Ue.objects.filter(programme__semestre__in=semestres_selected)
+    else:
+        ues = Ue.objects.filter(annee_universitaire=annee_universitaire)
 
-    matieres = Ue.objects.filter(programme__semestre__in=semestres_selected)
 
     if len(semestres_selected) == 1:
         semestres_selected = semestres_selected.get()
 
     data = {
-        'ues': matieres,
+        'ues': ues,
         'semestres': semestres,
         'titre_section': titre_section,
         'selected_semestre': semestres_selected,
     }
     return render(request, 'ues/ues.html', context=data)
 
-
-@login_required(login_url=settings.LOGIN_URL)
-@permission_required("main.view_ue")
-def ues(request):
-    """
-    Affiche la liste des Unités d'Enseignement (UE) associées à l'année universitaire courante.
-
-    :param request: L'objet de requête Django.
-    :return: Une réponse HTTP avec la liste des UE pour l'année universitaire courante.
-    """
-    id_annee_selectionnee = request.session.get('id_annee_selectionnee')
-    annee_universitaire = get_object_or_404(
-        AnneeUniversitaire, pk=id_annee_selectionnee)
-
-    ues = Ue.objects.filter(
-        programme__semestre__annee_universitaire=annee_universitaire)
-
-    # Rendre la page avec la liste des UE pour l'année universitaire courante
-    return render(request, 'ues/ues.html', {'ues': ues})
 
 
 @login_required(login_url=settings.LOGIN_URL)
@@ -898,6 +790,9 @@ def create_ue(request, id=0):
     :return: Une réponse HTTP avec un message d'erreur ou le formulaire pour créer ou modifier une UE.
     """
 
+    id_annee_selectionnee = request.session["id_annee_selectionnee"]
+    annee_universitaire = get_object_or_404(AnneeUniversitaire, pk=id_annee_selectionnee)
+
     # Vérifier la méthode de la requête (GET ou POST)
     if request.method == "GET":
         # Afficher le formulaire pour la création ou la modification d'une UE
@@ -922,7 +817,10 @@ def create_ue(request, id=0):
         # Vérifier si le formulaire est valide
         if form.is_valid():
             # Enregistrer les données du formulaire dans la base de données
-            ue = form.save()
+            ue = form.save(commit=False)
+            ue.annee_universitaire = annee_universitaire
+            ue.save()
+            print(ue.annee_universitaire)
             # Afficher un message d'erreur spécifique pour inciter à attacher l'UE à la gestion maquette
             messages.success(request, f"La matière {ue.libelle} {message} !")
             return redirect('main:ues')
@@ -939,7 +837,6 @@ def create_ue(request, id=0):
         * le nom du fichier pdf qui sera généré en sortie
         ( pour les fichiers ne pas mentionner l'extension )
 """
-
 
 @login_required(login_url=settings.LOGIN_URL)
 # methode générant la carte de l'étudiant
@@ -994,6 +891,7 @@ def carte_etudiant(request, id, niveau):
 
 @login_required(login_url=settings.LOGIN_URL)
 # methode générant la carte des étudiants d'un niveau
+@permission_required("main.delete_matiere")
 def carte_etudiant_all(request, niveau):
     from projet_ifnti.settings import BASE_DIR
     """
@@ -1122,6 +1020,7 @@ def diplome_etudiant(request, id):
 
 @login_required(login_url=settings.LOGIN_URL)
 # methode générant le diplome de l'étudiant
+@permission_required("main.delete_matiere")
 def diplome_etudiant_all(request):
     """
     Génére le diplome des étudiants de L3.
@@ -1223,6 +1122,7 @@ def certificat_scolaire(request, id, niveau):
         response['Content-Disposition'] = 'inline;filename=pdf_file.pdf'
         return response
 #---------------------------------------------------------------------------------------------------------------------------------
+
 @login_required(login_url=settings.LOGIN_URL)
 def attestation_scolarite(request, id, niveau):
     id_annee_selectionnee = request.session["id_annee_selectionnee"]
@@ -1261,9 +1161,6 @@ def attestation_scolarite(request, id, niveau):
         response['Content-Disposition'] = 'inline;filename=pdf_file.pdf'
         return response
     
-
-
-
 #---------------------------------------------------------------------------------------------------------------------------------
 @login_required(login_url=settings.LOGIN_URL)
 def attestation_diplome(request, id, niveau):
@@ -1303,7 +1200,6 @@ def attestation_diplome(request, id, niveau):
         response['Content-Disposition'] = 'inline;filename=pdf_file.pdf'
         return response
     
-
 #-------------------------------------------------------------------------------------------------------------------------------------
 
 @login_required(login_url=settings.LOGIN_URL)
@@ -1692,7 +1588,6 @@ def bilan_annuelle(request, id_semestre, avec_rattrapage=None):
         return response
 
 
-
 @login_required(login_url=settings.LOGIN_URL)
 def recapitulatif_notes(request, id_matiere, id_semestre):
     """
@@ -1747,7 +1642,6 @@ def recapitulatif_notes(request, id_matiere, id_semestre):
         response['Content-Disposition'] = 'inline;filename=pdf_file.pdf'
         return response
 
-
 def recapitulatifs_des_notes_par_etudiant(request, id_semestre):
     """
     Affiche une page affichant l'ensemble des matières suivies au cours d'un semestre par l'étudiant, pour pouvoir choisir le récapitulatif de la matière recherchée.
@@ -1765,7 +1659,6 @@ def recapitulatifs_des_notes_par_etudiant(request, id_semestre):
         'etudiant': etudiant
     }
     return render(request, 'evaluations/recapitulatifs_des_notes_etudiant.html', context=data)
-
 
 @show_recapitulatif_note_permission("show_recapitulatif")
 def recapitulatifs_des_notes_par_matiere(request, id_semestre, id_matiere):
@@ -2508,7 +2401,7 @@ def enseignants(request):
             if role.name == "enseignant":
                 niveau = "Mes collegues"
             enseignants = Enseignant.objects.filter(
-                is_active=True, matiere__ue__programme__semestre__in=semestres_selected).distinct()
+                personnel__is_active=True, matiere__ue__programme__semestre__in=semestres_selected).distinct()
         elif role.name == "directeur_des_etudes" or role.name == "comptable":
             if role.name == "comptable":
                 niveau = "Mes collegues"
@@ -2623,12 +2516,14 @@ def semestres(request):
     return render(request, 'semestres/semestres.html', context)
 
 @login_required(login_url=settings.LOGIN_URL)
+@permission_required("main.view_personnel")
 def personnels(request):
     listespersonnelles = Personnel.objects.all()
     print(listespersonnelles)
     return render(request, "employes/index.html", {'listespersonnelles' : listespersonnelles})
 
 @login_required(login_url=settings.LOGIN_URL)
+@permission_required("main.add_personnel")
 def create_personnel(request):
     data = {}
     roles = Group.objects.all()
@@ -2652,6 +2547,7 @@ def create_personnel(request):
     return render(request, 'employes/create_or_edit.html', context=data)
 
 @login_required(login_url=settings.LOGIN_URL)
+@permission_required("main.update_personnel")
 def update_personnel(request, id):
     data = {}
     personnel = get_object_or_404(Personnel, pk=id)
@@ -2668,6 +2564,7 @@ def update_personnel(request, id):
             groups = inputs_data.get('roles')
             personnel.assign_groups(groups)
             personnel.bind_enseignant(type_enseignant, speliatite_enseignant)
+            return HttpResponse("Hello2")
             return redirect('main:personnels')
         data['form'] = form
     else:
@@ -2681,6 +2578,7 @@ def update_personnel(request, id):
     return render(request, 'employes/create_or_edit.html', context=data)
 
 @login_required(login_url=settings.LOGIN_URL)
+@permission_required("main.delete_personnel")
 def delete_personnel(request, id):
     personnel = get_object_or_404(Personnel, pk=id)
     personnel.delete()

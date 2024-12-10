@@ -26,69 +26,6 @@
                     </div>
                 </div>
             </form>
-            {% comment %} <div class="d-flex flex-column align-items-center p-3">
-                <h3>IFNTI : Maquette {{ maquette_semestres.titre }} </h3>
-                <div class="mx-3">
-                    <div class="form-group col-lg-3">
-                        <a href="{{ pdf_file }}" download="pdf">
-                            <button type="submit" class="btn btn-outline-primary" style="margin-top: 30px;">
-                                <i class="si si-printer"></i> Imprimer
-                            </button>
-                        </a>
-                    </div>
-                    <table class="table table-bordered table-striped table-vcenter js-dataTable-full-pagination">
-                        <thead>
-                            <tr class="">
-                               <th class="border">Semestre</th>
-                               <th class="border">Intitulé</th>
-                               <th class="border">Type</th>
-                               <th class="border">Crédit</th>
-                               <th class="border">Matières</th>
-                               <th class="border">Volume Horraire (H)</th>
-                               <th class="border">Enseignant Responsable</th>
-                               <th class="border">Enseignant Responsable UE</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for maquette_semestre in maquette_semestres.ues  %}
-                            <tr class="border p-0 text-center">
-                                <td class="border p-0 inline-block align-middle">{{ maquette_semestre.semestre }}</td>
-                                <td class="border p-0 inline-block align-middle">{{ maquette_semestre.intitule }}</td>
-                                <td class="border p-0 inline-block align-middle">{{ maquette_semestre.type_ue }}</td>
-                                <td class="border p-0 inline-block align-middle">{{ maquette_semestre.credit }}</td>
-                                <td class="border p-0"> 
-                                {% for matiere in maquette_semestre.matieres  %}
-                                    <span>{{ matiere }}</span>
-                                    {% if not forloop.last %}
-                                        <hr class="w-100">
-                                    {% endif %}
-                                {% endfor %}
-                                </td>
-                                <td class="border p-0">
-                                    {% for horaire in maquette_semestre.volumes_horaires  %}
-                                    <span>{{ horaire }}</span>
-                                    {% if not forloop.last %}
-                                        <hr>
-                                    {% endif %}
-                                    {% endfor %}
-                                </td>
-                                <td class="border p-0">
-                                    {% for enseignant in maquette_semestre.enseignants  %}
-                                    <span>{{ enseignant }}</span>
-                                    {% if not forloop.last %}
-                                        <hr>
-                                    {% endif %}
-                                    {% endfor %}
-                                </td>
-                                <td class="border p-0 inline-block align-middle">
-                                    <span>{{ maquette_semestre.enseignants_principaux }}</span>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div> {% endcomment %}
             <div class="p-3">
                 <embed src="/media/pdf/maquette.pdf" width="100%" height="800">
             </div>

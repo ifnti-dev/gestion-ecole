@@ -107,7 +107,7 @@ urlpatterns = [
 
 
      #### UEs ####
-     path('ues/', views.ues_etudiants, name='ues'),
+     path('ues/', views.ues, name='ues'),
      path('liste_des_ues/', views.ues, name='liste_des_ues'),
      path('detail_ue/<int:id>/', views.detailUe, name='detail_ue'),
      path('create_ue/', views.create_ue, name='create_ue'),

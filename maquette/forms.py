@@ -64,7 +64,7 @@ class ProgrammeForm(forms.ModelForm):
     def set_ues(self, ues):
         self.fields['ues'] = forms.ModelMultipleChoiceField(
         queryset=ues,
-        widget=forms.SelectMultiple(attrs={'class' : 'form-control js-select2 form-control w-100'})
+        widget=forms.SelectMultiple(attrs={'class' : 'form-control js-select2 form-control'})
     )
 
     parcours = forms.ModelChoiceField(
@@ -76,7 +76,6 @@ class ProgrammeForm(forms.ModelForm):
     class Meta:
         model = Programme
         fields = ('semestre', 'ues','parcours')
-        #widgets = {'semestre': forms.Select(attrs={'class' : 'form-control'})}
     
     def clean(self):
         cleanned_data = super(ProgrammeForm, self).clean()   

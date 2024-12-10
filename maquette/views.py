@@ -45,7 +45,7 @@ def add_programme(request):
     id_annee_selectionnee = request.session.get('id_annee_selectionnee')
     annee_universitaire = get_object_or_404(AnneeUniversitaire, pk=id_annee_selectionnee)
     semestres = annee_universitaire.get_semestres()
-    ues = Ue.objects.exclude(programme__semestre__annee_universitaire=annee_universitaire)
+    ues = Ue.objects.filter(annee_universitaire=annee_universitaire)
     if request.POST:
         form = ProgrammeForm(request.POST)
         form.set_semestre(semestres)
@@ -71,7 +71,9 @@ def edit_programme(request, id):
     id_annee_selectionnee = request.session.get('id_annee_selectionnee')
     programme = get_object_or_404(Programme, pk=id)
     annee_universitaire = get_object_or_404(AnneeUniversitaire, pk=id_annee_selectionnee)
-    ues = Ue.objects.all()
+    # ues = Ue.objects.all()
+    ues = Ue.objects.filter(annee_universitaire=annee_universitaire)
+
     semestres = annee_universitaire.get_semestres()
     if request.POST:
         form = ProgrammeForm(request.POST, instance=programme)
