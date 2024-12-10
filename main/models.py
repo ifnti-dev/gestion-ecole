@@ -1314,9 +1314,12 @@ class Ue(models.Model):
 
         **Nullable:** true
     """
+    annee_universitaire = models.ForeignKey("AnneeUniversitaire", on_delete=models.SET_NULL, null=True)
+
 
     class Meta:
         verbose_name_plural = 'UE'
+        unique_together = ['annee_universitaire', 'libelle']
 
     def matiere_principacle(self):
         """
@@ -1875,8 +1878,7 @@ class Semestre(models.Model):
 
         **Valeur par défaut:** false
     """
-    annee_universitaire = models.ForeignKey(
-        AnneeUniversitaire, on_delete=models.SET_NULL, null=True)
+    annee_universitaire = models.ForeignKey(AnneeUniversitaire, on_delete=models.SET_NULL, null=True)
     """
     identifiant de l'année universitaire à laquelle le semestre est rattaché    
     

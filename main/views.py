@@ -132,10 +132,6 @@ def change_annee_universitaire(request):
         id_annee_universitaire = request.POST.get('annee_universitaire')
         request.session["id_annee_selectionnee"] = id_annee_universitaire
         new_origin_path = request.POST.get('origin_path')
-        new_origin_path = new_origin_path.split('/')
-        new_origin_path[3] = id_annee_universitaire
-        new_origin_path = "/".join(new_origin_path)
-
         return redirect(new_origin_path)
 
 
@@ -721,7 +717,7 @@ def delete_matiere(request, id_matiere):
     return redirect('main:matieres_etudiant')
 
 
-def ues_etudiants(request):
+def ues(request):
     """
     Retourne une page html affichant l'ensemble des UEs d'un utilisateur en fonction de son rôle et du semestre selectioné s'il existe. 
 
@@ -732,8 +728,7 @@ def ues_etudiants(request):
     """
     role = get_user_role(request)
     id_annee_selectionnee = request.session.get("id_annee_selectionnee")
-    annee_universitaire = get_object_or_404(
-        AnneeUniversitaire, pk=id_annee_selectionnee)
+    annee_universitaire = get_object_or_404(AnneeUniversitaire, pk=id_annee_selectionnee)
     semestres = annee_universitaire.semestre_set.all()
     semestres_selected = semestres
 
@@ -742,42 +737,25 @@ def ues_etudiants(request):
     elif role.name == "enseignant" or role.name == "directeur_des_etudes" or role.name == "secretaire":
         titre_section = "Nos Ues"
 
-    if 'semestre' in request.GET:
+    if 'semestre' in request.GET and request.GET.get('semestre') != "":
         semestre_id = request.GET.get('semestre')
         semestres_selected = semestres.filter(pk=semestre_id)
+        ues = Ue.objects.filter(programme__semestre__in=semestres_selected)
+    else:
+        ues = Ue.objects.filter(annee_universitaire=annee_universitaire)
 
-    matieres = Ue.objects.filter(programme__semestre__in=semestres_selected)
 
     if len(semestres_selected) == 1:
         semestres_selected = semestres_selected.get()
 
     data = {
-        'ues': matieres,
+        'ues': ues,
         'semestres': semestres,
         'titre_section': titre_section,
         'selected_semestre': semestres_selected,
     }
     return render(request, 'ues/ues.html', context=data)
 
-
-@login_required(login_url=settings.LOGIN_URL)
-@permission_required("main.view_ue")
-def ues(request):
-    """
-    Affiche la liste des Unités d'Enseignement (UE) associées à l'année universitaire courante.
-
-    :param request: L'objet de requête Django.
-    :return: Une réponse HTTP avec la liste des UE pour l'année universitaire courante.
-    """
-    id_annee_selectionnee = request.session.get('id_annee_selectionnee')
-    annee_universitaire = get_object_or_404(
-        AnneeUniversitaire, pk=id_annee_selectionnee)
-
-    ues = Ue.objects.filter(
-        programme__semestre__annee_universitaire=annee_universitaire)
-
-    # Rendre la page avec la liste des UE pour l'année universitaire courante
-    return render(request, 'ues/ues.html', {'ues': ues})
 
 
 @login_required(login_url=settings.LOGIN_URL)
@@ -812,6 +790,9 @@ def create_ue(request, id=0):
     :return: Une réponse HTTP avec un message d'erreur ou le formulaire pour créer ou modifier une UE.
     """
 
+    id_annee_selectionnee = request.session["id_annee_selectionnee"]
+    annee_universitaire = get_object_or_404(AnneeUniversitaire, pk=id_annee_selectionnee)
+
     # Vérifier la méthode de la requête (GET ou POST)
     if request.method == "GET":
         # Afficher le formulaire pour la création ou la modification d'une UE
@@ -836,7 +817,10 @@ def create_ue(request, id=0):
         # Vérifier si le formulaire est valide
         if form.is_valid():
             # Enregistrer les données du formulaire dans la base de données
-            ue = form.save()
+            ue = form.save(commit=False)
+            ue.annee_universitaire = annee_universitaire
+            ue.save()
+            print(ue.annee_universitaire)
             # Afficher un message d'erreur spécifique pour inciter à attacher l'UE à la gestion maquette
             messages.success(request, f"La matière {ue.libelle} {message} !")
             return redirect('main:ues')
