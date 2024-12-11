@@ -818,9 +818,9 @@ def create_ue(request, id=0):
         if form.is_valid():
             # Enregistrer les données du formulaire dans la base de données
             ue = form.save(commit=False)
-            ue.annee_universitaire = annee_universitaire
+            #ue.annee_universitaire = annee_universitaire
             ue.save()
-            print(ue.annee_universitaire)
+            #print(ue.annee_universitaire)
             # Afficher un message d'erreur spécifique pour inciter à attacher l'UE à la gestion maquette
             messages.success(request, f"La matière {ue.libelle} {message} !")
             return redirect('main:ues')
