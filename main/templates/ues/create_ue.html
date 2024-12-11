@@ -53,12 +53,17 @@
                         {{ form.minValue }}
                         <span class="text-danger">{{ form.minValue.errors }}</span>
                     </div>
-                </div>
-                <div class="form-row mb-3">
-                    <div class="col-md-12">
+                    <div class="col-md-6">
                         {{ form.enseignant.label_tag }}
                         {{ form.enseignant }}
                         <span class="text-danger">{{ form.enseignant.errors }}</span>
+                    </div>
+                </div>
+                <div class="form-row mb-3">
+                    <div class="col-md-12">
+                        {{ form.annee_universitaire.label_tag }}
+                        {{ form.annee_universitaire }}
+                        <span class="text-danger">{{ form.annee_universitaire.errors }}</span>
                     </div>
                 </div>
                 <button class="btn btn-primary btn-block mt-3" type="submit"><i class="fas fa-database"></i> Enrégistrer &nbsp;&nbsp;&nbsp;<span></span></button>
