@@ -791,7 +791,7 @@ def create_ue(request, id=0):
     """
 
     id_annee_selectionnee = request.session["id_annee_selectionnee"]
-    #annee_universitaire = get_object_or_404(AnneeUniversitaire, pk=id_annee_selectionnee)
+    annee_universitaire = get_object_or_404(AnneeUniversitaire, pk=id_annee_selectionnee)
 
     # Vérifier la méthode de la requête (GET ou POST)
     if request.method == "GET":
@@ -801,6 +801,8 @@ def create_ue(request, id=0):
         else:
             ue = Ue.objects.get(pk=id)
             form = UeForm(instance=ue)
+            
+        form.fields['semestre'].queryset = Semestre.objects.filter(annee_universitaire=annee_universitaire)
         return render(request, 'ues/create_ue.html', {'form': form})
     else:
         # Traitement des données du formulaire lorsqu'une requête POST est reçue
