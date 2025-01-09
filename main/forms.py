@@ -208,7 +208,7 @@ class ProgrammeForm(forms.ModelForm):
 class UeForm(forms.ModelForm):
     class Meta:
         model = Ue
-        fields = ['libelle', 'type', 'niveau', 'nbreCredits','minValue', 'heures', 'enseignant', 'annee_universitaire']
+        fields = ['libelle', 'type', 'niveau', 'nbreCredits','minValue', 'heures', 'enseignant', 'semestre']
         widgets = {
             'libelle': forms.TextInput(attrs={'class': 'form-control col-md-12'}),
             'type': forms.Select(attrs={'class': 'form-control col-md-12'}),       
@@ -217,7 +217,7 @@ class UeForm(forms.ModelForm):
             'minValue': forms.TextInput(attrs={'class': 'form-control col-md-12'}),
             'heures': forms.TextInput(attrs={'class': 'form-control col-md-12'}),
             'enseignant': forms.Select(attrs={'class': 'form-control col-md-12 js-select2'}),
-            'annee_universitaire': forms.Select(attrs={'class': 'form-control col-md-12 js-select2'}),
+            'semestre': forms.Select(attrs={'class': 'form-control col-md-12 js-select2'}),
         }
  
 
