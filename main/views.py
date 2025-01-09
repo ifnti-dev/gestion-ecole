@@ -742,7 +742,7 @@ def ues(request):
         semestres_selected = semestres.filter(pk=semestre_id)
         ues = Ue.objects.filter(programme__semestre__in=semestres_selected)
     else:
-        ues = Ue.objects.filter(annee_universitaire=annee_universitaire)
+        ues = Ue.objects.filter(semestre__annee_universitaire=annee_universitaire)
 
 
     if len(semestres_selected) == 1:
@@ -791,7 +791,7 @@ def create_ue(request, id=0):
     """
 
     id_annee_selectionnee = request.session["id_annee_selectionnee"]
-    annee_universitaire = get_object_or_404(AnneeUniversitaire, pk=id_annee_selectionnee)
+    #annee_universitaire = get_object_or_404(AnneeUniversitaire, pk=id_annee_selectionnee)
 
     # Vérifier la méthode de la requête (GET ou POST)
     if request.method == "GET":
@@ -824,6 +824,9 @@ def create_ue(request, id=0):
             # Afficher un message d'erreur spécifique pour inciter à attacher l'UE à la gestion maquette
             messages.success(request, f"La matière {ue.libelle} {message} !")
             return redirect('main:ues')
+        else:
+            print(form.errors)
+            return render(request, 'ues/create_ue.html', {'form': form})
 
 
 

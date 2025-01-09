@@ -1314,12 +1314,11 @@ class Ue(models.Model):
 
         **Nullable:** true
     """
-    annee_universitaire = models.ForeignKey("AnneeUniversitaire", on_delete=models.SET_NULL, null=True)
-
+    semestre = models.ForeignKey("Semestre", on_delete=models.SET_NULL, null=True)
 
     class Meta:
         verbose_name_plural = 'UE'
-        unique_together = ['annee_universitaire', 'libelle']
+        unique_together = ['semestre', 'libelle']
 
     def matiere_principacle(self):
         """
