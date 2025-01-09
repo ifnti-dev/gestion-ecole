@@ -219,7 +219,6 @@ class UeForm(forms.ModelForm):
             'enseignant': forms.Select(attrs={'class': 'form-control col-md-12 js-select2'}),
             'semestre': forms.Select(attrs={'class': 'form-control col-md-12 js-select2'}),
         }
- 
 
 class MatiereForm(forms.ModelForm):
 
