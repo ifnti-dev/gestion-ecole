@@ -1,0 +1,47 @@
+version: '3.9'
+
+services:
+  web:
+    image: python:3.9
+    container_name: gestion_ifnti_web
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    networks:
+      - gestion_ifnti_network
+
+  db:
+    image: postgres:13
+    container_name: postgres_db
+    environment:
+      POSTGRES_USER: gestion_ifnti_user
+      POSTGRES_PASSWORD: gestion_ifnti_password
+      POSTGRES_DB: gestion_ifnti_db
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5435:5432"
+    networks:
+      - gestion_ifnti_network
+
+  # nginx:
+  #   image: nginx:latest
+  #   build: 
+  #     context: nginx
+  #     dockerfile: Dockerfile
+  #   container_name: nginx_proxy
+  #   ports:
+  #     - "81:80"
+  #   depends_on:
+  #     - web
+  #   networks:
+  #     - gestion_ifnti_network
+
+networks:
+  gestion_ifnti_network:
