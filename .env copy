@@ -1,0 +1,8 @@
+IS_PRODUCTION=True
+DB_USER=gestion_ifnti_user
+DB_PASSWORD=gestion_ifnti_password
+DB_FIRST_HOST=gestion_ifnti_web
+DB_SECOND_HOST=gestion_ifnti_web
+DB_PORT=5432
+DATABASE=gestion_ifnti_db
+SECRET_KEY=x^clg28zuw!)q%lxj^g^cx&uv-365vj$)vj4yne)ids%2rmu@9

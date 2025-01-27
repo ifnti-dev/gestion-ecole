@@ -23,7 +23,6 @@ load_dotenv()
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv('SECRET_KEY')
-#SECRET_KEY = 'ghbfrhgkjssk'
 
 X_FRAME_OPTIONS = 'SAMEORIGIN'
 
@@ -31,7 +30,8 @@ X_FRAME_OPTIONS = 'SAMEORIGIN'
 DEBUG = True
     
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = [
+    "*",]
 
 
 LOGIN_URL = "/main/connexion"
