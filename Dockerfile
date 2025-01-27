@@ -16,7 +16,7 @@ COPY . /app
 # Exposer le port utilisé par l'application Django
 EXPOSE 8000
 
-RUN python manage.py loaddata whole.json
+#RUN python manage.py loaddata whole.json
 
 # Commande par défaut pour démarrer le serveur Django
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]

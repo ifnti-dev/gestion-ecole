@@ -13,8 +13,8 @@ db.sqlite3
 db*
 
 backup
-# whole.json
-# whole.*
+whole.json
+whole.*
 
 **/.zip
 **/migrations/**
