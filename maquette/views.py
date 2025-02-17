@@ -55,7 +55,6 @@ def add_programme(request):
             return redirect('maquette:programmes')
         data['form'] = form
     else:
-        
         data['form'] = ProgrammeForm()
         data['form'].set_semestre(semestres)
         data['form'].set_ues(ues)
@@ -72,7 +71,7 @@ def edit_programme(request, id):
     programme = get_object_or_404(Programme, pk=id)
     annee_universitaire = get_object_or_404(AnneeUniversitaire, pk=id_annee_selectionnee)
     # ues = Ue.objects.all()
-    ues = Ue.objects.filter(annee_universitaire=annee_universitaire)
+    ues = Ue.objects.filter(semestre__annee_universitaire=annee_universitaire)
 
     semestres = annee_universitaire.get_semestres()
     if request.POST:
