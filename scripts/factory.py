@@ -1,13 +1,13 @@
 import random
 from faker import Faker
 from main.models import Etudiant, Personnel, FicheDePaie, Enseignant, Programme,  Tuteur, Ue, Matiere, Evaluation, Competence, Semestre, Domaine, Parcours, AnneeUniversitaire, Note
-from cahier_de_texte.models import Seance
+# from cahier_de_texte.models import Seance
 from django.contrib.auth.models import User 
 from django.contrib.auth.models import Group, Permission
 
 
 def run():
-    users = User.objects.exclude(username__in=["malia", "amk", "walid", 'kaiser'])
+    users = User.objects.exclude(username__in=["patrik"])
     for user in users:
         user.delete()
     
@@ -19,7 +19,7 @@ def run():
         create_faker()
 
 def clean_data_base():
-    models = [AnneeUniversitaire, Programme, Seance, Personnel, Enseignant, Etudiant, Tuteur, Ue, Matiere, Evaluation, Competence, Semestre, Domaine, Note]
+    models = [AnneeUniversitaire, Programme,  Personnel, Enseignant, Etudiant, Tuteur, Ue, Matiere, Evaluation, Competence, Semestre, Domaine, Note]
     for model in models:
         print(f"::::::::::::::::::::::: Delete Model {model.__name__} :::::::::::::::::::::::")
         model.objects.all().delete()
