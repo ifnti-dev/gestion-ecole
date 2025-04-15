@@ -78,6 +78,7 @@ urlpatterns = [
           views.evaluations_etudiant, name='evaluations_etudiant'),
 
      path('etudiants/',views.etudiants, name='etudiants'),
+     path('etudiants/upload_photo_passport', views.upload_photo_passports,name='upload_photo_passport'),
 
      #### Étudiants ####
      path('change_annee_universitaire/', views.change_annee_universitaire,name='change_annee_universitaire'),

@@ -212,9 +212,13 @@ class Utilisateur(models.Model):
 
 def renommer_image_photo_passport(instance, filename):
     extension = filename.split('.')[-1]
-    nom_fichier = f"{instance.id}.{extension}"
+    # nom_fichier = f"{instance.id}.{extension}"
+    print("[[[[[[[[[[[[[[[[[[[[[[[[[]]]]]]]]]]]]]]]]]]]]]]]]]")
+    print(filename)
+    nom_fichier = f"{instance.id}.jpg"
+
     print(nom_fichier)
-    return os.path.join("images/photo_passports", nom_fichier)
+    return os.path.join("photo_passports", nom_fichier)
 
 class Etudiant(Utilisateur):
     """
@@ -486,11 +490,13 @@ class Etudiant(Utilisateur):
     """ Cléf de l'étudiant"""
 
     def save(self, force_insert=False, force_update=False, using=None):
+        
         """
         Méthode pour sauvegarder un étudiant
         """
         
         self.email = self.generate_email()
+        print(self.photo_passport)
         
         if not self.id:
             list_etudiants = Etudiant.objects.filter(anneeentree=self.anneeentree)
@@ -501,7 +507,8 @@ class Etudiant(Utilisateur):
                 self.id = f"{self.nom[0]}{self.prenom[0]}{self.anneeentree}{str_valeur_compteur}"
             else:
                 self.id = f"{self.nom[0]}{self.prenom[0]}{self.anneeentree}01"
-            
+
+            self.photo_passport=f"photo_passports/{self.id}.jpg"
             self.user = create_auth_user(self.nom, self.prenom, self.email)  
             group_etudiant = Group.objects.get(name="etudiant")
             self.user.groups.add(group_etudiant)

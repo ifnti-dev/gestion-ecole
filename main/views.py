@@ -916,9 +916,11 @@ def carte_etudiant_all(request, niveau):
     annee_suiv = int(annee_universitaire.annee) + 1
 
     semestre = Semestre.objects.filter(id=niveau)
+    print(semestre)
     if semestre:
         semestres = [semestre.get().libelle]
     elif niveau == "__all__":
+        print(niveau)
         semestres = ['S1', 'S2', 'S3', 'S4', 'S5', 'S6']
 
     etudiants = semestre.get().etudiant_set.all().order_by('nom', 'prenom')
@@ -934,10 +936,17 @@ def carte_etudiant_all(request, niveau):
         #     date_formatee = 'None'
 
         etudiant.datenaissance = etudiant.datenaissance if etudiant.datenaissance else ""
-        etudiant.photo = "/".join(etudiant.photo_passport.__str__().split('/')[1:]) if etudiant.photo_passport and etudiant.photo_passport != "" else "photo_passports/default.png"
-        etudiant.photo = os.path.join(BASE_DIR, 'media') + '/images/' + etudiant.photo
-        print(etudiant.photo)
-        #default.png
+
+        # etudiant.photo = "/".join(etudiant.photo_passport.__str__().split('/')[1:]) if etudiant.photo_passport and etudiant.photo_passport != "" else "photo_passports/default.png"
+        # etudiant.photo = os.path.join(BASE_DIR, 'media') + '/images/' + etudiant.photo
+
+        print(os.path.exists(f"media/{etudiant.photo_passport}"))
+
+        if os.path.isfile("media/"+str(etudiant.photo_passport)):
+            etudiant.photo= os.path.join(BASE_DIR, f"media/{etudiant.photo_passport}")
+        else :
+            etudiant.photo=os.path.join(BASE_DIR, 'media/images/photo_passports/default.png')
+
     #return HttpResponse("Hello")
 
     nbre_pages = len(etudiants) // 9
@@ -2787,3 +2796,16 @@ def importer_data(request):
       
         messages.success(request, "Donnée importer avec succes !")
         return redirect('main:etudiants')
+
+
+
+def upload_photo_passports(request):
+    from projet_ifnti.settings import BASE_DIR
+    if request.method=="POST" and request.FILES.getlist('file'):
+        files=request.FILES.getlist('file')
+        for file in files:
+            file_path=os.path.join(f"{BASE_DIR}/photo_passports", file)
+            with open(file_path, 'wb+') as destination:
+                for chunk in file.chunks():
+                    destination.write(chunk)
+    redirect("main:etudiants")
