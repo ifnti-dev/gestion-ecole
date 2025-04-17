@@ -870,6 +870,7 @@ def carte_etudiant(request, id, niveau):
     in_format = "%Y-%m-%d"
     out_format = "%d-%m-%Y"
 
+
     etudiant.datenaissance = etudiant.datenaissance if etudiant.datenaissance else ""
     # etudiant.photo = "/".join(etudiant.photo_passport.__str__().split('/')[1:]) if etudiant.photo_passport and etudiant.photo_passport != "" else "photo_passports/default.png"
     # etudiant.photo = os.path.join(BASE_DIR, 'media') + '/images/' + etudiant.photo
