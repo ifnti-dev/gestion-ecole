@@ -175,3 +175,4 @@ projet_ifnti/settings.py
 #Ignore folder export evaluation
 media/excel_templates/export/*
 *.sqlite3
+postgres_data/
