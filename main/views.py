@@ -876,9 +876,12 @@ def carte_etudiant(request, id, niveau):
     # etudiant.photo = os.path.join(BASE_DIR, 'media') + '/images/' + etudiant.photo
 
     etudiant.photo =  os.path.join(BASE_DIR, f"media/photo_passports/{etudiant.id}.jpg")
-
+    tuteurs=etudiant.tuteurs.first()
     context = {'etudiant': etudiant, 'niveau': niveau, 'annee': str(
-        annee_universitaire.annee) + '-' + str(annee_universitaire.annee + 1)}
+        annee_universitaire.annee) + '-' + str(annee_universitaire.annee + 1),'tuteurs':tuteurs}
+    print(context)
+    print(f"{etudiant} les etufgfgmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm")
+    print(f"{tuteurs} iretiurtiuhiueryeryeheeyfrhe")
 
     latex_input = 'carte_etudiant'
     latex_ouput = 'generated_carte_etudiant'
@@ -939,7 +942,7 @@ def carte_etudiant_all(request, niveau):
         #     date_formatee = 'None'
 
         etudiant.datenaissance = etudiant.datenaissance if etudiant.datenaissance else ""
-
+        
         # etudiant.photo = "/".join(etudiant.photo_passport.__str__().split('/')[1:]) if etudiant.photo_passport and etudiant.photo_passport != "" else "photo_passports/default.png"
         # etudiant.photo = os.path.join(BASE_DIR, 'media') + '/images/' + etudiant.photo
 
@@ -962,9 +965,10 @@ def carte_etudiant_all(request, niveau):
         latex_input = 'carte_etudiant'
         latex_ouput = 'generated_carte_etudiant'
         pdf_file = 'carte_etudiant_' + str(etudiant.id)
+        tuteurs=etudiant.tuteurs.first()
 
         temp_context = {'etudiant': etudiant, 'niveau': niveau, 'annee': str(
-            annee_universitaire.annee) + '-' + str(annee_suiv)}
+            annee_universitaire.annee) + '-' + str(annee_suiv),'tuteurs':tuteurs}
 
         # génération du pdf
         generate_pdf(temp_context, latex_input, latex_ouput, pdf_file)
