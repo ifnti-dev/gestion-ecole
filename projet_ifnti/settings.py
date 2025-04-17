@@ -107,7 +107,7 @@ WSGI_APPLICATION = 'projet_ifnti.wsgi.application'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
 #Configuration des conditions de production ou de developpement
-IS_PRODUCTION = False
+IS_PRODUCTION = True
 
 if IS_PRODUCTION:
     DATABASES = {
@@ -117,7 +117,7 @@ if IS_PRODUCTION:
             'USER': os.getenv('DB_USER'),
             'PASSWORD': os.getenv('DB_PASSWORD'),
             'HOST': os.getenv('DB_FIRST_HOST'),
-            'HOST': os.getenv('DB_SECOND_HOST'),
+            # 'HOST': os.getenv('DB_SECOND_HOST'),
             'PORT': os.getenv('DB_PORT'),
         }
     }

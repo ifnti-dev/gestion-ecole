@@ -15,9 +15,10 @@ services:
       - db
     networks:
       - gestion_ifnti_network
+    # restart: always
 
   db:
-    image: postgres:13
+    image: postgres:14
     container_name: postgres_db
     environment:
       POSTGRES_USER: gestion_ifnti_user
@@ -25,6 +26,7 @@ services:
       POSTGRES_DB: gestion_ifnti_db
     volumes:
       - ./postgres_data:/var/lib/postgresql/data
+      - ./gestion_ifnti_db_backup.sql:/app/gestion_ifnti_db_backup.sql
     ports:
       - "5435:5432"
     networks:

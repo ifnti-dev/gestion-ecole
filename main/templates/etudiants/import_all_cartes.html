@@ -1,0 +1,596 @@
+
+{% extends '../index.html' %}
+{% load static %}
+
+<!-- {% block head %}
+    <script src="{% static 'assets/js/bootstrap.bundle.min.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'assets/css/all.min.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/bootstrap.min.css' %}">
+    
+{% endblock %} -->
+
+
+
+{% block styles %}
+<style>
+    :root {
+        --primary: #0d6efd;
+        --primary-light: #e7f1ff;
+        --secondary: #6f42c1;
+        --secondary-light: #f0e6ff;
+        --danger: #dc3545;
+        --danger-light: #f8d7da;
+    }
+    
+    body {
+        background-color: #f8f9fa;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    .dropzone {
+        border: 2px dashed #dee2e6;
+        background-color: #f8f9fa;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    
+    .dropzone.active {
+        border-color: var(--primary);
+        background-color: var(--primary-light);
+        box-shadow: 0 0.5rem 1rem rgba(13, 110, 253, 0.15);
+    }
+    
+    .image-card {
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    }
+    
+    .image-card:hover {
+        transform: translateY(-0.25rem);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+    }
+    
+    .image-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+    }
+    
+    .image-preview {
+        height: 140px;
+        object-fit: cover;
+        width: 100%;
+        transition: transform 0.3s ease;
+    }
+    
+    .image-card:hover .image-preview {
+        transform: scale(1.03);
+    }
+    
+    .progress-bar {
+        height: 0.5rem;
+        transition: width 0.4s ease;
+        background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+    }
+    
+    .checkbox-container {
+        position: absolute;
+        top: 0.5rem;
+        left: 0.5rem;
+        z-index: 10;
+    }
+    
+    .checkbox-input {
+        width: 1.25rem;
+        height: 1.25rem;
+        border-radius: 0.25rem;
+        border: 2px solid #dee2e6;
+        background-color: white;
+        appearance: none;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    
+    .checkbox-input:checked {
+        background-color: var(--primary);
+        border-color: var(--primary);
+    }
+    
+    .checkbox-input:checked::after {
+        content: '✓';
+        display: block;
+        color: white;
+        text-align: center;
+        line-height: 1rem;
+        font-size: 0.75rem;
+    }
+    
+    .selected {
+        border: 2px solid var(--primary);
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
+    
+    .gradient-text {
+        background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+    }
+    
+    .bounce-slow {
+        animation: bounceSlow 2s infinite;
+    }
+    
+    @keyframes bounceSlow {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+    }
+    
+    .fade-in {
+        animation: fadeIn 0.3s ease-in-out;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    
+    .toast-container {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- En-tête -->
+    <header class="text-center mb-5">
+        <div class="d-inline-block mb-4 p-3 rounded-3 bg-gradient" style="background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);">
+            <i class="fas fa-images text-white fs-3"></i>
+        </div>
+        <h1 class="display-4 fw-bold gradient-text mb-3">Gestion Carte Groupe</h1>
+        <p class="text-muted fs-5 mx-auto" style="max-width: 600px;">Envoyer vos cartes en groupes plus simplement</p>
+    </header>
+
+    <!-- Zone de dépôt -->
+    
+    <!-- <div class="mb-5">
+        <div id="dropzone" class="dropzone rounded-3 p-5 text-center">
+            <div class="d-flex flex-column align-items-center justify-content-center gap-4">
+                <div class="p-4 rounded-circle" style="background: linear-gradient(90deg, var(--primary-light) 0%, var(--secondary-light) 100%);">
+                    <i class="fas fa-cloud-upload-alt text-primary fs-1 bounce-slow"></i>
+                </div>
+                <h3 class="fs-3 fw-semibold">Glissez-déposez vos images ici</h3>
+                <p class="text-muted mb-4 mx-auto" style="max-width: 500px;">Sélectionnez ou déposez vos fichiers JPEG/JPG. Nous prenons en charge les images jusqu'à 10MB.</p>
+                <label for="fileInput" class="btn btn-primary px-4 py-2 shadow-sm">
+                    <i class="fas fa-folder-open me-2"></i> Parcourir vos fichiers
+                </label>
+                <input id="fileInput" type="file" class="d-none" multiple accept="image/jpeg, image/jpg">
+                <p class="text-muted small mt-3">
+                    <i class="fas fa-info-circle me-1"></i> Formats acceptés: JPEG, JPG (max 10MB)
+                </p>
+            </div>
+        </div>
+    </div> -->
+    <form method="post" action="{% url 'main:upload_photo_passport' %}" enctype="multipart/form-data" class="mb-5 mt-10">
+        {% csrf_token %}
+        <div id="dropzone" class="dropzone rounded-3 p-5 text-center">
+            <div class="d-flex flex-column align-items-center justify-content-center gap-4">
+                <div class="p-4 rounded-circle" style="background: linear-gradient(90deg, var(--primary-light) 0%, var(--secondary-light) 100%);">
+                    <i class="fas fa-cloud-upload-alt text-primary fs-1 bounce-slow"></i>
+                </div>
+                <h3 class="fs-3 fw-semibold">Glissez-déposez vos images ici</h3>
+                <p class="text-muted mb-4 mx-auto" style="max-width: 500px;">Sélectionnez ou déposez vos fichiers JPEG/JPG. Nous prenons en charge les images jusqu'à 10MB.</p>
+                <label for="fileInput" class="btn btn-primary px-4 py-2 shadow-sm">
+                    <i class="fas fa-folder-open me-2"></i> Parcourir vos fichiers
+                </label>
+                <input id="fileInput" type="file" class="d-none"  name= 'files' multiple accept="image/jpeg, image/jpg">
+                <p class="text-muted small mt-3">
+                    <i class="fas fa-info-circle me-1"></i> Formats acceptés: JPEG, JPG (max 10MB)
+                </p>
+            </div>
+        </div>
+        <div class="d-flex flex-column flex-md-row justify-content-center justify-content-md-between align-items-center gap-3">
+            <div class="d-flex align-items-center text-muted small">
+                <i class="fas fa-shield-alt me-2 text-primary"></i>
+                <span>Vos images sont sécurisées et ne seront pas partagées</span>
+            </div>
+            <div class="d-flex gap-2">
+                <button id="submitBtn" disabled type="submit" class="btn btn-primary px-4 py-2 shadow-sm">
+                    <i class="fas fa-paper-plane me-2"></i> Envoyer
+                </button>
+            </div>
+        </div>
+    </form>
+
+    <!-- Statistiques et actions -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 bg-white rounded-3 p-3 shadow-sm border">
+        <div class="d-flex align-items-center gap-3 mb-3 mb-md-0 flex-wrap">
+            <div class="d-flex align-items-center">
+                <span class="text-muted me-2"><i class="fas fa-images"></i></span>
+                <span id="fileCount" class="fw-medium">0 image(s)</span>
+            </div>
+            <div class="vr"></div>
+            <div class="d-flex align-items-center">
+                <span class="text-muted me-2"><i class="fas fa-database"></i></span>
+                <span id="totalSize" class="fw-medium">0 MB</span>
+            </div>
+            <div class="vr"></div>
+            <div class="d-flex align-items-center">
+                <span class="text-muted me-2"><i class="fas fa-check-circle"></i></span>
+                <span id="selectedCount" class="fw-medium">0 sélectionnée(s)</span>
+            </div>
+        </div>
+        <div class="d-flex gap-2 flex-wrap">
+            <button id="selectAllBtn" class="btn btn-outline-secondary btn-sm">
+                <i class="fas fa-check-square me-2"></i> Tout sélectionner
+            </button>
+            <button id="clearAllBtn" class="btn btn-outline-secondary btn-sm">
+                <i class="fas fa-trash-alt me-2"></i> Tout effacer
+            </button>
+            <button id="deleteSelectedBtn" disabled class="btn btn-outline-danger btn-sm">
+                <i class="fas fa-trash me-2"></i> Supprimer sélection
+            </button>
+        </div>
+    </div>
+
+    <!-- Galerie d'images -->
+    <div class="mb-5">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4">
+            <h2 class="fs-4 fw-semibold d-flex align-items-center">
+                <i class="fas fa-photo-video me-2 text-primary"></i> Votre collection
+            </h2>
+        </div>
+
+        <div id="imageGallery" class="row g-3">
+            <!-- État vide -->
+            <div id="emptyState" class="col-12 text-center py-5">
+                <div class="d-inline-block mb-3 p-3 rounded-circle bg-light">
+                    <i class="fas fa-image text-muted fs-3"></i>
+                </div>
+                <h3 class="h5 fw-medium text-muted mb-2">Votre galerie est vide</h3>
+                <p class="text-muted mx-auto" style="max-width: 500px;">Commencez par ajouter des images en les glissant-déposant ou en cliquant sur le bouton "Parcourir"</p>
+            </div>
+        </div>
+    </div>
+    
+    
+    <!-- Bouton d'envoi -->
+    <!-- <div class="d-flex flex-column flex-md-row justify-content-center justify-content-md-between align-items-center gap-3">
+        <div class="d-flex align-items-center text-muted small">
+            <i class="fas fa-shield-alt me-2 text-primary"></i>
+            <span>Vos images sont sécurisées et ne seront pas partagées</span>
+        </div>
+        <div class="d-flex gap-2">
+            <button id="submitBtn" disabled type="submit" class="btn btn-primary px-4 py-2 shadow-sm">
+                <i class="fas fa-paper-plane me-2"></i> Envoyer
+            </button>
+        </div>
+    </div> -->
+
+    <!-- Barre de progression -->
+    <div id="progressContainer" class="mt-4 d-none">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <span class="small fw-medium">Téléchargement en cours...</span>
+            <span id="progressPercent" class="small fw-medium">0%</span>
+        </div>
+        <div class="progress" style="height: 0.5rem;">
+            <div id="progressBar" class="progress-bar" style="width: 0%"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast notifications -->
+
+<div class="toast-container">
+    <div id="alertToast" class="toast align-items-center text-white border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body d-flex align-items-center">
+                <i id="alertIcon" class="me-2"></i>
+                <span id="alertMessage"></span>
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+</div>
+
+<!-- <script src="{% static 'assets/js/bootstrap.bundle.min.js' %}"></script> -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const dropzone = document.getElementById('dropzone');
+        const fileInput = document.getElementById('fileInput');
+        const imageGallery = document.getElementById('imageGallery');
+        const emptyState = document.getElementById('emptyState');
+        const fileCount = document.getElementById('fileCount');
+        const totalSize = document.getElementById('totalSize');
+        const selectedCount = document.getElementById('selectedCount');
+        const selectAllBtn = document.getElementById('selectAllBtn');
+        const clearAllBtn = document.getElementById('clearAllBtn');
+        const deleteSelectedBtn = document.getElementById('deleteSelectedBtn');
+        const submitBtn = document.getElementById('submitBtn');
+        const progressContainer = document.getElementById('progressContainer');
+        const progressBar = document.getElementById('progressBar');
+        const progressPercent = document.getElementById('progressPercent');
+
+        let files = [];
+        let selectedFiles = new Set();
+
+        // Gestion du drag and drop
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropzone.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropzone.addEventListener(eventName, highlight, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropzone.addEventListener(eventName, unhighlight, false);
+        });
+
+        function highlight() {
+            dropzone.classList.add('active');
+        }
+
+        function unhighlight() {
+            dropzone.classList.remove('active');
+        }
+
+        dropzone.addEventListener('drop', handleDrop, false);
+        fileInput.addEventListener('change', handleFiles, false);
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const droppedFiles = dt.files;
+            handleFiles({ target: { files: droppedFiles } });
+        }
+
+        function handleFiles(e) {
+            const newFiles = Array.from(e.target.files).filter(file => {
+                return file.type.match('image/jpeg') || file.type.match('image/jpg');
+            });
+
+            if (newFiles.length === 0) {
+                alert('Veuillez sélectionner uniquement des images JPEG/JPG.');
+                return;
+            }
+
+            files = [...files, ...newFiles];
+            updateFileList();
+            renderGallery();
+        }
+
+        function updateFileList() {
+            if (files.length > 0) {
+                emptyState.style.display = 'none';
+                submitBtn.disabled = false;
+            } else {
+                emptyState.style.display = 'block';
+                submitBtn.disabled = true;
+            }
+
+            // Met à jour le compteur de fichiers
+            fileCount.textContent = `${files.length} image${files.length !== 1 ? 's' : ''}`;
+
+            // Calcul la taille totale
+            const totalBytes = files.reduce((sum, file) => sum + file.size, 0);
+            const totalMB = (totalBytes / (1024 * 1024)).toFixed(2);
+            totalSize.textContent = `${totalMB} MB`;
+        }
+
+        function renderGallery() {
+            imageGallery.innerHTML = '';
+            console.log(files)
+            if (files.length === 0) {
+                emptyState.style.display = 'block';
+                return;
+            }
+
+            files.forEach((file, index) => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const card = document.createElement('div');
+                    card.className = 'image-card rounded-lg overflow-hidden relative group';
+                    card.dataset.index = index;
+
+                    const isSelected = selectedFiles.has(index);
+                    if (isSelected) {
+                        card.classList.add('selected');
+                    }
+
+                    card.innerHTML = `
+                        <div class="checkbox-container">
+                            <input type="checkbox" class="checkbox-input" ${isSelected ? 'checked' : ''}>
+                        </div>
+                        <img src="${e.target.result}" alt="${file.name}" class="image-preview">
+                        <div class="p-3">
+                            <p class="text-sm font-medium text-gray-800 truncate">${file.name}</p>
+                            <p class="text-xs text-gray-500">${(file.size / (1024 * 1024)).toFixed(2)} MB</p>
+                        </div>
+                    `;
+
+                    imageGallery.appendChild(card);
+
+                    // Ajouter les écouteurs d'événements
+                    const checkbox = card.querySelector('.checkbox-input');
+                    checkbox.addEventListener('change', function() {
+                        toggleSelection(index, this.checked);
+                    });
+
+                    card.addEventListener('click', function(e) {
+                        if (e.target !== checkbox) {
+                            checkbox.checked = !checkbox.checked;
+                            toggleSelection(index, checkbox.checked);
+                        }
+                    });
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function toggleSelection(index, isSelected) {
+            if (isSelected) {
+                selectedFiles.add(index);
+            } else {
+                selectedFiles.delete(index);
+            }
+
+            updateSelectedCount();
+            updateCardSelection(index, isSelected);
+            updateDeleteSelectedButton();
+        }
+
+        function updateSelectedCount() {
+            selectedCount.textContent = `${selectedFiles.size} sélectionnée${selectedFiles.size !== 1 ? 's' : ''}`;
+        }
+
+        function updateCardSelection(index, isSelected) {
+            const cards = document.querySelectorAll('.image-card');
+            if (cards[index]) {
+                if (isSelected) {
+                    cards[index].classList.add('selected');
+                } else {
+                    cards[index].classList.remove('selected');
+                }
+            }
+        }
+
+        function updateDeleteSelectedButton() {
+            deleteSelectedBtn.disabled = selectedFiles.size === 0;
+        }
+
+        function removeFile(index) {
+            files.splice(index, 1);
+
+            // Mettre à jour les sélections
+            const newSelectedFiles = new Set();
+            selectedFiles.forEach(selectedIndex => {
+                if (selectedIndex < index) {
+                    newSelectedFiles.add(selectedIndex);
+                } else if (selectedIndex > index) {
+                    newSelectedFiles.add(selectedIndex - 1);
+                }
+            });
+            selectedFiles = newSelectedFiles;
+
+            updateFileList();
+            renderGallery();
+            updateSelectedCount();
+            updateDeleteSelectedButton();
+        }
+
+        function removeSelectedFiles() {
+            if (selectedFiles.size === 0) return;
+
+            // Supprimer les fichiers sélectionnés (en ordre décroissant pour éviter les problèmes d'index)
+            const sortedIndices = Array.from(selectedFiles).sort((a, b) => b - a);
+            sortedIndices.forEach(index => {
+                files.splice(index, 1);
+            });
+
+            selectedFiles.clear();
+            updateFileList();
+            renderGallery();
+            updateSelectedCount();
+            updateDeleteSelectedButton();
+        }
+
+        function selectAllFiles() {
+            selectedFiles.clear();
+            for (let i = 0; i < files.length; i++) {
+                selectedFiles.add(i);
+            }
+
+            updateSelectedCount();
+            renderGallery();
+            updateDeleteSelectedButton();
+        }
+
+        function clearAllFiles() {
+            files = [];
+            selectedFiles.clear();
+            updateFileList();
+            renderGallery();
+            updateSelectedCount();
+            updateDeleteSelectedButton();
+        }
+
+        // Écouteurs d'événements pour les boutons
+        selectAllBtn.addEventListener('click', selectAllFiles);
+        clearAllBtn.addEventListener('click', clearAllFiles);
+        deleteSelectedBtn.addEventListener('click', removeSelectedFiles);
+
+        // Simulation d'envoi
+        submitBtn.addEventListener('click', function() {
+            if (files.length === 0) return;
+
+            progressContainer.classList.remove('hidden');
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.random() * 10;
+                if (progress > 100) progress = 100;
+                progressBar.style.width = `${progress}%`;
+                progressPercent.textContent = `${Math.floor(progress)}%`;
+
+                if (progress === 100) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        progressContainer.classList.add('hidden');
+                        progressBar.style.width = '0%';
+                        progressPercent.textContent = '0%';
+                        alert('Vos images ont été envoyées avec succès!');
+                    }, 1000);
+                }
+            }, 200);
+        });
+    });
+</script>
+<script>
+    function showAlert(type, message) {
+        const toast = new bootstrap.Toast(document.getElementById('alertToast'));
+        const alertToast = document.getElementById('alertToast');
+        const alertIcon = document.getElementById('alertIcon');
+        const alertMessage = document.getElementById('alertMessage');
+
+        switch (type) {
+            case 'success':
+                alertToast.className = 'toast align-items-center text-white bg-success border-0';
+                alertIcon.className = 'fas fa-check-circle';
+                break;
+            case 'error':
+                alertToast.className = 'toast align-items-center text-white bg-danger border-0';
+                alertIcon.className = 'fas fa-exclamation-circle';
+                break;
+            case 'info':
+                alertToast.className = 'toast align-items-center text-white bg-info border-0';
+                alertIcon.className = 'fas fa-info-circle';
+                break;
+            case 'warning':
+                alertToast.className = 'toast align-items-center text-white bg-warning border-0';
+                alertIcon.className = 'fas fa-exclamation-triangle';
+                break;
+            default:
+                alertToast.className = 'toast align-items-center text-white bg-secondary border-0';
+                alertIcon.className = 'fas fa-bell';
+        }
+
+        alertMessage.textContent = message;
+        toast.show();
+    }
+</script>
+
+{% endblock %}

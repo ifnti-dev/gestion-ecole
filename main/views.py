@@ -871,8 +871,10 @@ def carte_etudiant(request, id, niveau):
     out_format = "%d-%m-%Y"
 
     etudiant.datenaissance = etudiant.datenaissance if etudiant.datenaissance else ""
-    etudiant.photo = "/".join(etudiant.photo_passport.__str__().split('/')[1:]) if etudiant.photo_passport and etudiant.photo_passport != "" else "photo_passports/default.png"
-    etudiant.photo = os.path.join(BASE_DIR, 'media') + '/images/' + etudiant.photo
+    # etudiant.photo = "/".join(etudiant.photo_passport.__str__().split('/')[1:]) if etudiant.photo_passport and etudiant.photo_passport != "" else "photo_passports/default.png"
+    # etudiant.photo = os.path.join(BASE_DIR, 'media') + '/images/' + etudiant.photo
+
+    etudiant.photo =  os.path.join(BASE_DIR, f"media/photo_passports/{etudiant.id}.jpg")
 
     context = {'etudiant': etudiant, 'niveau': niveau, 'annee': str(
         annee_universitaire.annee) + '-' + str(annee_universitaire.annee + 1)}
@@ -941,9 +943,9 @@ def carte_etudiant_all(request, niveau):
         # etudiant.photo = os.path.join(BASE_DIR, 'media') + '/images/' + etudiant.photo
 
         print(os.path.exists(f"media/{etudiant.photo_passport}"))
-
-        if os.path.isfile("media/"+str(etudiant.photo_passport)):
-            etudiant.photo= os.path.join(BASE_DIR, f"media/{etudiant.photo_passport}")
+        photo_passport = f"media/photo_passports/{etudiant.id}.jpg"
+        if os.path.isfile(photo_passport):
+            etudiant.photo= os.path.join(BASE_DIR, photo_passport)
         else :
             etudiant.photo=os.path.join(BASE_DIR, 'media/images/photo_passports/default.png')
 
@@ -2799,13 +2801,58 @@ def importer_data(request):
 
 
 
+# def upload_photo_passports(request):
+#     from projet_ifnti.settings import BASE_DIR
+    
+
+#     print("gfffffffffffffffffffffffffffffffffffffff")
+#     if request.method=="POST":
+#         print(request.FILES)
+#         print(request.POST)
+#         print("hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh")
+#         if request.FILES.getlist('files'):
+#             print("ggggggggggggggggggggggggggggggggggggg")
+#             files=request.FILES.getlist('files')
+#             for file in files:
+#                 file_path=os.path.join(f"{BASE_DIR}/photo_passports", file)
+#                 with open(file_path, 'wb+') as destination:
+#                     for chunk in file.chunks():
+#                         destination.write(chunk)
+#         return redirect("main:etudiants")
+#     else:
+#         return render(request, 'etudiants/import_all_cartes.html', {})
+
+
+
+import os
+from django.conf import settings
+from django.contrib import messages
+from django.shortcuts import redirect, render
+
 def upload_photo_passports(request):
-    from projet_ifnti.settings import BASE_DIR
-    if request.method=="POST" and request.FILES.getlist('file'):
-        files=request.FILES.getlist('file')
+    if request.method == "POST":
+        files = request.FILES.getlist('files')
+
+        if not files:
+            messages.error(request, "Aucun fichier sélectionné.")
+            return redirect("main:etudiants")
+
+        photo_passport_dir = os.path.join(settings.BASE_DIR, 'media/photo_passports')
+        os.makedirs(photo_passport_dir, exist_ok=True)
+
         for file in files:
-            file_path=os.path.join(f"{BASE_DIR}/photo_passports", file)
-            with open(file_path, 'wb+') as destination:
-                for chunk in file.chunks():
-                    destination.write(chunk)
-    redirect("main:etudiants")
+            file_path = os.path.join(photo_passport_dir, file.name)
+
+            try:
+                with open(file_path, 'wb+') as destination:
+                    for chunk in file.chunks():
+                        destination.write(chunk)
+            except Exception as e:
+                messages.error(request, f"Erreur lors du téléchargement de {file.name} : {e}")
+                return redirect("main:etudiants")
+
+        messages.success(request, "✅ Toutes les images ont été téléchargées avec succès.")
+        return redirect("main:etudiants")
+    
+    return render(request, 'etudiants/import_all_cartes.html')
+

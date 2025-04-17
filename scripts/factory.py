@@ -8,6 +8,7 @@ from django.contrib.auth.models import Group, Permission
 
 def run():
     users = User.objects.exclude(username__in=["wella", "marthe"])
+
     for user in users:
         user.delete()
     
@@ -27,6 +28,7 @@ def clean_data_base():
     except Exception as e:
         print(e)
         print(model)
+
         
 def create_faker():      
     print("::::::::::::::::::::::: Create Faker Data :::::::::::::::::::::::")
